@@ -1637,8 +1637,9 @@ fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId
     let mut out: Vec<TypeRef> = Vec::new();
     if flatten_into(ty, cgctx, scope, true, &mut out) {
         pair_typed_array_slice(&mut out, cgctx, scope);
-        if CodegenContext::generic_mono(cgctx) {
-            out = group_buffers(out, cgctx, scope);
+        match CodegenContext::generic_mono(cgctx) {
+            true => out = group_buffers(out, cgctx, scope),
+            false => add_buffer_bytes(&mut out, cgctx, scope),
         }
         return split_null_arm(out);
     }
@@ -1677,7 +1678,11 @@ pub(crate) fn is_buffer(ty: &TypeRef) -> bool {
 }
 
 /// Whether `ty` is the two classes of a `buffer`, or an alias of them.
-fn names_buffer(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> bool {
+pub(crate) fn names_buffer(
+    ty: &TypeRef,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> bool {
     let (mut t, mut at) = (ty.clone(), scope);
     for _ in 0..8 {
         if super::ir_types::buffer_pair(&t) {
@@ -1747,6 +1752,40 @@ fn group_buffers(
         }
     }
     alts
+}
+
+/// Without per-monomorphization a `buffer` keeps an alternative per class
+/// and takes its bytes as one more after them, a copy like the slice
+/// beside a typed array.
+fn add_buffer_bytes(alts: &mut Vec<TypeRef>, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId) {
+    let peel = |t: &TypeRef| match t.split_empties() {
+        Some((core, n)) => (core, Some(n)),
+        None => (t.clone(), None),
+    };
+    if alts
+        .iter()
+        .any(|t| matches!(peel(t).0, TypeRef::TypedSlice(..)))
+    {
+        return;
+    }
+    let find = |is: &dyn Fn(&TypeRef) -> bool| alts.iter().position(|t| is(&peel(t).0));
+    let last = match find(&|t| names_buffer(t, cgctx, scope)) {
+        Some(whole) => whole,
+        None => {
+            let buffer = find(&|t| t.as_ident() == Some("ArrayBuffer"));
+            let view = find(&|t| matches!(t, TypeRef::ArrayBufferView));
+            match (buffer, view) {
+                (Some(b), Some(v)) if peel(&alts[b]).1 == peel(&alts[v]).1 => b.max(v),
+                _ => return,
+            }
+        }
+    };
+    let bytes = TypeRef::TypedSlice(crate::ir::TypedArrayElement::U8, SharedMemory::Accepted);
+    let bytes = match peel(&alts[last]).1 {
+        Some(n) => bytes.with_empties(n),
+        None => bytes,
+    };
+    alts.insert(last + 1, bytes);
 }
 
 /// A written `null` is an ordinary union arm: each alternative is taken
@@ -2614,7 +2653,7 @@ fn mono_argument_type(ty: &TypeRef) -> Option<TokenStream> {
     if let Some((core, n)) = ty.split_empties() {
         let inner = match &core {
             TypeRef::String | TypeRef::StringLiteral(_) => quote! { &str },
-            core if is_buffer(core) => quote! { &[u8] },
+            core if is_buffer(core) => quote! { impl ::js_sys::BufferSourceLike },
             _ => return None,
         };
         return Some(typemap::nullable_carrier(inner, n, true));

@@ -1008,6 +1008,18 @@ pub mod web_assembly {
     ) -> Result<bool, JsValue> {
         __try_validate(bytes.into())
     }
+    #[wasm_bindgen]
+    extern "C" {
+        #[wasm_bindgen(js_name = "validate", js_namespace = "WebAssembly")]
+        pub fn validate_with_slice(#[wasm_bindgen(slice = "copy")] bytes: &[u8]) -> bool;
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "validate", js_namespace = "WebAssembly")]
+        pub fn try_validate_with_slice(
+            #[wasm_bindgen(slice = "copy")] bytes: &[u8],
+        ) -> Result<bool, JsValue>;
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -2918,6 +2930,18 @@ extern "C" {
         this: &Navigator,
         url: &str,
         body: &Object,
+    ) -> Result<bool, JsValue>;
+    #[wasm_bindgen(method, js_name = "sendBeacon")]
+    pub fn send_beacon_with_slice(
+        this: &Navigator,
+        url: &str,
+        #[wasm_bindgen(slice = "copy")] body: &[u8],
+    ) -> bool;
+    #[wasm_bindgen(method, catch, js_name = "sendBeacon")]
+    pub fn try_send_beacon_with_slice(
+        this: &Navigator,
+        url: &str,
+        #[wasm_bindgen(slice = "copy")] body: &[u8],
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "sendBeacon")]
     pub fn send_beacon_with_blob(this: &Navigator, url: &str, body: &Blob) -> bool;
@@ -6382,6 +6406,46 @@ extern "C" {
         key: &CryptoKey,
         plain_text: &Object,
     ) -> Promise<ArrayBuffer>;
+    #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
+    #[wasm_bindgen(method, catch, js_name = "encrypt")]
+    pub async fn encrypt_with_slice(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] plain_text: &[u8],
+    ) -> Result<ArrayBuffer, JsValue>;
+    #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
+    #[wasm_bindgen(method, js_name = "encrypt")]
+    pub fn encrypt_with_slice_promise(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] plain_text: &[u8],
+    ) -> Promise<ArrayBuffer>;
+    #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
+    #[wasm_bindgen(method, catch, js_name = "encrypt")]
+    pub async fn encrypt_with_algorithm_and_slice(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoEncryptAlgorithm,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] plain_text: &[u8],
+    ) -> Result<ArrayBuffer, JsValue>;
+    #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
+    #[wasm_bindgen(method, js_name = "encrypt")]
+    pub fn encrypt_with_algorithm_and_slice_promise(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoEncryptAlgorithm,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] plain_text: &[u8],
+    ) -> Promise<ArrayBuffer>;
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
@@ -6462,6 +6526,46 @@ extern "C" {
         key: &CryptoKey,
         cipher_text: &Object,
     ) -> Promise<ArrayBuffer>;
+    #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
+    #[wasm_bindgen(method, catch, js_name = "decrypt")]
+    pub async fn decrypt_with_slice(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] cipher_text: &[u8],
+    ) -> Result<ArrayBuffer, JsValue>;
+    #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
+    #[wasm_bindgen(method, js_name = "decrypt")]
+    pub fn decrypt_with_slice_promise(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] cipher_text: &[u8],
+    ) -> Promise<ArrayBuffer>;
+    #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
+    #[wasm_bindgen(method, catch, js_name = "decrypt")]
+    pub async fn decrypt_with_algorithm_and_slice(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoEncryptAlgorithm,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] cipher_text: &[u8],
+    ) -> Result<ArrayBuffer, JsValue>;
+    #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
+    #[wasm_bindgen(method, js_name = "decrypt")]
+    pub fn decrypt_with_algorithm_and_slice_promise(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoEncryptAlgorithm,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] cipher_text: &[u8],
+    ) -> Promise<ArrayBuffer>;
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
@@ -6541,6 +6645,46 @@ extern "C" {
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
         data: &Object,
+    ) -> Promise<ArrayBuffer>;
+    #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
+    #[wasm_bindgen(method, catch, js_name = "sign")]
+    pub async fn sign_with_slice(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Result<ArrayBuffer, JsValue>;
+    #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
+    #[wasm_bindgen(method, js_name = "sign")]
+    pub fn sign_with_slice_promise(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Promise<ArrayBuffer>;
+    #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
+    #[wasm_bindgen(method, catch, js_name = "sign")]
+    pub async fn sign_with_algorithm_and_slice(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoSignAlgorithm,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Result<ArrayBuffer, JsValue>;
+    #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
+    #[wasm_bindgen(method, js_name = "sign")]
+    pub fn sign_with_algorithm_and_slice_promise(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoSignAlgorithm,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
@@ -6634,6 +6778,50 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, catch, js_name = "verify")]
+    pub async fn verify_with_str_and_slice_and_array_buffer(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] signature: &[u8],
+        data: &ArrayBuffer,
+    ) -> Result<bool, JsValue>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, js_name = "verify")]
+    pub fn verify_with_str_and_slice_and_array_buffer_promise(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] signature: &[u8],
+        data: &ArrayBuffer,
+    ) -> Promise<Boolean>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, catch, js_name = "verify")]
+    pub async fn verify_with_algorithm_and_slice_and_array_buffer(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoSignAlgorithm,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] signature: &[u8],
+        data: &ArrayBuffer,
+    ) -> Result<bool, JsValue>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, js_name = "verify")]
+    pub fn verify_with_algorithm_and_slice_and_array_buffer_promise(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoSignAlgorithm,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] signature: &[u8],
+        data: &ArrayBuffer,
+    ) -> Promise<Boolean>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, catch, js_name = "verify")]
     pub async fn verify_with_str_and_array_buffer_and_typed_array(
         this: &SubtleCrypto,
         algorithm: &str,
@@ -6718,6 +6906,182 @@ extern "C" {
         signature: &Object,
         data: &Object,
     ) -> Promise<Boolean>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, catch, js_name = "verify")]
+    pub async fn verify_with_slice_and_typed_array(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] signature: &[u8],
+        data: &Object,
+    ) -> Result<bool, JsValue>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, js_name = "verify")]
+    pub fn verify_with_slice_and_typed_array_promise(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] signature: &[u8],
+        data: &Object,
+    ) -> Promise<Boolean>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, catch, js_name = "verify")]
+    pub async fn verify_with_algorithm_and_slice_and_typed_array(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoSignAlgorithm,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] signature: &[u8],
+        data: &Object,
+    ) -> Result<bool, JsValue>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, js_name = "verify")]
+    pub fn verify_with_algorithm_and_slice_and_typed_array_promise(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoSignAlgorithm,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] signature: &[u8],
+        data: &Object,
+    ) -> Promise<Boolean>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, catch, js_name = "verify")]
+    pub async fn verify_with_str_and_array_buffer_and_slice(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        key: &CryptoKey,
+        signature: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Result<bool, JsValue>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, js_name = "verify")]
+    pub fn verify_with_str_and_array_buffer_and_slice_promise(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        key: &CryptoKey,
+        signature: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Promise<Boolean>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, catch, js_name = "verify")]
+    pub async fn verify_with_algorithm_and_array_buffer_and_slice(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoSignAlgorithm,
+        key: &CryptoKey,
+        signature: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Result<bool, JsValue>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, js_name = "verify")]
+    pub fn verify_with_algorithm_and_array_buffer_and_slice_promise(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoSignAlgorithm,
+        key: &CryptoKey,
+        signature: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Promise<Boolean>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, catch, js_name = "verify")]
+    pub async fn verify_with_typed_array_and_slice(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        key: &CryptoKey,
+        signature: &Object,
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Result<bool, JsValue>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, js_name = "verify")]
+    pub fn verify_with_typed_array_and_slice_promise(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        key: &CryptoKey,
+        signature: &Object,
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Promise<Boolean>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, catch, js_name = "verify")]
+    pub async fn verify_with_algorithm_and_typed_array_and_slice(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoSignAlgorithm,
+        key: &CryptoKey,
+        signature: &Object,
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Result<bool, JsValue>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, js_name = "verify")]
+    pub fn verify_with_algorithm_and_typed_array_and_slice_promise(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoSignAlgorithm,
+        key: &CryptoKey,
+        signature: &Object,
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Promise<Boolean>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, catch, js_name = "verify")]
+    pub async fn verify_with_slice_and_slice(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] signature: &[u8],
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Result<bool, JsValue>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, js_name = "verify")]
+    pub fn verify_with_slice_and_slice_promise(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] signature: &[u8],
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Promise<Boolean>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, catch, js_name = "verify")]
+    pub async fn verify_with_algorithm_and_slice_and_slice(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoSignAlgorithm,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] signature: &[u8],
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Result<bool, JsValue>;
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    #[wasm_bindgen(method, js_name = "verify")]
+    pub fn verify_with_algorithm_and_slice_and_slice_promise(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoSignAlgorithm,
+        key: &CryptoKey,
+        #[wasm_bindgen(slice = "copy")] signature: &[u8],
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Promise<Boolean>;
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
@@ -6789,6 +7153,42 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoHashAlgorithm,
         data: &Object,
+    ) -> Promise<ArrayBuffer>;
+    #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
+    #[wasm_bindgen(method, catch, js_name = "digest")]
+    pub async fn digest_with_slice(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Result<ArrayBuffer, JsValue>;
+    #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
+    #[wasm_bindgen(method, js_name = "digest")]
+    pub fn digest_with_slice_promise(
+        this: &SubtleCrypto,
+        algorithm: &str,
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Promise<ArrayBuffer>;
+    #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
+    #[wasm_bindgen(method, catch, js_name = "digest")]
+    pub async fn digest_with_algorithm_and_slice(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoHashAlgorithm,
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Result<ArrayBuffer, JsValue>;
+    #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
+    #[wasm_bindgen(method, js_name = "digest")]
+    pub fn digest_with_algorithm_and_slice_promise(
+        this: &SubtleCrypto,
+        algorithm: &SubtleCryptoHashAlgorithm,
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`generateKey()`** method of the SubtleCrypto interface is used to generate a new key (for symmetric algorithms) or key pair (for public-key algorithms)."]
     #[doc = ""]
@@ -7054,6 +7454,30 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
+    pub async fn import_key_with_slice(
+        this: &SubtleCrypto,
+        format: &str,
+        #[wasm_bindgen(slice = "copy")] key_data: &[u8],
+        algorithm: &str,
+        extractable: bool,
+        key_usages: &[String],
+    ) -> Result<CryptoKey, JsValue>;
+    #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
+    #[wasm_bindgen(method, js_name = "importKey")]
+    pub fn import_key_with_slice_promise(
+        this: &SubtleCrypto,
+        format: &str,
+        #[wasm_bindgen(slice = "copy")] key_data: &[u8],
+        algorithm: &str,
+        extractable: bool,
+        key_usages: &[String],
+    ) -> Promise<CryptoKey>;
+    #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
+    #[wasm_bindgen(method, catch, js_name = "importKey")]
     pub async fn import_key_with_key_data(
         this: &SubtleCrypto,
         format: &str,
@@ -7118,6 +7542,30 @@ extern "C" {
         this: &SubtleCrypto,
         format: &str,
         key_data: &Object,
+        algorithm: &SubtleCryptoImportKeyAlgorithm,
+        extractable: bool,
+        key_usages: &[String],
+    ) -> Promise<CryptoKey>;
+    #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
+    #[wasm_bindgen(method, catch, js_name = "importKey")]
+    pub async fn import_key_with_slice_and_algorithm(
+        this: &SubtleCrypto,
+        format: &str,
+        #[wasm_bindgen(slice = "copy")] key_data: &[u8],
+        algorithm: &SubtleCryptoImportKeyAlgorithm,
+        extractable: bool,
+        key_usages: &[String],
+    ) -> Result<CryptoKey, JsValue>;
+    #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
+    #[wasm_bindgen(method, js_name = "importKey")]
+    pub fn import_key_with_slice_and_algorithm_promise(
+        this: &SubtleCrypto,
+        format: &str,
+        #[wasm_bindgen(slice = "copy")] key_data: &[u8],
         algorithm: &SubtleCryptoImportKeyAlgorithm,
         extractable: bool,
         key_usages: &[String],
@@ -7264,6 +7712,34 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
+    pub async fn unwrap_key_with_slice(
+        this: &SubtleCrypto,
+        format: &str,
+        #[wasm_bindgen(slice = "copy")] wrapped_key: &[u8],
+        unwrapping_key: &CryptoKey,
+        unwrap_algorithm: &str,
+        unwrapped_key_algorithm: &str,
+        extractable: bool,
+        key_usages: &[String],
+    ) -> Result<CryptoKey, JsValue>;
+    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
+    #[wasm_bindgen(method, js_name = "unwrapKey")]
+    pub fn unwrap_key_with_slice_promise(
+        this: &SubtleCrypto,
+        format: &str,
+        #[wasm_bindgen(slice = "copy")] wrapped_key: &[u8],
+        unwrapping_key: &CryptoKey,
+        unwrap_algorithm: &str,
+        unwrapped_key_algorithm: &str,
+        extractable: bool,
+        key_usages: &[String],
+    ) -> Promise<CryptoKey>;
+    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
+    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
     pub async fn unwrap_key_with_unwrap_algorithm(
         this: &SubtleCrypto,
         format: &str,
@@ -7310,6 +7786,34 @@ extern "C" {
         this: &SubtleCrypto,
         format: &str,
         wrapped_key: &Object,
+        unwrapping_key: &CryptoKey,
+        unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
+        unwrapped_key_algorithm: &str,
+        extractable: bool,
+        key_usages: &[String],
+    ) -> Promise<CryptoKey>;
+    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
+    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
+    pub async fn unwrap_key_with_slice_and_unwrap_algorithm(
+        this: &SubtleCrypto,
+        format: &str,
+        #[wasm_bindgen(slice = "copy")] wrapped_key: &[u8],
+        unwrapping_key: &CryptoKey,
+        unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
+        unwrapped_key_algorithm: &str,
+        extractable: bool,
+        key_usages: &[String],
+    ) -> Result<CryptoKey, JsValue>;
+    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
+    #[wasm_bindgen(method, js_name = "unwrapKey")]
+    pub fn unwrap_key_with_slice_and_unwrap_algorithm_promise(
+        this: &SubtleCrypto,
+        format: &str,
+        #[wasm_bindgen(slice = "copy")] wrapped_key: &[u8],
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
         unwrapped_key_algorithm: &str,
@@ -7376,6 +7880,34 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
+    pub async fn unwrap_key_with_slice_and_unwrapped_key_algorithm(
+        this: &SubtleCrypto,
+        format: &str,
+        #[wasm_bindgen(slice = "copy")] wrapped_key: &[u8],
+        unwrapping_key: &CryptoKey,
+        unwrap_algorithm: &str,
+        unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
+        extractable: bool,
+        key_usages: &[String],
+    ) -> Result<CryptoKey, JsValue>;
+    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
+    #[wasm_bindgen(method, js_name = "unwrapKey")]
+    pub fn unwrap_key_with_slice_and_unwrapped_key_algorithm_promise(
+        this: &SubtleCrypto,
+        format: &str,
+        #[wasm_bindgen(slice = "copy")] wrapped_key: &[u8],
+        unwrapping_key: &CryptoKey,
+        unwrap_algorithm: &str,
+        unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
+        extractable: bool,
+        key_usages: &[String],
+    ) -> Promise<CryptoKey>;
+    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
+    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
     pub async fn unwrap_key_with_unwrap_algorithm_and_unwrapped_key_algorithm(
         this: &SubtleCrypto,
         format: &str,
@@ -7428,6 +7960,34 @@ extern "C" {
         extractable: bool,
         key_usages: &[String],
     ) -> Promise<CryptoKey>;
+    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
+    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
+    pub async fn unwrap_key_with_slice_and_unwrap_algorithm_and_unwrapped_key_algorithm(
+        this: &SubtleCrypto,
+        format: &str,
+        #[wasm_bindgen(slice = "copy")] wrapped_key: &[u8],
+        unwrapping_key: &CryptoKey,
+        unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
+        unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
+        extractable: bool,
+        key_usages: &[String],
+    ) -> Result<CryptoKey, JsValue>;
+    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
+    #[wasm_bindgen(method, js_name = "unwrapKey")]
+    pub fn unwrap_key_with_slice_and_unwrap_algorithm_and_unwrapped_key_algorithm_promise(
+        this: &SubtleCrypto,
+        format: &str,
+        #[wasm_bindgen(slice = "copy")] wrapped_key: &[u8],
+        unwrapping_key: &CryptoKey,
+        unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
+        unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
+        extractable: bool,
+        key_usages: &[String],
+    ) -> Promise<CryptoKey>;
     #[wasm_bindgen(method, js_name = "timingSafeEqual")]
     pub fn timing_safe_equal(this: &SubtleCrypto, a: &ArrayBuffer, b: &ArrayBuffer) -> bool;
     #[wasm_bindgen(method, catch, js_name = "timingSafeEqual")]
@@ -7446,6 +8006,18 @@ extern "C" {
     pub fn try_timing_safe_equal_with_typed_array_and_array_buffer(
         this: &SubtleCrypto,
         a: &Object,
+        b: &ArrayBuffer,
+    ) -> Result<bool, JsValue>;
+    #[wasm_bindgen(method, js_name = "timingSafeEqual")]
+    pub fn timing_safe_equal_with_slice_and_array_buffer(
+        this: &SubtleCrypto,
+        #[wasm_bindgen(slice = "copy")] a: &[u8],
+        b: &ArrayBuffer,
+    ) -> bool;
+    #[wasm_bindgen(method, catch, js_name = "timingSafeEqual")]
+    pub fn try_timing_safe_equal_with_slice_and_array_buffer(
+        this: &SubtleCrypto,
+        #[wasm_bindgen(slice = "copy")] a: &[u8],
         b: &ArrayBuffer,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "timingSafeEqual")]
@@ -7471,6 +8043,54 @@ extern "C" {
         this: &SubtleCrypto,
         a: &Object,
         b: &Object,
+    ) -> Result<bool, JsValue>;
+    #[wasm_bindgen(method, js_name = "timingSafeEqual")]
+    pub fn timing_safe_equal_with_slice_and_typed_array(
+        this: &SubtleCrypto,
+        #[wasm_bindgen(slice = "copy")] a: &[u8],
+        b: &Object,
+    ) -> bool;
+    #[wasm_bindgen(method, catch, js_name = "timingSafeEqual")]
+    pub fn try_timing_safe_equal_with_slice_and_typed_array(
+        this: &SubtleCrypto,
+        #[wasm_bindgen(slice = "copy")] a: &[u8],
+        b: &Object,
+    ) -> Result<bool, JsValue>;
+    #[wasm_bindgen(method, js_name = "timingSafeEqual")]
+    pub fn timing_safe_equal_with_array_buffer_and_slice(
+        this: &SubtleCrypto,
+        a: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] b: &[u8],
+    ) -> bool;
+    #[wasm_bindgen(method, catch, js_name = "timingSafeEqual")]
+    pub fn try_timing_safe_equal_with_array_buffer_and_slice(
+        this: &SubtleCrypto,
+        a: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] b: &[u8],
+    ) -> Result<bool, JsValue>;
+    #[wasm_bindgen(method, js_name = "timingSafeEqual")]
+    pub fn timing_safe_equal_with_typed_array_and_slice(
+        this: &SubtleCrypto,
+        a: &Object,
+        #[wasm_bindgen(slice = "copy")] b: &[u8],
+    ) -> bool;
+    #[wasm_bindgen(method, catch, js_name = "timingSafeEqual")]
+    pub fn try_timing_safe_equal_with_typed_array_and_slice(
+        this: &SubtleCrypto,
+        a: &Object,
+        #[wasm_bindgen(slice = "copy")] b: &[u8],
+    ) -> Result<bool, JsValue>;
+    #[wasm_bindgen(method, js_name = "timingSafeEqual")]
+    pub fn timing_safe_equal_with_slice_and_slice(
+        this: &SubtleCrypto,
+        #[wasm_bindgen(slice = "copy")] a: &[u8],
+        #[wasm_bindgen(slice = "copy")] b: &[u8],
+    ) -> bool;
+    #[wasm_bindgen(method, catch, js_name = "timingSafeEqual")]
+    pub fn try_timing_safe_equal_with_slice_and_slice(
+        this: &SubtleCrypto,
+        #[wasm_bindgen(slice = "copy")] a: &[u8],
+        #[wasm_bindgen(slice = "copy")] b: &[u8],
     ) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen]
@@ -7757,14 +8377,23 @@ extern "C" {
     pub fn name(this: &SubtleCryptoDeriveKeyAlgorithm) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_name(this: &SubtleCryptoDeriveKeyAlgorithm, val: &str);
-    #[wasm_bindgen(method, getter)]
-    pub fn salt(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "salt")]
+    pub fn salt_js_buffer(
+        this: &SubtleCryptoDeriveKeyAlgorithm,
+    ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "salt")]
+    fn __salt(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_salt(this: &SubtleCryptoDeriveKeyAlgorithm, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "salt")]
     pub fn set_salt_with_typed_array<T: ::js_sys::TypedArray>(
         this: &SubtleCryptoDeriveKeyAlgorithm,
         val: &T,
+    );
+    #[wasm_bindgen(method, setter, js_name = "salt")]
+    pub fn set_salt_with_slice(
+        this: &SubtleCryptoDeriveKeyAlgorithm,
+        #[wasm_bindgen(slice = "copy")] val: &[u8],
     );
     #[wasm_bindgen(method, getter)]
     pub fn iterations(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<f64>;
@@ -7783,8 +8412,12 @@ extern "C" {
     pub fn public(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<CryptoKey>;
     #[wasm_bindgen(method, setter, js_name = "$public")]
     pub fn set_public(this: &SubtleCryptoDeriveKeyAlgorithm, val: &CryptoKey);
-    #[wasm_bindgen(method, getter)]
-    pub fn info(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "info")]
+    pub fn info_js_buffer(
+        this: &SubtleCryptoDeriveKeyAlgorithm,
+    ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "info")]
+    fn __info(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_info(this: &SubtleCryptoDeriveKeyAlgorithm, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "info")]
@@ -7792,6 +8425,21 @@ extern "C" {
         this: &SubtleCryptoDeriveKeyAlgorithm,
         val: &T,
     );
+    #[wasm_bindgen(method, setter, js_name = "info")]
+    pub fn set_info_with_slice(
+        this: &SubtleCryptoDeriveKeyAlgorithm,
+        #[wasm_bindgen(slice = "copy")] val: &[u8],
+    );
+}
+impl SubtleCryptoDeriveKeyAlgorithm {
+    pub fn salt(&self) -> Option<Vec<u8>> {
+        let v = self.__salt();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
+    pub fn info(&self) -> Option<Vec<u8>> {
+        let v = self.__info();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
 }
 impl SubtleCryptoDeriveKeyAlgorithm {
     pub fn new(name: &str) -> SubtleCryptoDeriveKeyAlgorithm {
@@ -7813,6 +8461,10 @@ impl SubtleCryptoDeriveKeyAlgorithmBuilder {
     }
     pub fn salt_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_salt_with_typed_array(val);
+        self
+    }
+    pub fn salt_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_salt_with_slice(val);
         self
     }
     pub fn iterations(self, val: f64) -> Self {
@@ -7839,6 +8491,10 @@ impl SubtleCryptoDeriveKeyAlgorithmBuilder {
         self.inner.set_info_with_typed_array(val);
         self
     }
+    pub fn info_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_info_with_slice(val);
+        self
+    }
     pub fn build(self) -> SubtleCryptoDeriveKeyAlgorithm {
         self.inner
     }
@@ -7857,8 +8513,12 @@ extern "C" {
     pub fn name(this: &SubtleCryptoEncryptAlgorithm) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_name(this: &SubtleCryptoEncryptAlgorithm, val: &str);
-    #[wasm_bindgen(method, getter)]
-    pub fn iv(this: &SubtleCryptoEncryptAlgorithm) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "iv")]
+    pub fn iv_js_buffer(
+        this: &SubtleCryptoEncryptAlgorithm,
+    ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "iv")]
+    fn __iv(this: &SubtleCryptoEncryptAlgorithm) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_iv(this: &SubtleCryptoEncryptAlgorithm, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "iv")]
@@ -7866,10 +8526,17 @@ extern "C" {
         this: &SubtleCryptoEncryptAlgorithm,
         val: &T,
     );
+    #[wasm_bindgen(method, setter, js_name = "iv")]
+    pub fn set_iv_with_slice(
+        this: &SubtleCryptoEncryptAlgorithm,
+        #[wasm_bindgen(slice = "copy")] val: &[u8],
+    );
     #[wasm_bindgen(method, getter, js_name = "additionalData")]
-    pub fn additional_data(
+    pub fn additional_data_js_buffer(
         this: &SubtleCryptoEncryptAlgorithm,
     ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "additionalData")]
+    fn __additional_data(this: &SubtleCryptoEncryptAlgorithm) -> Option<JsValue>;
     #[wasm_bindgen(method, setter, js_name = "additionalData")]
     pub fn set_additional_data(this: &SubtleCryptoEncryptAlgorithm, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "additionalData")]
@@ -7877,12 +8544,21 @@ extern "C" {
         this: &SubtleCryptoEncryptAlgorithm,
         val: &T,
     );
+    #[wasm_bindgen(method, setter, js_name = "additionalData")]
+    pub fn set_additional_data_with_slice(
+        this: &SubtleCryptoEncryptAlgorithm,
+        #[wasm_bindgen(slice = "copy")] val: &[u8],
+    );
     #[wasm_bindgen(method, getter, js_name = "tagLength")]
     pub fn tag_length(this: &SubtleCryptoEncryptAlgorithm) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "tagLength")]
     pub fn set_tag_length(this: &SubtleCryptoEncryptAlgorithm, val: f64);
-    #[wasm_bindgen(method, getter)]
-    pub fn counter(this: &SubtleCryptoEncryptAlgorithm) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "counter")]
+    pub fn counter_js_buffer(
+        this: &SubtleCryptoEncryptAlgorithm,
+    ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "counter")]
+    fn __counter(this: &SubtleCryptoEncryptAlgorithm) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_counter(this: &SubtleCryptoEncryptAlgorithm, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "counter")]
@@ -7890,12 +8566,21 @@ extern "C" {
         this: &SubtleCryptoEncryptAlgorithm,
         val: &T,
     );
+    #[wasm_bindgen(method, setter, js_name = "counter")]
+    pub fn set_counter_with_slice(
+        this: &SubtleCryptoEncryptAlgorithm,
+        #[wasm_bindgen(slice = "copy")] val: &[u8],
+    );
     #[wasm_bindgen(method, getter)]
     pub fn length(this: &SubtleCryptoEncryptAlgorithm) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_length(this: &SubtleCryptoEncryptAlgorithm, val: f64);
-    #[wasm_bindgen(method, getter)]
-    pub fn label(this: &SubtleCryptoEncryptAlgorithm) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "label")]
+    pub fn label_js_buffer(
+        this: &SubtleCryptoEncryptAlgorithm,
+    ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "label")]
+    fn __label(this: &SubtleCryptoEncryptAlgorithm) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_label(this: &SubtleCryptoEncryptAlgorithm, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "label")]
@@ -7903,6 +8588,29 @@ extern "C" {
         this: &SubtleCryptoEncryptAlgorithm,
         val: &T,
     );
+    #[wasm_bindgen(method, setter, js_name = "label")]
+    pub fn set_label_with_slice(
+        this: &SubtleCryptoEncryptAlgorithm,
+        #[wasm_bindgen(slice = "copy")] val: &[u8],
+    );
+}
+impl SubtleCryptoEncryptAlgorithm {
+    pub fn iv(&self) -> Option<Vec<u8>> {
+        let v = self.__iv();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
+    pub fn additional_data(&self) -> Option<Vec<u8>> {
+        let v = self.__additional_data();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
+    pub fn counter(&self) -> Option<Vec<u8>> {
+        let v = self.__counter();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
+    pub fn label(&self) -> Option<Vec<u8>> {
+        let v = self.__label();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
 }
 impl SubtleCryptoEncryptAlgorithm {
     pub fn new(name: &str) -> SubtleCryptoEncryptAlgorithm {
@@ -7926,12 +8634,20 @@ impl SubtleCryptoEncryptAlgorithmBuilder {
         self.inner.set_iv_with_typed_array(val);
         self
     }
+    pub fn iv_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_iv_with_slice(val);
+        self
+    }
     pub fn additional_data(self, val: &ArrayBuffer) -> Self {
         self.inner.set_additional_data(val);
         self
     }
     pub fn additional_data_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_additional_data_with_typed_array(val);
+        self
+    }
+    pub fn additional_data_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_additional_data_with_slice(val);
         self
     }
     pub fn tag_length(self, val: f64) -> Self {
@@ -7946,6 +8662,10 @@ impl SubtleCryptoEncryptAlgorithmBuilder {
         self.inner.set_counter_with_typed_array(val);
         self
     }
+    pub fn counter_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_counter_with_slice(val);
+        self
+    }
     pub fn length(self, val: f64) -> Self {
         self.inner.set_length(val);
         self
@@ -7956,6 +8676,10 @@ impl SubtleCryptoEncryptAlgorithmBuilder {
     }
     pub fn label_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_label_with_typed_array(val);
+        self
+    }
+    pub fn label_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_label_with_slice(val);
         self
     }
     pub fn build(self) -> SubtleCryptoEncryptAlgorithm {
@@ -7990,15 +8714,22 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "modulusLength")]
     pub fn set_modulus_length(this: &SubtleCryptoGenerateKeyAlgorithm, val: f64);
     #[wasm_bindgen(method, getter, js_name = "publicExponent")]
-    pub fn public_exponent(
+    pub fn public_exponent_js_buffer(
         this: &SubtleCryptoGenerateKeyAlgorithm,
     ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "publicExponent")]
+    fn __public_exponent(this: &SubtleCryptoGenerateKeyAlgorithm) -> Option<JsValue>;
     #[wasm_bindgen(method, setter, js_name = "publicExponent")]
     pub fn set_public_exponent(this: &SubtleCryptoGenerateKeyAlgorithm, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "publicExponent")]
     pub fn set_public_exponent_with_typed_array<T: ::js_sys::TypedArray>(
         this: &SubtleCryptoGenerateKeyAlgorithm,
         val: &T,
+    );
+    #[wasm_bindgen(method, setter, js_name = "publicExponent")]
+    pub fn set_public_exponent_with_slice(
+        this: &SubtleCryptoGenerateKeyAlgorithm,
+        #[wasm_bindgen(slice = "copy")] val: &[u8],
     );
     #[wasm_bindgen(method, getter)]
     pub fn length(this: &SubtleCryptoGenerateKeyAlgorithm) -> Option<f64>;
@@ -8008,6 +8739,12 @@ extern "C" {
     pub fn named_curve(this: &SubtleCryptoGenerateKeyAlgorithm) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "namedCurve")]
     pub fn set_named_curve(this: &SubtleCryptoGenerateKeyAlgorithm, val: &str);
+}
+impl SubtleCryptoGenerateKeyAlgorithm {
+    pub fn public_exponent(&self) -> Option<Vec<u8>> {
+        let v = self.__public_exponent();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
 }
 impl SubtleCryptoGenerateKeyAlgorithm {
     pub fn new(name: &str) -> SubtleCryptoGenerateKeyAlgorithm {
@@ -8041,6 +8778,10 @@ impl SubtleCryptoGenerateKeyAlgorithmBuilder {
     }
     pub fn public_exponent_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_public_exponent_with_typed_array(val);
+        self
+    }
+    pub fn public_exponent_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_public_exponent_with_slice(val);
         self
     }
     pub fn length(self, val: f64) -> Self {
@@ -8297,7 +9038,11 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "modulusLength")]
     pub fn set_modulus_length(this: &CryptoKeyRsaKeyAlgorithm, val: f64);
     #[wasm_bindgen(method, getter, js_name = "publicExponent")]
-    pub fn public_exponent(this: &CryptoKeyRsaKeyAlgorithm) -> ArrayBufferOrArrayBufferView;
+    pub fn public_exponent_js_buffer(
+        this: &CryptoKeyRsaKeyAlgorithm,
+    ) -> ArrayBufferOrArrayBufferView;
+    #[wasm_bindgen(method, getter, js_name = "publicExponent")]
+    fn __public_exponent(this: &CryptoKeyRsaKeyAlgorithm) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "publicExponent")]
     pub fn set_public_exponent(this: &CryptoKeyRsaKeyAlgorithm, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "publicExponent")]
@@ -8305,10 +9050,21 @@ extern "C" {
         this: &CryptoKeyRsaKeyAlgorithm,
         val: &T,
     );
+    #[wasm_bindgen(method, setter, js_name = "publicExponent")]
+    pub fn set_public_exponent_with_slice(
+        this: &CryptoKeyRsaKeyAlgorithm,
+        #[wasm_bindgen(slice = "copy")] val: &[u8],
+    );
     #[wasm_bindgen(method, getter)]
     pub fn hash(this: &CryptoKeyRsaKeyAlgorithm) -> Option<CryptoKeyKeyAlgorithm>;
     #[wasm_bindgen(method, setter)]
     pub fn set_hash(this: &CryptoKeyRsaKeyAlgorithm, val: &CryptoKeyKeyAlgorithm);
+}
+impl CryptoKeyRsaKeyAlgorithm {
+    pub fn public_exponent(&self) -> Vec<u8> {
+        let v = self.__public_exponent();
+        __ts_gen_buffer_bytes(&v)
+    }
 }
 impl CryptoKeyRsaKeyAlgorithm {
     pub fn new(
@@ -8324,6 +9080,13 @@ impl CryptoKeyRsaKeyAlgorithm {
         public_exponent: &T,
     ) -> CryptoKeyRsaKeyAlgorithm {
         Self::builder_with_typed_array(name, modulus_length, public_exponent).build()
+    }
+    pub fn new_with_slice(
+        name: &str,
+        modulus_length: f64,
+        public_exponent: &[u8],
+    ) -> CryptoKeyRsaKeyAlgorithm {
+        Self::builder_with_slice(name, modulus_length, public_exponent).build()
     }
     pub fn builder(
         name: &str,
@@ -8345,6 +9108,17 @@ impl CryptoKeyRsaKeyAlgorithm {
         inner.set_name(name);
         inner.set_modulus_length(modulus_length);
         inner.set_public_exponent_with_typed_array(public_exponent);
+        CryptoKeyRsaKeyAlgorithmBuilder { inner }
+    }
+    pub fn builder_with_slice(
+        name: &str,
+        modulus_length: f64,
+        public_exponent: &[u8],
+    ) -> CryptoKeyRsaKeyAlgorithmBuilder {
+        let inner: CryptoKeyRsaKeyAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_name(name);
+        inner.set_modulus_length(modulus_length);
+        inner.set_public_exponent_with_slice(public_exponent);
         CryptoKeyRsaKeyAlgorithmBuilder { inner }
     }
 }
@@ -8514,6 +9288,22 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, js_name = "decode")]
+    pub fn decode_with_slice(
+        this: &TextDecoder,
+        #[wasm_bindgen(slice = "copy")] input: &[u8],
+    ) -> String;
+    #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
+    #[wasm_bindgen(method, catch, js_name = "decode")]
+    pub fn try_decode_with_slice(
+        this: &TextDecoder,
+        #[wasm_bindgen(slice = "copy")] input: &[u8],
+    ) -> Result<String, JsValue>;
+    #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
+    #[wasm_bindgen(method, js_name = "decode")]
     pub fn decode_with_array_buffer_and_options(
         this: &TextDecoder,
         input: Option<&ArrayBuffer>,
@@ -8544,6 +9334,24 @@ extern "C" {
     pub fn try_decode_with_typed_array_and_options(
         this: &TextDecoder,
         input: &Object,
+        options: &TextDecoderDecodeOptions,
+    ) -> Result<String, JsValue>;
+    #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
+    #[wasm_bindgen(method, js_name = "decode")]
+    pub fn decode_with_slice_and_options(
+        this: &TextDecoder,
+        #[wasm_bindgen(slice = "copy")] input: &[u8],
+        options: &TextDecoderDecodeOptions,
+    ) -> String;
+    #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
+    #[wasm_bindgen(method, catch, js_name = "decode")]
+    pub fn try_decode_with_slice_and_options(
+        this: &TextDecoder,
+        #[wasm_bindgen(slice = "copy")] input: &[u8],
         options: &TextDecoderDecodeOptions,
     ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -10228,6 +11036,9 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_typed_array(body: &Object) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_slice(#[wasm_bindgen(slice = "copy")] body: &[u8])
+        -> Result<Response, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
     pub fn new_with_blob(body: &Blob) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_search_params(body: &URLSearchParams) -> Result<Response, JsValue>;
@@ -10250,6 +11061,11 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_typed_array_and_init(
         body: &Object,
+        init: &ResponseInit,
+    ) -> Result<Response, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_slice_and_init(
+        #[wasm_bindgen(slice = "copy")] body: &[u8],
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -10752,6 +11568,11 @@ extern "C" {
         val: &T,
     );
     #[wasm_bindgen(method, setter, js_name = "body")]
+    pub fn set_body_with_slice<Cf: ::wasm_bindgen::JsGeneric>(
+        this: &RequestInit<Cf>,
+        #[wasm_bindgen(slice = "copy")] val: &[u8],
+    );
+    #[wasm_bindgen(method, setter, js_name = "body")]
     pub fn set_body_with_blob<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &Blob);
     #[wasm_bindgen(method, setter, js_name = "body")]
     pub fn set_body_with_url_search_params<Cf: ::wasm_bindgen::JsGeneric>(
@@ -10886,6 +11707,10 @@ impl<Cf: ::wasm_bindgen::JsGeneric> RequestInitBuilder<Cf> {
     }
     pub fn body_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_body_with_typed_array(val);
+        self
+    }
+    pub fn body_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_body_with_slice(val);
         self
     }
     pub fn body_with_blob(self, val: &Blob) -> Self {
@@ -11584,6 +12409,18 @@ extern "C" {
         value: &Object,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
+    pub async fn put_with_slice(
+        this: &KVNamespace,
+        key: &str,
+        #[wasm_bindgen(slice = "copy")] value: &[u8],
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_with_slice_promise(
+        this: &KVNamespace,
+        key: &str,
+        #[wasm_bindgen(slice = "copy")] value: &[u8],
+    ) -> Promise<Undefined>;
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_readable_stream<R: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace,
         key: &str,
@@ -11635,6 +12472,20 @@ extern "C" {
         this: &KVNamespace,
         key: &str,
         value: &Object,
+        options: &KVNamespacePutOptions,
+    ) -> Promise<Undefined>;
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    pub async fn put_with_slice_and_options(
+        this: &KVNamespace,
+        key: &str,
+        #[wasm_bindgen(slice = "copy")] value: &[u8],
+        options: &KVNamespacePutOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_with_slice_and_options_promise(
+        this: &KVNamespace,
+        key: &str,
+        #[wasm_bindgen(slice = "copy")] value: &[u8],
         options: &KVNamespacePutOptions,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
@@ -14009,6 +14860,18 @@ extern "C" {
         value: &Object,
     ) -> Promise<JsNullable<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
+    pub async fn put_with_slice(
+        this: &R2Bucket,
+        key: &str,
+        #[wasm_bindgen(slice = "copy")] value: &[u8],
+    ) -> Result<Option<R2Object>, JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_with_slice_promise(
+        this: &R2Bucket,
+        key: &str,
+        #[wasm_bindgen(slice = "copy")] value: &[u8],
+    ) -> Promise<JsNullable<R2Object>>;
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_str(
         this: &R2Bucket,
         key: &str,
@@ -14086,6 +14949,20 @@ extern "C" {
         this: &R2Bucket,
         key: &str,
         value: &Object,
+        options: &R2BucketPutOptions,
+    ) -> Promise<JsNullable<R2Object>>;
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    pub async fn put_with_slice_and_r2_bucket_put_options(
+        this: &R2Bucket,
+        key: &str,
+        #[wasm_bindgen(slice = "copy")] value: &[u8],
+        options: &R2BucketPutOptions,
+    ) -> Result<Option<R2Object>, JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_with_slice_and_r2_bucket_put_options_promise(
+        this: &R2Bucket,
+        key: &str,
+        #[wasm_bindgen(slice = "copy")] value: &[u8],
         options: &R2BucketPutOptions,
     ) -> Promise<JsNullable<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
@@ -14170,6 +15047,20 @@ extern "C" {
         this: &R2Bucket,
         key: &str,
         value: &Object,
+        options: &R2PutOptions,
+    ) -> Promise<R2Object>;
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    pub async fn put_with_slice_and_r2_put_options(
+        this: &R2Bucket,
+        key: &str,
+        #[wasm_bindgen(slice = "copy")] value: &[u8],
+        options: &R2PutOptions,
+    ) -> Result<R2Object, JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_with_slice_and_r2_put_options_promise(
+        this: &R2Bucket,
+        key: &str,
+        #[wasm_bindgen(slice = "copy")] value: &[u8],
         options: &R2PutOptions,
     ) -> Promise<R2Object>;
     #[wasm_bindgen(method, catch, js_name = "put")]
@@ -14431,6 +15322,10 @@ impl R2BucketPutOptionsBuilder {
         self.inner.set_md5_with_typed_array(val);
         self
     }
+    pub fn md5_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_md5_with_slice(val);
+        self
+    }
     pub fn md5_with_str(self, val: &str) -> Self {
         self.inner.set_md5_with_str(val);
         self
@@ -14441,6 +15336,10 @@ impl R2BucketPutOptionsBuilder {
     }
     pub fn sha1_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_sha1_with_typed_array(val);
+        self
+    }
+    pub fn sha1_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_sha1_with_slice(val);
         self
     }
     pub fn sha1_with_str(self, val: &str) -> Self {
@@ -14455,6 +15354,10 @@ impl R2BucketPutOptionsBuilder {
         self.inner.set_sha256_with_typed_array(val);
         self
     }
+    pub fn sha256_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_sha256_with_slice(val);
+        self
+    }
     pub fn sha256_with_str(self, val: &str) -> Self {
         self.inner.set_sha256_with_str(val);
         self
@@ -14467,6 +15370,10 @@ impl R2BucketPutOptionsBuilder {
         self.inner.set_sha384_with_typed_array(val);
         self
     }
+    pub fn sha384_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_sha384_with_slice(val);
+        self
+    }
     pub fn sha384_with_str(self, val: &str) -> Self {
         self.inner.set_sha384_with_str(val);
         self
@@ -14477,6 +15384,10 @@ impl R2BucketPutOptionsBuilder {
     }
     pub fn sha512_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_sha512_with_typed_array(val);
+        self
+    }
+    pub fn sha512_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_sha512_with_slice(val);
         self
     }
     pub fn sha512_with_str(self, val: &str) -> Self {
@@ -14550,6 +15461,18 @@ extern "C" {
         value: &Object,
     ) -> Promise<R2UploadedPart>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
+    pub async fn upload_part_with_slice(
+        this: &R2MultipartUpload,
+        part_number: f64,
+        #[wasm_bindgen(slice = "copy")] value: &[u8],
+    ) -> Result<R2UploadedPart, JsValue>;
+    #[wasm_bindgen(method, js_name = "uploadPart")]
+    pub fn upload_part_with_slice_promise(
+        this: &R2MultipartUpload,
+        part_number: f64,
+        #[wasm_bindgen(slice = "copy")] value: &[u8],
+    ) -> Promise<R2UploadedPart>;
+    #[wasm_bindgen(method, catch, js_name = "uploadPart")]
     pub async fn upload_part_with_str(
         this: &R2MultipartUpload,
         part_number: f64,
@@ -14613,6 +15536,20 @@ extern "C" {
         this: &R2MultipartUpload,
         part_number: f64,
         value: &Object,
+        options: &R2UploadPartOptions,
+    ) -> Promise<R2UploadedPart>;
+    #[wasm_bindgen(method, catch, js_name = "uploadPart")]
+    pub async fn upload_part_with_slice_and_options(
+        this: &R2MultipartUpload,
+        part_number: f64,
+        #[wasm_bindgen(slice = "copy")] value: &[u8],
+        options: &R2UploadPartOptions,
+    ) -> Result<R2UploadedPart, JsValue>;
+    #[wasm_bindgen(method, js_name = "uploadPart")]
+    pub fn upload_part_with_slice_and_options_promise(
+        this: &R2MultipartUpload,
+        part_number: f64,
+        #[wasm_bindgen(slice = "copy")] value: &[u8],
         options: &R2UploadPartOptions,
     ) -> Promise<R2UploadedPart>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
@@ -14986,6 +15923,8 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "md5")]
     pub fn set_md5_with_typed_array<T: ::js_sys::TypedArray>(this: &R2PutOptions, val: &T);
     #[wasm_bindgen(method, setter, js_name = "md5")]
+    pub fn set_md5_with_slice(this: &R2PutOptions, #[wasm_bindgen(slice = "copy")] val: &[u8]);
+    #[wasm_bindgen(method, setter, js_name = "md5")]
     pub fn set_md5_with_str(this: &R2PutOptions, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn sha1(this: &R2PutOptions) -> Option<BufferOrStr>;
@@ -14993,6 +15932,8 @@ extern "C" {
     pub fn set_sha1(this: &R2PutOptions, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "sha1")]
     pub fn set_sha1_with_typed_array<T: ::js_sys::TypedArray>(this: &R2PutOptions, val: &T);
+    #[wasm_bindgen(method, setter, js_name = "sha1")]
+    pub fn set_sha1_with_slice(this: &R2PutOptions, #[wasm_bindgen(slice = "copy")] val: &[u8]);
     #[wasm_bindgen(method, setter, js_name = "sha1")]
     pub fn set_sha1_with_str(this: &R2PutOptions, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -15002,6 +15943,8 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "sha256")]
     pub fn set_sha256_with_typed_array<T: ::js_sys::TypedArray>(this: &R2PutOptions, val: &T);
     #[wasm_bindgen(method, setter, js_name = "sha256")]
+    pub fn set_sha256_with_slice(this: &R2PutOptions, #[wasm_bindgen(slice = "copy")] val: &[u8]);
+    #[wasm_bindgen(method, setter, js_name = "sha256")]
     pub fn set_sha256_with_str(this: &R2PutOptions, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn sha384(this: &R2PutOptions) -> Option<BufferOrStr>;
@@ -15010,6 +15953,8 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "sha384")]
     pub fn set_sha384_with_typed_array<T: ::js_sys::TypedArray>(this: &R2PutOptions, val: &T);
     #[wasm_bindgen(method, setter, js_name = "sha384")]
+    pub fn set_sha384_with_slice(this: &R2PutOptions, #[wasm_bindgen(slice = "copy")] val: &[u8]);
+    #[wasm_bindgen(method, setter, js_name = "sha384")]
     pub fn set_sha384_with_str(this: &R2PutOptions, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn sha512(this: &R2PutOptions) -> Option<BufferOrStr>;
@@ -15017,6 +15962,8 @@ extern "C" {
     pub fn set_sha512(this: &R2PutOptions, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "sha512")]
     pub fn set_sha512_with_typed_array<T: ::js_sys::TypedArray>(this: &R2PutOptions, val: &T);
+    #[wasm_bindgen(method, setter, js_name = "sha512")]
+    pub fn set_sha512_with_slice(this: &R2PutOptions, #[wasm_bindgen(slice = "copy")] val: &[u8]);
     #[wasm_bindgen(method, setter, js_name = "sha512")]
     pub fn set_sha512_with_str(this: &R2PutOptions, val: &str);
     #[wasm_bindgen(method, getter, js_name = "storageClass")]
@@ -15077,6 +16024,10 @@ impl R2PutOptionsBuilder {
         self.inner.set_md5_with_typed_array(val);
         self
     }
+    pub fn md5_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_md5_with_slice(val);
+        self
+    }
     pub fn md5_with_str(self, val: &str) -> Self {
         self.inner.set_md5_with_str(val);
         self
@@ -15087,6 +16038,10 @@ impl R2PutOptionsBuilder {
     }
     pub fn sha1_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_sha1_with_typed_array(val);
+        self
+    }
+    pub fn sha1_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_sha1_with_slice(val);
         self
     }
     pub fn sha1_with_str(self, val: &str) -> Self {
@@ -15101,6 +16056,10 @@ impl R2PutOptionsBuilder {
         self.inner.set_sha256_with_typed_array(val);
         self
     }
+    pub fn sha256_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_sha256_with_slice(val);
+        self
+    }
     pub fn sha256_with_str(self, val: &str) -> Self {
         self.inner.set_sha256_with_str(val);
         self
@@ -15113,6 +16072,10 @@ impl R2PutOptionsBuilder {
         self.inner.set_sha384_with_typed_array(val);
         self
     }
+    pub fn sha384_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_sha384_with_slice(val);
+        self
+    }
     pub fn sha384_with_str(self, val: &str) -> Self {
         self.inner.set_sha384_with_str(val);
         self
@@ -15123,6 +16086,10 @@ impl R2PutOptionsBuilder {
     }
     pub fn sha512_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_sha512_with_typed_array(val);
+        self
+    }
+    pub fn sha512_with_slice(self, val: &[u8]) -> Self {
+        self.inner.set_sha512_with_slice(val);
         self
     }
     pub fn sha512_with_str(self, val: &str) -> Self {
@@ -16668,6 +17635,22 @@ extern "C" {
         this: &ReadableStreamBYOBRequest,
         view: &Object,
     ) -> Result<(), JsValue>;
+    #[doc = " The **`respondWithNewView()`** method of the ReadableStreamBYOBRequest interface specifies a new view that the consumer of the associated readable byte stream should write to instead of ReadableStreamBYOBRequest.view."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/respondWithNewView)"]
+    #[wasm_bindgen(method, js_name = "respondWithNewView")]
+    pub fn respond_with_new_view_with_slice(
+        this: &ReadableStreamBYOBRequest,
+        #[wasm_bindgen(slice = "copy")] view: &[u8],
+    );
+    #[doc = " The **`respondWithNewView()`** method of the ReadableStreamBYOBRequest interface specifies a new view that the consumer of the associated readable byte stream should write to instead of ReadableStreamBYOBRequest.view."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/respondWithNewView)"]
+    #[wasm_bindgen(method, catch, js_name = "respondWithNewView")]
+    pub fn try_respond_with_new_view_with_slice(
+        this: &ReadableStreamBYOBRequest,
+        #[wasm_bindgen(slice = "copy")] view: &[u8],
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter, js_name = "atLeast")]
     pub fn at_least(this: &ReadableStreamBYOBRequest) -> Option<f64>;
 }
@@ -16790,6 +17773,22 @@ extern "C" {
     pub fn try_enqueue_with_typed_array(
         this: &ReadableByteStreamController,
         chunk: &Object,
+    ) -> Result<(), JsValue>;
+    #[doc = " The **`enqueue()`** method of the ReadableByteStreamController interface enqueues a given chunk on the associated readable byte stream (the chunk is copied into the stream's internal queues)."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/enqueue)"]
+    #[wasm_bindgen(method, js_name = "enqueue")]
+    pub fn enqueue_with_slice(
+        this: &ReadableByteStreamController,
+        #[wasm_bindgen(slice = "copy")] chunk: &[u8],
+    );
+    #[doc = " The **`enqueue()`** method of the ReadableByteStreamController interface enqueues a given chunk on the associated readable byte stream (the chunk is copied into the stream's internal queues)."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/enqueue)"]
+    #[wasm_bindgen(method, catch, js_name = "enqueue")]
+    pub fn try_enqueue_with_slice(
+        this: &ReadableByteStreamController,
+        #[wasm_bindgen(slice = "copy")] chunk: &[u8],
     ) -> Result<(), JsValue>;
     #[doc = " The **`error()`** method of the ReadableByteStreamController interface causes any future interactions with the associated stream to error with the specified reason."]
     #[doc = ""]
@@ -18925,6 +19924,19 @@ extern "C" {
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
     #[wasm_bindgen(method, catch, js_name = "send")]
     pub fn try_send_with_typed_array(this: &WebSocket, message: &Object) -> Result<(), JsValue>;
+    #[doc = " The **`WebSocket.send()`** method enqueues the specified data to be transmitted to the server over the WebSocket connection, increasing the value of `bufferedAmount` by the number of bytes needed to contain the data."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
+    #[wasm_bindgen(method, js_name = "send")]
+    pub fn send_with_slice(this: &WebSocket, #[wasm_bindgen(slice = "copy")] message: &[u8]);
+    #[doc = " The **`WebSocket.send()`** method enqueues the specified data to be transmitted to the server over the WebSocket connection, increasing the value of `bufferedAmount` by the number of bytes needed to contain the data."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
+    #[wasm_bindgen(method, catch, js_name = "send")]
+    pub fn try_send_with_slice(
+        this: &WebSocket,
+        #[wasm_bindgen(slice = "copy")] message: &[u8],
+    ) -> Result<(), JsValue>;
     #[doc = " The **`WebSocket.send()`** method enqueues the specified data to be transmitted to the server over the WebSocket connection, increasing the value of `bufferedAmount` by the number of bytes needed to contain the data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
@@ -47844,6 +48856,11 @@ extern "C" {
     pub fn set_content_with_array_buffer(this: &EmailAttachment, val: &ArrayBuffer);
     #[wasm_bindgen(method, setter, js_name = "content")]
     pub fn set_content_with_typed_array<T: ::js_sys::TypedArray>(this: &EmailAttachment, val: &T);
+    #[wasm_bindgen(method, setter, js_name = "content")]
+    pub fn set_content_with_slice(
+        this: &EmailAttachment,
+        #[wasm_bindgen(slice = "copy")] val: &[u8],
+    );
 }
 impl EmailAttachment {
     #[doc = " Construct with `disposition: \"inline\"`."]
@@ -47891,6 +48908,21 @@ impl EmailAttachment {
         inner.set_content_with_typed_array(content);
         inner
     }
+    #[doc = " Construct with `disposition: \"inline\"`."]
+    pub fn new_inline_with_slice(
+        content_id: &str,
+        filename: &str,
+        r#type: &str,
+        content: &[u8],
+    ) -> EmailAttachment {
+        let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(EmailAttachmentDisposition::Inline);
+        inner.set_content_id(content_id);
+        inner.set_filename(filename);
+        inner.set_type(r#type);
+        inner.set_content_with_slice(content);
+        inner
+    }
     #[doc = " Construct with `disposition: \"attachment\"`."]
     pub fn new_attachment(filename: &str, r#type: &str, content: &str) -> EmailAttachment {
         Self::builder_attachment(filename, r#type, content).build()
@@ -47910,6 +48942,14 @@ impl EmailAttachment {
         content: &T,
     ) -> EmailAttachment {
         Self::builder_attachment_with_typed_array(filename, r#type, content).build()
+    }
+    #[doc = " Construct with `disposition: \"attachment\"`."]
+    pub fn new_attachment_with_slice(
+        filename: &str,
+        r#type: &str,
+        content: &[u8],
+    ) -> EmailAttachment {
+        Self::builder_attachment_with_slice(filename, r#type, content).build()
     }
     #[doc = " Start a builder with `disposition: \"attachment\"`."]
     pub fn builder_attachment(
@@ -47948,6 +48988,19 @@ impl EmailAttachment {
         inner.set_filename(filename);
         inner.set_type(r#type);
         inner.set_content_with_typed_array(content);
+        EmailAttachmentBuilder { inner }
+    }
+    #[doc = " Start a builder with `disposition: \"attachment\"`."]
+    pub fn builder_attachment_with_slice(
+        filename: &str,
+        r#type: &str,
+        content: &[u8],
+    ) -> EmailAttachmentBuilder {
+        let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition(EmailAttachmentDisposition::Attachment);
+        inner.set_filename(filename);
+        inner.set_type(r#type);
+        inner.set_content_with_slice(content);
         EmailAttachmentBuilder { inner }
     }
 }
@@ -70930,4 +71983,27 @@ impl WebSocket {
             options,
         )
     }
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "Uint8Array")]
+    type __TsGenBytes;
+    #[wasm_bindgen(constructor, js_class = "Uint8Array")]
+    fn new(buffer: &JsValue, offset: f64, length: f64) -> __TsGenBytes;
+    #[wasm_bindgen(method, getter, js_class = "Uint8Array")]
+    fn buffer(this: &__TsGenBytes) -> JsValue;
+    #[wasm_bindgen(method, getter, js_class = "Uint8Array", js_name = "byteOffset")]
+    fn byte_offset(this: &__TsGenBytes) -> f64;
+    #[wasm_bindgen(method, getter, js_class = "Uint8Array", js_name = "byteLength")]
+    fn byte_length(this: &__TsGenBytes) -> f64;
+    # [wasm_bindgen (js_namespace = ArrayBuffer , js_name = "isView")]
+    fn __ts_gen_is_view(value: &JsValue) -> bool;
+}
+fn __ts_gen_buffer_bytes(value: &JsValue) -> Vec<u8> {
+    let view: &__TsGenBytes = ::wasm_bindgen::JsCast::unchecked_ref(value);
+    let bytes = match __ts_gen_is_view(value) {
+        true => __TsGenBytes::new(&view.buffer(), view.byte_offset(), view.byte_length()),
+        false => __TsGenBytes::new(value, 0.0, view.byte_length()),
+    };
+    ::wasm_bindgen::JsCast::unchecked_into::<::js_sys::Uint8Array>(bytes).to_vec()
 }

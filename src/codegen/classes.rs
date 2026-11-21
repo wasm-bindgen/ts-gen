@@ -3143,9 +3143,11 @@ fn constructor_binding(
     let generics = render_generic_bounds(&bounds);
 
     let literal = super::inline_wrappers::literal_attr(sig);
+    let buffer_read = super::inline_wrappers::buffer_result_attr(sig, config.cgctx);
     quote! {
         #doc
         #literal
+        #buffer_read
         #[wasm_bindgen(#(#wb_parts),*)]
         pub fn #rust_ident #generics (#params) -> #ret;
     }
@@ -3209,9 +3211,11 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     let this_generics = config.type_generics_args();
 
     let literal = super::inline_wrappers::literal_attr(sig);
+    let buffer_read = super::inline_wrappers::buffer_result_attr(sig, config.cgctx);
     quote! {
         #doc
         #literal
+        #buffer_read
         #[wasm_bindgen(#(#wb_parts),*)]
         pub #async_kw fn #rust_ident #method_generics (this: &#this_type #this_generics, #params) #ret;
     }
@@ -3286,9 +3290,11 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     let generics = render_generic_bounds(&bounds);
 
     let literal = super::inline_wrappers::literal_attr(sig);
+    let buffer_read = super::inline_wrappers::buffer_result_attr(sig, config.cgctx);
     quote! {
         #doc
         #literal
+        #buffer_read
         #[wasm_bindgen(#(#wb_parts),*)]
         pub #async_kw fn #rust_ident #generics (#params) #ret;
     }
@@ -3384,8 +3390,11 @@ fn generate_getter(
             },
         );
 
+    let buffer_read =
+        super::inline_wrappers::buffer_read_attr(&lowered_ty, config.cgctx, getter.scope);
     quote! {
         #doc
+        #buffer_read
         #[wasm_bindgen(#(#wb_parts),*)]
         pub fn #rust_ident #fn_generics (this: &#this_type #this_generics) -> #getter_type;
         #js_string_variant
@@ -3669,8 +3678,11 @@ fn generate_static_getter(
         }
     });
 
+    let buffer_read =
+        super::inline_wrappers::buffer_read_attr(&lowered_ty, config.cgctx, getter.scope);
     quote! {
         #doc
+        #buffer_read
         #[wasm_bindgen(#(#wb_parts),*)]
         pub fn #rust_ident #fn_generics () -> #getter_type;
         #js_string_variant

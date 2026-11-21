@@ -204,6 +204,18 @@ extern "C" {
         key: &str,
         data: &Object,
     ) -> Promise<Undefined>;
+    #[wasm_bindgen(method, catch, js_name = "upload")]
+    pub async fn upload_with_slice(
+        this: &Bucket,
+        key: &str,
+        #[wasm_bindgen(slice = "view")] data: &[u8],
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "upload")]
+    pub fn upload_with_slice_promise(
+        this: &Bucket,
+        key: &str,
+        #[wasm_bindgen(slice = "view")] data: &[u8],
+    ) -> Promise<Undefined>;
 }
 #[wasm_bindgen]
 extern "C" {
