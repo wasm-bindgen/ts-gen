@@ -52,10 +52,40 @@ fn a_buffer_takes_bytes_or_either_class() {
         "Uint8Array(7)+Uint8Array(8,9)"
     );
     assert_eq!(concat(&[bytes.buffer()]), "ArrayBuffer(1,2)");
+    // Where `undefined` can't be omitted the argument still takes a class.
+    assert_eq!(
+        decode_with_input_and_label(Some(&[1u8][..]), "x"),
+        "x:Uint8Array(1)"
+    );
+    assert_eq!(
+        decode_with_input_and_label(Some(bytes.buffer()), "x"),
+        "x:ArrayBuffer(1,2)"
+    );
+    assert_eq!(decode_with_input_and_label(None::<&[u8]>, "x"), "x:none");
+}
+
+#[wasm_bindgen_test]
+async fn a_buffer_reads_as_its_bytes_or_its_handle() {
+    use js_sys::Uint8Array;
+    let bytes = Uint8Array::new_from_slice(&[1, 2]);
+    assert_eq!(echo(&bytes.buffer()), [1, 2]);
+    assert_eq!(echo(&[5u8, 6][..]), [5, 6]);
     assert!(matches!(
-        echo(&bytes.buffer()),
+        echo_js_buffer(&bytes.buffer()),
         EchoReturnKind::ArrayBuffer(b) if b.byte_length() == 2
     ));
+    // A view is its own window of its buffer, whatever its element.
+    assert_eq!(slab("buffer"), [1, 2, 3]);
+    assert_eq!(slab("bytes"), [2, 3]);
+    assert_eq!(slab("floats"), [0, 0, 128, 63, 0, 0, 0, 64]);
+    assert_eq!(slab("view"), [8, 7]);
+    assert_eq!(maybe_slab(), None);
+    assert_eq!(maybe_slab_with_kind("view"), Some(vec![8, 7]));
+    assert_eq!(slab_later("floats").await.unwrap().len(), 8);
+    let slab = Slab::new("bytes").unwrap();
+    assert_eq!(slab.data(), [2, 3]);
+    assert_eq!(slab.bytes(), [2, 3]);
+    assert_eq!(Slab::of("view"), [8, 7]);
 }
 
 #[wasm_bindgen_test]

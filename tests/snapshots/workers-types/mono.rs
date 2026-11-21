@@ -6283,8 +6283,12 @@ extern "C" {
     pub fn name_js_string(this: &SubtleCryptoDeriveKeyAlgorithm) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_name(this: &SubtleCryptoDeriveKeyAlgorithm, val: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, getter)]
-    pub fn salt(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "salt")]
+    pub fn salt_js_buffer(
+        this: &SubtleCryptoDeriveKeyAlgorithm,
+    ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "salt")]
+    fn __salt(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_salt(
         this: &SubtleCryptoDeriveKeyAlgorithm,
@@ -6307,13 +6311,27 @@ extern "C" {
     pub fn public(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<CryptoKey>;
     #[wasm_bindgen(method, setter, js_name = "$public")]
     pub fn set_public(this: &SubtleCryptoDeriveKeyAlgorithm, val: &CryptoKey);
-    #[wasm_bindgen(method, getter)]
-    pub fn info(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "info")]
+    pub fn info_js_buffer(
+        this: &SubtleCryptoDeriveKeyAlgorithm,
+    ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "info")]
+    fn __info(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_info(
         this: &SubtleCryptoDeriveKeyAlgorithm,
         #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
     );
+}
+impl SubtleCryptoDeriveKeyAlgorithm {
+    pub fn salt(&self) -> Option<Vec<u8>> {
+        let v = self.__salt();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
+    pub fn info(&self) -> Option<Vec<u8>> {
+        let v = self.__info();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
 }
 impl SubtleCryptoDeriveKeyAlgorithm {
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> SubtleCryptoDeriveKeyAlgorithm {
@@ -6375,17 +6393,23 @@ extern "C" {
     pub fn name_js_string(this: &SubtleCryptoEncryptAlgorithm) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_name(this: &SubtleCryptoEncryptAlgorithm, val: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, getter)]
-    pub fn iv(this: &SubtleCryptoEncryptAlgorithm) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "iv")]
+    pub fn iv_js_buffer(
+        this: &SubtleCryptoEncryptAlgorithm,
+    ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "iv")]
+    fn __iv(this: &SubtleCryptoEncryptAlgorithm) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_iv(
         this: &SubtleCryptoEncryptAlgorithm,
         #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
     );
     #[wasm_bindgen(method, getter, js_name = "additionalData")]
-    pub fn additional_data(
+    pub fn additional_data_js_buffer(
         this: &SubtleCryptoEncryptAlgorithm,
     ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "additionalData")]
+    fn __additional_data(this: &SubtleCryptoEncryptAlgorithm) -> Option<JsValue>;
     #[wasm_bindgen(method, setter, js_name = "additionalData")]
     pub fn set_additional_data(
         this: &SubtleCryptoEncryptAlgorithm,
@@ -6395,8 +6419,12 @@ extern "C" {
     pub fn tag_length(this: &SubtleCryptoEncryptAlgorithm) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "tagLength")]
     pub fn set_tag_length(this: &SubtleCryptoEncryptAlgorithm, val: f64);
-    #[wasm_bindgen(method, getter)]
-    pub fn counter(this: &SubtleCryptoEncryptAlgorithm) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "counter")]
+    pub fn counter_js_buffer(
+        this: &SubtleCryptoEncryptAlgorithm,
+    ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "counter")]
+    fn __counter(this: &SubtleCryptoEncryptAlgorithm) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_counter(
         this: &SubtleCryptoEncryptAlgorithm,
@@ -6406,13 +6434,35 @@ extern "C" {
     pub fn length(this: &SubtleCryptoEncryptAlgorithm) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_length(this: &SubtleCryptoEncryptAlgorithm, val: f64);
-    #[wasm_bindgen(method, getter)]
-    pub fn label(this: &SubtleCryptoEncryptAlgorithm) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "label")]
+    pub fn label_js_buffer(
+        this: &SubtleCryptoEncryptAlgorithm,
+    ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "label")]
+    fn __label(this: &SubtleCryptoEncryptAlgorithm) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_label(
         this: &SubtleCryptoEncryptAlgorithm,
         #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
     );
+}
+impl SubtleCryptoEncryptAlgorithm {
+    pub fn iv(&self) -> Option<Vec<u8>> {
+        let v = self.__iv();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
+    pub fn additional_data(&self) -> Option<Vec<u8>> {
+        let v = self.__additional_data();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
+    pub fn counter(&self) -> Option<Vec<u8>> {
+        let v = self.__counter();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
+    pub fn label(&self) -> Option<Vec<u8>> {
+        let v = self.__label();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
 }
 impl SubtleCryptoEncryptAlgorithm {
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> SubtleCryptoEncryptAlgorithm {
@@ -6492,9 +6542,11 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "modulusLength")]
     pub fn set_modulus_length(this: &SubtleCryptoGenerateKeyAlgorithm, val: f64);
     #[wasm_bindgen(method, getter, js_name = "publicExponent")]
-    pub fn public_exponent(
+    pub fn public_exponent_js_buffer(
         this: &SubtleCryptoGenerateKeyAlgorithm,
     ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "publicExponent")]
+    fn __public_exponent(this: &SubtleCryptoGenerateKeyAlgorithm) -> Option<JsValue>;
     #[wasm_bindgen(method, setter, js_name = "publicExponent")]
     pub fn set_public_exponent(
         this: &SubtleCryptoGenerateKeyAlgorithm,
@@ -6513,6 +6565,12 @@ extern "C" {
         this: &SubtleCryptoGenerateKeyAlgorithm,
         val: impl ::wasm_bindgen::JsStringLike,
     );
+}
+impl SubtleCryptoGenerateKeyAlgorithm {
+    pub fn public_exponent(&self) -> Option<Vec<u8>> {
+        let v = self.__public_exponent();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
 }
 impl SubtleCryptoGenerateKeyAlgorithm {
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> SubtleCryptoGenerateKeyAlgorithm {
@@ -6825,7 +6883,11 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "modulusLength")]
     pub fn set_modulus_length(this: &CryptoKeyRsaKeyAlgorithm, val: f64);
     #[wasm_bindgen(method, getter, js_name = "publicExponent")]
-    pub fn public_exponent(this: &CryptoKeyRsaKeyAlgorithm) -> ArrayBufferOrArrayBufferView;
+    pub fn public_exponent_js_buffer(
+        this: &CryptoKeyRsaKeyAlgorithm,
+    ) -> ArrayBufferOrArrayBufferView;
+    #[wasm_bindgen(method, getter, js_name = "publicExponent")]
+    fn __public_exponent(this: &CryptoKeyRsaKeyAlgorithm) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "publicExponent")]
     pub fn set_public_exponent(
         this: &CryptoKeyRsaKeyAlgorithm,
@@ -6835,6 +6897,12 @@ extern "C" {
     pub fn hash(this: &CryptoKeyRsaKeyAlgorithm) -> Option<CryptoKeyKeyAlgorithm>;
     #[wasm_bindgen(method, setter)]
     pub fn set_hash(this: &CryptoKeyRsaKeyAlgorithm, val: &CryptoKeyKeyAlgorithm);
+}
+impl CryptoKeyRsaKeyAlgorithm {
+    pub fn public_exponent(&self) -> Vec<u8> {
+        let v = self.__public_exponent();
+        __ts_gen_buffer_bytes(&v)
+    }
 }
 impl CryptoKeyRsaKeyAlgorithm {
     pub fn new(
@@ -7034,7 +7102,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "decode")]
     pub fn decode_with_input_and_options(
         this: &TextDecoder,
-        #[wasm_bindgen(slice = "copy")] input: Option<&[u8]>,
+        #[wasm_bindgen(slice = "copy")] input: Option<impl ::js_sys::BufferSourceLike>,
         options: &TextDecoderDecodeOptions,
     ) -> Result<String, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
@@ -7043,7 +7111,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "decode")]
     pub fn decode_with_input_and_options_js_string(
         this: &TextDecoder,
-        #[wasm_bindgen(slice = "copy")] input: Option<&[u8]>,
+        #[wasm_bindgen(slice = "copy")] input: Option<impl ::js_sys::BufferSourceLike>,
         options: &TextDecoderDecodeOptions,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -72502,4 +72570,27 @@ impl WebSocket {
             options,
         )
     }
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "Uint8Array")]
+    type __TsGenBytes;
+    #[wasm_bindgen(constructor, js_class = "Uint8Array")]
+    fn new(buffer: &JsValue, offset: f64, length: f64) -> __TsGenBytes;
+    #[wasm_bindgen(method, getter, js_class = "Uint8Array")]
+    fn buffer(this: &__TsGenBytes) -> JsValue;
+    #[wasm_bindgen(method, getter, js_class = "Uint8Array", js_name = "byteOffset")]
+    fn byte_offset(this: &__TsGenBytes) -> f64;
+    #[wasm_bindgen(method, getter, js_class = "Uint8Array", js_name = "byteLength")]
+    fn byte_length(this: &__TsGenBytes) -> f64;
+    # [wasm_bindgen (js_namespace = ArrayBuffer , js_name = "isView")]
+    fn __ts_gen_is_view(value: &JsValue) -> bool;
+}
+fn __ts_gen_buffer_bytes(value: &JsValue) -> Vec<u8> {
+    let view: &__TsGenBytes = ::wasm_bindgen::JsCast::unchecked_ref(value);
+    let bytes = match __ts_gen_is_view(value) {
+        true => __TsGenBytes::new(&view.buffer(), view.byte_offset(), view.byte_length()),
+        false => __TsGenBytes::new(value, 0.0, view.byte_length()),
+    };
+    ::wasm_bindgen::JsCast::unchecked_into::<::js_sys::Uint8Array>(bytes).to_vec()
 }

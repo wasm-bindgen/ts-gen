@@ -378,7 +378,7 @@ fn members(cx: &Cx<'_>, t: &abi::Type) -> Option<Vec<TypeRef>> {
     }
     // Per-monomorphization takes a `buffer` whole.
     if *t == abi::Type::Buffer {
-        return (!cx.mono).then(|| buffer_handles(cx)).flatten();
+        return (!cx.mono).then(|| buffer_arms(cx)).flatten();
     }
     let abi::Type::Named(r) = t else {
         return None;
@@ -402,7 +402,7 @@ fn members(cx: &Cx<'_>, t: &abi::Type) -> Option<Vec<TypeRef>> {
                 abi::JsEntry::Literal(s) => Some(TypeRef::StringLiteral(s.clone())),
                 _ => None,
             })?]),
-            [abi::Type::Buffer] if !cx.mono => buffer_handles(cx),
+            [abi::Type::Buffer] if !cx.mono => buffer_arms(cx),
             [p] => Some(vec![ty(cx, p)?]),
             _ => None,
         })
@@ -434,6 +434,17 @@ fn buffer_handles(cx: &Cx<'_>) -> Option<Vec<TypeRef>> {
         .iter()
         .map(|n| named(cx, &abi::Path::new([*n])))
         .collect()
+}
+
+/// What a `buffer` argument takes without per-monomorphization: either
+/// class, or its bytes as a copy.
+fn buffer_arms(cx: &Cx<'_>) -> Option<Vec<TypeRef>> {
+    let mut arms = buffer_handles(cx)?;
+    arms.push(TypeRef::TypedSlice(
+        crate::ir::TypedArrayElement::U8,
+        crate::ir::SharedMemory::Accepted,
+    ));
+    Some(arms)
 }
 
 /// Whether `p` is a throws enum (IR.md §15): one extending `err`, or one

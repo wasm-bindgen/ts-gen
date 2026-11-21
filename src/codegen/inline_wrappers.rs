@@ -16,6 +16,10 @@
 //! face of the extern.
 
 use super::null_arms;
+use super::signatures::{FunctionSignature, PromiseForm};
+use super::typemap::CodegenContext;
+use crate::ir::TypeRef;
+use crate::parse::scope::ScopeId;
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote, ToTokens};
 use syn::{
@@ -24,6 +28,7 @@ use syn::{
 };
 
 const LITERAL_ATTR: &str = "ts_gen_literal";
+const BUFFER_READ_ATTR: &str = "ts_gen_buffer_read";
 /// Names the extern a wrapper calls, so [`copy_abi_bounds`] can find it.
 const WRAPS_ATTR: &str = "ts_gen_wraps";
 
@@ -165,7 +170,7 @@ fn is_literal_keyed(item: &ForeignItemFn) -> bool {
 
 fn mentions_literal(block: &ItemForeignMod) -> bool {
     block.items.iter().any(|i| match i {
-        ForeignItem::Fn(f) => is_literal_keyed(f),
+        ForeignItem::Fn(f) => is_literal_keyed(f) || reads_buffer(f),
         _ => false,
     })
 }
@@ -434,68 +439,8 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
 
     let is_async = public_sig.asyncness.is_some();
     let await_tokens = is_async.then(|| quote! { .await });
-    let (target, callee) = if binding.method {
-        let Some((ty, args)) = this_type(item).and_then(type_head) else {
-            return Vec::new();
-        };
-        let (on_impl, on_fn) = split_generics(&public_sig.generics, &args);
-        public_sig.generics = on_fn;
-        let self_arg: FnArg = syn::parse_quote!(&self);
-        match public_sig.inputs.first_mut() {
-            Some(first) => *first = self_arg,
-            None => return Vec::new(),
-        }
-        let args_tokens = generic_args(&on_impl);
-        (
-            Target::Method {
-                ty,
-                generics: on_impl,
-                args: args_tokens,
-            },
-            quote! { self.#extern_name },
-        )
-    } else if let Some(ty) = binding.static_of {
-        // A bare `static_method_of` binds the type's defaults, unless the
-        // static returns the type itself, which hoists its arguments (as
-        // in `null_arms`).
-        let args = match &public_sig.output {
-            ReturnType::Type(_, ret) => type_head(result_ok(ret))
-                .filter(|(head, _)| *head == ty)
-                .map(|(_, args)| args)
-                .unwrap_or_default(),
-            ReturnType::Default => Vec::new(),
-        };
-        let (on_impl, on_fn) = split_generics(&public_sig.generics, &args);
-        public_sig.generics = on_fn;
-        let args_tokens = generic_args(&on_impl);
-        (
-            Target::Associated {
-                ty,
-                generics: on_impl,
-                args: args_tokens,
-            },
-            quote! { Self::#extern_name },
-        )
-    } else if binding.constructor {
-        let ReturnType::Type(_, ret) = &public_sig.output else {
-            return Vec::new();
-        };
-        let Some((ty, args)) = type_head(result_ok(ret)) else {
-            return Vec::new();
-        };
-        let (on_impl, on_fn) = split_generics(&public_sig.generics, &args);
-        public_sig.generics = on_fn;
-        let args_tokens = generic_args(&on_impl);
-        (
-            Target::Associated {
-                ty,
-                generics: on_impl,
-                args: args_tokens,
-            },
-            quote! { Self::#extern_name },
-        )
-    } else {
-        (Target::Free, quote! { #extern_name })
+    let Some((target, callee)) = place(item, &binding, &mut public_sig, &extern_name) else {
+        return Vec::new();
     };
 
     // One wrapper per literal arm: the literal and `null` parameters
@@ -579,8 +524,294 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
         .collect()
 }
 
+/// Where a wrapper over `item` goes and how it reaches the extern
+/// `extern_name`. A method's receiver becomes `&self`, and the generics
+/// its `impl` states leave `public_sig`.
+fn place(
+    item: &ForeignItemFn,
+    binding: &Binding,
+    public_sig: &mut Signature,
+    extern_name: &Ident,
+) -> Option<(Target, TokenStream)> {
+    Some(if binding.method {
+        let (ty, args) = this_type(item).and_then(type_head)?;
+        let (on_impl, on_fn) = split_generics(&public_sig.generics, &args);
+        public_sig.generics = on_fn;
+        let self_arg: FnArg = syn::parse_quote!(&self);
+        *public_sig.inputs.first_mut()? = self_arg;
+        let args_tokens = generic_args(&on_impl);
+        (
+            Target::Method {
+                ty,
+                generics: on_impl,
+                args: args_tokens,
+            },
+            quote! { self.#extern_name },
+        )
+    } else if let Some(ty) = binding.static_of.clone() {
+        // A bare `static_method_of` binds the type's defaults, unless the
+        // static returns the type itself, which hoists its arguments (as
+        // in `null_arms`).
+        let args = match &public_sig.output {
+            ReturnType::Type(_, ret) => type_head(result_ok(ret))
+                .filter(|(head, _)| *head == ty)
+                .map(|(_, args)| args)
+                .unwrap_or_default(),
+            ReturnType::Default => Vec::new(),
+        };
+        let (on_impl, on_fn) = split_generics(&public_sig.generics, &args);
+        public_sig.generics = on_fn;
+        let args_tokens = generic_args(&on_impl);
+        (
+            Target::Associated {
+                ty,
+                generics: on_impl,
+                args: args_tokens,
+            },
+            quote! { Self::#extern_name },
+        )
+    } else if binding.constructor {
+        let ReturnType::Type(_, ret) = &public_sig.output else {
+            return None;
+        };
+        let (ty, args) = type_head(result_ok(ret))?;
+        let (on_impl, on_fn) = split_generics(&public_sig.generics, &args);
+        public_sig.generics = on_fn;
+        let args_tokens = generic_args(&on_impl);
+        (
+            Target::Associated {
+                ty,
+                generics: on_impl,
+                args: args_tokens,
+            },
+            quote! { Self::#extern_name },
+        )
+    } else {
+        (Target::Free, quote! { #extern_name })
+    })
+}
+
+/// The attribute the signature layer puts on an extern fn reading a
+/// `buffer`. The extern keeps the handle as `<name>_js_buffer` and a
+/// wrapper of the public name reads its bytes.
+pub(crate) fn buffer_read_attr(
+    ty: &TypeRef,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> TokenStream {
+    let core = |t: &TypeRef| t.split_empties().map_or_else(|| t.clone(), |(c, _)| c);
+    let mut t = core(ty);
+    if let TypeRef::Reference {
+        segments,
+        generic_args,
+    } = &t
+    {
+        if segments.len() == 1 && segments[0] == "Promise" && generic_args.len() == 1 {
+            t = core(&generic_args[0]);
+        }
+    }
+    if !super::signatures::names_buffer(&t, cgctx, scope) {
+        return quote! {};
+    }
+    let attr = format_ident!("{BUFFER_READ_ATTR}");
+    quote! { #[#attr] }
+}
+
+/// [`buffer_read_attr`] for a callable's result.
+pub(crate) fn buffer_result_attr(
+    sig: &FunctionSignature,
+    cgctx: Option<&CodegenContext<'_>>,
+) -> TokenStream {
+    if sig.literal.is_some() || sig.js_string_return || matches!(sig.form, PromiseForm::Handle(_)) {
+        return quote! {};
+    }
+    buffer_read_attr(&sig.return_type, cgctx, sig.body_scope)
+}
+
+fn reads_buffer(item: &ForeignItemFn) -> bool {
+    item.attrs
+        .iter()
+        .any(|a| a.path().is_ident(BUFFER_READ_ATTR))
+}
+
+/// `ret` with its handle replaced by `Vec<u8>` and by `JsValue`, and
+/// `call`, returning the latter, read as the former: under `Result<_, E>`,
+/// `Option<_>` or both.
+fn bytes_return(ret: &Type, call: TokenStream) -> Option<(Type, Type, TokenStream)> {
+    fn args_of(ty: &Type, name: &str) -> Option<Vec<Type>> {
+        let Type::Path(p) = ty else {
+            return None;
+        };
+        let seg = p.path.segments.last()?;
+        let PathArguments::AngleBracketed(args) = &seg.arguments else {
+            return None;
+        };
+        (seg.ident == name).then(|| {
+            args.args
+                .iter()
+                .filter_map(|a| match a {
+                    GenericArgument::Type(t) => Some(t.clone()),
+                    _ => None,
+                })
+                .collect()
+        })
+    }
+    let (ok, err) = match args_of(ret, "Result").as_deref() {
+        Some([ok, err]) => (ok.clone(), Some(err.clone())),
+        _ => (ret.clone(), None),
+    };
+    let (handle, optional) = match args_of(&ok, "Option").as_deref() {
+        Some([t]) => (t.clone(), true),
+        _ => (ok, false),
+    };
+    // A class, or the enum of the two: a `Promise<T>` stays the handle.
+    let Type::Path(p) = &handle else {
+        return None;
+    };
+    if !p.path.segments.last()?.arguments.is_none() {
+        return None;
+    }
+    let read = quote! { __ts_gen_buffer_bytes(&v) };
+    let (mut bytes, mut value, read): (Type, Type, _) = match optional {
+        true => (
+            syn::parse_quote!(Option<Vec<u8>>),
+            syn::parse_quote!(Option<JsValue>),
+            quote! { v.map(|v| #read) },
+        ),
+        false => (syn::parse_quote!(Vec<u8>), syn::parse_quote!(JsValue), read),
+    };
+    let body = match &err {
+        Some(_) => quote! { #call.map(|v| #read) },
+        None => quote! { let v = #call; #read },
+    };
+    if let Some(err) = err {
+        bytes = syn::parse_quote!(Result<#bytes, #err>);
+        value = syn::parse_quote!(Result<#value, #err>);
+    }
+    Some((bytes, value, body))
+}
+
+/// The wrapper reading a `buffer` result's bytes, and the private extern
+/// it calls, which takes the result as any value: the handle's enum admits
+/// one view class. `item` becomes the `_js_buffer` twin.
+fn wrap_buffer_read(item: &mut ForeignItemFn) -> Option<(Wrapper, ForeignItemFn)> {
+    let idx = item
+        .attrs
+        .iter()
+        .position(|a| a.path().is_ident(BUFFER_READ_ATTR))?;
+    item.attrs.remove(idx);
+    // A literal-keyed extern and one dropping a `null` parameter already
+    // have their wrappers, which keep the handle.
+    let marker = |arg: &FnArg| matches!(arg, FnArg::Typed(pat) if null_arms::is_marker(&pat.ty));
+    if is_literal_keyed(item) || item.sig.inputs.iter().any(marker) {
+        return None;
+    }
+    let (attr_idx, binding) = read_binding(item)?;
+    if binding.constructor || binding.setter {
+        return None;
+    }
+    let public_name = item.sig.ident.clone();
+    let js_name = syn::ext::IdentExt::unraw(&public_name).to_string();
+    let extern_name = format_ident!("__{js_name}");
+    let mut public_sig = item.sig.clone();
+    for arg in public_sig.inputs.iter_mut() {
+        if let FnArg::Typed(pat) = arg {
+            pat.attrs.clear();
+        }
+    }
+    let args = item
+        .sig
+        .inputs
+        .iter()
+        .skip(usize::from(binding.method))
+        .filter_map(|arg| match arg {
+            FnArg::Typed(pat) => match &*pat.pat {
+                Pat::Ident(id) => {
+                    let name = &id.ident;
+                    Some(match into_target(&pat.ty) {
+                        Some(_) => quote! { #name.into() },
+                        None => quote! { #name },
+                    })
+                }
+                _ => None,
+            },
+            FnArg::Receiver(_) => None,
+        });
+    let call_args: Vec<TokenStream> = args.collect();
+    let (target, callee) = place(item, &binding, &mut public_sig, &extern_name)?;
+    let await_tokens = public_sig.asyncness.map(|_| quote! { .await });
+    let ReturnType::Type(arrow, ret) = &public_sig.output else {
+        return None;
+    };
+    let arrow = *arrow;
+    let (bytes, value, body) = bytes_return(ret, quote! { #callee(#(#call_args),*)#await_tokens })?;
+    public_sig.output = ReturnType::Type(arrow, Box::new(bytes));
+
+    if !binding.has_js_name {
+        let syn::Meta::List(list) = &mut item.attrs[attr_idx].meta else {
+            return None;
+        };
+        let extra = match list.tokens.is_empty() {
+            true => quote! { js_name = #js_name },
+            false => quote! { , js_name = #js_name },
+        };
+        list.tokens.extend(extra);
+    }
+    let mut private = item.clone();
+    private.sig.ident = extern_name.clone();
+    private.sig.output = ReturnType::Type(arrow, Box::new(value));
+    private.vis = syn::Visibility::Inherited;
+    private.attrs.retain(|a| !a.path().is_ident("doc"));
+    bind_into_targets(&mut private.sig);
+    item.sig.ident = format_ident!("{js_name}_js_buffer");
+
+    let doc_attrs = item.attrs.iter().filter(|a| a.path().is_ident("doc"));
+    let wraps = format_ident!("{WRAPS_ATTR}");
+    let wrapper = Wrapper {
+        target,
+        item: quote! {
+            #(#doc_attrs)*
+            #[#wraps(#extern_name)]
+            pub #public_sig { #body }
+        },
+    };
+    Some((wrapper, private))
+}
+
+/// The bytes of a `buffer` handle: a view contributes its own window of
+/// its `ArrayBuffer`, whatever its element.
+fn buffer_bytes_helper() -> Vec<Item> {
+    let file: syn::File = syn::parse_quote! {
+        #[wasm_bindgen]
+        extern "C" {
+            #[wasm_bindgen(js_name = "Uint8Array")]
+            type __TsGenBytes;
+            #[wasm_bindgen(constructor, js_class = "Uint8Array")]
+            fn new(buffer: &JsValue, offset: f64, length: f64) -> __TsGenBytes;
+            #[wasm_bindgen(method, getter, js_class = "Uint8Array")]
+            fn buffer(this: &__TsGenBytes) -> JsValue;
+            #[wasm_bindgen(method, getter, js_class = "Uint8Array", js_name = "byteOffset")]
+            fn byte_offset(this: &__TsGenBytes) -> f64;
+            #[wasm_bindgen(method, getter, js_class = "Uint8Array", js_name = "byteLength")]
+            fn byte_length(this: &__TsGenBytes) -> f64;
+            #[wasm_bindgen(js_namespace = ArrayBuffer, js_name = "isView")]
+            fn __ts_gen_is_view(value: &JsValue) -> bool;
+        }
+        fn __ts_gen_buffer_bytes(value: &JsValue) -> Vec<u8> {
+            let view: &__TsGenBytes = ::wasm_bindgen::JsCast::unchecked_ref(value);
+            let bytes = match __ts_gen_is_view(value) {
+                true => __TsGenBytes::new(&view.buffer(), view.byte_offset(), view.byte_length()),
+                false => __TsGenBytes::new(value, 0.0, view.byte_length()),
+            };
+            ::wasm_bindgen::JsCast::unchecked_into::<::js_sys::Uint8Array>(bytes).to_vec()
+        }
+    };
+    file.items
+}
+
 fn process_items(items: &mut Vec<Item>) {
     let mut out: Vec<Item> = Vec::with_capacity(items.len());
+    let mut reads = false;
     for mut item in items.drain(..) {
         match &mut item {
             Item::Mod(m) => {
@@ -591,18 +822,31 @@ fn process_items(items: &mut Vec<Item>) {
             }
             Item::ForeignMod(block) if mentions_literal(block) => {
                 let mut wrappers = Vec::new();
-                for fi in block.items.iter_mut() {
-                    if let ForeignItem::Fn(f) = fi {
+                let mut items = Vec::with_capacity(block.items.len());
+                for mut fi in block.items.drain(..) {
+                    let mut private = None;
+                    if let ForeignItem::Fn(f) = &mut fi {
+                        if let Some((w, p)) = wrap_buffer_read(f) {
+                            wrappers.push(w);
+                            private = Some(ForeignItem::Fn(p));
+                            reads = true;
+                        }
                         if is_literal_keyed(f) {
                             wrappers.extend(wrap(f));
                         }
                     }
+                    items.push(fi);
+                    items.extend(private);
                 }
+                block.items = items;
                 out.push(item);
                 out.extend(render_wrappers(wrappers));
             }
             _ => out.push(item),
         }
+    }
+    if reads {
+        out.extend(buffer_bytes_helper());
     }
     *items = out;
 }
@@ -640,7 +884,7 @@ fn render_wrappers(wrappers: Vec<Wrapper>) -> Vec<Item> {
 /// Emit the wrappers for every extern fn in `file` that needs one.
 pub(crate) fn apply(file: &mut syn::File) {
     let text = file.to_token_stream().to_string();
-    if !text.contains(LITERAL_ATTR) {
+    if !text.contains(LITERAL_ATTR) && !text.contains(BUFFER_READ_ATTR) {
         return;
     }
     process_items(&mut file.items);

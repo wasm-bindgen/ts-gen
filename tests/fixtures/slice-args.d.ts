@@ -78,3 +78,14 @@ export declare function concat(parts: BufferSource[]): string;
 export declare function owned(data: BufferSource): boolean;
 /** @param data {@slice view} read before the call returns */
 export declare function ownedView(data: BufferSource): boolean;
+
+export declare function slab(kind: string): ArrayBuffer | ArrayBufferView;
+export declare function maybeSlab(kind?: string): BufferSource | undefined;
+export declare function slabLater(kind: string): Promise<BufferSource>;
+export declare class Slab {
+  constructor(kind: string);
+  readonly data: BufferSource;
+  bytes(): BufferSource;
+  static of(kind: string): BufferSource;
+}
+export declare function decode(input?: BufferSource, label?: string): string;

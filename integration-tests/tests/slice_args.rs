@@ -78,12 +78,35 @@ fn a_buffer_is_written_as_either_class() {
         "k=ArrayBuffer(1,2)"
     );
     assert_eq!(store_with_typed_array("k", &bytes), "k=Uint8Array(1,2)");
+    assert_eq!(hash_with_slice(&[1, 2]), "Uint8Array(1,2)");
+    assert_eq!(store_with_slice("k", &[4]), "k=Uint8Array(4)");
+    assert!(owned_with_slice(&[1, 2]));
+    assert_eq!(decode_with_slice(&[1]), "utf-8:Uint8Array(1)");
+}
+
+#[wasm_bindgen_test]
+async fn a_buffer_reads_as_its_bytes_or_its_handle() {
+    let bytes = Uint8Array::new_from_slice(&[1, 2]);
+    assert_eq!(echo(&bytes.buffer()), [1, 2]);
+    assert_eq!(echo_with_slice(&[5, 6]), [5, 6]);
     assert!(matches!(
-        echo(&bytes.buffer()),
+        echo_js_buffer(&bytes.buffer()),
         EchoReturnKind::ArrayBuffer(b) if b.byte_length() == 2
     ));
     assert!(matches!(
-        echo_with_typed_array(&bytes),
+        echo_with_typed_array_js_buffer(&bytes),
         EchoReturnKind::Uint8Array(b) if b.to_vec() == [1, 2]
     ));
+    // A view is its own window of its buffer, whatever its element.
+    assert_eq!(slab("buffer"), [1, 2, 3]);
+    assert_eq!(slab("bytes"), [2, 3]);
+    assert_eq!(slab("floats"), [0, 0, 128, 63, 0, 0, 0, 64]);
+    assert_eq!(slab("view"), [8, 7]);
+    assert_eq!(maybe_slab(), None);
+    assert_eq!(maybe_slab_with_kind("view"), Some(vec![8, 7]));
+    assert_eq!(slab_later("floats").await.unwrap().len(), 8);
+    let slab = Slab::new("bytes").unwrap();
+    assert_eq!(slab.data(), [2, 3]);
+    assert_eq!(slab.bytes(), [2, 3]);
+    assert_eq!(Slab::of("view"), [8, 7]);
 }

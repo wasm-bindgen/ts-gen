@@ -612,14 +612,41 @@ digest(float32_array);     // the typed array itself
 and is a no-op for the classes. A `{@slice view}` hint, the author
 asserting the callee reads the bytes before it returns, makes them a
 view of linear memory instead (`slice = "view"`). Where `undefined`
-can't be omitted the argument is its bytes, `Option<&[u8]>`, since a
-`None` would leave an `impl` nothing to infer. A list's elements arrive
-as an `Array` of buffers, bytes as `Uint8Array` copies.
+can't be omitted the argument is `Option<impl js_sys::BufferSourceLike>`,
+still taking a class, and a `None` names its type (`None::<&[u8]>`). A
+list's elements arrive as an `Array` of buffers, bytes as `Uint8Array`
+copies.
 
 Without `--experimental-generic-mono` the two classes keep an overload
 each (`_with_array_buffer`, `_with_typed_array`), and a named union its
-enum, since `BufferSourceLike` isn't in a released js-sys. A `buffer`
-read is the two classes in both modes.
+enum, since `BufferSourceLike` isn't in a released js-sys. The bytes are
+one more overload after them, `_with_slice`, as beside a
+[typed array](#typed-array-unions):
+
+```rs
+pub fn put_with_array_buffer(key: &str, value: &ArrayBuffer);
+pub fn put_with_typed_array(key: &str, value: &Object);
+pub fn put_with_slice(key: &str, #[wasm_bindgen(slice = "copy")] value: &[u8]);
+```
+
+A `buffer` result reads as its bytes in both modes: a view contributes
+its own window of its `ArrayBuffer`, whatever its element (a
+`Float32Array` of two elements is eight bytes), and an `ArrayBuffer` all
+of it. The handle stays available as a `_js_buffer` twin, the two
+classes:
+
+```ts
+function read(key: string): ArrayBuffer | ArrayBufferView | undefined;
+```
+
+```rs
+pub fn read(key: &str) -> Option<Vec<u8>>;
+pub fn read_js_buffer(key: &str) -> Option<ReadReturnKind>;
+```
+
+This is a function's, method's or getter's own result, under `Option`,
+`Result` and `async`. A `buffer` inside a list, another union's enum or
+a `Promise<T>` handle stays the two classes.
 
 ## Function types
 

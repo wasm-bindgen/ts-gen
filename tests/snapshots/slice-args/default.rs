@@ -613,6 +613,18 @@ pub fn try_hash(data: impl ::core::convert::Into<BufferSource>) -> Result<String
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
+    #[wasm_bindgen(js_name = "hash")]
+    pub fn hash_with_slice(#[wasm_bindgen(slice = "copy")] data: &[u8]) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "hash")]
+    pub fn try_hash_with_slice(
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
     pub fn store(key: &str, value: &str) -> String;
 }
 #[wasm_bindgen(module = "slice-args")]
@@ -642,22 +654,84 @@ extern "C" {
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
-    pub fn echo(data: &ArrayBuffer) -> EchoReturnKind;
+    #[wasm_bindgen(js_name = "store")]
+    pub fn store_with_slice(key: &str, #[wasm_bindgen(slice = "copy")] value: &[u8]) -> String;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "echo")]
-    pub fn try_echo(data: &ArrayBuffer) -> Result<EchoReturnKind, JsValue>;
+    #[wasm_bindgen(catch, js_name = "store")]
+    pub fn try_store_with_slice(
+        key: &str,
+        #[wasm_bindgen(slice = "copy")] value: &[u8],
+    ) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
     #[wasm_bindgen(js_name = "echo")]
-    pub fn echo_with_typed_array(data: &Object) -> EchoReturnKind;
+    pub fn echo_js_buffer(data: &ArrayBuffer) -> EchoReturnKind;
+    #[wasm_bindgen(js_name = "echo")]
+    fn __echo(data: &ArrayBuffer) -> JsValue;
+}
+pub fn echo(data: &ArrayBuffer) -> Vec<u8> {
+    let v = __echo(data);
+    __ts_gen_buffer_bytes(&v)
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "echo")]
-    pub fn try_echo_with_typed_array(data: &Object) -> Result<EchoReturnKind, JsValue>;
+    pub fn try_echo_js_buffer(data: &ArrayBuffer) -> Result<EchoReturnKind, JsValue>;
+    #[wasm_bindgen(catch, js_name = "echo")]
+    fn __try_echo(data: &ArrayBuffer) -> Result<JsValue, JsValue>;
+}
+pub fn try_echo(data: &ArrayBuffer) -> Result<Vec<u8>, JsValue> {
+    __try_echo(data).map(|v| __ts_gen_buffer_bytes(&v))
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "echo")]
+    pub fn echo_with_typed_array_js_buffer(data: &Object) -> EchoReturnKind;
+    #[wasm_bindgen(js_name = "echo")]
+    fn __echo_with_typed_array(data: &Object) -> JsValue;
+}
+pub fn echo_with_typed_array(data: &Object) -> Vec<u8> {
+    let v = __echo_with_typed_array(data);
+    __ts_gen_buffer_bytes(&v)
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "echo")]
+    pub fn try_echo_with_typed_array_js_buffer(data: &Object) -> Result<EchoReturnKind, JsValue>;
+    #[wasm_bindgen(catch, js_name = "echo")]
+    fn __try_echo_with_typed_array(data: &Object) -> Result<JsValue, JsValue>;
+}
+pub fn try_echo_with_typed_array(data: &Object) -> Result<Vec<u8>, JsValue> {
+    __try_echo_with_typed_array(data).map(|v| __ts_gen_buffer_bytes(&v))
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "echo")]
+    pub fn echo_with_slice_js_buffer(#[wasm_bindgen(slice = "copy")] data: &[u8])
+        -> EchoReturnKind;
+    #[wasm_bindgen(js_name = "echo")]
+    fn __echo_with_slice(#[wasm_bindgen(slice = "copy")] data: &[u8]) -> JsValue;
+}
+pub fn echo_with_slice(data: &[u8]) -> Vec<u8> {
+    let v = __echo_with_slice(data);
+    __ts_gen_buffer_bytes(&v)
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "echo")]
+    pub fn try_echo_with_slice_js_buffer(
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Result<EchoReturnKind, JsValue>;
+    #[wasm_bindgen(catch, js_name = "echo")]
+    fn __try_echo_with_slice(
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Result<JsValue, JsValue>;
+}
+pub fn try_echo_with_slice(data: &[u8]) -> Result<Vec<u8>, JsValue> {
+    __try_echo_with_slice(data).map(|v| __ts_gen_buffer_bytes(&v))
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
@@ -676,6 +750,20 @@ extern "C" {
 #[doc = " * `data` - read before the call returns"]
 pub fn try_peek(data: impl ::core::convert::Into<BufferSource>) -> Result<String, JsValue> {
     __try_peek(data.into())
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[doc = " * `data` - read before the call returns"]
+    #[wasm_bindgen(js_name = "peek")]
+    pub fn peek_with_slice(#[wasm_bindgen(slice = "view")] data: &[u8]) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[doc = " * `data` - read before the call returns"]
+    #[wasm_bindgen(catch, js_name = "peek")]
+    pub fn try_peek_with_slice(
+        #[wasm_bindgen(slice = "view")] data: &[u8],
+    ) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
@@ -704,6 +792,18 @@ pub fn try_owned(data: impl ::core::convert::Into<BufferSource>) -> Result<bool,
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
+    #[wasm_bindgen(js_name = "owned")]
+    pub fn owned_with_slice(#[wasm_bindgen(slice = "copy")] data: &[u8]) -> bool;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "owned")]
+    pub fn try_owned_with_slice(
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
     #[wasm_bindgen(js_name = "ownedView")]
     fn __owned_view(data: BufferSource) -> bool;
 }
@@ -720,9 +820,248 @@ extern "C" {
 pub fn try_owned_view(data: impl ::core::convert::Into<BufferSource>) -> Result<bool, JsValue> {
     __try_owned_view(data.into())
 }
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[doc = " * `data` - read before the call returns"]
+    #[wasm_bindgen(js_name = "ownedView")]
+    pub fn owned_view_with_slice(#[wasm_bindgen(slice = "view")] data: &[u8]) -> bool;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[doc = " * `data` - read before the call returns"]
+    #[wasm_bindgen(catch, js_name = "ownedView")]
+    pub fn try_owned_view_with_slice(
+        #[wasm_bindgen(slice = "view")] data: &[u8],
+    ) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "slab")]
+    pub fn slab_js_buffer(kind: &str) -> EchoReturnKind;
+    #[wasm_bindgen(js_name = "slab")]
+    fn __slab(kind: &str) -> JsValue;
+}
+pub fn slab(kind: &str) -> Vec<u8> {
+    let v = __slab(kind);
+    __ts_gen_buffer_bytes(&v)
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "slab")]
+    pub fn try_slab_js_buffer(kind: &str) -> Result<EchoReturnKind, JsValue>;
+    #[wasm_bindgen(catch, js_name = "slab")]
+    fn __try_slab(kind: &str) -> Result<JsValue, JsValue>;
+}
+pub fn try_slab(kind: &str) -> Result<Vec<u8>, JsValue> {
+    __try_slab(kind).map(|v| __ts_gen_buffer_bytes(&v))
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "maybeSlab")]
+    pub fn maybe_slab_js_buffer() -> Option<MaybeSlabReturnKind>;
+    #[wasm_bindgen(js_name = "maybeSlab")]
+    fn __maybe_slab() -> Option<JsValue>;
+}
+pub fn maybe_slab() -> Option<Vec<u8>> {
+    let v = __maybe_slab();
+    v.map(|v| __ts_gen_buffer_bytes(&v))
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "maybeSlab")]
+    pub fn try_maybe_slab_js_buffer() -> Result<Option<MaybeSlabReturnKind>, JsValue>;
+    #[wasm_bindgen(catch, js_name = "maybeSlab")]
+    fn __try_maybe_slab() -> Result<Option<JsValue>, JsValue>;
+}
+pub fn try_maybe_slab() -> Result<Option<Vec<u8>>, JsValue> {
+    __try_maybe_slab().map(|v| v.map(|v| __ts_gen_buffer_bytes(&v)))
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "maybeSlab")]
+    pub fn maybe_slab_with_kind_js_buffer(kind: &str) -> Option<MaybeSlabReturnKind>;
+    #[wasm_bindgen(js_name = "maybeSlab")]
+    fn __maybe_slab_with_kind(kind: &str) -> Option<JsValue>;
+}
+pub fn maybe_slab_with_kind(kind: &str) -> Option<Vec<u8>> {
+    let v = __maybe_slab_with_kind(kind);
+    v.map(|v| __ts_gen_buffer_bytes(&v))
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "maybeSlab")]
+    pub fn try_maybe_slab_with_kind_js_buffer(
+        kind: &str,
+    ) -> Result<Option<MaybeSlabReturnKind>, JsValue>;
+    #[wasm_bindgen(catch, js_name = "maybeSlab")]
+    fn __try_maybe_slab_with_kind(kind: &str) -> Result<Option<JsValue>, JsValue>;
+}
+pub fn try_maybe_slab_with_kind(kind: &str) -> Result<Option<Vec<u8>>, JsValue> {
+    __try_maybe_slab_with_kind(kind).map(|v| v.map(|v| __ts_gen_buffer_bytes(&v)))
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "slabLater")]
+    pub async fn slab_later_js_buffer(kind: &str) -> Result<MaybeSlabReturnKind, JsValue>;
+    #[wasm_bindgen(catch, js_name = "slabLater")]
+    async fn __slab_later(kind: &str) -> Result<JsValue, JsValue>;
+}
+pub async fn slab_later(kind: &str) -> Result<Vec<u8>, JsValue> {
+    __slab_later(kind).await.map(|v| __ts_gen_buffer_bytes(&v))
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "slabLater")]
+    pub fn slab_later_promise(kind: &str) -> Promise;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Slab;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new(kind: &str) -> Result<Slab, JsValue>;
+    #[wasm_bindgen(method, getter, js_name = "data")]
+    pub fn data_js_buffer(this: &Slab) -> MaybeSlabReturnKind;
+    #[wasm_bindgen(method, getter, js_name = "data")]
+    fn __data(this: &Slab) -> JsValue;
+    #[wasm_bindgen(method, js_name = "bytes")]
+    pub fn bytes_js_buffer(this: &Slab) -> MaybeSlabReturnKind;
+    #[wasm_bindgen(method, js_name = "bytes")]
+    fn __bytes(this: &Slab) -> JsValue;
+    #[wasm_bindgen(method, catch, js_name = "bytes")]
+    pub fn try_bytes_js_buffer(this: &Slab) -> Result<MaybeSlabReturnKind, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "bytes")]
+    fn __try_bytes(this: &Slab) -> Result<JsValue, JsValue>;
+    # [wasm_bindgen (static_method_of = Slab , js_name = "of")]
+    pub fn of_js_buffer(kind: &str) -> MaybeSlabReturnKind;
+    # [wasm_bindgen (static_method_of = Slab , js_name = "of")]
+    fn __of(kind: &str) -> JsValue;
+    # [wasm_bindgen (static_method_of = Slab , catch , js_name = "of")]
+    pub fn try_of_js_buffer(kind: &str) -> Result<MaybeSlabReturnKind, JsValue>;
+    # [wasm_bindgen (static_method_of = Slab , catch , js_name = "of")]
+    fn __try_of(kind: &str) -> Result<JsValue, JsValue>;
+}
+impl Slab {
+    pub fn data(&self) -> Vec<u8> {
+        let v = self.__data();
+        __ts_gen_buffer_bytes(&v)
+    }
+    pub fn bytes(&self) -> Vec<u8> {
+        let v = self.__bytes();
+        __ts_gen_buffer_bytes(&v)
+    }
+    pub fn try_bytes(&self) -> Result<Vec<u8>, JsValue> {
+        self.__try_bytes().map(|v| __ts_gen_buffer_bytes(&v))
+    }
+    pub fn of(kind: &str) -> Vec<u8> {
+        let v = Self::__of(kind);
+        __ts_gen_buffer_bytes(&v)
+    }
+    pub fn try_of(kind: &str) -> Result<Vec<u8>, JsValue> {
+        Self::__try_of(kind).map(|v| __ts_gen_buffer_bytes(&v))
+    }
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    pub fn decode() -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "decode")]
+    pub fn try_decode() -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "decode")]
+    fn __decode_with_buffer_source(input: BufferSource) -> String;
+}
+pub fn decode_with_buffer_source(input: impl ::core::convert::Into<BufferSource>) -> String {
+    __decode_with_buffer_source(input.into())
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "decode")]
+    fn __try_decode_with_buffer_source(input: BufferSource) -> Result<String, JsValue>;
+}
+pub fn try_decode_with_buffer_source(
+    input: impl ::core::convert::Into<BufferSource>,
+) -> Result<String, JsValue> {
+    __try_decode_with_buffer_source(input.into())
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "decode")]
+    pub fn decode_with_slice(#[wasm_bindgen(slice = "copy")] input: &[u8]) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "decode")]
+    pub fn try_decode_with_slice(
+        #[wasm_bindgen(slice = "copy")] input: &[u8],
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "decode")]
+    pub fn decode_with_buffer_source_and_label(input: Option<BufferSource>, label: &str) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "decode")]
+    pub fn try_decode_with_buffer_source_and_label(
+        input: Option<BufferSource>,
+        label: &str,
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "decode")]
+    pub fn decode_with_slice_and_label(
+        #[wasm_bindgen(slice = "copy")] input: &[u8],
+        label: &str,
+    ) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "decode")]
+    pub fn try_decode_with_slice_and_label(
+        #[wasm_bindgen(slice = "copy")] input: &[u8],
+        label: &str,
+    ) -> Result<String, JsValue>;
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum EchoReturnKind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum MaybeSlabReturnKind {
+    Uint8Array(Uint8Array),
+    ArrayBuffer(ArrayBuffer),
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "Uint8Array")]
+    type __TsGenBytes;
+    #[wasm_bindgen(constructor, js_class = "Uint8Array")]
+    fn new(buffer: &JsValue, offset: f64, length: f64) -> __TsGenBytes;
+    #[wasm_bindgen(method, getter, js_class = "Uint8Array")]
+    fn buffer(this: &__TsGenBytes) -> JsValue;
+    #[wasm_bindgen(method, getter, js_class = "Uint8Array", js_name = "byteOffset")]
+    fn byte_offset(this: &__TsGenBytes) -> f64;
+    #[wasm_bindgen(method, getter, js_class = "Uint8Array", js_name = "byteLength")]
+    fn byte_length(this: &__TsGenBytes) -> f64;
+    # [wasm_bindgen (js_namespace = ArrayBuffer , js_name = "isView")]
+    fn __ts_gen_is_view(value: &JsValue) -> bool;
+}
+fn __ts_gen_buffer_bytes(value: &JsValue) -> Vec<u8> {
+    let view: &__TsGenBytes = ::wasm_bindgen::JsCast::unchecked_ref(value);
+    let bytes = match __ts_gen_is_view(value) {
+        true => __TsGenBytes::new(&view.buffer(), view.byte_offset(), view.byte_length()),
+        false => __TsGenBytes::new(value, 0.0, view.byte_length()),
+    };
+    ::wasm_bindgen::JsCast::unchecked_into::<::js_sys::Uint8Array>(bytes).to_vec()
 }
