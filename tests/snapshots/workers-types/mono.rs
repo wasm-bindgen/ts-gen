@@ -9119,7 +9119,7 @@ extern "C" {
         this: &KVNamespaceListResult<Metadata>,
         val: &[KVNamespaceListKey<Metadata>],
     ) where
-        KVNamespaceListKey<Metadata>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        KVNamespaceListKey<Metadata>: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, getter)]
     pub fn cursor<Metadata>(this: &KVNamespaceListResult<Metadata>) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "cursor")]
@@ -43194,9 +43194,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_results<T>(this: &D1Result<T>, #[wasm_bindgen(slice = "array")] val: &[T])
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::VectorRefIntoWasmAbi>
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::RefIntoWasmAbi>
     D1Result<T>
 {
     #[doc = " Construct with `success: true`."]
@@ -43215,7 +43215,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::VectorRe
 pub struct D1ResultBuilder<T> {
     inner: D1Result<T>,
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::VectorRefIntoWasmAbi>
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::RefIntoWasmAbi>
     D1ResultBuilder<T>
 {
     pub fn build(self) -> D1Result<T> {
@@ -44172,7 +44172,7 @@ pub mod cloudflare {
                 metadata: &PipelineBatchMetadata,
             ) -> Result<Array<O>, JsValue>
             where
-                I: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
+                I: ::wasm_bindgen::convert::RefIntoWasmAbi,
                 O: 'static;
             #[doc = " run receives an array of PipelineRecord which can be"]
             #[doc = " transformed and returned to the pipeline"]
@@ -44188,7 +44188,7 @@ pub mod cloudflare {
                 metadata: &PipelineBatchMetadata,
             ) -> Promise<Array<O>>
             where
-                I: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+                I: ::wasm_bindgen::convert::RefIntoWasmAbi;
         }
         #[allow(dead_code)]
         pub type PipelineRecord = Object;
@@ -44241,7 +44241,7 @@ pub mod cloudflare {
                 #[wasm_bindgen(slice = "array")] records: &[T],
             ) -> Result<(), JsValue>
             where
-                T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+                T: ::wasm_bindgen::convert::RefIntoWasmAbi;
             #[doc = " The Pipeline interface represents the type of a binding to a Pipeline"]
             #[doc = ""]
             #[doc = " * `records` - The records to send to the pipeline"]
@@ -44251,7 +44251,7 @@ pub mod cloudflare {
                 #[wasm_bindgen(slice = "array")] records: &[T],
             ) -> Promise<Undefined>
             where
-                T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+                T: ::wasm_bindgen::convert::RefIntoWasmAbi;
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -47297,7 +47297,7 @@ pub mod rpc {
         pub fn dup<T>(this: &Stub<T>) -> Result<StubBase<T>, JsValue>;
     }
     #[allow(dead_code)]
-    pub type BaseType = Option<Nullable<JsValue>>;
+    pub type BaseType = Nullable<Option<JsValue>>;
     #[allow(dead_code)]
     pub type Stubify = JsValue;
     #[allow(dead_code)]
@@ -52932,7 +52932,7 @@ extern "C" {
         batch: &[WorkflowInstanceCreateOptions<PARAMS>],
     ) -> Result<Vec<WorkflowInstance>, JsValue>
     where
-        WorkflowInstanceCreateOptions<PARAMS>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        WorkflowInstanceCreateOptions<PARAMS>: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[doc = " Create a batch of instances and return handle for all of them. If a provided id exists, an error will be thrown."]
     #[doc = " `createBatch` is limited at 100 instances at a time or when the RPC limit for the batch (1MiB) is reached."]
     #[doc = ""]
@@ -52945,7 +52945,7 @@ extern "C" {
         batch: &[WorkflowInstanceCreateOptions<PARAMS>],
     ) -> Promise<Array<WorkflowInstance>>
     where
-        WorkflowInstanceCreateOptions<PARAMS>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        WorkflowInstanceCreateOptions<PARAMS>: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

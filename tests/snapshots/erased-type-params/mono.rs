@@ -58,7 +58,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_keys<Metadata>(this: &ListResult<Metadata>, val: &[ListKey<Metadata>])
     where
-        ListKey<Metadata>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        ListKey<Metadata>: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, getter)]
     pub fn cursor<Metadata>(this: &ListResult<Metadata>) -> String;
     #[wasm_bindgen(method, getter, js_name = "cursor")]

@@ -831,7 +831,7 @@ impl<'a> ClassConfig<'a> {
     /// erased path keeps the extern declaration's `JsGeneric` bound. The
     /// per-monomorphization path instead needs `IntoWasmAbi` because helper
     /// bodies call generated setters with values of these types, and
-    /// `VectorRefIntoWasmAbi` for one a setter takes a `&[T]` of.
+    /// `RefIntoWasmAbi` for one a setter takes a `&[T]` of.
     fn helper_generics_decl(&self) -> TokenStream {
         if !CodegenContext::generic_mono(self.cgctx) {
             return self.type_generics_decl();
@@ -852,7 +852,7 @@ impl<'a> ClassConfig<'a> {
                 let ident = super::typemap::make_ident(&tp.name);
                 let mut bound = quote! { ::wasm_bindgen::convert::IntoWasmAbi };
                 if sliced(&tp.name) {
-                    bound.extend(quote! { + ::wasm_bindgen::convert::VectorRefIntoWasmAbi });
+                    bound.extend(quote! { + ::wasm_bindgen::convert::RefIntoWasmAbi });
                 }
                 if let Some(b) = self.bounded().filter(|b| b.param == tp.name) {
                     let b = super::typemap::make_ident(&b.trait_name);

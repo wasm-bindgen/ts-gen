@@ -2322,7 +2322,8 @@ pub(crate) fn render_param_type(
 /// `None` would have nothing to infer it from.
 fn mono_argument_type(ty: &TypeRef) -> Option<TokenStream> {
     if let Some((core, n)) = ty.split_empties() {
-        return mono_argument_type(&core).map(|_| typemap::nullable_carrier(quote! { &str }, n));
+        return mono_argument_type(&core)
+            .map(|_| typemap::nullable_carrier(quote! { &str }, n, true));
     }
     match ty {
         TypeRef::String | TypeRef::StringLiteral(_) => {
@@ -2440,8 +2441,8 @@ pub fn generate_dictionary_params_in(
 
 /// Under per-monomorphization a type parameter crosses the ABI as itself,
 /// so a generic import states the ABI traits it needs in a `where` clause:
-/// `IntoWasmAbi` for an argument (`RefIntoWasmAbi` for a borrowed `&T`,
-/// `VectorRefIntoWasmAbi` on the element of a borrowed `&[T]`),
+/// `IntoWasmAbi` for an argument (`RefIntoWasmAbi` for a borrowed `&T` and
+/// on the element of a borrowed `&[T]`),
 /// `FromWasmAbi` for a return, and `'static` for an awaited one. An
 /// imported type implements its ABI for any arguments, so it is bounded
 /// only by `'static`; bare parameters and std containers of them are
@@ -2629,8 +2630,8 @@ fn state_fn_abi_bounds(f: &mut syn::ForeignItemFn, awaits_promise: bool) {
         }
         match &*arg.ty {
             // wasm-bindgen marshals a borrowed type parameter through
-            // `RefIntoWasmAbi` and a borrowed slice through its element's
-            // `VectorRefIntoWasmAbi`; other referents through `&X` itself.
+            // `RefIntoWasmAbi` and a borrowed slice through its element's;
+            // other referents through `&X` itself.
             syn::Type::Reference(r) => match &*r.elem {
                 syn::Type::Path(p) if p.qself.is_none() && is_bare_param(&p.path, &params) => {
                     bound(
@@ -2642,7 +2643,7 @@ fn state_fn_abi_bounds(f: &mut syn::ForeignItemFn, awaits_promise: bool) {
                     let elem = &slice.elem;
                     bound(
                         quote! { #elem },
-                        quote! { ::wasm_bindgen::convert::VectorRefIntoWasmAbi },
+                        quote! { ::wasm_bindgen::convert::RefIntoWasmAbi },
                     );
                 }
                 elem => {
@@ -2713,7 +2714,8 @@ fn is_bare_param(path: &syn::Path, params: &std::collections::HashSet<String>) -
 }
 
 /// The bare type parameter `T` of an `Option<T>`, `Nullable<T>` or
-/// `Option<Nullable<T>>`, with the carrier whose ABI trait bounds it.
+/// `Option<Nullable<T>>` (`Nullable<Option<T>>`), with the carrier whose ABI
+/// trait bounds it.
 fn carrier_param<'t>(
     ty: &'t syn::Type,
     params: &std::collections::HashSet<String>,
@@ -2733,8 +2735,10 @@ fn carrier_param<'t>(
     let Some(syn::GenericArgument::Type(inner)) = args.args.first() else {
         return None;
     };
-    if let Some((param, "Nullable")) = carrier_param(inner, params) {
-        return Some((param, "Nullable"));
+    match carrier_param(inner, params) {
+        Some((param, "Nullable")) => return Some((param, "Nullable")),
+        Some((param, "Option")) if carrier == "Nullable" => return Some((param, "Nullable")),
+        _ => {}
     }
     let syn::Type::Path(inner) = inner else {
         return None;

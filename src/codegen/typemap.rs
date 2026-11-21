@@ -2319,7 +2319,7 @@ pub fn to_syn_type(
             if bare == "JsValue" || (bare == "& JsValue" && n.admits_null()) {
                 return inner_ty;
             }
-            return nullable_carrier(inner_ty, n);
+            return nullable_carrier(inner_ty, n, CodegenContext::generic_mono(ctx));
         }
         // A read of the top type stays bare: `any` and `unknown` already
         // admit both empties in-band (`is_null`, `is_undefined`), and
@@ -2330,7 +2330,7 @@ pub fn to_syn_type(
         if is_jsvalue_arg(&inner_ty) && is_top_type(&core, ctx, scope) {
             return inner_ty;
         }
-        return read_carrier(inner_ty, n);
+        return read_carrier(inner_ty, n, CodegenContext::generic_mono(ctx));
     }
 
     // Helper: should this type get `&` in argument position?
@@ -2803,7 +2803,11 @@ pub(crate) fn union_alias_argument(
     Some(match n {
         None if alias.kind.is_some() => quote! { impl #path },
         None => quote! { impl ::core::convert::Into<#path> },
-        Some(n) => nullable_carrier(union_alias_enum_path(&alias, path), n),
+        Some(n) => nullable_carrier(
+            union_alias_enum_path(&alias, path),
+            n,
+            ctx.experimental_generic_mono,
+        ),
     })
 }
 
@@ -2831,7 +2835,7 @@ fn union_alias_read(
             .chain(alias.nullability)
             .reduce(|a, b| a.with(b))
         {
-            Some(n) => read_carrier(path, n),
+            Some(n) => read_carrier(path, n, ctx.experimental_generic_mono),
             None => path,
         },
     )
@@ -2861,8 +2865,13 @@ fn union_alias_enum_path(alias: &UnionAlias, path: TokenStream) -> TokenStream {
 /// `Option<Nullable<T>>` admits both. `IntoWasmAbi` has to choose what an
 /// empty crosses as, so on a write each carrier owns one empty; a type
 /// argument has no direction and names the union as written.
-pub(crate) fn nullable_carrier(inner: TokenStream, n: ir::Nullability) -> TokenStream {
+///
+/// Per-monomorphization (`mono`) builds on wasm-bindgen#5468, where the
+/// carrier of both is `Nullable<Option<T>>` and the released nesting no
+/// longer crosses.
+pub(crate) fn nullable_carrier(inner: TokenStream, n: ir::Nullability, mono: bool) -> TokenStream {
     match n {
+        ir::Nullability::Both if mono => quote! { Nullable<Option<#inner>> },
         ir::Nullability::Both => quote! { Option<Nullable<#inner>> },
         ir::Nullability::Null => quote! { Nullable<#inner> },
         ir::Nullability::Undefined => quote! { Option<#inner> },
@@ -2873,10 +2882,11 @@ pub(crate) fn nullable_carrier(inner: TokenStream, n: ir::Nullability) -> TokenS
 /// changes nothing JS to Wasm, so `T?` and `@js(null) T?` read as
 /// `Option<T>`, which takes `null` and `undefined` alike as `None`
 /// (wasm-bindgen#5428), where `Nullable<T>` would reject `undefined`. Only
-/// the strict IR's `T??` tells them apart, as `Option<Nullable<T>>`.
-pub(crate) fn read_carrier(inner: TokenStream, n: ir::Nullability) -> TokenStream {
+/// the strict IR's `T??` tells them apart, in the [exact
+/// carrier](nullable_carrier) of both.
+pub(crate) fn read_carrier(inner: TokenStream, n: ir::Nullability, mono: bool) -> TokenStream {
     match n {
-        ir::Nullability::Both => nullable_carrier(inner, n),
+        ir::Nullability::Both => nullable_carrier(inner, n, mono),
         _ => quote! { Option<#inner> },
     }
 }
@@ -3250,7 +3260,8 @@ fn mono_promise_carrier(
     }
     let (core, n, scope) = split_empties_in(inner, ctx, scope)?;
     let inner_ty = to_syn_type(&core, pos.to_inner(), ctx, scope, from_module);
-    (!is_jsvalue_arg(&inner_ty)).then(|| read_carrier(inner_ty, n))
+    (!is_jsvalue_arg(&inner_ty))
+        .then(|| read_carrier(inner_ty, n, CodegenContext::generic_mono(ctx)))
 }
 
 /// Append `generic_args` to `base` when `name` is a locally emitted generic
@@ -3553,6 +3564,7 @@ fn return_value(
                     from_module,
                 ),
                 n,
+                CodegenContext::generic_mono(ctx),
             ),
             None => to_syn_type(ty, TypePosition::RETURN.to_inner(), ctx, scope, from_module),
         };
@@ -3762,7 +3774,7 @@ fn to_mono_user_generic_arg_impl(
         ),
         t if let Some((inner, n, s)) = split_empties_in(t, Some(ctx), peeled_scope) => {
             let inner = to_mono_user_generic_arg_impl(&inner, ctx, s, from_module, visited);
-            nullable_carrier(inner, n)
+            nullable_carrier(inner, n, true)
         }
         t if local_generic_args(t, ctx, peeled_scope).is_some() => to_syn_type(
             t,
@@ -3862,9 +3874,9 @@ fn to_mono_js_string_return_type_impl(
             let inner =
                 to_mono_js_string_return_type_impl(&inner, ctx, s, from_module, read, visited);
             if read {
-                read_carrier(inner, n)
+                read_carrier(inner, n, true)
             } else {
-                nullable_carrier(inner, n)
+                nullable_carrier(inner, n, true)
             }
         }
         t @ TypeRef::Reference { segments, .. }
@@ -3961,7 +3973,7 @@ fn synthesised_read(
     }
     let (core, n) = read.split_empties()?;
     let inner = maybe_synthesise_return_union(&core, ctx, scope, from_module, anchor)?;
-    Some(read_carrier(inner, n))
+    Some(read_carrier(inner, n, CodegenContext::generic_mono(ctx)))
 }
 
 /// Whether `ty` is `any` or `unknown`, through aliases.

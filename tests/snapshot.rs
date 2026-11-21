@@ -44,6 +44,15 @@ const FEATURE_CONFIGS: &[(&str, &[&str], &[&str])] = &[
         &["node-nullable", "nullability", "optional-reads"],
     ),
     (
+        "mono-strict",
+        &[
+            "--experimental-generic-mono",
+            "--fallible",
+            "--strict-nullable",
+        ],
+        &["node-nullable", "nullability", "optional-reads"],
+    ),
+    (
         "promise",
         &["--promise-returns", "promise"],
         PROMISE_FIXTURES,

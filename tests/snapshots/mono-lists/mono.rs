@@ -78,7 +78,7 @@ extern "C" {
     #[wasm_bindgen(variadic, catch, js_name = "bagOf")]
     pub fn bag_of<T>(items: &[T]) -> Result<Bag<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {

@@ -318,7 +318,7 @@ and keeps the exact one):
 The remaining handle positions are ones wasm-bindgen does not accept a
 carrier in yet: `Function<fn(..)>` needs `ErasableGeneric<Repr =
 JsValue>` and `JsCast` on its signature types, slices need
-`VectorRefIntoWasmAbi`, and the js-sys `Array`, `Map` and `Object`
+`RefIntoWasmAbi` on the element, and the js-sys `Array`, `Map` and `Object`
 APIs (and `Promise::resolve`) need `ErasableGeneric<Repr = JsValue>` on
 the element.
 
@@ -339,8 +339,15 @@ admitting both empties, and every name besides their `null` arms:
 | `f(x: string \| null)` (write)            | `f(&str)`, `f_with_null()` | the same                         |
 | `f(x?: string \| null)` (write)           | `f()`, `f_with_x(&str)`    | adds `f_with_null()`             |
 
+[Per-monomorphization](#per-monomorphization) builds on wasm-bindgen's
+unreleased stack, where the carrier of both empties is `Nullable<Option<T>>`
+(`Nullable::Null`, `Nullable::Value(None)` for `undefined`) and
+`Option<Nullable<T>>` no longer crosses, so it nests `T??` that way round
+wherever the default writes `Option<Nullable<T>>`.
+
 The `nullability`, `node-nullable` and `optional-reads` fixtures carry a
-`strict.rs` snapshot beside their `default.rs` and `mono.rs`.
+`strict.rs` and a `mono-strict.rs` snapshot beside their `default.rs` and
+`mono.rs`.
 
 ## Array and slice types
 
@@ -2721,8 +2728,8 @@ per-monomorphization path. Every generated extern block receives
 bare type-parameter arguments are passed by value so each concrete Rust type
 uses its native ABI representation. Each import states the ABI bounds it
 needs, so a generic caller can read them off the declaration: `IntoWasmAbi`
-for an argument (`T: RefIntoWasmAbi` for a borrowed `&T`, and
-`T: VectorRefIntoWasmAbi` for a borrowed `&[T]`), `FromWasmAbi` for a return,
+for an argument (`T: RefIntoWasmAbi` for a borrowed `&T` and for the element
+of a borrowed `&[T]`), `FromWasmAbi` for a return,
 `Option<T>: IntoWasmAbi`/`Option<T>: FromWasmAbi` for an `Option<T>`,
 `NullableIntoWasmAbi` for a written `Nullable<T>` (and
 `NullableFromWasmAbi` for a `T??` read's), and `'static`
