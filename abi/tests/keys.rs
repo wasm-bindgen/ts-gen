@@ -257,7 +257,9 @@ fn canonical_spelling() {
         ("Any?", "Any?"),
         ("\"node:buffer\".Buffer", "\"node:buffer\".Buffer"),
         ("Buffer", "Buffer"),
-        ("\"Str\"", "Str"),
+        (".\"Str\"", ".Str"),
+        ("\"Str\"", "\"Str\""),
+        ("Buffer[\"a\"][]", "Buffer[\"a\"][]"),
         ("ns.\"content-type\"", "ns.\"content-type\""),
     ];
     for (src, want) in cases {

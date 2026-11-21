@@ -461,6 +461,7 @@ impl<'a, 'b> Glue<'a, 'b> {
         Ok(match &r.kind {
             Kind::Rec { .. } => unreachable!(),
             Kind::Unit | Kind::Never => "undefined".into(),
+            Kind::Lit(l) => literal(l),
             Kind::Scalar(s) => lift_scalar(*s, &w[0]),
             Kind::NullScalar(s, ScalarNull::Niche(n)) => format!(
                 "({} === {} ? {absent} : {})",
@@ -1053,6 +1054,10 @@ impl<'a, 'b> Glue<'a, 'b> {
         let cx = if lowers_alloc(r) { "cx" } else { "null" };
         Ok(match &r.kind {
             Kind::Unit | Kind::Never => Vec::new(),
+            Kind::Lit(l) => {
+                b.line(format!("if ({v} !== {}) $fail({what}, {v});", literal(l)));
+                Vec::new()
+            }
             Kind::Scalar(s) => vec![b.bind(lower_scalar(*s, v, m))],
             Kind::NullScalar(s, ScalarNull::Niche(n)) => vec![b.bind(format!(
                 "({v} == null ? {} : {})",
@@ -2713,4 +2718,9 @@ pub(crate) fn lowers_alloc(r: &Repr) -> bool {
             .any(|a| a.payload.iter().any(lowers_alloc)),
         _ => false,
     }
+}
+
+/// A literal type's value (§13).
+fn literal(l: &ts_gen_abi::ir::Literal) -> String {
+    ts_gen_abi::text::print_type(&ts_gen_abi::ir::Type::Lit(l.clone()))
 }

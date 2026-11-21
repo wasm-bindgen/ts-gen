@@ -177,6 +177,14 @@ pub struct ScopeArena {
     /// by the scope their declaration is declared in and its name. Only the
     /// IR producer reads them.
     symbol_members: HashMap<(ScopeId, String), Vec<crate::ir::Member>>,
+    /// The parameters typed by exactly an erased `keyof` type parameter of
+    /// their own signature, by its scope and their position. Only the IR
+    /// producer reads them.
+    key_params: HashMap<(ScopeId, usize), String>,
+    /// The type as written of each parameter that indexes by such a type
+    /// parameter, and of the result at `usize::MAX`, which evaluation
+    /// replaces. Only the IR producer reads them.
+    keyed: HashMap<(ScopeId, usize), crate::ir::TypeRef>,
 }
 
 impl ScopeArena {
@@ -187,6 +195,69 @@ impl ScopeArena {
             erased_bounds: HashMap::new(),
             nullish: Default::default(),
             symbol_members: HashMap::new(),
+            key_params: HashMap::new(),
+            keyed: HashMap::new(),
+        }
+    }
+
+    /// Whether `name` is an erased `keyof` type parameter that `scope`
+    /// itself declares.
+    pub fn is_key(&self, scope: ScopeId, name: &str) -> bool {
+        matches!(
+            self.erased_bound(scope, name),
+            Some((owner, crate::ir::TypeRef::KeyOf(_))) if owner == scope
+        )
+    }
+
+    pub fn note_key_param(&mut self, scope: ScopeId, position: usize, name: String) {
+        self.key_params.insert((scope, position), name);
+    }
+
+    pub fn key_param(&self, scope: ScopeId, position: usize) -> Option<&String> {
+        self.key_params.get(&(scope, position))
+    }
+
+    pub fn note_keyed(&mut self, scope: ScopeId, position: usize, ty: crate::ir::TypeRef) {
+        self.keyed.insert((scope, position), ty);
+    }
+
+    pub fn keyed(&self, scope: ScopeId, position: usize) -> Option<&crate::ir::TypeRef> {
+        self.keyed.get(&(scope, position))
+    }
+
+    /// The scope binding `name`, from `scope` outwards.
+    pub fn binding_owner(&self, scope: ScopeId, name: &str) -> Option<ScopeId> {
+        self.chain(scope)
+            .into_iter()
+            .find(|&s| self.get(s).get_binding(name).is_some())
+    }
+
+    /// Whether `ty` indexes by a key parameter of `scope`.
+    pub fn indexes_by_key(&self, scope: ScopeId, ty: &crate::ir::TypeRef) -> bool {
+        use crate::ir::TypeRef;
+        let any = |ts: &mut dyn Iterator<Item = &TypeRef>| {
+            let mut found = false;
+            for t in ts {
+                found |= self.indexes_by_key(scope, t);
+            }
+            found
+        };
+        match ty {
+            TypeRef::IndexedAccess(o, i) => {
+                let key = matches!(&**i, TypeRef::Reference { segments, generic_args }
+                    if generic_args.is_empty()
+                        && matches!(&segments[..], [k] if self.is_key(scope, k)));
+                key || self.indexes_by_key(scope, o)
+            }
+            TypeRef::Reference { generic_args, .. } => any(&mut generic_args.iter()),
+            TypeRef::Array(e) => self.indexes_by_key(scope, e),
+            TypeRef::Union(u) => any(&mut u.members().iter()),
+            TypeRef::Intersection(v) | TypeRef::Tuple(v) => any(&mut v.iter()),
+            TypeRef::Function(sig) => {
+                any(&mut sig.params.iter().map(|p| &p.type_ref))
+                    || self.indexes_by_key(scope, &sig.return_type)
+            }
+            _ => false,
         }
     }
 

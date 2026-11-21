@@ -167,6 +167,8 @@ impl<'a> Keys<'a> {
                 format!("*{m}{}", self.whole_vec(elem, cx))
             }
             Type::Nullable(t, _) => format!("{}?", self.operand(t, cx)),
+            Type::Lit(l) => crate::text::print_type(&Type::Lit(l.clone())),
+            Type::Index(m, k) => format!("{}[{}]", self.operand(m, cx), self.ty(k, cx)),
             Type::Named(r) => {
                 if let Some((loc, t)) = self.symbols.unfold(r, cx) {
                     if !self.expanding.borrow().contains(&loc) {

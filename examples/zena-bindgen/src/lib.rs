@@ -414,6 +414,27 @@ pub fn generate_with(ir: &Ir, libs: &[Lib<'_>], opts: &Options) -> anyhow::Resul
     }
     g.lib_tags();
     let members = layouts.keys.members();
+    // A keyed member reads erased (IR.md §13), under its own key.
+    let erased: Vec<Option<Member>> = members
+        .iter()
+        .map(|k| ts_gen_abi::keyed::erased_member(&layouts.keys.symbols, k.member, &k.cx))
+        .collect();
+    let members: Vec<Keyed<'_>> = members
+        .into_iter()
+        .zip(&erased)
+        .map(|(k, m)| match m {
+            Some(member) => {
+                let declared = k
+                    .member
+                    .tparams
+                    .iter()
+                    .map(|p| (p.name.clone(), matches!(p.bound, Some(Bound::KeyOf(_)))));
+                g.member_keys.insert(k.key.clone(), declared.collect());
+                Keyed { member, ..k }
+            }
+            None => k,
+        })
+        .collect();
     g.enums()?;
     g.classes(&members)?;
     g.functions(&members)?;
@@ -454,6 +475,7 @@ impl<'a> Gen<'a> {
             iter_result: None,
             lib: false,
             runtime: false,
+            member_keys: HashMap::new(),
             tags: HashMap::new(),
             owner: None,
             opaque_boxes: false,
@@ -479,6 +501,9 @@ struct DeclRef<'a> {
 struct Gen<'a> {
     layouts: &'a Layouts<'a>,
     opts: &'a Options,
+    /// The type parameters a keyed member is declared with, by its key,
+    /// each with whether it is a key: its instantiations give a key `str`.
+    member_keys: HashMap<String, Vec<(String, bool)>>,
     /// Zena names by canonical location (`key::location`).
     names: HashMap<String, String>,
     used: HashSet<String>,
@@ -1904,9 +1929,9 @@ impl<'a> Gen<'a> {
             unreachable!("exports are skipped")
         };
         let (name, tparams) = match arg {
-            Some(a) if generic => (partial_key(k, a), raw_targs_member(m)),
+            Some(a) if generic => (partial_key(k, a, &self.member_keys), raw_targs_member(m)),
             Some(a) => (brace_escape(&instance_key(k, &[a])), String::new()),
-            None if generic => (templated_key(k), raw_tparams(k)),
+            None if generic => (templated_key(k, &self.member_keys), raw_tparams(k)),
             None => (
                 brace_escape(self.arm.as_ref().map_or(&k.key, |(key, _)| key)),
                 String::new(),
@@ -2375,6 +2400,7 @@ impl<'a> Gen<'a> {
         Ok(match &r.kind {
             // A Zena function type can't name itself.
             Kind::Rec { .. } => return skip("a recursive function type"),
+            Kind::Lit(_) => return skip("a literal type"),
             Kind::Unit => "void".into(),
             // Zena's bottom type: a call to it ends control flow, and the
             // bridge throws if one returns.
@@ -4303,14 +4329,14 @@ fn brace_escape(s: &str) -> String {
 
 /// A generic member's import name: its key with a placeholder per type
 /// parameter, which the Zena compiler fills in per instantiation.
-fn templated_key(k: &Keyed<'_>) -> String {
-    let all: Vec<String> = k
+fn templated_key(k: &Keyed<'_>, keys: &HashMap<String, Vec<(String, bool)>>) -> String {
+    let mut all: Vec<String> = k
         .owner
         .iter()
         .flat_map(|c| c.tparams.iter())
-        .chain(&k.member.tparams)
         .map(|p| format!("{{{}}}", p.name))
         .collect();
+    all.extend(member_targs(k, keys));
     let (head, tail) = split_params(&k.key);
     format!(
         "{}<{}>{}",
@@ -4332,11 +4358,31 @@ fn fn_of(t: &Type) -> Option<(&FnType, bool)> {
     }
 }
 
+/// A placeholder per type parameter of the member's own, and `str` for a
+/// key, which stays a value (IR.md §13).
+fn member_targs(k: &Keyed<'_>, keys: &HashMap<String, Vec<(String, bool)>>) -> Vec<String> {
+    match keys.get(&k.key) {
+        Some(declared) => declared
+            .iter()
+            .map(|(name, key)| match key {
+                true => "str".into(),
+                false => format!("{{{name}}}"),
+            })
+            .collect(),
+        None => k
+            .member
+            .tparams
+            .iter()
+            .map(|p| format!("{{{}}}", p.name))
+            .collect(),
+    }
+}
+
 /// A specialized class's generic member's import name: its key at the
 /// class's argument `arg`, with a placeholder per type parameter of its own.
-fn partial_key(k: &Keyed<'_>, arg: &str) -> String {
+fn partial_key(k: &Keyed<'_>, arg: &str, keys: &HashMap<String, Vec<(String, bool)>>) -> String {
     let mut all = vec![brace_escape(arg)];
-    all.extend(k.member.tparams.iter().map(|p| format!("{{{}}}", p.name)));
+    all.extend(member_targs(k, keys));
     let (head, tail) = split_params(&k.key);
     format!(
         "{}<{}>{}",

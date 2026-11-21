@@ -13,7 +13,12 @@ class Bag {
     this.got = v;
   }
 }
-Object.assign(globalThis, { Util, Bag });
+class Shape {
+  static read(key) {
+    return { width: 7, label: "sq" }[key];
+  }
+}
+Object.assign(globalThis, { Util, Bag, Shape });
 
 const { instantiate } = await import("./bridge.js");
 const fs = await import("node:fs");
@@ -51,3 +56,12 @@ const b = new Bag();
 L.call("Bag#put<str>(T)", b, ...L.str("x"));
 assert.equal(b.got, "x");
 console.log("done");
+
+// A key's variant supplies it, and reads its own property's type.
+assert.equal(L.call('Shape.read<"width">(K)'), 7);
+assert.equal(L.takeStr(...L.call('Shape.read<"label">(K)')), "sq");
+// Erased, a key is a string and the result any of the properties.
+assert.equal(L.call("Shape.read(K)", ...L.str("width")), 7);
+assert.equal(L.call("Shape.read(K)", ...L.str("label")), "sq");
+// A variant may leave its key a value.
+assert.equal(L.call("Shape.read<str>(K)", ...L.str("label")), "sq");

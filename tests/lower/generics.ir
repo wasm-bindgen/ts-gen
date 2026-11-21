@@ -176,12 +176,119 @@ interface SignalMap {
   set halt(value: Halt);
 }
 
-listen(type: str, handler: fn(SignalOrHalt)) throws;
+listen<K in keyof SignalMap>(type: K, handler: fn(SignalMap[K])) throws;
 first<T>(items: T): T throws;
 
 class Cell<T> {
   new(value: T) throws;
   get value(): T;
+}
+
+class Event {}
+
+class MessageEvent extends Event {
+  get data(): str;
+}
+
+class CloseEvent extends Event {
+  get code(): f64;
+}
+
+interface EventListenerObject<E: Event = Event> {
+  handleEvent(event: E) throws;
+}
+
+interface WebSocketEventMap {
+  @js(object)
+  new();
+  get message(): MessageEvent;
+  set message(value: MessageEvent);
+  get close(): CloseEvent;
+  set close(value: CloseEvent);
+}
+
+class EventTarget<EventMap: Record<Event> = Record<Event>> {
+  new() throws;
+  addEventListener<Type in keyof EventMap>(type: Type, handler: EventListener<EventMap[Type]>) throws;
+  addEventListener<Type in keyof EventMap>(type: Type, handler: EventListenerObject<EventMap[Type]>) throws;
+  dispatchEvent(event: Event): bool throws;
+}
+
+class WebSocket extends EventTarget<WebSocketEventMap> {
+  new(url: str) throws;
+}
+
+addEventListener<Type in keyof WebSocketEventMap>(type: Type, handler: EventListener<WebSocketEventMap[Type]>) throws;
+addEventListener<Type in keyof WebSocketEventMap>(type: Type, handler: EventListenerObject<WebSocketEventMap[Type]>) throws;
+
+interface TextModel {
+  @js(object)
+  new();
+  get inputs(): TextModelInputs;
+  set inputs(value: TextModelInputs);
+  get postProcessedOutputs(): TextModelPostProcessedOutputs;
+  set postProcessedOutputs(value: TextModelPostProcessedOutputs);
+}
+
+interface ImageModel {
+  @js(object)
+  new();
+  get inputs(): ImageModelInputs;
+  set inputs(value: ImageModelInputs);
+  get postProcessedOutputs(): ImageModelPostProcessedOutputs;
+  set postProcessedOutputs(value: ImageModelPostProcessedOutputs);
+}
+
+interface AiModelList {
+  @js(object)
+  new();
+  get "text-model"(): TextModel;
+  set "text-model"(value: TextModel);
+  get "image-model"(): ImageModel;
+  set "image-model"(value: ImageModel);
+}
+
+interface Sizes {
+  @js(object)
+  new();
+  get width(): f64;
+  set width(value: f64);
+  get label(): str;
+  set label(value: str);
+}
+
+class Ai {
+  run<Name in keyof AiModelList>(model: Name, inputs: AiModelList[Name]["inputs"]): future<AiModelList[Name]["postProcessedOutputs"]>;
+  size<K in keyof Sizes>(key: K): Sizes[K] throws;
+  sizes(): F64OrStr throws;
+}
+
+interface TextModelInputs {
+  @js(object)
+  new();
+  get prompt(): str;
+  set prompt(value: str);
+}
+
+interface TextModelPostProcessedOutputs {
+  @js(object)
+  new();
+  get text(): str;
+  set text(value: str);
+}
+
+interface ImageModelInputs {
+  @js(object)
+  new();
+  get image(): arr<f64>;
+  set image(value: arr<f64>);
+}
+
+interface ImageModelPostProcessedOutputs {
+  @js(object)
+  new();
+  get label(): str;
+  set label(value: str);
 }
 
 enum DateUnitOrTimeUnit extends DateUnit, TimeUnit {}
@@ -222,6 +329,28 @@ enum HourOrWeek {
 enum SignalOrHalt {
   Signal(Signal);
   Halt(Halt);
+}
+
+type EventListener<E = Event> = fn(E);
+
+enum EventListenerOrEventListenerObject {
+  EventListener(EventListener<Event>);
+  EventListenerObject(EventListenerObject<Event>);
+}
+
+enum MessageEventOrCloseEvent {
+  MessageEvent(MessageEvent);
+  CloseEvent(CloseEvent);
+}
+
+enum EventListenerOrEventListenerObjectMessageEventOrCloseEvent {
+  EventListener(EventListener<MessageEventOrCloseEvent>);
+  EventListenerObject(EventListenerObject<MessageEventOrCloseEvent>);
+}
+
+enum F64OrStr {
+  F64(f64);
+  Str(str);
 }
 
 enum PluralExcludeTimeUnitHour {

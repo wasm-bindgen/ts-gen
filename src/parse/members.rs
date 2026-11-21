@@ -379,6 +379,9 @@ pub(crate) fn convert_formal_params_with_synthesis(
     let mut result_params = Vec::new();
 
     for (i, param) in params.items.iter().enumerate() {
+        if let Some(ann) = &param.type_annotation {
+            super::types::note_key_param(&ann.type_annotation, i, scope, ctx.scopes);
+        }
         // Capture the original (un-snake_cased) parameter name first so we
         // can use it as the synthesized type's name segment. The Rust
         // param name still goes through snake_case below.

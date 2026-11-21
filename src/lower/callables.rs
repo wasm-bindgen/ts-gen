@@ -943,6 +943,15 @@ impl Lowerer<'_> {
         named: Option<&Named>,
         cx: &Tcx,
     ) -> Option<(abi::Type, bool)> {
+        // An arm over a key isn't an enum's: enums have no type parameters.
+        let keyed = |t: &abi::Type| {
+            let mut keyed = false;
+            t.walk(&mut |t| keyed |= matches!(t, abi::Type::Index(..) | abi::Type::Lit(_)));
+            keyed
+        };
+        if l.values.iter().any(keyed) {
+            return None;
+        }
         let kinds = l.values.len()
             + usize::from(!l.strs.is_empty())
             + usize::from(!l.nums.is_empty())
@@ -1096,6 +1105,122 @@ impl Lowerer<'_> {
         doc: Option<String>,
         cx: &Tcx,
     ) -> Vec<Overload> {
+        let keyed = match form {
+            Form::Method(_) => self.keyed_sig(&sig, ret, cx),
+            _ => None,
+        };
+        let Some((params, kret, keys)) = keyed else {
+            let none = Vec::new();
+            return self.callable_as(form, is_static, tparams, sig, ret, throws, doc, cx, none);
+        };
+        // The evaluated reading declares the enums an erasing reading of
+        // the keyed one names.
+        let evaluated = Sig {
+            params: sig.params,
+            scope: sig.scope,
+        };
+        let said = self.diagnostics.len();
+        self.callable_as(
+            form.clone(),
+            is_static,
+            tparams,
+            evaluated,
+            ret,
+            throws,
+            doc.clone(),
+            cx,
+            Vec::new(),
+        );
+        self.diagnostics.truncate(said);
+        self.keyed = keys.iter().map(|k| k.name.clone()).collect();
+        let written = Sig {
+            params: &params,
+            scope: sig.scope,
+        };
+        let kret = kret.as_ref();
+        let out = self.callable_as(
+            form, is_static, tparams, written, kret, throws, doc, cx, keys,
+        );
+        self.keyed.clear();
+        out
+    }
+
+    /// The signature as written where it is keyed (§13): its parameters
+    /// and result before evaluation, and `K in keyof M` for each type
+    /// parameter that types a parameter. `None` when it isn't keyed, or
+    /// the IR can't state it.
+    #[allow(clippy::type_complexity)]
+    fn keyed_sig(
+        &mut self,
+        sig: &Sig<'_>,
+        ret: Option<&TypeRef>,
+        cx: &Tcx,
+    ) -> Option<(Vec<Param>, Option<TypeRef>, Vec<abi::TypeParam>)> {
+        if !self.opts.keyed || self.opts.lib.is_some() {
+            return None;
+        }
+        let scopes = &self.gctx.scopes;
+        let mut names: Vec<String> = Vec::new();
+        let mut params = sig.params.to_vec();
+        for (i, p) in params.iter_mut().enumerate() {
+            if let Some(k) = scopes.key_param(sig.scope, i) {
+                if !names.contains(k) {
+                    names.push(k.clone());
+                }
+                p.type_ref = TypeRef::ident(k.clone());
+            } else if let Some(t) = scopes.keyed(sig.scope, i) {
+                p.type_ref = t.clone();
+            }
+        }
+        if names.is_empty() {
+            return None;
+        }
+        let ret = match scopes.keyed(sig.scope, usize::MAX) {
+            Some(t) => Some(t.clone()),
+            None => ret.cloned(),
+        };
+        let cx = cx.at(sig.scope);
+        let mut keys = Vec::new();
+        for k in &names {
+            let (_, TypeRef::KeyOf(m)) = scopes.erased_bound(sig.scope, k)? else {
+                return None;
+            };
+            if !self.is_map(m, &cx) {
+                return None;
+            }
+            let m @ abi::Type::Named(_) = self.ty(m, &cx) else {
+                return None;
+            };
+            keys.push(abi::TypeParam {
+                name: k.clone(),
+                bound: Some(abi::Bound::KeyOf(m)),
+                default: None,
+            });
+        }
+        self.keyed = names;
+        let plain = params
+            .iter()
+            .map(|p| &p.type_ref)
+            .chain(&ret)
+            .all(|t| self.keyed_plain(t));
+        self.keyed.clear();
+        plain.then_some((params, ret, keys))
+    }
+
+    /// [`Self::callable`], with `keys` among its type parameters.
+    #[allow(clippy::too_many_arguments)]
+    fn callable_as(
+        &mut self,
+        form: Form,
+        is_static: bool,
+        tparams: &[TypeParam],
+        sig: Sig<'_>,
+        ret: Option<&TypeRef>,
+        throws: &Throws,
+        doc: Option<String>,
+        cx: &Tcx,
+        keys: Vec<abi::TypeParam>,
+    ) -> Vec<Overload> {
         let place = cx.place.clone();
         // The IR has no constructor type parameters: they read as their
         // default, else a class or interface they're bounded by, else `Any?`.
@@ -1164,7 +1289,9 @@ impl Lowerer<'_> {
                 .filter(|p| rest.is_none_or(|r| r.name != p.name))
                 .cloned()
                 .collect();
-            (self.tparams(&kept, sig.scope, &place, Some(&key), None), cx)
+            let mut own = self.tparams(&kept, sig.scope, &place, Some(&key), None);
+            own.extend(keys);
+            (own, cx)
         };
         let (mut result, js_null) = match ret {
             Some(TypeRef::Never) => (abi::Type::Never, false),

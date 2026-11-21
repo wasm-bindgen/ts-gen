@@ -92,6 +92,7 @@ impl Cx<'_> {
             namespace: self.namespace.clone(),
             tparams: self.tparams.clone(),
             assoc: self.assoc.clone(),
+            ..Context::default()
         }
     }
 }

@@ -112,6 +112,7 @@ impl<'a> Expander<'a> {
                 bound: p.bound.as_ref().map(|b| match b {
                     Bound::Subtype(t) => Bound::Subtype(self.ty(t, cx)),
                     Bound::In(ts) => Bound::In(ts.iter().map(|t| self.ty(t, cx)).collect()),
+                    Bound::KeyOf(t) => Bound::KeyOf(self.ty(t, cx)),
                 }),
                 default: p.default.as_ref().map(|t| self.ty(t, cx)),
             })

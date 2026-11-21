@@ -181,6 +181,10 @@ impl Type {
                 fun.result.walk(f);
             }
             Type::Named(r) => r.args.iter().for_each(|t| t.walk(f)),
+            Type::Index(m, k) => {
+                m.walk(f);
+                k.walk(f);
+            }
             _ => {}
         }
     }
@@ -190,7 +194,19 @@ impl Type {
     /// `self` with each named type that `f` maps replaced, innermost
     /// last: a replacement isn't mapped again.
     pub fn map_named(&self, f: &impl Fn(&TypeRef) -> Option<Type>) -> Type {
-        let m = |t: &Type| t.map_named(f);
+        self.map(&|t| match t {
+            Type::Named(r) => f(r),
+            _ => None,
+        })
+    }
+
+    /// `self` with each type that `f` maps replaced, outermost first: a
+    /// replacement isn't mapped again.
+    pub fn map(&self, f: &impl Fn(&Type) -> Option<Type>) -> Type {
+        if let Some(t) = f(self) {
+            return t;
+        }
+        let m = |t: &Type| t.map(f);
         let mb = |t: &Type| Box::new(m(t));
         match self {
             Type::Vec(t) => Type::Vec(mb(t)),
@@ -212,12 +228,11 @@ impl Type {
                 result: m(&fun.result),
                 throws: fun.throws.clone(),
             })),
-            Type::Named(r) => f(r).unwrap_or_else(|| {
-                Type::Named(TypeRef {
-                    path: r.path.clone(),
-                    args: r.args.iter().map(m).collect(),
-                })
+            Type::Named(r) => Type::Named(TypeRef {
+                path: r.path.clone(),
+                args: r.args.iter().map(m).collect(),
             }),
+            Type::Index(t, k) => Type::Index(mb(t), mb(k)),
             t => t.clone(),
         }
     }
@@ -245,6 +260,8 @@ pub enum Bound {
     Subtype(Type),
     /// `T in (A, B)`.
     In(Vec<Type>),
+    /// `K in keyof M`: the literal types of `M`'s property names (§13).
+    KeyOf(Type),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -542,6 +559,11 @@ pub enum Type {
     /// A class, interface, enum or type parameter, resolved by
     /// [`crate::resolve`].
     Named(TypeRef),
+    /// `"text"`, `1`, `true`: the type of that one value, which never
+    /// crosses (§13).
+    Lit(Literal),
+    /// `M[K]`: the type of `M`'s property `K` (§13).
+    Index(Box<Type>, Box<Type>),
 }
 
 impl Type {
@@ -658,7 +680,7 @@ pub struct ClassPred {
     pub props: Vec<(String, Literal)>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Literal {
     Str(String),
     Int(i64),

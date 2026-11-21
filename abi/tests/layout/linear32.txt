@@ -80,6 +80,19 @@ import tw:js/global D1PreparedStatement#all(): (externref) -> (externref)
   enum err: slots (externref); TypeError=1[0] Error=-1[0]
   future future<D1Result<T>>: take (externref) error (i32, externref)
 
+## Keys
+import tw:js/global Record#at(str): (externref, i32, i32) -> (externref)
+import tw:js/global WebSocketEventMap#get:message(): (externref) -> (externref)
+import tw:js/global WebSocketEventMap#get:close(): (externref) -> (externref)
+import tw:js/global EventTarget#addEventListener(Type,fn(EventMap[Type])): (externref, i32, i32, i32)
+  trampoline fn(Event): (i32, externref)
+import tw:js/global Model#get:inputs(): (externref) -> (i32, i32)
+import tw:js/global Model#get:outputs(): (externref) -> (f64)
+import tw:js/global AiModelList#get:"text-model"(): (externref) -> (externref)
+import tw:js/global Ai#run(Name,AiModelList[Name]["inputs"]): (externref, i32, i32, i32, i32) -> (externref)
+  enum err: slots (externref); TypeError=1[0] Error=-1[0]
+  future future<f64>: take (f64) error (i32, externref)
+
 ## Associated types
 import tw:js/global RoundingOptions#get:smallestUnit(): (externref) -> (externref)
 import tw:js/global RoundingOptions#set:smallestUnit(PluralUnit): (externref, externref)

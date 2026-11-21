@@ -43,6 +43,11 @@ function $str(v) {
   return v;
 }
 
+function $some(v, what) {
+  if (v === null || v === undefined) $fail(what, v);
+  return v;
+}
+
 // A class's value, or null when its path holds no function: its checks
 // then degrade to the interface test, and its arm tests never match (§8).
 function $class(C) {
@@ -449,14 +454,49 @@ function $f5(w0_0, w1_0) {
   w0_0.put(t1);
 }
 
+// ("tw:js/global", "Sizes#get:width()")
+function $f6(w0_0) {
+  const r = w0_0.width;
+  const t1 = $int(r, 0, 4294967295, "u32");
+  return t1;
+}
+
+// ("tw:js/global", "Sizes#get:label()")
+function $f7(w0_0) {
+  const cx = $cx;
+  const cxm = cx.n;
+  try {
+    const r = w0_0.label;
+    const t1 = $lowerUtf8($L, $str(r), cx);
+    const t2 = t1[0];
+    const t3 = t1[1];
+    const ra = $ret();
+    ra.i32[0] = t3;
+    return t2;
+  } catch (e) {
+    $release(cx, cxm);
+    throw e;
+  } finally {
+    cx.n = cxm;
+  }
+}
+
+// ("tw:js/global", "Shape.read(K)")
+function $f8(w0_0, w0_1) {
+  const t1 = $liftUtf8($L, w0_0, w0_1);
+  const r = globalThis.Shape.read(t1);
+  const t2 = $some(r, "Any");
+  return t2;
+}
+
 // ("tw:js/global", "Map.new<str,u32>()")
-function $f6() {
+function $f9() {
   const r = new globalThis.Map();
   return r;
 }
 
 // ("tw:js/global", "Map#get<str,u32>(K)")
-function $f7(w0_0, w1_0, w1_1) {
+function $f10(w0_0, w1_0, w1_1) {
   const t1 = $liftUtf8($L, w1_0, w1_1);
   const r = w0_0.get(t1);
   const t2 = (r == null ? 0 : 1);
@@ -467,7 +507,7 @@ function $f7(w0_0, w1_0, w1_1) {
 }
 
 // ("tw:js/global", "Map#set<str,u32>(K,V)")
-function $f8(w0_0, w1_0, w1_1, w2_0) {
+function $f11(w0_0, w1_0, w1_1, w2_0) {
   const t1 = $liftUtf8($L, w1_0, w1_1);
   const t2 = (w2_0 >>> 0);
   const r = w0_0.set(t1, t2);
@@ -476,7 +516,7 @@ function $f8(w0_0, w1_0, w1_1, w2_0) {
 }
 
 // ("tw:js/global", "Util.first<u32>(arr<T>)")
-function $f9(w0_0, w0_1) {
+function $f12(w0_0, w0_1) {
   const t1 = $h2(w0_0, w0_1);
   const r = globalThis.Util.first(t1);
   const t2 = (r == null ? 0 : 1);
@@ -487,7 +527,7 @@ function $f9(w0_0, w0_1) {
 }
 
 // ("tw:js/global", "Util.pair<str,bool>(A,B)")
-function $f10(w0_0, w0_1, w1_0) {
+function $f13(w0_0, w0_1, w1_0) {
   const t1 = $liftUtf8($L, w0_0, w0_1);
   const t2 = (w1_0 !== 0);
   const cx = $cx;
@@ -514,16 +554,53 @@ function $f10(w0_0, w0_1, w1_0) {
 }
 
 // ("tw:js/global", "Bag#put<str>(T)")
-function $f11(w0_0, w1_0, w1_1) {
+function $f14(w0_0, w1_0, w1_1) {
   const t1 = $liftUtf8($L, w1_0, w1_1);
   w0_0.put(t1);
+}
+
+// ("tw:js/global", "Shape.read<"width">(K)")
+function $f15() {
+  const t1 = "width";
+  const r = globalThis.Shape.read(t1);
+  const t2 = $int(r, 0, 4294967295, "u32");
+  return t2;
+}
+
+// ("tw:js/global", "Shape.read<"label">(K)")
+function $f16() {
+  const t1 = "label";
+  const cx = $cx;
+  const cxm = cx.n;
+  try {
+    const r = globalThis.Shape.read(t1);
+    const t2 = $lowerUtf8($L, $str(r), cx);
+    const t3 = t2[0];
+    const t4 = t2[1];
+    const ra = $ret();
+    ra.i32[0] = t4;
+    return t3;
+  } catch (e) {
+    $release(cx, cxm);
+    throw e;
+  } finally {
+    cx.n = cxm;
+  }
+}
+
+// ("tw:js/global", "Shape.read<str>(K)")
+function $f17(w0_0, w0_1) {
+  const t1 = $liftUtf8($L, w0_0, w0_1);
+  const r = globalThis.Shape.read(t1);
+  const t2 = $some(r, "Any");
+  return t2;
 }
 
 export function instantiate(language, bridge, imports = {}) {
   if ($B) throw new Error("this bridge is already instantiated");
   $cls0 = $class(globalThis.Map);
   $B = new WebAssembly.Instance(bridge, {
-    "tw:glue": { r7: $f7, r9: $f9, r10: $f10 },
+    "tw:glue": { r7: $f7, r10: $f10, r12: $f12, r13: $f13, r16: $f16 },
   }).exports;
   $S = new $Scratch($B);
   const instance = new WebAssembly.Instance(language, {
@@ -535,12 +612,18 @@ export function instantiate(language, bridge, imports = {}) {
       "Util.first(arr<T>)": $f3,
       "Util.pair(A,B)": $f4,
       "Bag#put(T)": $f5,
-      "Map.new<str,u32>()": $f6,
-      "Map#get<str,u32>(K)": $B.f7,
-      "Map#set<str,u32>(K,V)": $f8,
-      "Util.first<u32>(arr<T>)": $B.f9,
-      "Util.pair<str,bool>(A,B)": $B.f10,
-      "Bag#put<str>(T)": $f11,
+      "Sizes#get:width()": $f6,
+      "Sizes#get:label()": $B.f7,
+      "Shape.read(K)": $f8,
+      "Map.new<str,u32>()": $f9,
+      "Map#get<str,u32>(K)": $B.f10,
+      "Map#set<str,u32>(K,V)": $f11,
+      "Util.first<u32>(arr<T>)": $B.f12,
+      "Util.pair<str,bool>(A,B)": $B.f13,
+      "Bag#put<str>(T)": $f14,
+      "Shape.read<\"width\">(K)": $f15,
+      "Shape.read<\"label\">(K)": $B.f16,
+      "Shape.read<str>(K)": $f17,
     },
   });
   $X = instance.exports;

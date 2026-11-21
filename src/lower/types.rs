@@ -396,6 +396,14 @@ impl Lowerer<'_> {
                 generic_args,
             } => self.reference(segments, generic_args, cx),
             TypeRef::Unresolved(s) if s == "this" => cx.this.clone().unwrap_or(T::Any),
+            TypeRef::IndexedAccess(o, i) if self.key_index(o, i) => {
+                let m = self.ty(o, cx);
+                let k = match &**i {
+                    TypeRef::StringLiteral(s) => T::Lit(abi::Literal::Str(s.clone())),
+                    i => self.ty(i, cx),
+                };
+                T::Index(Box::new(m), Box::new(k))
+            }
             other => {
                 self.warn(format!(
                     "{}: `{}` has no IR type and reads as `Any`",
@@ -1682,6 +1690,106 @@ impl Lowerer<'_> {
         }
     }
 
+    /// Whether `o[i]` is an index the IR states (§13): by a key parameter
+    /// of the signature being lowered, or by a literal into one that is.
+    pub(crate) fn key_index(&self, o: &TypeRef, i: &TypeRef) -> bool {
+        match i {
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } => generic_args.is_empty() && matches!(&segments[..], [k] if self.keyed.contains(k)),
+            TypeRef::StringLiteral(_) => {
+                matches!(o, TypeRef::IndexedAccess(o, i) if self.key_index(o, i))
+            }
+            _ => false,
+        }
+    }
+
+    /// [`Self::plain`], but for the indexes the IR states.
+    pub(crate) fn keyed_plain(&self, t: &TypeRef) -> bool {
+        match t {
+            TypeRef::IndexedAccess(o, i) => {
+                self.key_index(o, i)
+                    && match &**o {
+                        TypeRef::IndexedAccess(..) => self.keyed_plain(o),
+                        o => self.plain(o),
+                    }
+            }
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } => {
+                self.utility(segments).is_none()
+                    && segments.as_slice() != ["this"]
+                    && generic_args.iter().all(|a| self.keyed_plain(a))
+            }
+            TypeRef::Array(t) => self.keyed_plain(t),
+            TypeRef::Tuple(ts) => ts.iter().all(|t| self.keyed_plain(t)),
+            TypeRef::Union(u) => u.members().iter().all(|t| self.keyed_plain(t)),
+            TypeRef::Function(f) => {
+                f.params.iter().all(|p| self.keyed_plain(&p.type_ref))
+                    && self.keyed_plain(&f.return_type)
+            }
+            t => self.plain(t),
+        }
+    }
+
+    /// Whether `m` lowers to a map (§13): a class or an interface, or a
+    /// type parameter bounded by one or by a string-keyed `Record`.
+    pub(crate) fn is_map(&self, m: &TypeRef, cx: &Tcx) -> bool {
+        let TypeRef::Reference {
+            segments,
+            generic_args,
+        } = m
+        else {
+            return false;
+        };
+        if !generic_args.iter().all(|a| self.plain(a)) {
+            return false;
+        }
+        let declared = |segments: &[String]| {
+            self.resolve_id(segments, cx).is_some_and(|id| {
+                matches!(
+                    self.gctx.get_type(id).kind,
+                    TypeKind::Interface(_) | TypeKind::Class(_)
+                )
+            })
+        };
+        if declared(segments) {
+            return true;
+        }
+        let [name] = &segments[..] else { return false };
+        let scopes = &self.gctx.scopes;
+        if !matches!(
+            scopes.resolve_binding(cx.scope, name),
+            Some(Binding::TypeParam)
+        ) || cx.subst.contains_key(name)
+        {
+            return false;
+        }
+        let Some(owner) = scopes.binding_owner(cx.scope, name) else {
+            return false;
+        };
+        let bound = self.gctx.iter_types().find_map(|(_, d)| {
+            let (scope, ps) = match &d.kind {
+                TypeKind::Class(c) => (c.body_scope, &c.type_params),
+                TypeKind::Interface(i) => (i.body_scope, &i.type_params),
+                _ => return None,
+            };
+            (scope == owner).then(|| ps.iter().find(|p| p.name == *name))?
+        });
+        match bound.and_then(|p| p.constraint.as_ref()) {
+            Some(TypeRef::Reference {
+                segments,
+                generic_args,
+            }) => match (segments.as_slice(), generic_args.as_slice()) {
+                ([r], [TypeRef::String, v]) if r == "Record" => self.plain(v),
+                _ => generic_args.iter().all(|a| self.plain(a)) && declared(segments),
+            },
+            _ => false,
+        }
+    }
+
     /// Whether `t` reads the same wherever it's written: nothing a use
     /// evaluates (`keyof`, `T[K]`, mapped and template types, utilities)
     /// or names for itself (object literals, intersections).
@@ -1970,6 +2078,9 @@ impl Lowerer<'_> {
                         Some(t) => t.clone(),
                         None => abi::Type::named([name.as_str()]),
                     };
+                }
+                Some(Binding::Erased(_)) if args.is_empty() && self.keyed.contains(name) => {
+                    return abi::Type::named([name.as_str()]);
                 }
                 Some(Binding::Erased(e)) => return self.ty(&e.type_ref(), cx),
                 _ => {}
