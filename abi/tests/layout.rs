@@ -566,10 +566,10 @@ class Store {
     );
     assert_eq!(s.params[2].repr.ty, "fn(MessageEvent)");
     assert_eq!(s.core().to_string(), "(externref, i32)");
-    // A key left a value reads erased over the map the variant gives.
+    // A key left a value reads as the member does erased.
     let s = l.member(on, &[ty("SocketEvents"), Type::Str]).unwrap();
     assert_eq!(s.params[1].repr.ty, "str");
-    assert_eq!(s.params[2].repr.ty, "fn(Any)");
+    assert_eq!(s.params[2].repr.ty, "fn(Event)");
     let s = l
         .member(on, &[ty("Record<Event>"), lit("anything")])
         .unwrap();

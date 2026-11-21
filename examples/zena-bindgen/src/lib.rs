@@ -48,7 +48,7 @@ use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::fmt::Write;
 
 use ts_gen_abi::ir::*;
-use ts_gen_abi::key::{location, Keyed, Role};
+use ts_gen_abi::key::{as_type, location, Keyed, Role};
 use ts_gen_abi::layout::{
     EnumLayout, Flow, FnLayout, Host, Kind, Layouts, Origin, Pos, Repr, ScalarNull, Shape, Storage,
     ValType,
@@ -834,7 +834,7 @@ impl<'a> Gen<'a> {
         match t {
             Type::Named(r) if r.args.is_empty() => {
                 match self.layouts.keys.symbols.resolve_decl(&r.path, cx) {
-                    Some((loc, _)) => location(&loc),
+                    Some((loc, _)) => as_type(location(&loc)),
                     None => ts_gen_abi::text::print_type(t),
                 }
             }
@@ -1483,7 +1483,7 @@ impl<'a> Gen<'a> {
                 let zarg = self
                     .generic_surface(&arg, &Context::default())
                     .map_err(|Skip(why)| anyhow::anyhow!("`{}`: {why}", s.arg))?;
-                let spelling = format!("{canonical}<{}>", s.arg);
+                let spelling = format!("{}<{}>", as_type(canonical.clone()), s.arg);
                 let _ = writeln!(head, "@spelling({})", zena_string(&spelling));
                 (
                     s.name.clone(),
@@ -1494,7 +1494,8 @@ impl<'a> Gen<'a> {
             }
             None => {
                 if base != canonical {
-                    let _ = writeln!(head, "@spelling({})", zena_string(&canonical));
+                    let spelling = as_type(canonical.clone());
+                    let _ = writeln!(head, "@spelling({})", zena_string(&spelling));
                 }
                 (base, self.class_tparams(c, &loc), parent, Vec::new())
             }

@@ -272,6 +272,13 @@ fn canonical_spelling() {
             "canonical spelling reads back for {src}"
         );
     }
+    // A declared name that isn't an identifier stays apart from a literal.
+    let ir = text::parse("ir 1;\nclass \"foo-bar\" {}").unwrap();
+    let named = text::parse_type(".\"foo-bar\"").unwrap();
+    assert_eq!(
+        Keys::new(&ir).ty(&named, &Context::default()),
+        ".\"foo-bar\""
+    );
 }
 
 #[test]

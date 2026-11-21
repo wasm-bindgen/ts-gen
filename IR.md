@@ -1709,8 +1709,8 @@ class Ai {
   Its key parameter has no wire value, and each index is that property's
   type: here `fn(MessageEvent)`. A literal that names no property of a
   closed map is a link error. A variant that leaves a key a value gives it
-  `str`: the key crosses as a string, and each index reads as it does
-  erased, over the map the variant gives.
+  `str`: the key crosses as a string, and each index reads as the
+  member's does erased, whatever map the variant gives.
 * **Erased**, a key parameter is a `str`, and `M[K]` is the type every key
   gives: an open map's value, else the one type its properties share, else
   the declared enum whose arms carry exactly their types, else `Any`. An
@@ -2503,7 +2503,8 @@ ctype       = the canonical spelling of a type (§3)
 * `T: C` is a subtype bound, `T in (A, B)` a concrete bound and
   `K in keyof M` a key bound (§13).
 * A `string` in type position that no `.` follows is a literal type, so a
-  lone quoted type name is written `."name"` there.
+  lone quoted type name is written `."name"` there, and in a canonical
+  spelling.
 * `type` begins an associated type only before a name and `=`, so it stays
   a member name (§13).
 * In a `ctype`, a type declared in a `module` block is the path

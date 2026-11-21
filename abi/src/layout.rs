@@ -1772,19 +1772,18 @@ impl<'a> Layouts<'a> {
                 elem: qb(elem),
             },
             Type::Nullable(t, js_null) => Type::Nullable(qb(t), *js_null),
-            // A key a type argument gives picks its property.
+            // A key a type argument gives picks its property. One left a
+            // value reads the index as its declaration erases it.
             Type::Index(m, k) => {
-                let (m, k) = (q(m), q(k));
                 let global = Context::default();
-                let found = match &k {
-                    Type::Lit(l) => crate::keyed::index(&self.keys.symbols, &m, l, &global),
+                let found = match q(k) {
+                    Type::Lit(l) => crate::keyed::index(&self.keys.symbols, &q(m), &l, &global),
                     _ => None,
                 };
-                let t = found.unwrap_or_else(|| {
-                    let t = Type::Index(Box::new(m), Box::new(k));
-                    crate::keyed::erased(&self.keys.symbols, &t, &global)
-                });
-                self.qualify(&t, &global, &HashMap::new())
+                match found {
+                    Some(t) => self.qualify(&t, &global, &HashMap::new()),
+                    None => q(&crate::keyed::erased(&self.keys.symbols, t, cx)),
+                }
             }
             Type::Named(r) => {
                 if let Some(a) = cx.assoc(&r.path) {
