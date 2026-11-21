@@ -58,6 +58,11 @@ impl PlaceholderBuilder {
         self.inner
     }
 }
+impl From<Placeholder> for PlaceholderBuilder {
+    fn from(inner: Placeholder) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -118,6 +123,11 @@ impl AttachmentBuilder {
         self.inner
     }
 }
+impl From<Attachment> for AttachmentBuilder {
+    fn from(inner: Attachment) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -174,6 +184,11 @@ impl PartBuilder {
     }
     pub fn build(self) -> Part {
         self.inner
+    }
+}
+impl From<Part> for PartBuilder {
+    fn from(inner: Part) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -264,6 +279,11 @@ impl CappedAttachmentBuilder {
     }
     pub fn build(self) -> CappedAttachment {
         self.inner
+    }
+}
+impl From<CappedAttachment> for CappedAttachmentBuilder {
+    fn from(inner: CappedAttachment) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]

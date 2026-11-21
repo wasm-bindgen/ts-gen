@@ -48,6 +48,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl From<BoxLikeObject> for BoxLikeObjectBuilder {
+        fn from(inner: BoxLikeObject) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -91,6 +96,11 @@ pub mod polish {
         }
         pub fn build(self) -> TimeLikeObject {
             self.inner
+        }
+    }
+    impl From<TimeLikeObject> for TimeLikeObjectBuilder {
+        fn from(inner: TimeLikeObject) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(private)]
@@ -170,6 +180,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl From<Options> for OptionsBuilder {
+        fn from(inner: Options) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -215,6 +230,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl<T: ::wasm_bindgen::JsGeneric> From<Holder<T>> for HolderBuilder<T> {
+        fn from(inner: Holder<T>) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -257,6 +277,11 @@ pub mod polish {
         }
         pub fn build(self) -> Transition {
             self.inner
+        }
+    }
+    impl From<Transition> for TransitionBuilder {
+        fn from(inner: Transition) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen]
@@ -330,6 +355,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl<U: ::wasm_bindgen::JsGeneric> From<Rounding<U>> for RoundingBuilder<U> {
+        fn from(inner: Rounding<U>) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Rounding , extends = Object , is_type_of = JsValue :: is_object)]
@@ -387,6 +417,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl<S: ::wasm_bindgen::JsGeneric> From<Stepped<S>> for SteppedBuilder<S> {
+        fn from(inner: Stepped<S>) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Stepped , extends = Object , is_type_of = JsValue :: is_object)]
@@ -430,6 +465,11 @@ pub mod polish {
         }
         pub fn build(self) -> MinuteStepping {
             self.inner
+        }
+    }
+    impl From<MinuteStepping> for MinuteSteppingBuilder {
+        fn from(inner: MinuteStepping) -> Self {
+            Self { inner }
         }
     }
     #[allow(dead_code)]
@@ -496,6 +536,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl<U: ::wasm_bindgen::JsGeneric> From<Bounded<U>> for BoundedBuilder<U> {
+        fn from(inner: Bounded<U>) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -554,6 +599,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl<U: ::wasm_bindgen::JsGeneric> From<PickedRounding<U>> for PickedRoundingBuilder<U> {
+        fn from(inner: PickedRounding<U>) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = PickedRounding , extends = Object , is_type_of = JsValue :: is_object)]
@@ -589,6 +639,11 @@ pub mod polish {
         }
         pub fn build(self) -> TimePicking {
             self.inner
+        }
+    }
+    impl From<TimePicking> for TimePickingBuilder {
+        fn from(inner: TimePicking) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen]
@@ -641,6 +696,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl<U: ::wasm_bindgen::JsGeneric> From<Spanning<U>> for SpanningBuilder<U> {
+        fn from(inner: Spanning<U>) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Spanning , extends = Object , is_type_of = JsValue :: is_object)]
@@ -672,6 +732,11 @@ pub mod polish {
         }
         pub fn build(self) -> HourSpanning {
             self.inner
+        }
+    }
+    impl From<HourSpanning> for HourSpanningBuilder {
+        fn from(inner: HourSpanning) -> Self {
+            Self { inner }
         }
     }
     pub mod spans {
@@ -733,6 +798,11 @@ pub mod polish {
                 self.inner
             }
         }
+        impl<U: ::wasm_bindgen::JsGeneric> From<Span<U>> for SpanBuilder<U> {
+            fn from(inner: Span<U>) -> Self {
+                Self { inner }
+            }
+        }
         #[wasm_bindgen]
         extern "C" {
             # [wasm_bindgen (extends = Span , extends = Object , is_type_of = JsValue :: is_object)]
@@ -764,6 +834,11 @@ pub mod polish {
             }
             pub fn build(self) -> HourSpan {
                 self.inner
+            }
+        }
+        impl From<HourSpan> for HourSpanBuilder {
+            fn from(inner: HourSpan) -> Self {
+                Self { inner }
             }
         }
         #[wasm_bindgen]
@@ -805,6 +880,11 @@ pub mod polish {
             }
             pub fn build(self) -> Mid<U> {
                 self.inner
+            }
+        }
+        impl<U: ::wasm_bindgen::JsGeneric> From<Mid<U>> for MidBuilder<U> {
+            fn from(inner: Mid<U>) -> Self {
+                Self { inner }
             }
         }
         #[wasm_bindgen]
@@ -857,6 +937,11 @@ pub mod polish {
                 self.inner
             }
         }
+        impl<U: ::wasm_bindgen::JsGeneric> From<Spanned<U>> for SpannedBuilder<U> {
+            fn from(inner: Spanned<U>) -> Self {
+                Self { inner }
+            }
+        }
     }
     pub mod steps {
         #[allow(unused_imports)]
@@ -900,6 +985,11 @@ pub mod polish {
                 self.inner
             }
         }
+        impl From<DaySpan> for DaySpanBuilder {
+            fn from(inner: DaySpan) -> Self {
+                Self { inner }
+            }
+        }
         #[wasm_bindgen]
         extern "C" {
             # [wasm_bindgen (extends = super :: spans :: Mid , extends = Object , is_type_of = JsValue :: is_object)]
@@ -933,6 +1023,11 @@ pub mod polish {
                 self.inner
             }
         }
+        impl From<DaySpan2> for DaySpan2Builder {
+            fn from(inner: DaySpan2) -> Self {
+                Self { inner }
+            }
+        }
         #[wasm_bindgen]
         extern "C" {
             # [wasm_bindgen (extends = super :: spans :: Spanned , extends = Object , is_type_of = JsValue :: is_object)]
@@ -964,6 +1059,11 @@ pub mod polish {
             }
             pub fn build(self) -> AnySpan {
                 self.inner
+            }
+        }
+        impl From<AnySpan> for AnySpanBuilder {
+            fn from(inner: AnySpan) -> Self {
+                Self { inner }
             }
         }
     }
@@ -1100,6 +1200,13 @@ pub mod polish {
             self.inner
         }
     }
+    impl<S: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric> From<Defaulted<S, T>>
+        for DefaultedBuilder<S, T>
+    {
+        fn from(inner: Defaulted<S, T>) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -1183,6 +1290,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl From<PartialBoxLikeObject> for PartialBoxLikeObjectBuilder {
+        fn from(inner: PartialBoxLikeObject) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -1226,6 +1338,11 @@ pub mod polish {
         }
         pub fn build(self) -> PartialOmitLikeBoxLikeObject {
             self.inner
+        }
+    }
+    impl From<PartialOmitLikeBoxLikeObject> for PartialOmitLikeBoxLikeObjectBuilder {
+        fn from(inner: PartialOmitLikeBoxLikeObject) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(private)]

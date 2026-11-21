@@ -272,6 +272,11 @@ impl RequestInitBuilder {
         self.inner
     }
 }
+impl From<RequestInit> for RequestInitBuilder {
+    fn from(inner: RequestInit) -> Self {
+        Self { inner }
+    }
+}
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `BodyInit`",
     label = "expected ReadableStream, string, ArrayBuffer, Blob, URLSearchParams or FormData"
@@ -521,6 +526,11 @@ impl ResponseInitBuilder {
         self.inner
     }
 }
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -610,6 +620,13 @@ impl<E: ::wasm_bindgen::convert::IntoWasmAbi> ExportedHandlerBuilder<E> {
     }
     pub fn build(self) -> ExportedHandler<E> {
         self.inner
+    }
+}
+impl<E: ::wasm_bindgen::convert::IntoWasmAbi> From<ExportedHandler<E>>
+    for ExportedHandlerBuilder<E>
+{
+    fn from(inner: ExportedHandler<E>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

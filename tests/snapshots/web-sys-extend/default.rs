@@ -66,6 +66,11 @@ impl FetchOptionsBuilder {
         self.inner
     }
 }
+impl From<FetchOptions> for FetchOptionsBuilder {
+    fn from(inner: FetchOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Response , extends = Object , is_type_of = JsValue :: is_object)]

@@ -263,6 +263,11 @@ impl RequestInitBuilder {
         self.inner
     }
 }
+impl From<RequestInit> for RequestInitBuilder {
+    fn from(inner: RequestInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum BodyInit {
@@ -496,6 +501,11 @@ impl ResponseInitBuilder {
         self.inner
     }
 }
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -583,6 +593,11 @@ impl<E: ::wasm_bindgen::JsGeneric> ExportedHandlerBuilder<E> {
     }
     pub fn build(self) -> ExportedHandler<E> {
         self.inner
+    }
+}
+impl<E: ::wasm_bindgen::JsGeneric> From<ExportedHandler<E>> for ExportedHandlerBuilder<E> {
+    fn from(inner: ExportedHandler<E>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]

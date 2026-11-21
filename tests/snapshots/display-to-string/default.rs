@@ -41,6 +41,11 @@ impl StampOptionsBuilder {
         self.inner
     }
 }
+impl From<StampOptions> for StampOptionsBuilder {
+    fn from(inner: StampOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

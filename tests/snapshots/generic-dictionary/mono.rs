@@ -66,6 +66,13 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetailsBuilder<T> {
         self.inner
     }
 }
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<EvaluationDetails<T>>
+    for EvaluationDetailsBuilder<T>
+{
+    fn from(inner: EvaluationDetails<T>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -123,5 +130,10 @@ impl<Cf: ::wasm_bindgen::convert::IntoWasmAbi> FetchOptionsBuilder<Cf> {
     }
     pub fn build(self) -> FetchOptions<Cf> {
         self.inner
+    }
+}
+impl<Cf: ::wasm_bindgen::convert::IntoWasmAbi> From<FetchOptions<Cf>> for FetchOptionsBuilder<Cf> {
+    fn from(inner: FetchOptions<Cf>) -> Self {
+        Self { inner }
     }
 }

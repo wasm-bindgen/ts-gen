@@ -52,6 +52,11 @@ pub mod shapes {
             self.inner
         }
     }
+    impl From<RoundingOptions> for RoundingOptionsBuilder {
+        fn from(inner: RoundingOptions) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -137,6 +142,11 @@ pub mod shapes {
             self.inner
         }
     }
+    impl From<Init> for InitBuilder {
+        fn from(inner: Init) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         #[wasm_bindgen(js_namespace = "Shapes")]
@@ -205,6 +215,11 @@ impl GlobalInitBuilder {
         self.inner
     }
 }
+impl From<GlobalInit> for GlobalInitBuilder {
+    fn from(inner: GlobalInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "shape-checks")]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -240,6 +255,11 @@ impl ModuleOptionsBuilder {
     }
     pub fn build(self) -> ModuleOptions {
         self.inner
+    }
+}
+impl From<ModuleOptions> for ModuleOptionsBuilder {
+    fn from(inner: ModuleOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "shape-checks")]
@@ -298,6 +318,11 @@ impl ChoiceBuilder {
     }
     pub fn build(self) -> Choice {
         self.inner
+    }
+}
+impl From<Choice> for ChoiceBuilder {
+    fn from(inner: Choice) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private, fallback)]

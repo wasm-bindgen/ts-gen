@@ -266,6 +266,11 @@ impl SettingsBuilder {
         self.inner
     }
 }
+impl From<Settings> for SettingsBuilder {
+    fn from(inner: Settings) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -1860,6 +1865,11 @@ impl AttachmentBuilder {
         self.inner
     }
 }
+impl From<Attachment> for AttachmentBuilder {
+    fn from(inner: Attachment) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     pub fn send(attachment: &Attachment);
@@ -1935,6 +1945,11 @@ impl UploadBuilder {
         self.inner
     }
 }
+impl From<Upload> for UploadBuilder {
+    fn from(inner: Upload) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     pub fn upload(upload: &Upload);
@@ -1999,6 +2014,11 @@ impl CoverBuilder {
     }
     pub fn build(self) -> Cover {
         self.inner
+    }
+}
+impl From<Cover> for CoverBuilder {
+    fn from(inner: Cover) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "nullability")]

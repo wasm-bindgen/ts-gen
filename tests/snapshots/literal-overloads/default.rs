@@ -692,6 +692,11 @@ impl<Type: ::wasm_bindgen::JsGeneric> GetOptionsBuilder<Type> {
         self.inner
     }
 }
+impl<Type: ::wasm_bindgen::JsGeneric> From<GetOptions<Type>> for GetOptionsBuilder<Type> {
+    fn from(inner: GetOptions<Type>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "literal-overloads")]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -955,6 +960,11 @@ impl StoreReaderBuilder {
     }
     pub fn build(self) -> StoreReader {
         self.inner
+    }
+}
+impl From<StoreReader> for StoreReaderBuilder {
+    fn from(inner: StoreReader) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "literal-overloads")]
