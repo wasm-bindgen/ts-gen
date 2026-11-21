@@ -712,12 +712,16 @@ impl ::core::convert::From<&ArrayBuffer> for BufferSourceKind {
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn hash(data: impl BufferSource) -> Result<String, JsValue>;
+    pub fn hash(
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "hash")]
-    pub fn hash_js_string(data: impl BufferSource) -> Result<JsString, JsValue>;
+    pub fn hash_js_string(
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
@@ -738,56 +742,67 @@ extern "C" {
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "store")]
-    pub fn store_with_array_buffer(
+    pub fn store_with_buffer(
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike,
     ) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "store")]
-    pub fn store_with_array_buffer_js_string(
+    pub fn store_with_buffer_js_string(
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
-    ) -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "store")]
-    pub fn store_with_typed_array(
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
-    ) -> Result<String, JsValue>;
-}
-#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "store")]
-    pub fn store_with_typed_array_js_string(
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
+        #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike,
     ) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn echo(data: &ArrayBuffer) -> Result<EchoReturnKind, JsValue>;
-}
-#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "echo")]
-    pub fn echo_with_typed_array(data: &Object) -> Result<EchoReturnKind, JsValue>;
+    pub fn echo(
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<EchoReturnKind, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
     #[doc = " * `data` - read before the call returns"]
     #[wasm_bindgen(catch)]
-    pub fn peek(data: impl BufferSource) -> Result<String, JsValue>;
+    pub fn peek(
+        #[wasm_bindgen(slice = "view")] data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
     #[doc = " * `data` - read before the call returns"]
     #[wasm_bindgen(catch, js_name = "peek")]
-    pub fn peek_js_string(data: impl BufferSource) -> Result<JsString, JsValue>;
+    pub fn peek_js_string(
+        #[wasm_bindgen(slice = "view")] data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn concat(parts: &[impl ::js_sys::BufferSourceLike]) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "concat")]
+    pub fn concat_js_string(parts: &[impl ::js_sys::BufferSourceLike])
+        -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn owned(
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
+extern "C" {
+    #[doc = " * `data` - read before the call returns"]
+    #[wasm_bindgen(catch, js_name = "ownedView")]
+    pub fn owned_view(
+        #[wasm_bindgen(slice = "view")] data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]

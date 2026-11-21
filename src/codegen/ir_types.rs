@@ -375,8 +375,9 @@ fn members(cx: &Cx<'_>, t: &abi::Type) -> Option<Vec<TypeRef>> {
             .map(|a| TypeRef::union([a.clone(), TypeRef::Undefined]));
         return Some(arms.iter().cloned().chain(omitted).collect());
     }
+    // Per-monomorphization takes a `buffer` whole.
     if *t == abi::Type::Buffer {
-        return buffer_handles(cx);
+        return (!cx.mono).then(|| buffer_handles(cx)).flatten();
     }
     let abi::Type::Named(r) = t else {
         return None;
@@ -400,7 +401,7 @@ fn members(cx: &Cx<'_>, t: &abi::Type) -> Option<Vec<TypeRef>> {
                 abi::JsEntry::Literal(s) => Some(TypeRef::StringLiteral(s.clone())),
                 _ => None,
             })?]),
-            [abi::Type::Buffer] => buffer_handles(cx),
+            [abi::Type::Buffer] if !cx.mono => buffer_handles(cx),
             [p] => Some(vec![ty(cx, p)?]),
             _ => None,
         })

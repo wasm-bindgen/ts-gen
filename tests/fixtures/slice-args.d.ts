@@ -72,3 +72,9 @@ export declare function store(key: string, value: string | ArrayBuffer | ArrayBu
 export declare function echo(data: ArrayBuffer | ArrayBufferView): ArrayBuffer | ArrayBufferView;
 /** @param data {@slice view} read before the call returns */
 export declare function peek(data: BufferSource): string;
+export declare function concat(parts: BufferSource[]): string;
+// Whether the callee received bytes it owns, rather than a view of linear
+// memory.
+export declare function owned(data: BufferSource): boolean;
+/** @param data {@slice view} read before the call returns */
+export declare function ownedView(data: BufferSource): boolean;
