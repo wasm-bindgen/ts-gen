@@ -677,6 +677,49 @@ extern "C" {
 pub fn try_peek(data: impl ::core::convert::Into<BufferSource>) -> Result<String, JsValue> {
     __try_peek(data.into())
 }
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    pub fn concat(parts: &[JsValue]) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "concat")]
+    pub fn try_concat(parts: &[JsValue]) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "owned")]
+    fn __owned(data: BufferSource) -> bool;
+}
+pub fn owned(data: impl ::core::convert::Into<BufferSource>) -> bool {
+    __owned(data.into())
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "owned")]
+    fn __try_owned(data: BufferSource) -> Result<bool, JsValue>;
+}
+pub fn try_owned(data: impl ::core::convert::Into<BufferSource>) -> Result<bool, JsValue> {
+    __try_owned(data.into())
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "ownedView")]
+    fn __owned_view(data: BufferSource) -> bool;
+}
+#[doc = " * `data` - read before the call returns"]
+pub fn owned_view(data: impl ::core::convert::Into<BufferSource>) -> bool {
+    __owned_view(data.into())
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "ownedView")]
+    fn __try_owned_view(data: BufferSource) -> Result<bool, JsValue>;
+}
+#[doc = " * `data` - read before the call returns"]
+pub fn try_owned_view(data: impl ::core::convert::Into<BufferSource>) -> Result<bool, JsValue> {
+    __try_owned_view(data.into())
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum EchoReturnKind {
