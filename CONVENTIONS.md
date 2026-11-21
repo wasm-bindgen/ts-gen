@@ -579,6 +579,48 @@ generic over their buffer (`Uint8Array<ArrayBuffer>`,
 argument is dropped in every position without a warning, and
 `Uint8Array<ArrayBuffer>` lowers exactly like `Uint8Array`.
 
+### Buffers
+
+`ArrayBuffer | ArrayBufferView`, however it's spelled (`BufferSource`
+included) and whatever else the union holds, is how a JS API says
+"bytes": the IR's `buffer` (IR.md §11). Per-monomorphization it is one
+argument, `impl js_sys::BufferSourceLike`, suffixed `_with_buffer` beside
+other alternatives. Bytes (`&[u8]`, `Vec<u8>`) and every buffer class
+(`ArrayBuffer`, each typed array, `DataView`, owned or borrowed) cross
+through the one import, a class as itself:
+
+```ts
+function digest(data: BufferSource): Promise<ArrayBuffer>;
+function put(key: string, value: string | ArrayBuffer | ArrayBufferView): void;
+function join(parts: BufferSource[]): Blob;
+```
+
+```rs
+pub async fn digest(#[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike) -> Result<ArrayBuffer, JsValue>;
+pub fn put(key: impl ::wasm_bindgen::JsStringLike, value: impl ::wasm_bindgen::JsStringLike);
+pub fn put_with_buffer(key: impl ::wasm_bindgen::JsStringLike, #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike);
+pub fn join(parts: &[impl ::js_sys::BufferSourceLike]) -> Blob;
+```
+
+```rs
+digest(&bytes[..]);        // a fresh `Uint8Array` of the bytes
+digest(&array_buffer);     // the `ArrayBuffer` itself
+digest(float32_array);     // the typed array itself
+```
+
+`slice = "copy"` makes the bytes a fresh `Uint8Array` the callee owns,
+and is a no-op for the classes. A `{@slice view}` hint, the author
+asserting the callee reads the bytes before it returns, makes them a
+view of linear memory instead (`slice = "view"`). Where `undefined`
+can't be omitted the argument is its bytes, `Option<&[u8]>`, since a
+`None` would leave an `impl` nothing to infer. A list's elements arrive
+as an `Array` of buffers, bytes as `Uint8Array` copies.
+
+Without `--experimental-generic-mono` the two classes keep an overload
+each (`_with_array_buffer`, `_with_typed_array`), and a named union its
+enum, since `BufferSourceLike` isn't in a released js-sys. A `buffer`
+read is the two classes in both modes.
+
 ## Function types
 
 A function type lowers to wasm-bindgen's typed `Function<fn(P…) -> R>`,
@@ -2283,6 +2325,7 @@ up with what callers see in the function signature:
 | `symbol`        | `&Symbol`        | `_with_symbol`  |
 | `Array<T>` / `T[]` | `&[T]`        | `_with_slice`   |
 | `Uint8Array`    | `&Uint8Array`    | `_with_uint8_array` |
+| `ArrayBuffer \| ArrayBufferView` (per-monomorphization) | `impl BufferSourceLike` | `_with_buffer` |
 | `Foo` (named)   | `&Foo`           | `_with_foo`     |
 | `A.X` (qualified) | `&a::X`        | `_with_a_x`     |
 | `null`          | (dropped — see [Optional and nullable types](#optional-and-nullable-types)) | – |

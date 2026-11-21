@@ -4527,6 +4527,11 @@ pub fn param_slice_mode(
             Some(SliceMode::Array)
         }
         TypeRef::TypedSlice(..) => Some(SliceMode::Copy),
+        // A `buffer`'s bytes are a copy unless the callee is said to read
+        // them before it returns; its classes cross as themselves.
+        ty if CodegenContext::generic_mono(ctx) && crate::codegen::signatures::is_buffer(ty) => {
+            Some(SliceMode::Copy)
+        }
         _ => None,
     };
     // A `{@slice mode}` JSDoc hint overrides the inferred mode when the

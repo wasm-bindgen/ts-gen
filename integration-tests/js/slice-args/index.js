@@ -50,3 +50,6 @@ export const store = (key, value) =>
   `${key}=${typeof value === "string" ? value : describeBuffer(value)}`;
 export const echo = (data) => data;
 export const peek = describeBuffer;
+export const concat = (parts) => parts.map(describeBuffer).join("+");
+export const owned = (data) => data.buffer.byteLength === data.byteLength;
+export const ownedView = owned;

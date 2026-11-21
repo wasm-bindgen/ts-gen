@@ -1636,6 +1636,9 @@ fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId
     let mut out: Vec<TypeRef> = Vec::new();
     if flatten_into(ty, cgctx, scope, true, &mut out) {
         pair_typed_array_slice(&mut out, cgctx, scope);
+        if CodegenContext::generic_mono(cgctx) {
+            out = group_buffers(out, cgctx, scope);
+        }
         return split_null_arm(out);
     }
     if let Some(c) = cgctx {
@@ -1661,6 +1664,88 @@ pub(crate) fn union_alias_alternatives(
 ) -> Option<Vec<TypeRef>> {
     let mut out = Vec::new();
     flatten_into(target, Some(cgctx), scope, false, &mut out).then_some(out)
+}
+
+/// `ArrayBuffer | ArrayBufferView`, the IR's `buffer`.
+pub(crate) fn buffer_union() -> TypeRef {
+    TypeRef::union([TypeRef::ident("ArrayBuffer"), TypeRef::ArrayBufferView])
+}
+
+pub(crate) fn is_buffer(ty: &TypeRef) -> bool {
+    *ty == buffer_union()
+}
+
+/// Whether `ty` is the two classes of a `buffer`, or an alias of them.
+fn names_buffer(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> bool {
+    let (mut t, mut at) = (ty.clone(), scope);
+    for _ in 0..8 {
+        if super::ir_types::buffer_pair(&t) {
+            return true;
+        }
+        let TypeRef::Reference {
+            segments,
+            generic_args,
+        } = &t
+        else {
+            return false;
+        };
+        if !generic_args.is_empty() {
+            return false;
+        }
+        let Some((target, s)) = cgctx.and_then(|c| c.resolve_alias(&segments.join("."), at)) else {
+            return false;
+        };
+        (t, at) = (target.into_owned(), s);
+    }
+    false
+}
+
+/// Per-monomorphization, the two classes of a `buffer` are one alternative,
+/// at the first one's place, which lowers to `impl js_sys::BufferSourceLike`:
+/// bytes and every buffer class cross through the one import. A list of
+/// them groups alike.
+fn group_buffers(
+    alts: Vec<TypeRef>,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> Vec<TypeRef> {
+    fn peel(t: &TypeRef) -> (TypeRef, Option<Nullability>) {
+        match t.split_empties() {
+            Some((core, n)) => (core, Some(n)),
+            None => (t.clone(), None),
+        }
+    }
+    let with = |t: TypeRef, n: Option<Nullability>| match n {
+        Some(n) => t.with_empties(n),
+        None => t,
+    };
+    let mut alts: Vec<TypeRef> = alts
+        .into_iter()
+        .map(|t| {
+            let (core, n) = peel(&t);
+            match &core {
+                c if names_buffer(c, cgctx, scope) => with(buffer_union(), n),
+                TypeRef::Array(e) if names_buffer(e, cgctx, scope) => {
+                    with(TypeRef::Array(Box::new(buffer_union())), n)
+                }
+                _ => t,
+            }
+        })
+        .collect();
+    let buffer = alts
+        .iter()
+        .position(|t| peel(t).0.as_ident() == Some("ArrayBuffer"));
+    let view = alts
+        .iter()
+        .position(|t| matches!(peel(t).0, TypeRef::ArrayBufferView));
+    if let (Some(buffer), Some(view)) = (buffer, view) {
+        let n = peel(&alts[buffer]).1;
+        if n == peel(&alts[view]).1 {
+            alts[buffer.min(view)] = with(buffer_union(), n);
+            alts.remove(buffer.max(view));
+        }
+    }
+    alts
 }
 
 /// A written `null` is an ordinary union arm: each alternative is taken
@@ -2300,6 +2385,7 @@ fn type_snake_name(ty: &TypeRef) -> String {
         TypeRef::Any | TypeRef::Unknown => "js_value".to_string(),
         TypeRef::Object => "object".to_string(),
         TypeRef::ArrayBufferView => "typed_array".to_string(),
+        ty if is_buffer(ty) => "buffer".to_string(),
         TypeRef::Union(_) if let Some((core, _)) = ty.split_empties() => type_snake_name(&core),
         TypeRef::Union(_) | TypeRef::PropertyKey => "js_value".to_string(),
         // Snake-case every segment of a named reference, so `A.X` is
@@ -2519,18 +2605,25 @@ pub(crate) fn render_param_type(
 }
 
 /// Per-monomorphization argument bounds: a string becomes `impl
-/// JsStringLike`. Each occurrence is an independent anonymous type
-/// parameter, so a string inside a carrier stays `&str`: a caller passing
-/// `None` would have nothing to infer it from.
+/// JsStringLike`, and a `buffer` `impl BufferSourceLike`. Each occurrence
+/// is an independent anonymous type parameter, so inside a carrier a
+/// string stays `&str` and a `buffer` its bytes: a caller passing `None`
+/// would have nothing to infer it from.
 fn mono_argument_type(ty: &TypeRef) -> Option<TokenStream> {
     if let Some((core, n)) = ty.split_empties() {
-        return mono_argument_type(&core)
-            .map(|_| typemap::nullable_carrier(quote! { &str }, n, true));
+        let inner = match &core {
+            TypeRef::String | TypeRef::StringLiteral(_) => quote! { &str },
+            core if is_buffer(core) => quote! { &[u8] },
+            _ => return None,
+        };
+        return Some(typemap::nullable_carrier(inner, n, true));
     }
     match ty {
         TypeRef::String | TypeRef::StringLiteral(_) => {
             Some(quote! { impl ::wasm_bindgen::JsStringLike })
         }
+        ty if is_buffer(ty) => Some(quote! { impl ::js_sys::BufferSourceLike }),
+        TypeRef::Array(e) if is_buffer(e) => Some(quote! { &[impl ::js_sys::BufferSourceLike] }),
         _ => None,
     }
 }
