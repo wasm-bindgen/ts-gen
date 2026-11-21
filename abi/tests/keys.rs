@@ -257,7 +257,9 @@ fn canonical_spelling() {
         ("Any?", "Any?"),
         ("\"node:buffer\".Buffer", "\"node:buffer\".Buffer"),
         ("Buffer", "Buffer"),
-        ("\"Str\"", "Str"),
+        (".\"Str\"", ".Str"),
+        ("\"Str\"", "\"Str\""),
+        ("Buffer[\"a\"][]", "Buffer[\"a\"][]"),
         ("ns.\"content-type\"", "ns.\"content-type\""),
     ];
     for (src, want) in cases {
@@ -270,6 +272,13 @@ fn canonical_spelling() {
             "canonical spelling reads back for {src}"
         );
     }
+    // A declared name that isn't an identifier stays apart from a literal.
+    let ir = text::parse("ir 1;\nclass \"foo-bar\" {}").unwrap();
+    let named = text::parse_type(".\"foo-bar\"").unwrap();
+    assert_eq!(
+        Keys::new(&ir).ty(&named, &Context::default()),
+        ".\"foo-bar\""
+    );
 }
 
 #[test]

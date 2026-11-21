@@ -203,6 +203,8 @@ pub fn type_word(t: &Type) -> String {
         Type::Fn(_) => "Fn".into(),
         Type::View { .. } => "View".into(),
         Type::Nullable(t, _) => type_word(t),
+        Type::Lit(l) => literal_word(l),
+        Type::Index(m, _) => type_word(m),
         Type::Named(r) => {
             let spec = match &r.path.base {
                 crate::ir::Base::Module(spec) => Some(spec),

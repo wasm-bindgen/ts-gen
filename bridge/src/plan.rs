@@ -516,7 +516,38 @@ pub(crate) fn bounds(
         .flat_map(|c| &c.tparams)
         .chain(&k.member.tparams);
     let global = Context::default();
-    for (p, t) in tparams.zip(targs) {
+    let tparams: Vec<_> = tparams.collect();
+    let none = std::collections::HashMap::new();
+    let subst: std::collections::HashMap<&str, Type> = tparams
+        .iter()
+        .zip(targs)
+        .map(|(p, t)| (p.name.as_str(), l.keys.symbols.absolute(t, &global, &none)))
+        .collect();
+    for (p, t) in tparams.into_iter().zip(targs) {
+        // A key is a literal type naming a property of its map, or `str`
+        // (§13).
+        if let Some(Bound::KeyOf(m)) = &p.bound {
+            use ts_gen_abi::keyed::{self, Map};
+            let m = l.keys.symbols.absolute(m, &k.cx, &subst);
+            let named = match (keyed::map(&l.keys.symbols, &m, &global), t) {
+                // A key that stays a value.
+                (Some(_), Type::Str) => true,
+                (Some(Map::Open(_)), Type::Lit(ts_gen_abi::ir::Literal::Str(_))) => true,
+                (Some(Map::Closed(_)), Type::Lit(lit)) => {
+                    keyed::index(&l.keys.symbols, &m, lit, &global).is_some()
+                }
+                _ => false,
+            };
+            if !named {
+                return Err(Error::Import(format!(
+                    "{}: `{}` isn't a key of `{}`",
+                    what(),
+                    l.keys.ty(t, &global),
+                    l.keys.ty(&m, &global)
+                )));
+            }
+            continue;
+        }
         let Some(Bound::In(allowed)) = &p.bound else {
             continue;
         };

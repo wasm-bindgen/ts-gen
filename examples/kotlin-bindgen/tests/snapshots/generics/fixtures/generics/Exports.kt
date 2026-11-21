@@ -20,6 +20,20 @@ fun trampoline_fn_SignalOrHalt(p0: JsAny?, p1: Int, p2: JsAny?) {
     f(decodeSignalOrHalt(p1, p2)!!)
 }
 
+@JsExport
+@JsName("tw:call:fn(Event)")
+fun trampoline_fn_Event(p0: JsAny?, p1: JsAny?) {
+    val f = p0!!.unsafeCast<JsReference<(Event) -> Unit>>().get()
+    f(p1!!.unsafeCast<Event>())
+}
+
+@JsExport
+@JsName("tw:call:fn(MessageEventOrCloseEvent)")
+fun trampoline_fn_MessageEventOrCloseEvent(p0: JsAny?, p1: Int, p2: JsAny?) {
+    val f = p0!!.unsafeCast<JsReference<(MessageEventOrCloseEvent) -> Unit>>().get()
+    f(decodeMessageEventOrCloseEvent(p1, p2)!!)
+}
+
 /** A `fn(T)->U` as its box: a JS function calling it. */
 fun ((JsAny?) -> JsAny?).toJs(): JsAny = fixtures.generics.flat.box_fn_T_U(this.toJsReference())!!
 
@@ -31,4 +45,16 @@ fun ((SignalOrHalt) -> Unit).toJs(): JsAny = fixtures.generics.flat.box_fn_Signa
 
 /** The function a box holds; a `JsException` unless it's one this module provided. */
 fun JsAny.toFnSignalOrHaltToUnit(): (SignalOrHalt) -> Unit = fixtures.generics.flat.unbox_fn_SignalOrHalt(this)!!.unsafeCast<JsReference<(SignalOrHalt) -> Unit>>().get()
+
+/** A `fn(Event)` as its box: a JS function calling it. */
+fun ((Event) -> Unit).toJs(): JsAny = fixtures.generics.flat.box_fn_Event(this.toJsReference())!!
+
+/** The function a box holds; a `JsException` unless it's one this module provided. */
+fun JsAny.toFnEventToUnit(): (Event) -> Unit = fixtures.generics.flat.unbox_fn_Event(this)!!.unsafeCast<JsReference<(Event) -> Unit>>().get()
+
+/** A `fn(MessageEventOrCloseEvent)` as its box: a JS function calling it. */
+fun ((MessageEventOrCloseEvent) -> Unit).toJs(): JsAny = fixtures.generics.flat.box_fn_MessageEventOrCloseEvent(this.toJsReference())!!
+
+/** The function a box holds; a `JsException` unless it's one this module provided. */
+fun JsAny.toFnMessageEventOrCloseEventToUnit(): (MessageEventOrCloseEvent) -> Unit = fixtures.generics.flat.unbox_fn_MessageEventOrCloseEvent(this)!!.unsafeCast<JsReference<(MessageEventOrCloseEvent) -> Unit>>().get()
 

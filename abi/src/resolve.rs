@@ -74,12 +74,16 @@ pub struct Context<'a> {
     pub tparams: Vec<&'a str>,
     /// The enclosing class's associated types.
     pub assoc: Vec<&'a Assoc>,
+    /// The type parameters in scope that [`Context::with_tparams`] added,
+    /// for their bounds.
+    pub bounds: Vec<&'a TypeParam>,
 }
 
 impl<'a> Context<'a> {
     pub fn with_tparams(&self, ps: &'a [TypeParam]) -> Context<'a> {
         let mut cx = self.clone();
         cx.tparams.extend(ps.iter().map(|p| p.name.as_str()));
+        cx.bounds.extend(ps);
         cx
     }
 
@@ -298,6 +302,7 @@ impl<'a> Symbols<'a> {
                 elem: qb(elem),
             },
             Type::Nullable(t, js_null) => Type::Nullable(qb(t), *js_null),
+            Type::Index(m, k) => Type::Index(qb(m), qb(k)),
             Type::Named(r) => match (self.resolve(&r.path, cx), &r.path.segments[..]) {
                 (Some(Target::TypeParam), [name]) if subst.contains_key(name.as_str()) => {
                     subst[name.as_str()].clone()
@@ -309,6 +314,34 @@ impl<'a> Symbols<'a> {
             },
             t => t.clone(),
         }
+    }
+
+    /// The declared enum whose arms each carry one of `ts`, and between
+    /// them all of it: the union an erasing reading gives `M[K]` (§13).
+    pub fn enum_of(&self, ts: &[Type], cx: &Context<'_>) -> Option<Type> {
+        let none = HashMap::new();
+        let want: Vec<Type> = ts.iter().map(|t| self.absolute(t, cx, &none)).collect();
+        let mut found: Vec<&Location> = self
+            .types
+            .values()
+            .filter_map(|(loc, d)| {
+                let TypeDecl::Enum(e) = d else { return None };
+                let ecx = loc.context();
+                let fits = e.arms.len() == want.len()
+                    && e.extends.is_empty()
+                    && e.arms.iter().all(|a| match &a.payload[..] {
+                        [t] => want.contains(&self.absolute(t, &ecx, &none)),
+                        _ => false,
+                    });
+                fits.then_some(loc)
+            })
+            .collect();
+        found.sort_by_key(|l| (&l.module, &l.path));
+        let loc = found.first()?;
+        Some(Type::Named(TypeRef {
+            path: loc.absolute(),
+            args: Vec::new(),
+        }))
     }
 
     /// Whether the alias at `loc` reaches itself, through other aliases.

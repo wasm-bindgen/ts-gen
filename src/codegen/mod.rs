@@ -401,6 +401,7 @@ fn generate_tokens(
         let opts = crate::lower::Options {
             with: vec![std_ir().clone()],
             strict_nullable: options.strict_nullable,
+            keyed: false,
             ..Default::default()
         };
         let mut ir = from_ir::IrDecls::new(crate::lower::lower_with(module, gctx, &opts));

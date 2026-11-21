@@ -272,7 +272,7 @@ impl Forms {
 
     fn walk(&self, r: &Repr, out: &mut Vec<Jv>) -> Result<()> {
         match &r.kind {
-            Kind::Unit | Kind::Never => {}
+            Kind::Unit | Kind::Never | Kind::Lit(_) => {}
             Kind::Scalar(s) | Kind::NullScalar(s, ScalarNull::Niche(_)) => out.push(scalar_jv(*s)),
             Kind::NullScalar(s, ScalarNull::Present) => {
                 out.push(Jv::I32);
@@ -463,7 +463,7 @@ impl Forms {
                     }
                 }
             },
-            Kind::Unit => {}
+            Kind::Unit | Kind::Lit(_) => {}
             Kind::View { .. } => return unsupported("`*T[]` is legal only in import parameters"),
             _ => {
                 for j in self.jsw(r)? {

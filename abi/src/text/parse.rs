@@ -443,13 +443,17 @@ impl<'a> Parser<'a> {
             let bound = if p.eat(":") {
                 Some(Bound::Subtype(p.ty()?))
             } else if p.eat_kw("in") {
-                p.expect("(")?;
-                let set = p.list(")", false, Self::ty)?;
-                p.expect(")")?;
-                if set.is_empty() {
-                    return p.err("an empty concrete bound");
+                if p.eat_kw("keyof") {
+                    Some(Bound::KeyOf(p.ty()?))
+                } else {
+                    p.expect("(")?;
+                    let set = p.list(")", false, Self::ty)?;
+                    p.expect(")")?;
+                    if set.is_empty() {
+                        return p.err("an empty concrete bound");
+                    }
+                    Some(Bound::In(set))
                 }
-                Some(Bound::In(set))
             } else {
                 None
             };
@@ -701,6 +705,10 @@ impl<'a> Parser<'a> {
                 t = Type::Nullable(Box::new(t), false);
             } else if self.eat_brackets() {
                 t = Type::Vec(Box::new(t));
+            } else if self.eat("[") {
+                let k = self.ty()?;
+                self.expect("]")?;
+                t = Type::Index(Box::new(t), Box::new(k));
             } else {
                 return Ok(t);
             }
@@ -806,6 +814,18 @@ impl<'a> Parser<'a> {
                 self.expect(")")?;
             }
             return Ok(Type::Tuple(elems));
+        }
+        // A string not heading a path is a literal type; a type of that
+        // name is written `."name"`.
+        let lit = match self.peek() {
+            Tok::Str(s) if !is_p(self.peek_at(1), ".") => Some(Literal::Str(s.clone())),
+            Tok::Int(n) => Some(Literal::Int(*n)),
+            Tok::Ident(s) if s == "true" || s == "false" => Some(Literal::Bool(s == "true")),
+            _ => None,
+        };
+        if let Some(lit) = lit {
+            self.bump();
+            return Ok(Type::Lit(lit));
         }
         let Tok::Ident(id) = self.peek() else {
             if matches!(self.peek(), Tok::Str(_)) || self.is(".") && self.is_name_at(1) {

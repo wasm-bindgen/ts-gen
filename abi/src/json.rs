@@ -542,6 +542,7 @@ fn tparam(l: &Layouts<'_>, p: &TypeParam, cx: &Context<'_>) -> Json {
                 Json::Arr(ts.iter().map(|t| Json::str(l.keys.ty(t, cx))).collect()),
             )
             .done(),
+        Some(Bound::KeyOf(t)) => Json::obj().set("keyof", Json::str(l.keys.ty(t, cx))).done(),
     };
     // The default's layout, for a generator that erases to it; `null` when
     // it has none (it names a type parameter, for one).
@@ -657,7 +658,13 @@ fn member(l: &Layouts<'_>, k: &Keyed<'_>, variant: Option<String>) -> Json {
         MemberKind::Set(n) => ("set", Some(n.clone())),
         MemberKind::New(n) => ("new", n.clone()),
     };
-    let tparams = m.tparams.iter().map(|p| tparam(l, p, &k.cx)).collect();
+    // The signature is the erased reading, where a key is a string (§13).
+    let tparams = m
+        .tparams
+        .iter()
+        .filter(|p| !matches!(p.bound, Some(Bound::KeyOf(_))))
+        .map(|p| tparam(l, p, &k.cx))
+        .collect();
     // `...p` in `@js(args)`: the array's elements are the call's arguments.
     let spread = |p: String| {
         m.meta.attrs.js.args().is_some_and(|args| {
@@ -826,6 +833,10 @@ pub fn repr(l: &Layouts<'_>, r: &Repr) -> Json {
     let nullable = |o: Obj, n: bool| o.set("nullable", Json::Bool(n));
     match &r.kind {
         Kind::Unit => o.set("kind", Json::str("unit")),
+        Kind::Lit(l) => o.set("kind", Json::str("literal")).set(
+            "value",
+            Json::str(crate::text::print_type(&Type::Lit(l.clone()))),
+        ),
         Kind::Never => o.set("kind", Json::str("never")),
         Kind::Scalar(s) => o
             .set("kind", Json::str("scalar"))

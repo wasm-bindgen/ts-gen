@@ -511,6 +511,22 @@ impl<'a> Validator<'a> {
                         self.ty(t, Pos::Inner, cx, span);
                     }
                 }
+                Some(Bound::KeyOf(m)) => {
+                    self.ty(m, Pos::Inner, cx, span);
+                    if crate::keyed::map(&self.symbols, m, cx).is_none() {
+                        self.err(
+                            span,
+                            format!(
+                                "`{} in keyof {}`: `{1}` isn't a class or an interface, or a type parameter bounded by one",
+                                p.name,
+                                crate::text::print_type(m)
+                            ),
+                        );
+                    }
+                    if p.default.is_some() {
+                        self.err(span, format!("`{}` is a key, which has no default", p.name));
+                    }
+                }
             }
             let Some(d) = &p.default else { continue };
             self.ty(d, Pos::Inner, cx, span);
@@ -1443,7 +1459,28 @@ impl<'a> Validator<'a> {
             | Type::BigInt
             | Type::BigIntBox
             | Type::Buffer
+            | Type::Lit(_)
             | Type::UnitBox => {}
+            Type::Index(m, k) => {
+                if !matches!(**m, Type::Index(..)) {
+                    self.ty(m, Pos::Inner, cx, span);
+                }
+                let key = matches!(**k, Type::Lit(_)) || crate::keyed::is_key(&self.symbols, k, cx);
+                if !key {
+                    p(format!(
+                        "`{}`: an index is a literal type or a `keyof` parameter",
+                        text()
+                    ));
+                } else if let Type::Lit(l) = &**k {
+                    let closed = matches!(
+                        crate::keyed::map(&self.symbols, m, cx),
+                        Some(crate::keyed::Map::Closed(_))
+                    );
+                    if closed && crate::keyed::index(&self.symbols, m, l, cx).is_none() {
+                        p(format!("`{}`: no such property", text()));
+                    }
+                }
+            }
             Type::Vec(e) | Type::VecBox(e) => self.element(t, e, cx, span),
             Type::MutVec(e) => {
                 if !matches!(pos, Pos::ImportParam | Pos::ExportParam) {

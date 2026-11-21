@@ -584,6 +584,9 @@ pub(crate) fn convert_formal_params_with_arena(
 ) -> Vec<crate::ir::Param> {
     let mut result = Vec::new();
     for (i, param) in params.items.iter().enumerate() {
+        if let Some(ann) = &param.type_annotation {
+            note_key_param(&ann.type_annotation, i, scope, scopes);
+        }
         let raw = binding_pattern_name(&param.pattern);
         let name = raw
             .as_deref()
@@ -626,6 +629,20 @@ pub(crate) fn convert_formal_params_with_arena(
     }
 
     result
+}
+
+/// Note parameter `i` of the signature at `scope` when it is typed by
+/// exactly a `keyof` type parameter of the signature.
+pub(crate) fn note_key_param(ty: &TSType<'_>, i: usize, scope: ScopeId, scopes: &mut ScopeArena) {
+    let TSType::TSTypeReference(r) = ty else {
+        return;
+    };
+    let TSTypeName::IdentifierReference(id) = &r.type_name else {
+        return;
+    };
+    if r.type_arguments.is_none() && scopes.is_key(scope, &id.name) {
+        scopes.note_key_param(scope, i, id.name.to_string());
+    }
 }
 
 /// Extract a name from a binding pattern (only handles simple identifier patterns).

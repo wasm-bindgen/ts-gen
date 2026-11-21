@@ -122,6 +122,7 @@ pub(crate) fn arm_name(t: &abi::Type) -> String {
         T::Fn(_) => "Fn".into(),
         T::View { .. } => "View".into(),
         T::Named(r) => pascal(r.path.segments.last().map_or("Named", |s| s.as_str())),
+        T::Lit(_) | T::Index(..) => ts_gen_abi::naming::type_word(t),
     }
 }
 

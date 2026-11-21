@@ -49,6 +49,27 @@ pub fn import_module(module: Option<&str>) -> &str {
     module.unwrap_or(protocol::GLOBAL)
 }
 
+/// A canonical path as a type spells it: one quoted name alone is
+/// anchored (`."name"`), since unanchored it reads as a literal type.
+pub fn as_type(mut path: String) -> String {
+    let mut chars = path.char_indices().skip(1);
+    let lone = path.starts_with('"')
+        && loop {
+            match chars.next() {
+                Some((_, '\\')) => {
+                    chars.next();
+                }
+                Some((i, '"')) => break i + 1 == path.len(),
+                Some(_) => {}
+                None => break false,
+            }
+        };
+    if lone {
+        path.insert(0, '.');
+    }
+    path
+}
+
 /// A declaration's location in canonical spelling: `"spec".Path` inside a
 /// module block, the dotted path otherwise.
 pub fn location(loc: &Location) -> String {
@@ -167,6 +188,8 @@ impl<'a> Keys<'a> {
                 format!("*{m}{}", self.whole_vec(elem, cx))
             }
             Type::Nullable(t, _) => format!("{}?", self.operand(t, cx)),
+            Type::Lit(l) => crate::text::print_type(&Type::Lit(l.clone())),
+            Type::Index(m, k) => format!("{}[{}]", self.operand(m, cx), self.ty(k, cx)),
             Type::Named(r) => {
                 if let Some((loc, t)) = self.symbols.unfold(r, cx) {
                     if !self.expanding.borrow().contains(&loc) {
@@ -176,7 +199,7 @@ impl<'a> Keys<'a> {
                         return s;
                     }
                 }
-                let mut s = self.path(&r.path, cx);
+                let mut s = as_type(self.path(&r.path, cx));
                 if !r.args.is_empty() {
                     let _ = write!(s, "<{}>", self.list(&r.args, cx));
                 }

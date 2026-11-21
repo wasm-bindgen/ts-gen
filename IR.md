@@ -1625,6 +1625,8 @@ enumerates them.
 * `T: C` is a subtype bound (TS `<T extends C>`).
 * `T in (A, B)` is a concrete bound: a finite set of allowed
   concretizations. A one-element set is `T in (A)`.
+* `K in keyof M` is a key bound: the literal types of `M`'s property names
+  ([Keys](#keys)).
 
 The IR has no generics mode flag.
 
@@ -1657,6 +1659,66 @@ Example: Kotlin, erased, `Map<Str, Tuple<u32, bool>>`.
    unconverted.
 3. Kotlin knows `V` statically, and calls `("tw:unbox", "(u32,bool)")`,
    which validates and returns `(i32 7, i32 1)`.
+
+### Keys
+
+A literal type, a key bound and an index state what TypeScript's
+`K extends keyof M` and `M[K]` do: a value picks a property, and the
+property types the rest of the signature.
+
+```ts
+class Event {}
+class MessageEvent extends Event {}
+interface Record<V> {
+  @js(index) at(key: str): V?;
+}
+interface WebSocketEventMap {
+  get message(): MessageEvent;
+  get close(): Event;
+}
+class EventTarget<EventMap: Record<Event> = Record<Event>> {
+  addEventListener<Type in keyof EventMap>(type: Type, handler: fn(EventMap[Type]));
+}
+interface Model {
+  get inputs(): str;
+  get outputs(): f64;
+}
+interface AiModelList {
+  get "text-model"(): Model;
+}
+class Ai {
+  run<Name in keyof AiModelList>(model: Name, inputs: AiModelList[Name]["inputs"]): future<AiModelList[Name]["outputs"]>;
+}
+```
+
+* **A literal type** is a string, integer or boolean literal in type
+  position: `"message"`, `1`, `true`. It has one value, which never
+  crosses: the bridge supplies it to JS, and checks a value from JS
+  against it with `===`. A type whose name the text would quote is written
+  from the root there (`."content-type"`), since a lone string is a
+  literal type.
+* **`K in keyof M`** bounds `K` to the literal types of `M`'s property
+  names. `M` is a class or an interface, an alias of one, or a type
+  parameter bounded by one. Its properties are its getters, its own before
+  its parents'. An `M` with an `@js(index)` getter (a `Record`) is open:
+  every string is a key, and each has the getter's value.
+* **`M[K]`** is the type of the property `K` names: `K` is a key
+  parameter or a literal type, and indexes chain (`M[K]["inputs"]`).
+* **A mono variant** gives a key as a type argument, a literal type, after
+  those of the class: `EventTarget#addEventListener<WebSocketEventMap,"message">(Type,fn(EventMap[Type]))`.
+  Its key parameter has no wire value, and each index is that property's
+  type: here `fn(MessageEvent)`. A literal that names no property of a
+  closed map is a link error. A variant that leaves a key a value gives it
+  `str`: the key crosses as a string, and each index reads as the
+  member's does erased, whatever map the variant gives.
+* **Erased**, a key parameter is a `str`, and `M[K]` is the type every key
+  gives: an open map's value, else the one type its properties share, else
+  the declared enum whose arms carry exactly their types, else `Any`. An
+  index that names no property of some key's value is `Any`. The key is
+  still the keyed member's: `EventTarget#addEventListener(Type,fn(EventMap[Type]))`
+  takes `(externref, str, fn(Event))`.
+* A key parameter has no default, and an enum arm can't name one: a union
+  over an index is an overload per arm (§7).
 
 ### Associated types
 
@@ -2394,14 +2456,15 @@ params      = param ("," param)*
 param       = pattr* name ":" "union"? type
 pattr       = "@js" "(" ("null" | "unshared") ")" | "@once"   // `@js(null)` is the type's
 tparams     = "<" tparam ("," tparam)* ">"
-tparam      = ident (":" type | "in" "(" type ("," type)* ")")? ("=" type)?
+tparam      = ident (":" type | "in" "(" type ("," type)* ")" | "in" "keyof" type)? ("=" type)?
 type        = "@js" "(" "null" ")" type | prefix postfix*  // the attribute needs a `T?`
-postfix     = "?" | "[" "]"
+postfix     = "?" | "[" "]" | "[" type "]"            // `M[K]` (§13)
 prefix      = "*" "mut"? primary "[" "]" | "*" "buffer" | "mut" primary "[" "]" | fntype | primary
 fntype      = "fn" "(" ((type ",")* "..."? type)? ")" ("->" type)? throws?
 primary     = scalar | "bigint" | "str" | "buffer" | "unit" | "never" | "Any" | box
             | "arr" "<" type ">" | "future" "<" type ("," path)? ">"
             | "(" type ")" | "(" type "," ")" | "(" type ("," type)+ ")"
+            | string | int | "true" | "false"         // a literal type (§13)
             | typeref
 box         = "Bool" | "I8" | "U8" | "I16" | "U16" | "I32" | "U32" | "I53" | "U53"
             | "I64" | "U64" | "F16" | "F32" | "F64" | "BigInt" | "Str" | "Unit"
@@ -2437,7 +2500,11 @@ targs       = "<" ctype ("," ctype)* ">"
 ctype       = the canonical spelling of a type (§3)
 ```
 
-* `T: C` is a subtype bound and `T in (A, B)` a concrete bound (§13).
+* `T: C` is a subtype bound, `T in (A, B)` a concrete bound and
+  `K in keyof M` a key bound (§13).
+* A `string` in type position that no `.` follows is a literal type, so a
+  lone quoted type name is written `."name"` there, and in a canonical
+  spelling.
 * `type` begins an associated type only before a name and `=`, so it stays
   a member name (§13).
 * In a `ctype`, a type declared in a `module` block is the path
