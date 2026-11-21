@@ -293,18 +293,26 @@ extern "C" {
     pub fn set_largest_unit<U: ::wasm_bindgen::JsGeneric>(this: &Rounding<U>, val: LargestUnitUnit);
 }
 impl<U: ::wasm_bindgen::JsGeneric> Rounding<U> {
-    pub fn new() -> Rounding<U> {
-        Self::builder().build()
+    pub fn new_typed() -> Rounding<U> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> RoundingBuilder<U> {
+    pub fn builder_typed() -> RoundingBuilder<U> {
         RoundingBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl Rounding<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> RoundingBuilder<JsValue> {
+        Self::builder_typed()
+    }
+}
 impl<U: ::wasm_bindgen::JsGeneric> Default for Rounding<U> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct RoundingBuilder<U: ::wasm_bindgen::JsGeneric> {
@@ -885,18 +893,26 @@ extern "C" {
     pub fn set_label<T: ::wasm_bindgen::JsGeneric>(this: &PartialBox<T>, val: &str);
 }
 impl<T: ::wasm_bindgen::JsGeneric> PartialBox<T> {
-    pub fn new() -> PartialBox<T> {
-        Self::builder().build()
+    pub fn new_typed() -> PartialBox<T> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> PartialBoxBuilder<T> {
+    pub fn builder_typed() -> PartialBoxBuilder<T> {
         PartialBoxBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl PartialBox<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> PartialBoxBuilder<JsValue> {
+        Self::builder_typed()
+    }
+}
 impl<T: ::wasm_bindgen::JsGeneric> Default for PartialBox<T> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct PartialBoxBuilder<T: ::wasm_bindgen::JsGeneric> {

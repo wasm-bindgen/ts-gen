@@ -1533,20 +1533,28 @@ pub mod temporal {
         );
     }
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits> RoundingOptions<Units> {
-        pub fn new() -> RoundingOptions<Units> {
-            Self::builder().build()
+        pub fn new_typed() -> RoundingOptions<Units> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> RoundingOptionsBuilder<Units> {
+        pub fn builder_typed() -> RoundingOptionsBuilder<Units> {
             RoundingOptionsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl RoundingOptions<DateUnitOrTimeUnit> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> RoundingOptionsBuilder<DateUnitOrTimeUnit> {
+            Self::builder_typed()
         }
     }
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits> Default
         for RoundingOptions<Units>
     {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct RoundingOptionsBuilder<Units> {
@@ -1677,20 +1685,28 @@ pub mod temporal {
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsWithLargestUnitUnits>
         RoundingOptionsWithLargestUnit<Units>
     {
-        pub fn new() -> RoundingOptionsWithLargestUnit<Units> {
-            Self::builder().build()
+        pub fn new_typed() -> RoundingOptionsWithLargestUnit<Units> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> RoundingOptionsWithLargestUnitBuilder<Units> {
+        pub fn builder_typed() -> RoundingOptionsWithLargestUnitBuilder<Units> {
             RoundingOptionsWithLargestUnitBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl RoundingOptionsWithLargestUnit<DateUnitOrTimeUnit> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> RoundingOptionsWithLargestUnitBuilder<DateUnitOrTimeUnit> {
+            Self::builder_typed()
         }
     }
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsWithLargestUnitUnits> Default
         for RoundingOptionsWithLargestUnit<Units>
     {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct RoundingOptionsWithLargestUnitBuilder<Units> {
@@ -1767,20 +1783,28 @@ pub mod temporal {
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits>
         ToStringRoundingOptions<Units>
     {
-        pub fn new() -> ToStringRoundingOptions<Units> {
-            Self::builder().build()
+        pub fn new_typed() -> ToStringRoundingOptions<Units> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> ToStringRoundingOptionsBuilder<Units> {
+        pub fn builder_typed() -> ToStringRoundingOptionsBuilder<Units> {
             ToStringRoundingOptionsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl ToStringRoundingOptions<DateUnitOrTimeUnit> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> ToStringRoundingOptionsBuilder<DateUnitOrTimeUnit> {
+            Self::builder_typed()
         }
     }
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits> Default
         for ToStringRoundingOptions<Units>
     {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct ToStringRoundingOptionsBuilder<Units> {
@@ -1830,20 +1854,29 @@ pub mod temporal {
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits>
         ToStringRoundingOptionsWithFractionalSeconds<Units>
     {
-        pub fn new() -> ToStringRoundingOptionsWithFractionalSeconds<Units> {
-            Self::builder().build()
+        pub fn new_typed() -> ToStringRoundingOptionsWithFractionalSeconds<Units> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> ToStringRoundingOptionsWithFractionalSecondsBuilder<Units> {
+        pub fn builder_typed() -> ToStringRoundingOptionsWithFractionalSecondsBuilder<Units> {
             ToStringRoundingOptionsWithFractionalSecondsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl ToStringRoundingOptionsWithFractionalSeconds<DateUnitOrTimeUnit> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> ToStringRoundingOptionsWithFractionalSecondsBuilder<DateUnitOrTimeUnit>
+        {
+            Self::builder_typed()
         }
     }
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits> Default
         for ToStringRoundingOptionsWithFractionalSeconds<Units>
     {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct ToStringRoundingOptionsWithFractionalSecondsBuilder<Units> {

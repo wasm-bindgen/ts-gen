@@ -187,18 +187,26 @@ pub mod polish {
             T: ::wasm_bindgen::convert::IntoWasmAbi;
     }
     impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Holder<T> {
-        pub fn new() -> Holder<T> {
-            Self::builder().build()
+        pub fn new_typed() -> Holder<T> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> HolderBuilder<T> {
+        pub fn builder_typed() -> HolderBuilder<T> {
             HolderBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
+    impl Holder<JsValue> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> HolderBuilder<JsValue> {
+            Self::builder_typed()
+        }
+    }
     impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for Holder<T> {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct HolderBuilder<T> {
@@ -284,18 +292,26 @@ pub mod polish {
         pub fn set_increment<U: RoundingU>(this: &Rounding<U>, val: f64);
     }
     impl<U: ::wasm_bindgen::convert::IntoWasmAbi + RoundingU> Rounding<U> {
-        pub fn new() -> Rounding<U> {
-            Self::builder().build()
+        pub fn new_typed() -> Rounding<U> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> RoundingBuilder<U> {
+        pub fn builder_typed() -> RoundingBuilder<U> {
             RoundingBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
+    impl Rounding<DayOrTimeUnit> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> RoundingBuilder<DayOrTimeUnit> {
+            Self::builder_typed()
+        }
+    }
     impl<U: ::wasm_bindgen::convert::IntoWasmAbi + RoundingU> Default for Rounding<U> {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct RoundingBuilder<U> {
@@ -369,18 +385,26 @@ pub mod polish {
         }
     }
     impl<S: ::wasm_bindgen::convert::IntoWasmAbi + RoundingU> Stepped<S> {
-        pub fn new() -> Stepped<S> {
-            Self::builder().build()
+        pub fn new_typed() -> Stepped<S> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> SteppedBuilder<S> {
+        pub fn builder_typed() -> SteppedBuilder<S> {
             SteppedBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
+    impl Stepped<TimeUnit> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> SteppedBuilder<TimeUnit> {
+            Self::builder_typed()
+        }
+    }
     impl<S: ::wasm_bindgen::convert::IntoWasmAbi + RoundingU> Default for Stepped<S> {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct SteppedBuilder<S> {
@@ -481,18 +505,26 @@ pub mod polish {
         }
     }
     impl<U: ::wasm_bindgen::convert::IntoWasmAbi + BoundedU> Bounded<U> {
-        pub fn new() -> Bounded<U> {
-            Self::builder().build()
+        pub fn new_typed() -> Bounded<U> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> BoundedBuilder<U> {
+        pub fn builder_typed() -> BoundedBuilder<U> {
             BoundedBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
+    impl Bounded<DayOrTimeUnit> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> BoundedBuilder<DayOrTimeUnit> {
+            Self::builder_typed()
+        }
+    }
     impl<U: ::wasm_bindgen::convert::IntoWasmAbi + BoundedU> Default for Bounded<U> {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct BoundedBuilder<U> {
@@ -550,18 +582,26 @@ pub mod polish {
         pub fn set_increment<U: ClockU>(this: &PickedRounding<U>, val: f64);
     }
     impl<U: ::wasm_bindgen::convert::IntoWasmAbi + ClockU> PickedRounding<U> {
-        pub fn new() -> PickedRounding<U> {
-            Self::builder().build()
+        pub fn new_typed() -> PickedRounding<U> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> PickedRoundingBuilder<U> {
+        pub fn builder_typed() -> PickedRoundingBuilder<U> {
             PickedRoundingBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
+    impl PickedRounding<DayOrTimeUnit> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> PickedRoundingBuilder<DayOrTimeUnit> {
+            Self::builder_typed()
+        }
+    }
     impl<U: ::wasm_bindgen::convert::IntoWasmAbi + ClockU> Default for PickedRounding<U> {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct PickedRoundingBuilder<U> {
@@ -638,18 +678,26 @@ pub mod polish {
             U::LargestUnit: ::wasm_bindgen::convert::IntoWasmAbi;
     }
     impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanningU> Spanning<U> {
-        pub fn new() -> Spanning<U> {
-            Self::builder().build()
+        pub fn new_typed() -> Spanning<U> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> SpanningBuilder<U> {
+        pub fn builder_typed() -> SpanningBuilder<U> {
             SpanningBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
+    impl Spanning<HourOrWeek> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> SpanningBuilder<HourOrWeek> {
+            Self::builder_typed()
+        }
+    }
     impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanningU> Default for Spanning<U> {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct SpanningBuilder<U> {
@@ -739,18 +787,26 @@ pub mod polish {
                 U::LargestUnit: ::wasm_bindgen::convert::IntoWasmAbi;
         }
         impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanU> Span<U> {
-            pub fn new() -> Span<U> {
-                Self::builder().build()
+            pub fn new_typed() -> Span<U> {
+                Self::builder_typed().build()
             }
-            pub fn builder() -> SpanBuilder<U> {
+            pub fn builder_typed() -> SpanBuilder<U> {
                 SpanBuilder {
                     inner: JsCast::unchecked_into(js_sys::Object::new()),
                 }
             }
         }
+        impl Span<UnitOrDay> {
+            pub fn new() -> Self {
+                Self::new_typed()
+            }
+            pub fn builder() -> SpanBuilder<UnitOrDay> {
+                Self::builder_typed()
+            }
+        }
         impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanU> Default for Span<U> {
             fn default() -> Self {
-                Self::new()
+                Self::new_typed()
             }
         }
         pub struct SpanBuilder<U> {
@@ -832,18 +888,26 @@ pub mod polish {
             }
         }
         impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanU> Mid<U> {
-            pub fn new() -> Mid<U> {
-                Self::builder().build()
+            pub fn new_typed() -> Mid<U> {
+                Self::builder_typed().build()
             }
-            pub fn builder() -> MidBuilder<U> {
+            pub fn builder_typed() -> MidBuilder<U> {
                 MidBuilder {
                     inner: JsCast::unchecked_into(js_sys::Object::new()),
                 }
             }
         }
+        impl Mid<UnitOrDay> {
+            pub fn new() -> Self {
+                Self::new_typed()
+            }
+            pub fn builder() -> MidBuilder<UnitOrDay> {
+                Self::builder_typed()
+            }
+        }
         impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanU> Default for Mid<U> {
             fn default() -> Self {
-                Self::new()
+                Self::new_typed()
             }
         }
         pub struct MidBuilder<U> {
@@ -873,18 +937,26 @@ pub mod polish {
                 U::LargestUnit: ::wasm_bindgen::convert::IntoWasmAbi;
         }
         impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanU> Spanned<U> {
-            pub fn new() -> Spanned<U> {
-                Self::builder().build()
+            pub fn new_typed() -> Spanned<U> {
+                Self::builder_typed().build()
             }
-            pub fn builder() -> SpannedBuilder<U> {
+            pub fn builder_typed() -> SpannedBuilder<U> {
                 SpannedBuilder {
                     inner: JsCast::unchecked_into(js_sys::Object::new()),
                 }
             }
         }
+        impl Spanned<Unit> {
+            pub fn new() -> Self {
+                Self::new_typed()
+            }
+            pub fn builder() -> SpannedBuilder<Unit> {
+                Self::builder_typed()
+            }
+        }
         impl<U: ::wasm_bindgen::convert::IntoWasmAbi + SpanU> Default for Spanned<U> {
             fn default() -> Self {
-                Self::new()
+                Self::new_typed()
             }
         }
         pub struct SpannedBuilder<U> {
@@ -1116,20 +1188,28 @@ pub mod polish {
     impl<S: ::wasm_bindgen::convert::IntoWasmAbi, T: ::wasm_bindgen::convert::IntoWasmAbi>
         Defaulted<S, T>
     {
-        pub fn new() -> Defaulted<S, T> {
-            Self::builder().build()
+        pub fn new_typed() -> Defaulted<S, T> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> DefaultedBuilder<S, T> {
+        pub fn builder_typed() -> DefaultedBuilder<S, T> {
             DefaultedBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl Defaulted<JsValue, Approximate> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> DefaultedBuilder<JsValue, Approximate> {
+            Self::builder_typed()
         }
     }
     impl<S: ::wasm_bindgen::convert::IntoWasmAbi, T: ::wasm_bindgen::convert::IntoWasmAbi> Default
         for Defaulted<S, T>
     {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct DefaultedBuilder<S, T> {

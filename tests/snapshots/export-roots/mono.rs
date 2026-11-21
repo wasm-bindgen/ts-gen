@@ -241,6 +241,11 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
+    #[wasm_bindgen(catch, js_name = "listBuckets")]
+    pub fn list_buckets_typed<T>() -> Result<Map<JsString, T>, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Socket;

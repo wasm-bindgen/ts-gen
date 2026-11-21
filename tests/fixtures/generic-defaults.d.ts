@@ -29,12 +29,12 @@ export declare function stringHolder(): Holder<string, Box<string>>;
 export declare function mixedHolder(): Holder<string, Box<unknown>>;
 export declare function makeHolder<V>(): Holder<string, V>;
 
-// A method-level type parameter no argument mentions after lowering is
-// kept only when the (awaited) return is exactly `T`, `T | undefined` or
-// `T | null`: there the turbofish is the cast. Nested in a container it
-// erases to the default of the type it instantiates, else the method's
-// own default, else `any`; absent from the return altogether it is
-// dropped.
+// A method-level type parameter no argument mentions after lowering reads
+// as what TypeScript infers with nothing to go on: the default of the
+// type it instantiates in the return, else the method's own default, else
+// its class or interface bound, else `any`. A `_typed` twin keeps the
+// parameter for the caller to name (`get_typed::<Row>(key)`), unless the
+// return never mentions it.
 
 export interface Row<T = Record<string, unknown>> {
   results: T[];
@@ -48,24 +48,24 @@ export interface Store {
   // A rest array infers its element only per-monomorphization, where it
   // lowers to `&[T]`; elsewhere it is `&[JsValue]` and `T` erases.
   append<T>(...items: T[]): Row<T>;
-  // 2. the whole return: kept, the caller names the cast.
+  // 2. the whole return: the default, and the twin names the cast.
   get<T = unknown>(key: string): Promise<T | undefined>;
   first<T = unknown>(): Promise<T | null>;
   json<T>(): Promise<T>;
-  // A callback's `Promise<T>` return does not count as mentioning `T`;
-  // the whole-return rule still keeps it, and nested it erases.
+  // A callback's parameters and return count as mentions, unless it has
+  // a rest parameter: then it is the untyped `Function` and `T` is open.
   transaction<T>(closure: (tx: Store) => Promise<T>): Promise<T>;
   collect<T>(make: () => Promise<T>): Promise<Map<string, T>>;
-  // A callback's parameters and return do count, unless it has a rest
-  // parameter: then it is the untyped `Function` and `T` erases.
   each<T>(fn: (item: T) => void): Promise<Map<string, T>>;
   eachRest<T>(fn: (item: T, ...rest: unknown[]) => void): Promise<Map<string, T>>;
-  // 3. nested: erased. `Row<T = Record<…>>` wins over the method's
+  // 3. nested: `Row<T = Record<…>>` wins over the method's
   // `T = unknown`; a builtin container has no default, so the method's
   // applies; `Cursor<T = string>` has one even when the method does not.
   run<T = unknown>(): Promise<Row<T>>;
   list<T = unknown>(): Promise<Map<string, T>>;
   scan<T>(): Cursor<T>;
+  // A class or interface bound stands in for a missing default.
+  pick<T extends Cursor>(): T;
   // 4. absent from the return once the variadic callback lowers to the
   // untyped `Function`: dropped.
   schedule<Args extends unknown[]>(callback: (...args: Args) => void, ...args: Args): number;

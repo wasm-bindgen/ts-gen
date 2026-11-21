@@ -91,7 +91,7 @@ async fn nullability_mono_async_compile(registry_value: &Registry) {
     let _: Result<Option<Registry>, _> = fetch_null().await;
     let _: Result<Option<f64>, _> = fetch_optional().await;
     let _: Result<Option<String>, _> = fetch_both().await;
-    let _: Result<Option<f64>, _> = fetch_generic::<f64>().await;
+    let _: Result<Option<f64>, _> = fetch_generic_typed::<f64>().await;
     let _: Result<Option<JsString>, _> =
         wasm_bindgen_futures::JsFuture::from(registry_value.pending()).await;
 }

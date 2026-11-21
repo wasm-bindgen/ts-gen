@@ -5,7 +5,7 @@ use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::generic_type_level::{
-    load_value, Bag, Chained, Labelled, PingTarget, TransformStream,
+    load_value_typed, Bag, Chained, Labelled, PingTarget, TransformStream,
 };
 
 fn assert_eq<T: Eq>() {}
@@ -26,8 +26,8 @@ fn every_type_is_eq() {
 // the settled value, and resolve to the caller's choice of `T`.
 #[allow(dead_code)]
 async fn async_bare_param_returns() -> Result<(), JsValue> {
-    let _: JsString = Labelled::<JsValue>::load::<JsString>().await?;
-    let _: Number = load_value::<Number>().await?;
+    let _: JsString = Labelled::<JsValue>::load_typed::<JsString>().await?;
+    let _: Number = load_value_typed::<Number>().await?;
     Ok(())
 }
 

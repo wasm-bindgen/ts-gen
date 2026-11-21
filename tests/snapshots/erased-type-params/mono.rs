@@ -25,13 +25,21 @@ extern "C" {
         Metadata: ::wasm_bindgen::convert::IntoWasmAbi;
 }
 impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> ListKey<Metadata> {
-    pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> ListKey<Metadata> {
-        Self::builder(name).build()
+    pub fn new_typed(name: impl ::wasm_bindgen::JsStringLike) -> ListKey<Metadata> {
+        Self::builder_typed(name).build()
     }
-    pub fn builder(name: impl ::wasm_bindgen::JsStringLike) -> ListKeyBuilder<Metadata> {
+    pub fn builder_typed(name: impl ::wasm_bindgen::JsStringLike) -> ListKeyBuilder<Metadata> {
         let inner: ListKey<Metadata> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         ListKeyBuilder { inner }
+    }
+}
+impl ListKey<JsValue> {
+    pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> Self {
+        Self::new_typed(name)
+    }
+    pub fn builder(name: impl ::wasm_bindgen::JsStringLike) -> ListKeyBuilder<JsValue> {
+        Self::builder_typed(name)
     }
 }
 pub struct ListKeyBuilder<Metadata> {
@@ -104,6 +112,12 @@ extern "C" {
     pub async fn list(this: &Store) -> Result<ListResult, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
     pub fn list_promise(this: &Store) -> Promise<ListResult>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_typed<Metadata>(this: &Store) -> Result<ListResult<Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "list")]
+    pub fn list_typed_promise<Metadata>(this: &Store) -> Promise<ListResult<Metadata>>;
     #[wasm_bindgen(method, catch)]
     pub fn tag(
         this: &Store,

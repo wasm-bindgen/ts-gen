@@ -98,11 +98,15 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &Request) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
-    pub async fn json<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
+    pub async fn json(this: &Request) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, js_name = "json")]
+    pub fn json_promise(this: &Request) -> Promise;
+    #[wasm_bindgen(method, catch, js_name = "json")]
+    pub async fn json_typed<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
         this: &Request,
     ) -> Result<T, JsValue>;
     #[wasm_bindgen(method, js_name = "json")]
-    pub fn json_promise<T: ::wasm_bindgen::JsGeneric>(this: &Request) -> Promise<T>;
+    pub fn json_typed_promise<T: ::wasm_bindgen::JsGeneric>(this: &Request) -> Promise<T>;
     #[wasm_bindgen(method, catch)]
     pub async fn blob(this: &Request) -> Result<Blob, JsValue>;
     #[wasm_bindgen(method, js_name = "blob")]
@@ -404,11 +408,15 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &Response) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
-    pub async fn json<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
+    pub async fn json(this: &Response) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, js_name = "json")]
+    pub fn json_promise(this: &Response) -> Promise;
+    #[wasm_bindgen(method, catch, js_name = "json")]
+    pub async fn json_typed<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
         this: &Response,
     ) -> Result<T, JsValue>;
     #[wasm_bindgen(method, js_name = "json")]
-    pub fn json_promise<T: ::wasm_bindgen::JsGeneric>(this: &Response) -> Promise<T>;
+    pub fn json_typed_promise<T: ::wasm_bindgen::JsGeneric>(this: &Response) -> Promise<T>;
     #[wasm_bindgen(method, catch)]
     pub async fn blob(this: &Response) -> Result<Blob, JsValue>;
     #[wasm_bindgen(method, js_name = "blob")]
@@ -533,18 +541,26 @@ extern "C" {
     );
 }
 impl<E: ::wasm_bindgen::JsGeneric> ExportedHandler<E> {
-    pub fn new() -> ExportedHandler<E> {
-        Self::builder().build()
+    pub fn new_typed() -> ExportedHandler<E> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> ExportedHandlerBuilder<E> {
+    pub fn builder_typed() -> ExportedHandlerBuilder<E> {
         ExportedHandlerBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl ExportedHandler<Env> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> ExportedHandlerBuilder<Env> {
+        Self::builder_typed()
+    }
+}
 impl<E: ::wasm_bindgen::JsGeneric> Default for ExportedHandler<E> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct ExportedHandlerBuilder<E: ::wasm_bindgen::JsGeneric> {

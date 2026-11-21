@@ -9,7 +9,7 @@ use ts_gen_integration_tests::generic_dictionary_abv::{GenAbv, ReqAbv, U};
 #[allow(dead_code)]
 fn generic_dictionary_abv_compile(bytes: &Uint8Array, floats: &Float32Array, owner: &U) {
     let value = JsString::from("v");
-    let gen: GenAbv<JsString> = GenAbv::builder().value(&value).data(floats).build();
+    let gen: GenAbv<JsString> = GenAbv::builder_typed().value(&value).data(floats).build();
     gen.set_data(bytes);
     let req: ReqAbv<JsString> = ReqAbv::new(&value, bytes, floats, owner);
     req.set_other(floats);

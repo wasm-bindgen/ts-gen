@@ -227,7 +227,22 @@ extern "C" {
         r#type: &str,
     ) -> Promise<JsNullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn __get_json<Key: ::wasm_bindgen::JsGeneric, ExpectedValue: ::wasm_bindgen::JsGeneric>(
+    async fn __get_json<Key: ::wasm_bindgen::JsGeneric>(
+        this: &KVStore<Key>,
+        key: &Key,
+        r#type: &str,
+    ) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_json_promise<Key: ::wasm_bindgen::JsGeneric>(
+        this: &KVStore<Key>,
+        key: &Key,
+        r#type: &str,
+    ) -> Promise;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_json_typed<
+        Key: ::wasm_bindgen::JsGeneric,
+        ExpectedValue: ::wasm_bindgen::JsGeneric,
+    >(
         this: &KVStore<Key>,
         key: &Key,
         r#type: &str,
@@ -235,7 +250,7 @@ extern "C" {
     where
         Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, js_name = "get")]
-    fn __get_json_promise<
+    fn __get_json_typed_promise<
         Key: ::wasm_bindgen::JsGeneric,
         ExpectedValue: ::wasm_bindgen::JsGeneric,
     >(
@@ -291,20 +306,26 @@ impl<Key: ::wasm_bindgen::JsGeneric> KVStore<Key> {
     pub fn get_text_promise(&self, key: &Key) -> Promise<JsNullable<JsString>> {
         self.__get_text_promise(key, "text")
     }
-    pub async fn get_json<ExpectedValue: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_json(&self, key: &Key) -> Result<JsValue, JsValue> {
+        self.__get_json(key, "json").await
+    }
+    pub fn get_json_promise(&self, key: &Key) -> Promise {
+        self.__get_json_promise(key, "json")
+    }
+    pub async fn get_json_typed<ExpectedValue: ::wasm_bindgen::JsGeneric>(
         &self,
         key: &Key,
     ) -> Result<Option<ExpectedValue>, JsValue>
     where
         Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
     {
-        self.__get_json(key, "json").await
+        self.__get_json_typed(key, "json").await
     }
-    pub fn get_json_promise<ExpectedValue: ::wasm_bindgen::JsGeneric>(
+    pub fn get_json_typed_promise<ExpectedValue: ::wasm_bindgen::JsGeneric>(
         &self,
         key: &Key,
     ) -> Promise<JsNullable<ExpectedValue>> {
-        self.__get_json_promise(key, "json")
+        self.__get_json_typed_promise(key, "json")
     }
 }
 #[wasm_bindgen(module = "literal-overloads")]
@@ -528,6 +549,8 @@ extern "C" {
     pub type Boxed<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(kind: BoxedKind) -> Result<Boxed, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<T: ::wasm_bindgen::JsGeneric>(kind: BoxedKind) -> Result<Boxed<T>, JsValue>;
     # [wasm_bindgen (static_method_of = Boxed)]
     pub fn label(kind: BoxedKind) -> String;
     # [wasm_bindgen (static_method_of = Boxed , catch , js_name = "label")]

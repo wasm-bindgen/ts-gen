@@ -329,7 +329,23 @@ extern "C" {
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn __get_json<Key, ExpectedValue>(
+    async fn __get_json<Key>(
+        this: &KVStore<Key>,
+        key: Key,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<JsValue, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    fn __get_json_promise<Key>(
+        this: &KVStore<Key>,
+        key: Key,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_json_typed<Key, ExpectedValue>(
         this: &KVStore<Key>,
         key: Key,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -339,7 +355,7 @@ extern "C" {
         Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
         ExpectedValue: 'static;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    fn __get_json_promise<Key, ExpectedValue>(
+    fn __get_json_typed_promise<Key, ExpectedValue>(
         this: &KVStore<Key>,
         key: Key,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -394,22 +410,37 @@ impl<Key> KVStore<Key> {
     {
         self.__get_text_promise(key, "text")
     }
-    pub async fn get_json<ExpectedValue>(&self, key: Key) -> Result<Option<ExpectedValue>, JsValue>
+    pub async fn get_json(&self, key: Key) -> Result<JsValue, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
+        self.__get_json(key, "json").await
+    }
+    pub fn get_json_promise(&self, key: Key) -> Result<Promise, JsValue>
+    where
+        Key: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
+        self.__get_json_promise(key, "json")
+    }
+    pub async fn get_json_typed<ExpectedValue>(
+        &self,
+        key: Key,
+    ) -> Result<Option<ExpectedValue>, JsValue>
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi,
         Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
         ExpectedValue: 'static,
     {
-        self.__get_json(key, "json").await
+        self.__get_json_typed(key, "json").await
     }
-    pub fn get_json_promise<ExpectedValue>(
+    pub fn get_json_typed_promise<ExpectedValue>(
         &self,
         key: Key,
     ) -> Result<Promise<Option<ExpectedValue>>, JsValue>
     where
         Key: ::wasm_bindgen::convert::IntoWasmAbi,
     {
-        self.__get_json_promise(key, "json")
+        self.__get_json_typed_promise(key, "json")
     }
 }
 #[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
@@ -618,7 +649,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Boxed<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<T>(kind: BoxedKind) -> Result<Boxed<T>, JsValue>;
+    pub fn new(kind: BoxedKind) -> Result<Boxed, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<T>(kind: BoxedKind) -> Result<Boxed<T>, JsValue>;
     # [wasm_bindgen (static_method_of = Boxed , catch)]
     pub fn label(kind: BoxedKind) -> Result<String, JsValue>;
     # [wasm_bindgen (static_method_of = Boxed , catch , js_name = "label")]
