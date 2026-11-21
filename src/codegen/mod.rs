@@ -13,6 +13,7 @@ pub mod functions;
 pub(crate) mod inline_wrappers;
 mod ir_callables;
 mod ir_types;
+pub(crate) mod keyed;
 pub(crate) mod null_arms;
 pub mod signatures;
 pub mod subtyping;
@@ -409,6 +410,13 @@ fn generate_tokens(
             ir.monomorphize();
         }
         cgctx.ir = Some(ir);
+        let opts = crate::lower::Options {
+            with: vec![std_ir().clone()],
+            strict_nullable: options.strict_nullable,
+            ..Default::default()
+        };
+        let keyed = crate::lower::lower_with(module, gctx, &opts).ir;
+        cgctx.keyed = Some(keyed::Keyed::new(keyed, vec![std_ir()]));
     }
     let cgctx = cgctx;
 
@@ -508,6 +516,7 @@ fn generate_tokens(
         }
     }
     cgctx.take_diagnostics().emit();
+    let keyed = cgctx.keyed.as_ref().map(|k| k.support());
 
     Ok(quote! {
         #preamble
@@ -516,6 +525,7 @@ fn generate_tokens(
         #dynamic_unions
         #(#instances)*
         #error_enum
+        #keyed
     })
 }
 

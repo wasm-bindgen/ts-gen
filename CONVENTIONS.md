@@ -3066,6 +3066,74 @@ pub async fn list_typed<T: JsGeneric>(this: &Store) -> Result<Map<JsString, T>, 
 pub fn schedule(this: &Store, callback: &Function, args: &[JsValue]) -> f64;
 ```
 
+### Keyed members
+
+A type parameter bounded by `keyof` a map, where another argument is
+typed by an index of that map, ties a string to a type: the key passed
+picks the property that types the rest of the call. The plain name reads
+it erased, as it always has: the key is a `&str`, and the index is the
+type every key gives. A `_typed` twin states the relation. It takes the
+key as a type argument in place of the string, a marker type that
+implements `MapKey` for the map, and reads each index as that marker's
+`Value`.
+
+```ts
+interface SocketEventMap {
+  message: MessageEvent;
+  close: Event;
+}
+declare class EventTarget<EventMap extends Record<string, Event> = Record<string, Event>> {
+  addEventListener<Type extends keyof EventMap>(type: Type, handler: (event: EventMap[Type]) => void): void;
+}
+declare class Socket extends EventTarget<SocketEventMap> {}
+```
+
+```rust
+pub trait MapKey<M: ?Sized> {
+    type Value: JsGeneric;
+    const KEY: &'static str;
+}
+pub mod socket_event_map {
+    pub struct Message;
+    impl MapKey<SocketEventMap> for Message {
+        type Value = MessageEvent;
+        const KEY: &'static str = "message";
+    }
+    pub struct Close; // Value = Event, KEY = "close"
+}
+impl<EventMap: JsGeneric> EventTarget<EventMap> {
+    pub fn add_event_listener_typed<K: MapKey<EventMap>>(&self, handler: &Function<fn(K::Value) -> Undefined>);
+}
+impl Socket {
+    pub fn add_event_listener_typed<K: MapKey<SocketEventMap>>(&self, handler: &Function<fn(K::Value) -> Undefined>);
+}
+
+socket.add_event_listener_typed::<socket_event_map::Message>(&on_message); // fn(MessageEvent)
+socket.add_event_listener("message", &on_event); // fn(Event), as before
+```
+
+* `MapKey` is emitted once, with a module per declared map a twin can
+  be called with: the map's name in snake case, holding a marker per
+  property in Pascal case. A property whose type isn't a non-generic
+  class or interface has no marker.
+* The twin wraps the plain binding, passing `K::KEY` for the key, so it
+  is the same under `--experimental-generic-mono`. `_typed` closes the
+  name as it does for an
+  [uninferrable parameter](#uninferrable-method-type-parameters):
+  `try_add_event_listener_typed`,
+  `add_event_listener_with_event_listener_object_typed`.
+* A subclass derefs to its parent at the parent's default map, so where
+  the map is the parent's type parameter, each non-generic class that
+  extends the parent at a declared map has the twin over that map
+  (`Socket` above).
+* An open map (`Record<string, Event>`) has no markers, since any
+  string is a key: the plain name is its only reading.
+* A member keeps the plain name alone where the twin couldn't state it:
+  a keyed return, a chained or literal index
+  (`AiModelList[Name]["inputs"]`), a literal-keyed overload, a member
+  of a declared module or namespace, and a callable that already has a
+  `_typed` twin for an uninferrable parameter.
+
 ### Type-level generics propagate to every binding site
 
 When the surrounding *type* declares parameters

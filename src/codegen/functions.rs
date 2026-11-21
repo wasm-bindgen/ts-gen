@@ -158,11 +158,32 @@ fn emit_function(
         false => Vec::new(),
     };
 
-    let items: Vec<TokenStream> = sigs
+    let mut items: Vec<TokenStream> = sigs
         .iter()
         .chain(&twins)
         .map(|sig| generate_expanded_free_function(sig, ctx, cgctx, js_namespace, scope))
         .collect();
+    // The `_typed` twins of a keyed function ([`super::keyed`]).
+    let keyed = cgctx.and_then(|c| Some((c, c.keyed.as_ref()?)));
+    if let (Some((cgctx, keyed)), true, true, None) = (
+        keyed,
+        twins.is_empty(),
+        js_namespace.is_empty(),
+        ctx.specifier(),
+    ) {
+        let own = |_: &syn::Ident| false;
+        for sig in sigs.iter().filter(|sig| sig.literal.is_none()) {
+            let binding =
+                generate_expanded_free_function(sig, ctx, Some(cgctx), js_namespace, scope);
+            let at = super::keyed::At {
+                cgctx,
+                scope: sig.body_scope,
+                module: ctx,
+            };
+            let receiver = super::keyed::Receiver::Function;
+            items.extend(keyed.twin(None, &sig.js_name, receiver, binding, &own, at));
+        }
+    }
 
     quote! { #(#items)* }
 }

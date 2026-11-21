@@ -2485,6 +2485,10 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     impls.push(display.impl_);
                 }
                 impls.extend(into_iterator(config, &sigs));
+                if twins.is_empty() {
+                    let receiver = super::keyed::Receiver::Method;
+                    impls.extend(keyed_twins(config, receiver, &sigs));
+                }
                 for sig in sigs.iter().chain(&twins) {
                     items.push(generate_expanded_method(config, sig));
                 }
@@ -2524,6 +2528,10 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     config.cgctx,
                 );
                 let twins = config.typed_twins(&spec, form, &sigs, &mut names);
+                if twins.is_empty() {
+                    let receiver = super::keyed::Receiver::Static;
+                    impls.extend(keyed_twins(config, receiver, &sigs));
+                }
                 for sig in sigs.iter().chain(&twins) {
                     items.push(generate_expanded_static_method(config, sig));
                 }
@@ -2676,6 +2684,54 @@ fn display_to_string(
 /// The adapter calls only what js-sys has both with and without
 /// `js_sys_unstable_apis`, where its own iteration of an `Iterator<T>`
 /// differs.
+/// The `_typed` twins of the plain bindings `sigs` of a keyed method
+/// ([`super::keyed`]), each in an `impl` of the class.
+fn keyed_twins(
+    config: &ClassConfig,
+    receiver: super::keyed::Receiver,
+    sigs: &[FunctionSignature],
+) -> Vec<TokenStream> {
+    let form = match receiver {
+        super::keyed::Receiver::Static => super::ir_callables::Form::Static,
+        _ => super::ir_callables::Form::Method,
+    };
+    let (Some(cgctx), Some(site)) = (config.cgctx, ir_site(config, form)) else {
+        return Vec::new();
+    };
+    let (Some(keyed), None, [owner]) = (&cgctx.keyed, site.module, site.path) else {
+        return Vec::new();
+    };
+    let module = config.from_module();
+    let own = |ident: &syn::Ident| config.type_params.iter().any(|tp| ident == &tp.name);
+    let this = super::typemap::make_ident(&config.effective_rust_name());
+    let decl = config.type_generics_decl();
+    let args = config.type_generics_args();
+    let twins: Vec<TokenStream> = sigs
+        .iter()
+        .filter(|sig| sig.literal.is_none())
+        .filter_map(|sig| {
+            let binding = match receiver {
+                super::keyed::Receiver::Static => generate_expanded_static_method(config, sig),
+                _ => generate_expanded_method(config, sig),
+            };
+            let at = super::keyed::At {
+                cgctx,
+                scope: sig.body_scope,
+                module: &module,
+            };
+            keyed.twin(Some(owner), &sig.js_name, receiver, binding, &own, at)
+        })
+        .collect();
+    if twins.is_empty() {
+        return Vec::new();
+    }
+    vec![quote! {
+        impl #decl #this #args {
+            #(#twins)*
+        }
+    }]
+}
+
 fn into_iterator(config: &ClassConfig, sigs: &[FunctionSignature]) -> Option<TokenStream> {
     let sig = sigs
         .iter()
