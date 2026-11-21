@@ -292,6 +292,9 @@ pub enum Kind {
         /// `bigint`, as its `u64` limbs (§10); the host bigint itself under
         /// the `host` carrier.
         bigint: bool,
+        /// `buffer`: JS gives an `ArrayBuffer` or any view, read as its
+        /// bytes.
+        buffer: bool,
     },
     /// `arr<T>`.
     Array {
@@ -843,14 +846,24 @@ impl<'a> Layouts<'a> {
                     writeback: matches!(t, Type::MutVec(_)),
                     nullable,
                     bigint: false,
+                    buffer: false,
                 }
             }
+            Type::Buffer => Kind::Vec {
+                elem: Scalar::U8,
+                carrier: p.vec,
+                writeback: false,
+                nullable,
+                bigint: false,
+                buffer: true,
+            },
             Type::BigInt => Kind::Vec {
                 elem: Scalar::U64,
                 carrier: p.vec,
                 writeback: false,
                 nullable,
                 bigint: true,
+                buffer: false,
             },
             Type::Array(e) => Kind::Array {
                 elem: Box::new(self.lower(e, cx, flow)?),
@@ -885,6 +898,13 @@ impl<'a> Layouts<'a> {
                 nullable,
             },
             Type::View { mutable, elem } if !nullable => match **elem {
+                Type::Buffer if !*mutable => {
+                    self.width("`*buffer`")?;
+                    Kind::View {
+                        elem: Scalar::U8,
+                        mutable: false,
+                    }
+                }
                 Type::Scalar(s) if is_vec_elem(s) => {
                     self.width("`*T[]`")?;
                     Kind::View {

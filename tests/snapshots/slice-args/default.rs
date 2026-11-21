@@ -449,3 +449,237 @@ extern "C" {
         data: &Float64Array,
     ) -> Result<String, JsValue>;
 }
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum BufferSource {
+    Object(Object),
+    ArrayBuffer(ArrayBuffer),
+}
+impl ::core::convert::From<Object> for BufferSource {
+    fn from(value: Object) -> Self {
+        Self::Object(value)
+    }
+}
+impl ::core::convert::From<&Object> for BufferSource {
+    fn from(value: &Object) -> Self {
+        Self::Object(value.clone())
+    }
+}
+impl ::core::convert::From<::js_sys::Int8Array> for BufferSource {
+    fn from(value: ::js_sys::Int8Array) -> Self {
+        Self::Object(Object::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::Int8Array> for BufferSource {
+    fn from(value: &::js_sys::Int8Array) -> Self {
+        Self::Object(Object::from(value.clone()))
+    }
+}
+impl ::core::convert::From<::js_sys::Uint8Array> for BufferSource {
+    fn from(value: ::js_sys::Uint8Array) -> Self {
+        Self::Object(Object::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::Uint8Array> for BufferSource {
+    fn from(value: &::js_sys::Uint8Array) -> Self {
+        Self::Object(Object::from(value.clone()))
+    }
+}
+impl ::core::convert::From<::js_sys::Uint8ClampedArray> for BufferSource {
+    fn from(value: ::js_sys::Uint8ClampedArray) -> Self {
+        Self::Object(Object::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::Uint8ClampedArray> for BufferSource {
+    fn from(value: &::js_sys::Uint8ClampedArray) -> Self {
+        Self::Object(Object::from(value.clone()))
+    }
+}
+impl ::core::convert::From<::js_sys::Int16Array> for BufferSource {
+    fn from(value: ::js_sys::Int16Array) -> Self {
+        Self::Object(Object::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::Int16Array> for BufferSource {
+    fn from(value: &::js_sys::Int16Array) -> Self {
+        Self::Object(Object::from(value.clone()))
+    }
+}
+impl ::core::convert::From<::js_sys::Uint16Array> for BufferSource {
+    fn from(value: ::js_sys::Uint16Array) -> Self {
+        Self::Object(Object::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::Uint16Array> for BufferSource {
+    fn from(value: &::js_sys::Uint16Array) -> Self {
+        Self::Object(Object::from(value.clone()))
+    }
+}
+impl ::core::convert::From<::js_sys::Int32Array> for BufferSource {
+    fn from(value: ::js_sys::Int32Array) -> Self {
+        Self::Object(Object::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::Int32Array> for BufferSource {
+    fn from(value: &::js_sys::Int32Array) -> Self {
+        Self::Object(Object::from(value.clone()))
+    }
+}
+impl ::core::convert::From<::js_sys::Uint32Array> for BufferSource {
+    fn from(value: ::js_sys::Uint32Array) -> Self {
+        Self::Object(Object::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::Uint32Array> for BufferSource {
+    fn from(value: &::js_sys::Uint32Array) -> Self {
+        Self::Object(Object::from(value.clone()))
+    }
+}
+impl ::core::convert::From<::js_sys::Float32Array> for BufferSource {
+    fn from(value: ::js_sys::Float32Array) -> Self {
+        Self::Object(Object::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::Float32Array> for BufferSource {
+    fn from(value: &::js_sys::Float32Array) -> Self {
+        Self::Object(Object::from(value.clone()))
+    }
+}
+impl ::core::convert::From<::js_sys::Float64Array> for BufferSource {
+    fn from(value: ::js_sys::Float64Array) -> Self {
+        Self::Object(Object::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::Float64Array> for BufferSource {
+    fn from(value: &::js_sys::Float64Array) -> Self {
+        Self::Object(Object::from(value.clone()))
+    }
+}
+impl ::core::convert::From<::js_sys::BigInt64Array> for BufferSource {
+    fn from(value: ::js_sys::BigInt64Array) -> Self {
+        Self::Object(Object::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::BigInt64Array> for BufferSource {
+    fn from(value: &::js_sys::BigInt64Array) -> Self {
+        Self::Object(Object::from(value.clone()))
+    }
+}
+impl ::core::convert::From<::js_sys::BigUint64Array> for BufferSource {
+    fn from(value: ::js_sys::BigUint64Array) -> Self {
+        Self::Object(Object::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::BigUint64Array> for BufferSource {
+    fn from(value: &::js_sys::BigUint64Array) -> Self {
+        Self::Object(Object::from(value.clone()))
+    }
+}
+impl ::core::convert::From<::js_sys::DataView> for BufferSource {
+    fn from(value: ::js_sys::DataView) -> Self {
+        Self::Object(Object::from(value))
+    }
+}
+impl ::core::convert::From<&::js_sys::DataView> for BufferSource {
+    fn from(value: &::js_sys::DataView) -> Self {
+        Self::Object(Object::from(value.clone()))
+    }
+}
+impl ::core::convert::From<ArrayBuffer> for BufferSource {
+    fn from(value: ArrayBuffer) -> Self {
+        Self::ArrayBuffer(value)
+    }
+}
+impl ::core::convert::From<&ArrayBuffer> for BufferSource {
+    fn from(value: &ArrayBuffer) -> Self {
+        Self::ArrayBuffer(value.clone())
+    }
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "hash")]
+    fn __hash(data: BufferSource) -> String;
+}
+pub fn hash(data: impl ::core::convert::Into<BufferSource>) -> String {
+    __hash(data.into())
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "hash")]
+    fn __try_hash(data: BufferSource) -> Result<String, JsValue>;
+}
+pub fn try_hash(data: impl ::core::convert::Into<BufferSource>) -> Result<String, JsValue> {
+    __try_hash(data.into())
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    pub fn store(key: &str, value: &str) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "store")]
+    pub fn try_store(key: &str, value: &str) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "store")]
+    pub fn store_with_array_buffer(key: &str, value: &ArrayBuffer) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "store")]
+    pub fn try_store_with_array_buffer(key: &str, value: &ArrayBuffer) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "store")]
+    pub fn store_with_typed_array(key: &str, value: &Object) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "store")]
+    pub fn try_store_with_typed_array(key: &str, value: &Object) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    pub fn echo(data: &ArrayBuffer) -> EchoReturnKind;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "echo")]
+    pub fn try_echo(data: &ArrayBuffer) -> Result<EchoReturnKind, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "echo")]
+    pub fn echo_with_typed_array(data: &Object) -> EchoReturnKind;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "echo")]
+    pub fn try_echo_with_typed_array(data: &Object) -> Result<EchoReturnKind, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "peek")]
+    fn __peek(data: BufferSource) -> String;
+}
+#[doc = " * `data` - read before the call returns"]
+pub fn peek(data: impl ::core::convert::Into<BufferSource>) -> String {
+    __peek(data.into())
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "peek")]
+    fn __try_peek(data: BufferSource) -> Result<String, JsValue>;
+}
+#[doc = " * `data` - read before the call returns"]
+pub fn try_peek(data: impl ::core::convert::Into<BufferSource>) -> Result<String, JsValue> {
+    __try_peek(data.into())
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum EchoReturnKind {
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+}

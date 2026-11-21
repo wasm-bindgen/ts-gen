@@ -9,6 +9,7 @@ class Probe {
 }
 for (const m of [
   "str", "optStr", "bytes", "floats", "bigs", "optBytes", "fill", "nums", "strs", "optStrs",
+  "buf", "optBuf", "peek",
   "rows", "reqs", "nested", "mixed", "pair", "optPair",
 ]) {
   Probe.prototype[m] = function (v) {
@@ -82,6 +83,47 @@ assert.deepEqual(call("Probe#optBytes(u8[]?)", undefined, 0, -1), [0, -1]);
   const ptr = L.bytes(new Uint8Array([1, 2, 3, 4]));
   call("Probe#fill(mut u8[])", (v) => v.fill(9, 1, 3), ptr, 4);
   assert.deepEqual([...L.u8().slice(ptr, ptr + 4)], [1, 9, 9, 4]);
+}
+
+// buffer: bytes to JS as a fresh `Uint8Array`; an `ArrayBuffer` or any view
+// back as its bytes, a view as exactly its window.
+L.balanced(() => {
+  const ptr = L.bytes(new Uint8Array([1, 2, 3]));
+  const [rp, rl] = call("Probe#buf(buffer)", (v) => v.buffer, ptr, 3);
+  const seen = p.seen.pop();
+  assert.ok(seen instanceof Uint8Array);
+  assert.notEqual(seen.buffer, L.ex.memory.buffer);
+  assert.deepEqual([...L.take(rp, rl)], [1, 2, 3]);
+});
+L.balanced(() => {
+  const floats = new Float32Array([0, 1.5, 2.5, 0]).subarray(1, 3);
+  const [rp, rl] = call("Probe#buf(buffer)", floats, 1, 0);
+  assert.equal(rl, 8);
+  assert.deepEqual([...new Float32Array(Uint8Array.from(L.take(rp, rl)).buffer)], [1.5, 2.5]);
+});
+L.balanced(() => {
+  const view = new DataView(new Uint8Array([9, 8, 7, 6]).buffer, 1, 2);
+  assert.deepEqual([...L.take(...call("Probe#buf(buffer)", view, 1, 0))], [8, 7]);
+});
+L.balanced(() => L.throwsType(() => call("Probe#buf(buffer)", [1, 2], 1, 0), /buffer/));
+assert.deepEqual(call("Probe#optBuf(buffer?)", undefined, 0, -1), [0, -1]);
+// Either class it's one of is written as the object itself.
+L.balanced(() => {
+  const buffer = new ArrayBuffer(2);
+  assert.equal(L.take(...call("Probe#buf(ArrayBuffer)", (v) => v, buffer)).length, 2);
+  assert.equal(p.seen.pop(), buffer);
+  const view = new Int16Array([1, 2]);
+  assert.equal(L.take(...call("Probe#buf(ArrayBufferView)", (v) => v, view)).length, 4);
+  assert.equal(p.seen.pop(), view);
+});
+L.throwsType(() => call("Probe#buf(ArrayBuffer)", undefined, new Uint8Array(1)));
+// *buffer: a view of the language's memory.
+{
+  const ptr = L.bytes(new Uint8Array([4, 5]));
+  call("Probe#peek(*buffer)", undefined, ptr, 2);
+  const seen = p.seen.pop();
+  assert.equal(seen.buffer, L.ex.memory.buffer);
+  assert.deepEqual([...seen], [4, 5]);
 }
 
 // arr<T>: numeric memory parts, packed.

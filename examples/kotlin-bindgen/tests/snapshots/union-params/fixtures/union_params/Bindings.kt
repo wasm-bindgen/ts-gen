@@ -100,6 +100,47 @@ fun Universal.setCache(value: Boolean) {
     fixtures.union_params.flat.Universal_set_cache_bool(this, (if (value) 1 else 0))
 }
 
+external interface Box<T : JsAny?> : JsAny
+
+var <T : JsAny?> Box<T>.value: T
+    get() {
+        val r0 = fixtures.union_params.flat.Box_get_value(this)
+        return (r0 as T)
+    }
+    set(value) {
+        fixtures.union_params.flat.Box_set_value_T(this, value)
+    }
+
+external interface Frame : JsAny
+
+var Frame.payload: ByteArray
+    get() {
+        val r0 = fixtures.union_params.flat.Frame_get_payload(this)
+        return tsgen.runtime.byteArray(r0!!)
+    }
+    set(value) {
+        fixtures.union_params.flat.Frame_set_payload_buffer(this, tsgen.runtime.typedArray("Uint8Array", value))
+    }
+
+val Frame.tag: BufferOrStr?
+    get() {
+        val r0 = fixtures.union_params.flat.Frame_get_tag(this)
+        val s1 = fixtures.union_params.flat.ret_externref()
+        return decodeBufferOrStr(r0, s1)
+    }
+
+fun Frame.setTag(value: BufferOrStr) {
+    val w0 = encodeBufferOrStr(value)
+    fixtures.union_params.flat.Frame_set_tag_BufferOrStr(this, w0.arm, w0.s0)
+}
+
+fun Frame.setTag(value: ByteArray) = setTag(BufferOrStr.Buffer(value))
+fun Frame.setTag(value: String) = setTag(BufferOrStr.Str(value))
+
+external interface ArrayBuffer : JsAny
+
+external interface ArrayBufferView : JsAny
+
 fun Chunk(): Chunk {
     val r0 = fixtures.union_params.flat.Chunk_new()
     return r0!!.unsafeCast<Chunk>()
@@ -212,6 +253,75 @@ fun configure(s: Universal) {
     try { fixtures.union_params.flat.configure_Universal(s) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
+fun digest(data: ByteArray): ArrayBuffer {
+    val r0 = try { fixtures.union_params.flat.digest_buffer(tsgen.runtime.typedArray("Uint8Array", data)) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0!!.unsafeCast<ArrayBuffer>()
+}
+
+fun store(key: String, value: ValueKind) {
+    val w0 = encodeValueKind(value)
+    try { fixtures.union_params.flat.store_str_ValueKind(key.toJsString(), w0.arm, w0.s0) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+fun store(key: String, value: String) = store(key, ValueKind.Str(value))
+fun store(key: String, value: ByteArray) = store(key, ValueKind.Buffer(value))
+
+fun storeBlob(value: ValueKind2) {
+    val w0 = encodeValueKind2(value)
+    try { fixtures.union_params.flat.storeBlob_ValueKind2(w0.arm, w0.s0) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+fun storeBlob(value: Blob) = storeBlob(ValueKind2.Blob(value))
+fun storeBlob(value: ByteArray) = storeBlob(ValueKind2.Buffer(value))
+fun storeBlob(value: String) = storeBlob(ValueKind2.Str(value))
+
+fun load(): ByteArray? {
+    val r0 = try { fixtures.union_params.flat.load() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0?.let { tsgen.runtime.byteArray(it) }
+}
+
+fun loadText(): BufferOrStr {
+    val r0 = try { fixtures.union_params.flat.loadText() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    val s1 = fixtures.union_params.flat.ret_externref()
+    return decodeBufferOrStr(r0, s1)!!
+}
+
+fun join(parts: JsArray<JsAny?>): tsgen.runtime.Future<ByteArray> {
+    val r0 = fixtures.union_params.flat.join_arr_buffer(parts)
+    return tsgen.runtime.Future<ByteArray>(r0!!, { f -> val r1 = fixtures.union_params.flat.take_buffer(f); tsgen.runtime.byteArray(r1!!) }, { f -> futureErrorErr(f) })
+}
+
+fun boxed(): Box<JsAny?> {
+    val r0 = try { fixtures.union_params.flat.boxed() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0!!.unsafeCast<Box<JsAny?>>()
+}
+
+/**
+ * * `data`
+ */
+fun hash(data: ByteArray) {
+    try { fixtures.union_params.flat.hash_buffer(tsgen.runtime.typedArray("Uint8Array", data)) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+/**
+ * * `data`
+ */
+fun hashText(data: String) {
+    try { fixtures.union_params.flat.hashText_str(data.toJsString()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+/**
+ * * `data`
+ */
+fun hashText(data: ByteArray) {
+    try { fixtures.union_params.flat.hashText_buffer(tsgen.runtime.typedArray("Uint8Array", data)) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+fun Frame(): Frame {
+    val r0 = fixtures.union_params.flat.Frame_new()
+    return r0!!.unsafeCast<Frame>()
+}
+
 /** `Body` as its box: its arm's JS value. */
 fun Body.toJs(): JsAny {
     val w0 = encodeBody(this)
@@ -302,6 +412,58 @@ fun JsAny.toVKind(): VKind {
     val s2 = fixtures.union_params.flat.ret_externref()
     val s3 = fixtures.union_params.flat.ret_f64()
     return decodeVKind(r1, s2, s3)!!
+}
+
+/** `ValueKind` as its box: its arm's JS value. */
+fun ValueKind.toJs(): JsAny {
+    val w0 = encodeValueKind(this)
+    return fixtures.union_params.flat.box_ValueKind(w0.arm, w0.s0)!!
+}
+
+/** The `ValueKind` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toValueKind(): ValueKind {
+    val r1 = fixtures.union_params.flat.unbox_ValueKind(this)
+    val s2 = fixtures.union_params.flat.ret_externref()
+    return decodeValueKind(r1, s2)!!
+}
+
+/** `ValueKind2` as its box: its arm's JS value. */
+fun ValueKind2.toJs(): JsAny {
+    val w0 = encodeValueKind2(this)
+    return fixtures.union_params.flat.box_ValueKind2(w0.arm, w0.s0)!!
+}
+
+/** The `ValueKind2` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toValueKind2(): ValueKind2 {
+    val r1 = fixtures.union_params.flat.unbox_ValueKind2(this)
+    val s2 = fixtures.union_params.flat.ret_externref()
+    return decodeValueKind2(r1, s2)!!
+}
+
+/** `BufferOrStr` as its box: its arm's JS value. */
+fun BufferOrStr.toJs(): JsAny {
+    val w0 = encodeBufferOrStr(this)
+    return fixtures.union_params.flat.box_BufferOrStr(w0.arm, w0.s0)!!
+}
+
+/** The `BufferOrStr` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toBufferOrStr(): BufferOrStr {
+    val r1 = fixtures.union_params.flat.unbox_BufferOrStr(this)
+    val s2 = fixtures.union_params.flat.ret_externref()
+    return decodeBufferOrStr(r1, s2)!!
+}
+
+/** `BufferSource` as its box: its arm's JS value. */
+fun BufferSource.toJs(): JsAny {
+    val w0 = encodeBufferSource(this)
+    return fixtures.union_params.flat.box_BufferSource(w0.arm, w0.s0)!!
+}
+
+/** The `BufferSource` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toBufferSource(): BufferSource {
+    val r1 = fixtures.union_params.flat.unbox_BufferSource(this)
+    val s2 = fixtures.union_params.flat.ret_externref()
+    return decodeBufferSource(r1, s2)!!
 }
 
 sealed interface Body {
@@ -447,6 +609,89 @@ fun decodeVKind(arm: Int, s0: JsAny?, s1: Double): VKind? = when (arm) {
     else -> throw IllegalStateException("VKind: arm $arm")
 }
 
+sealed interface ValueKind {
+    data class Str(val value: String) : ValueKind
+    data class Buffer(val value: ByteArray) : ValueKind
+}
+
+class ValueKindWire(val arm: Int, val s0: JsAny?)
+
+fun encodeValueKind(v: ValueKind?): ValueKindWire = when (v) {
+    null -> ValueKindWire(0, null)
+    is ValueKind.Str -> ValueKindWire(1, v.value.toJsString())
+    is ValueKind.Buffer -> ValueKindWire(2, tsgen.runtime.typedArray("Uint8Array", v.value))
+}
+
+fun decodeValueKind(arm: Int, s0: JsAny?): ValueKind? = when (arm) {
+    0 -> null
+    1 -> ValueKind.Str(s0!!.unsafeCast<JsString>().toString())
+    2 -> ValueKind.Buffer(tsgen.runtime.byteArray(s0!!))
+    else -> throw IllegalStateException("ValueKind: arm $arm")
+}
+
+sealed interface ValueKind2 {
+    data class Blob(val value: fixtures.union_params.Blob) : ValueKind2
+    data class Buffer(val value: ByteArray) : ValueKind2
+    data class Str(val value: String) : ValueKind2
+}
+
+class ValueKind2Wire(val arm: Int, val s0: JsAny?)
+
+fun encodeValueKind2(v: ValueKind2?): ValueKind2Wire = when (v) {
+    null -> ValueKind2Wire(0, null)
+    is ValueKind2.Blob -> ValueKind2Wire(1, v.value)
+    is ValueKind2.Buffer -> ValueKind2Wire(2, tsgen.runtime.typedArray("Uint8Array", v.value))
+    is ValueKind2.Str -> ValueKind2Wire(3, v.value.toJsString())
+}
+
+fun decodeValueKind2(arm: Int, s0: JsAny?): ValueKind2? = when (arm) {
+    0 -> null
+    1 -> ValueKind2.Blob(s0!!.unsafeCast<Blob>())
+    2 -> ValueKind2.Buffer(tsgen.runtime.byteArray(s0!!))
+    3 -> ValueKind2.Str(s0!!.unsafeCast<JsString>().toString())
+    else -> throw IllegalStateException("ValueKind2: arm $arm")
+}
+
+sealed interface BufferOrStr {
+    data class Buffer(val value: ByteArray) : BufferOrStr
+    data class Str(val value: String) : BufferOrStr
+}
+
+class BufferOrStrWire(val arm: Int, val s0: JsAny?)
+
+fun encodeBufferOrStr(v: BufferOrStr?): BufferOrStrWire = when (v) {
+    null -> BufferOrStrWire(0, null)
+    is BufferOrStr.Buffer -> BufferOrStrWire(1, tsgen.runtime.typedArray("Uint8Array", v.value))
+    is BufferOrStr.Str -> BufferOrStrWire(2, v.value.toJsString())
+}
+
+fun decodeBufferOrStr(arm: Int, s0: JsAny?): BufferOrStr? = when (arm) {
+    0 -> null
+    1 -> BufferOrStr.Buffer(tsgen.runtime.byteArray(s0!!))
+    2 -> BufferOrStr.Str(s0!!.unsafeCast<JsString>().toString())
+    else -> throw IllegalStateException("BufferOrStr: arm $arm")
+}
+
+sealed interface BufferSource {
+    data class ArrayBuffer(val value: fixtures.union_params.ArrayBuffer) : BufferSource
+    data class ArrayBufferView(val value: fixtures.union_params.ArrayBufferView) : BufferSource
+}
+
+class BufferSourceWire(val arm: Int, val s0: JsAny?)
+
+fun encodeBufferSource(v: BufferSource?): BufferSourceWire = when (v) {
+    null -> BufferSourceWire(0, null)
+    is BufferSource.ArrayBuffer -> BufferSourceWire(1, v.value)
+    is BufferSource.ArrayBufferView -> BufferSourceWire(2, v.value)
+}
+
+fun decodeBufferSource(arm: Int, s0: JsAny?): BufferSource? = when (arm) {
+    0 -> null
+    1 -> BufferSource.ArrayBuffer(s0!!.unsafeCast<ArrayBuffer>())
+    2 -> BufferSource.ArrayBufferView(s0!!.unsafeCast<ArrayBufferView>())
+    else -> throw IllegalStateException("BufferSource: arm $arm")
+}
+
 sealed interface Err {
     data class TypeError(val value: JsString) : Err
     data class Error(val value: JsString) : Err
@@ -482,6 +727,12 @@ fun raiseErr(e: kotlin.js.JsException): ErrException {
     val r1 = fixtures.union_params.flat.err_err(e.thrownValue)
     val s2 = fixtures.union_params.flat.ret_externref()
     return ErrException(decodeErr(r1, s2)!!)
+}
+
+fun futureErrorErr(f: JsAny): ErrException {
+    val r2 = fixtures.union_params.flat.error_err(f)
+    val s3 = fixtures.union_params.flat.ret_externref()
+    return ErrException(decodeErr(r2, s3)!!)
 }
 
 fun setErr(e: kotlin.Throwable) {

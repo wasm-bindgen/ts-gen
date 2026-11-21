@@ -395,3 +395,11 @@ fn pascal_words() {
         ["fEmpty", "fNeg1", "f2"]
     );
 }
+
+#[test]
+fn a_buffer_names_itself() {
+    assert_eq!(
+        names("put", &["v: str", "v: buffer", "v: *buffer"]),
+        ["put", "putWithBuffer", "putWithView"]
+    );
+}

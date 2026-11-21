@@ -118,6 +118,7 @@ fn ty(t: &mut abi::Type, f: &mut impl FnMut(&mut abi::TypeRef)) {
         | T::Never
         | T::Scalar(_)
         | T::Str
+        | T::Buffer
         | T::Any
         | T::ScalarBox(_)
         | T::StrBox

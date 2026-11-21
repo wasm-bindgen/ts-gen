@@ -110,6 +110,7 @@ pub(crate) fn arm_name(t: &abi::Type) -> String {
         T::Never => "Never".into(),
         T::Scalar(s) => pascal(s.name()),
         T::Str | T::StrBox => "Str".into(),
+        T::Buffer => "Buffer".into(),
         T::BigInt | T::BigIntBox => "BigInt".into(),
         T::Any => "Any".into(),
         T::ScalarBox(s) => s.box_name().into(),

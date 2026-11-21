@@ -253,7 +253,8 @@ impl<'a> Flattener<'_, 'a> {
     /// literals, then nominal tests (`instanceof`, `Array.isArray`, function
     /// and thenable), then structural ones (interfaces and nested enums),
     /// then `typeof` primitives, then `Any`. A nominal test never matches
-    /// what an earlier structural one would have caught by mistake.
+    /// what an earlier structural one would have caught by mistake. A
+    /// `buffer` is structural: it takes every view class.
     fn test_rank(&self, a: &FlatArm<'a>) -> u8 {
         let t = match a.arm.payload.as_slice() {
             [] => return 0,
@@ -540,8 +541,15 @@ impl<'a> Flattener<'_, 'a> {
             }
         }
 
-        own_disc.sort_by_key(|&i| self.test_rank(&arms[i]));
-        discrimination.sort_by_key(|&i| self.test_rank(&arms[i]));
+        // A `buffer` is tested before the other structural arms, which
+        // take any object.
+        let rank = |i: usize| {
+            let buffer =
+                matches!(arms[i].arm.payload.as_slice(), [t] if crate::union::is_buffer(t));
+            (self.test_rank(&arms[i]), !buffer)
+        };
+        own_disc.sort_by_key(|&i| rank(i));
+        discrimination.sort_by_key(|&i| rank(i));
         let own_tier = own_disc.len();
         let ranks = arms.iter().map(|a| self.test_rank(a)).collect();
         let mut order = own_disc;

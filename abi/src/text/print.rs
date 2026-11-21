@@ -397,6 +397,7 @@ pub(super) fn ty(t: &Type) -> String {
         Type::ScalarBox(s) => s.box_name().into(),
         Type::StrBox => "Str".into(),
         Type::BigInt => "bigint".into(),
+        Type::Buffer => "buffer".into(),
         Type::BigIntBox => "BigInt".into(),
         Type::UnitBox => "Unit".into(),
         Type::Vec(t) => format!("{}[]", operand(t)),
@@ -428,6 +429,7 @@ pub(super) fn ty(t: &Type) -> String {
             s.push_str(&throws(&f.throws));
             s
         }
+        Type::View { elem, .. } if **elem == Type::Buffer => "*buffer".into(),
         Type::View { mutable, elem } => {
             let m = if *mutable { "mut " } else { "" };
             format!("*{m}{}", whole_vec(elem))

@@ -41,6 +41,12 @@ pub(crate) struct Tcx {
     /// In a union of `bigint` with other values (a comparator's
     /// `number | bigint`), where `bigint` is no typed array element.
     pub mixed: bool,
+    /// A type argument, which holds no `buffer`: its two classes stay an
+    /// enum there.
+    pub arg: bool,
+    /// A `{@slice view}` parameter, whose `buffer` is written by arm
+    /// beside its view.
+    pub view: bool,
 }
 
 /// What a use is of the declaration holding it.
@@ -75,6 +81,16 @@ impl Tcx {
             owner: None,
             export: false,
             mixed: false,
+            arg: false,
+            view: false,
+        }
+    }
+
+    /// A type argument of the use.
+    pub fn arg(&self) -> Tcx {
+        Tcx {
+            arg: true,
+            ..self.clone()
         }
     }
 
@@ -171,6 +187,9 @@ pub(crate) struct Leaves {
     /// The value types and string literals in source order, which a name
     /// spelled from them follows.
     pub order: Vec<Leaf>,
+    /// The `ArrayBuffer` and `ArrayBufferView` a `buffer` among `values`
+    /// stands for.
+    pub handles: Vec<abi::Type>,
 }
 
 impl Leaves {
@@ -220,7 +239,62 @@ impl Leaves {
                 l.values.push(abi::Type::Scalar(abi::Scalar::Bool));
             }
         }
+        l.fold_buffer();
         l
+    }
+
+    /// `ArrayBuffer` and `ArrayBufferView` together are a `buffer`,
+    /// whatever else the union holds (IR.md §3).
+    fn fold_buffer(&mut self) {
+        let class = |name: &str| {
+            self.values.iter().position(|v| {
+                matches!(v, abi::Type::Named(r)
+                    if r.path.segments.last().is_some_and(|n| n == name))
+            })
+        };
+        let (Some(a), Some(b)) = (class("ArrayBuffer"), class("ArrayBufferView")) else {
+            return;
+        };
+        self.handles = vec![self.values[a].clone(), self.values[b].clone()];
+        self.values[a.min(b)] = abi::Type::Buffer;
+        self.values.remove(a.max(b));
+        let mut folded = false;
+        let handles = &self.handles;
+        self.order.retain_mut(|leaf| match leaf {
+            Leaf::Ty(t) if handles.contains(t) => {
+                *t = abi::Type::Buffer;
+                !std::mem::replace(&mut folded, true)
+            }
+            _ => true,
+        });
+    }
+
+    /// Whether the union is a `buffer` and nothing else.
+    fn buffer_only(&self) -> bool {
+        self.values == [abi::Type::Buffer]
+            && self.strs.is_empty()
+            && self.nums.is_empty()
+            && self.bools.is_empty()
+            && !self.open
+    }
+
+    /// The `buffer` as the two classes it folded.
+    fn unfold_buffer(&mut self) {
+        let handles = std::mem::take(&mut self.handles);
+        self.values = std::mem::take(&mut self.values)
+            .into_iter()
+            .flat_map(|t| match t {
+                abi::Type::Buffer => handles.clone(),
+                t => vec![t],
+            })
+            .collect();
+        self.order = std::mem::take(&mut self.order)
+            .into_iter()
+            .flat_map(|leaf| match leaf {
+                Leaf::Ty(abi::Type::Buffer) => handles.iter().cloned().map(Leaf::Ty).collect(),
+                leaf => vec![leaf],
+            })
+            .collect();
     }
 }
 
@@ -684,6 +758,9 @@ impl Lowerer<'_> {
         use abi::Type as T;
         if l.top {
             return (T::Nullable(Box::new(T::Any), false), false);
+        }
+        if cx.arg && l.buffer_only() {
+            l.unfold_buffer();
         }
         if !l.nums.is_empty() {
             let only = l.values.is_empty() && l.strs.is_empty() && l.bools.is_empty();
@@ -1727,7 +1804,7 @@ impl Lowerer<'_> {
                 return self.literal_enum(&strs, cx, Some(named));
             }
         }
-        self.inner(a, cx)
+        self.inner(a, &cx.arg())
     }
 
     /// `undefined`, `void` or `never` as a type argument: `unit`, the
@@ -2090,7 +2167,12 @@ impl Lowerer<'_> {
             _ => {
                 let args = args
                     .iter()
-                    .map(|a| boxed(self.void_arg(a, cx).unwrap_or_else(|| self.inner(a, cx))))
+                    .map(|a| {
+                        boxed(
+                            self.void_arg(a, cx)
+                                .unwrap_or_else(|| self.inner(a, &cx.arg())),
+                        )
+                    })
                     .collect();
                 // A lib's own interfaces outside its roots stay interfaces.
                 let declared = self.resolve_id(&[name.to_string()], cx);
@@ -2116,7 +2198,7 @@ impl Lowerer<'_> {
             _ => "Record",
         };
         let value = match args.get(1) {
-            Some(v) => self.inner(v, cx),
+            Some(v) => self.inner(v, &cx.arg()),
             None => abi::Type::Nullable(Box::new(abi::Type::Any), false),
         };
         self.taken.insert(name.to_string());
@@ -2245,6 +2327,15 @@ impl Lowerer<'_> {
                 _ if self.is_fn(v, &cx.place) => "function".into(),
                 T::Future(..) => "thenable".into(),
                 T::Vec(e) => format!("vec {}", print_type(e)),
+                // A `buffer` takes any view, so it comes after every other
+                // object arm, as the interface it folded did.
+                T::Buffer => {
+                    if object {
+                        return false;
+                    }
+                    object = true;
+                    continue;
+                }
                 // A nested enum's literals or payloads may be anything.
                 _ if self.is_enum(v, &cx.place) => return false,
                 // An interface takes any object, so it comes after every

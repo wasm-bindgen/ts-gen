@@ -105,14 +105,14 @@ impl<'a> Plan<'a> {
         let p = l.profile;
         let mut members: HashMap<(String, String), Keyed<'a>> = HashMap::new();
         let mut ctors: HashMap<String, Keyed<'a>> = HashMap::new();
-        // Members with a `union` parameter, by import module, whose arm
-        // variants are derived when imported (§7).
+        // Members with a `union` or `buffer` parameter, by import module,
+        // whose variants are derived when imported (§7).
         let mut unions: HashMap<String, Vec<Keyed<'a>>> = HashMap::new();
         // A lib's members are imports too (§5), after the IR's own.
         for k in l.keys.members().into_iter().chain(l.keys.lib_members()) {
             match &k.role {
                 Role::Import(module) => {
-                    if k.member.params.iter().any(|p| p.union) {
+                    if union::varies(k.member) {
                         unions.entry(module.clone()).or_default().push(k.clone());
                     }
                     members.entry((module.clone(), k.key.clone())).or_insert(k);
