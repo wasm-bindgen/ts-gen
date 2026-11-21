@@ -669,6 +669,21 @@ getArrayBuffer(key: str, options: GetOptions<Any?>?): future<ArrayBuffer?>;
   it as for a positional constant (`getText`, `getArrayBuffer`).
 * A type parameter bounded by literals keeps its enums instead.
 
+A dictionary whose every field is such a constant leaves the caller
+nothing to set. Its parameter is dropped, and the fill's object is a
+`let` the bridge makes:
+
+```
+getReader(): ReadableStreamDefaultReader;
+@js(name = "getReader", args = (options? { mode = "byob" }), let options = ReadableStreamGetReaderOptions.new())
+getReaderByob(): ReadableStreamBYOBReader;
+```
+
+* It collides with the overload omitting the parameter, and is renamed
+  by the literal.
+* A dictionary with a field the caller can set, or a parent, keeps its
+  parameter.
+
 * A path through a nullable parameter reads it without supplying it, and
   is `undefined` when the parameter is absent: `init.signal` with no
   `init`.

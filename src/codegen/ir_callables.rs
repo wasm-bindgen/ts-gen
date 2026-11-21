@@ -205,8 +205,11 @@ fn restated(
     // A field the declaration types by one literal is set by the
     // dictionary's factories; a wrapper fills those a type argument gives.
     for o in &mut overloads {
-        let params = &o.params;
+        let (params, made) = (&o.params, &o.made);
         o.fills.retain(|(j, field, _)| {
+            if made.contains(j) {
+                return true;
+            }
             let t = &params[*j].type_ref;
             let core = t.split_empties().map(|(core, _)| core);
             match core.as_ref().unwrap_or(t) {
@@ -561,6 +564,16 @@ fn restated(
                 false => Vec::new(),
             },
             literal_arms,
+            made: o
+                .made
+                .iter()
+                .filter_map(|j| {
+                    let at = |a: &super::ir_types::Arg| {
+                        matches!(a, super::ir_types::Arg::Param(p) if p == j)
+                    };
+                    o.args.iter().position(at)
+                })
+                .collect(),
         }];
         for (k, members) in splits {
             collapsed = true;
@@ -601,6 +614,44 @@ fn restated(
         let suffixes = crate::codegen::signatures::compute_suffixes_in(&params, cgctx, scope);
         for (k, s) in plain.into_iter().zip(suffixes) {
             expansions[k].name_suffix = s;
+        }
+    }
+    // A parameter the binding makes names nothing; the literal it's filled
+    // with does, where the IR renamed the overload by it.
+    if expansions.iter().any(|x| !x.made.is_empty()) {
+        let plain: Vec<usize> = (0..expansions.len())
+            .filter(|&k| expansions[k].literal_arms.is_empty())
+            .collect();
+        let given: Vec<Vec<ConcreteParam>> = plain
+            .iter()
+            .map(|&k| {
+                let x = &expansions[k];
+                let kept =
+                    |(i, p): (usize, &ConcreteParam)| (!x.made.contains(&i)).then(|| p.clone());
+                x.params.iter().enumerate().filter_map(kept).collect()
+            })
+            .collect();
+        // One taking what another does is told apart by its literal.
+        let mut distinct: Vec<Vec<ConcreteParam>> = Vec::new();
+        for g in &given {
+            if !distinct.contains(g) {
+                distinct.push(g.clone());
+            }
+        }
+        let suffixes = crate::codegen::signatures::compute_suffixes_in(&distinct, cgctx, scope);
+        for (k, g) in plain.into_iter().zip(&given) {
+            let s = suffixes[distinct.iter().position(|d| d == g).unwrap()].clone();
+            let x = &mut expansions[k];
+            x.name_suffix = match x.made.is_empty() {
+                true => s,
+                false => {
+                    let literal = &overloads[x.overload].made_suffix;
+                    match literal.is_empty() {
+                        true => s,
+                        false => format!("{s}_{}", crate::util::naming::to_snake_case(literal)),
+                    }
+                }
+            };
         }
     }
     // The IR pairs each typed array with its copy (`u8[]`), which the

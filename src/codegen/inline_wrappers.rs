@@ -52,7 +52,12 @@ pub(crate) fn literal_attr(sig: &crate::codegen::signatures::FunctionSignature) 
     });
     let fields = &spec.fields;
     let fields = (!fields.is_empty()).then(|| quote! { fields(#(#fields),*), });
-    quote! { #[#attr(binding(#binding), positions(#(#positions),*), #fields #(#arms),*)] }
+    let made = spec
+        .made
+        .iter()
+        .map(|p| proc_macro2::Literal::usize_unsuffixed(*p));
+    let made = (!spec.made.is_empty()).then(|| quote! { made(#(#made),*), });
+    quote! { #[#attr(binding(#binding), positions(#(#positions),*), #fields #made #(#arms),*)] }
 }
 
 struct LiteralArms {
@@ -61,6 +66,9 @@ struct LiteralArms {
     /// `fields("type")`: the literals fill these fields of the parameters
     /// at the positions, which the wrapper keeps.
     fields: Vec<String>,
+    /// `made(0)`: the parameters at these positions are the wrapper's to
+    /// make, filled, rather than the caller's.
+    made: Vec<usize>,
     arms: Vec<(Vec<String>, Ident)>,
 }
 
@@ -81,6 +89,7 @@ impl syn::parse::Parse for LiteralArms {
         let mut binding = None;
         let mut positions = Vec::new();
         let mut fields = Vec::new();
+        let mut made = Vec::new();
         let mut arms = Vec::new();
         while !input.is_empty() {
             let key: Ident = input.parse()?;
@@ -92,6 +101,11 @@ impl syn::parse::Parse for LiteralArms {
                 let list = content.parse_terminated(syn::LitInt::parse, syn::Token![,])?;
                 for lit in list {
                     positions.push(lit.base10_parse()?);
+                }
+            } else if key == "made" {
+                let list = content.parse_terminated(syn::LitInt::parse, syn::Token![,])?;
+                for lit in list {
+                    made.push(lit.base10_parse()?);
                 }
             } else if key == "fields" {
                 let list = content
@@ -116,6 +130,7 @@ impl syn::parse::Parse for LiteralArms {
             binding,
             positions,
             fields,
+            made,
             arms,
         })
     }
@@ -476,14 +491,19 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
                     .enumerate()
                     .map(|(n, ((pos, lit), field))| {
                         let pname = &param_names[*pos];
-                        let copy = (!values[..n].iter().any(|(p, _)| p == pos)).then(|| {
-                            quote! {
+                        let first = !values[..n].iter().any(|(p, _)| p == pos);
+                        let copy = match (first, literal.made.contains(pos)) {
+                            (false, _) => None,
+                            (true, true) => Some(quote! {
+                                let #pname = ::js_sys::Object::new();
+                            }),
+                            (true, false) => Some(quote! {
                                 let #pname: ::js_sys::Object = ::js_sys::Object::assign(
                                     &::js_sys::Object::new(),
                                     ::wasm_bindgen::JsCast::unchecked_ref(#pname),
                                 );
-                            }
-                        });
+                            }),
+                        };
                         quote! {
                             #copy
                             let _ = ::js_sys::Reflect::set_str(
@@ -506,6 +526,7 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
                         .filter(|(i, _)| {
                             (filled || !values.iter().any(|(pos, _)| pos == i))
                                 && !null_positions.contains(i)
+                                && !literal.made.contains(i)
                         })
                         .map(|(_, a)| a.clone()),
                 )

@@ -17273,19 +17273,13 @@ extern "C" {
     pub fn try_get_reader<R: ::wasm_bindgen::JsGeneric>(
         this: &ReadableStream<R>,
     ) -> Result<ReadableStreamDefaultReader<R>, JsValue>;
-    #[doc = " The **`getReader()`** method of the ReadableStream interface creates a reader and locks the stream to it."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/getReader)"]
     #[wasm_bindgen(method, js_name = "getReader")]
-    pub fn get_reader_with_options<R: ::wasm_bindgen::JsGeneric>(
+    fn __get_reader_byob<R: ::wasm_bindgen::JsGeneric>(
         this: &ReadableStream<R>,
         options: &ReadableStreamGetReaderOptions,
     ) -> ReadableStreamBYOBReader;
-    #[doc = " The **`getReader()`** method of the ReadableStream interface creates a reader and locks the stream to it."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/getReader)"]
     #[wasm_bindgen(method, catch, js_name = "getReader")]
-    pub fn try_get_reader_with_options<R: ::wasm_bindgen::JsGeneric>(
+    fn __try_get_reader_byob<R: ::wasm_bindgen::JsGeneric>(
         this: &ReadableStream<R>,
         options: &ReadableStreamGetReaderOptions,
     ) -> Result<ReadableStreamBYOBReader, JsValue>;
@@ -17390,6 +17384,32 @@ extern "C" {
         this: &ReadableStream<R>,
         options: &ReadableStreamValuesOptions,
     ) -> Result<AsyncIterator<R>, JsValue>;
+}
+impl<R: ::wasm_bindgen::JsGeneric> ReadableStream<R> {
+    #[doc = " The **`getReader()`** method of the ReadableStream interface creates a reader and locks the stream to it."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/getReader)"]
+    pub fn get_reader_byob(&self) -> ReadableStreamBYOBReader {
+        let options = ::js_sys::Object::new();
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("mode"),
+            &::wasm_bindgen::JsValue::from_str("byob"),
+        );
+        self.__get_reader_byob(::wasm_bindgen::JsCast::unchecked_ref(&options))
+    }
+    #[doc = " The **`getReader()`** method of the ReadableStream interface creates a reader and locks the stream to it."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/getReader)"]
+    pub fn try_get_reader_byob(&self) -> Result<ReadableStreamBYOBReader, JsValue> {
+        let options = ::js_sys::Object::new();
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("mode"),
+            &::wasm_bindgen::JsValue::from_str("byob"),
+        );
+        self.__try_get_reader_byob(::wasm_bindgen::JsCast::unchecked_ref(&options))
+    }
 }
 #[wasm_bindgen]
 extern "C" {

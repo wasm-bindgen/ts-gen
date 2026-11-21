@@ -3919,6 +3919,26 @@ impl KVNamespace {
   by the dictionary's own factories ([literal-type discriminator
   collapse](#literal-type-discriminator-collapse)), and a parameter
   bounded by literals takes its enum.
+* A dictionary whose every field is such a constant, declared literals
+  included, leaves the caller nothing to set: its parameter is dropped
+  and the wrapper makes the object. Where that collides with the
+  overload omitting it, the literal names it.
+
+```ts
+getReader(): ReadableStreamDefaultReader;
+getReader(options: { mode: "byob" }): ReadableStreamBYOBReader;
+```
+
+```rs
+pub fn get_reader(this: &ReadableStream) -> ReadableStreamDefaultReader;
+impl ReadableStream {
+    pub fn get_reader_byob(&self) -> ReadableStreamBYOBReader {
+        let options = Object::new();
+        let _ = Reflect::set_str(&options, &"mode".into(), &"byob".into());
+        self.__get_reader_byob(options.unchecked_ref())
+    }
+}
+```
 
 ## `@tw-abi` JSDoc → Rust scalar
 

@@ -38,6 +38,12 @@ pub struct Overload {
     /// The literals the call fills dictionary parameters with:
     /// `(parameter, field, literal)`.
     pub fills: Vec<(usize, String, String)>,
+    /// The parameters standing for a dictionary the bridge makes and fills
+    /// with constants alone, which a binding's wrapper makes.
+    pub made: Vec<usize>,
+    /// What the IR names the overload beyond its JS name (`Byob` of
+    /// `getReaderByob`), where dropping such a parameter made it collide.
+    pub made_suffix: String,
 }
 
 impl Overload {
@@ -174,7 +180,45 @@ pub fn overload(cx: &Cx<'_>, m: &abi::Member) -> Option<Overload> {
     };
     cx.tparams.extend(m.tparams.iter().map(|p| p.name.as_str()));
     let cx = &cx;
-    let index = |n: &str| m.params.iter().position(|p| p.name == n);
+    // A dictionary the bridge makes for the call and fills with string
+    // constants alone: its `let` and the class it's made of.
+    let made: Vec<(&str, TypeRef)> = template.map_or(Vec::new(), |t| {
+        t.iter()
+            .filter_map(|e| {
+                let abi::Telem::Fill { param, fields } = e else {
+                    return None;
+                };
+                if !fields
+                    .iter()
+                    .all(|(_, x)| matches!(x, abi::Expr::Lit(abi::Literal::Str(_))))
+                {
+                    return None;
+                }
+                let class = m.meta.attrs.js.iter().find_map(|e| match e {
+                    abi::JsEntry::Let(
+                        n,
+                        abi::Expr::Ref {
+                            path,
+                            call: Some(args),
+                        },
+                    ) if n == param && args.is_empty() => match path.split_last() {
+                        Some((new, class)) if new == "new" && !class.is_empty() => {
+                            Some(abi::Path::new(class.iter().map(String::as_str)))
+                        }
+                        _ => None,
+                    },
+                    _ => None,
+                })?;
+                Some((param.as_str(), named(cx, &class)?))
+            })
+            .collect()
+    });
+    let index = |n: &str| {
+        m.params.iter().position(|p| p.name == n).or_else(|| {
+            let at = made.iter().position(|(name, _)| *name == n)?;
+            Some(m.params.len() + at)
+        })
+    };
     let args = match template {
         None => (0..m.params.len()).map(Arg::Param).collect(),
         // A fill of a `let` is an object the bridge makes, which a
@@ -254,6 +298,16 @@ pub fn overload(cx: &Cx<'_>, m: &abi::Member) -> Option<Overload> {
                 slice_mode: view.then_some(crate::ir::SliceModeHint::View),
             })
         })
+        .chain(made.iter().map(|(name, t)| {
+            Some(Param {
+                name: crate::util::naming::to_snake_case(name),
+                js_name: None,
+                type_ref: t.clone(),
+                optional: false,
+                variadic: false,
+                slice_mode: None,
+            })
+        }))
         .collect::<Option<Vec<_>>>()?;
     let return_type = ty(cx, &m.result)?;
     // A named throws enum is typed, by the classes it declares; `err` is
@@ -289,8 +343,23 @@ pub fn overload(cx: &Cx<'_>, m: &abi::Member) -> Option<Overload> {
         return_type,
         throws,
         doc: m.meta.doc.clone(),
-        members: m.params.iter().map(|p| members(cx, &p.ty)).collect(),
-        whole: m.params.iter().map(|p| whole(cx, &p.ty)).collect(),
+        members: m
+            .params
+            .iter()
+            .map(|p| members(cx, &p.ty))
+            .chain(made.iter().map(|_| None))
+            .collect(),
+        whole: m
+            .params
+            .iter()
+            .map(|p| whole(cx, &p.ty))
+            .chain(made.iter().map(|_| false))
+            .collect(),
+        made: (0..made.len()).map(|at| m.params.len() + at).collect(),
+        made_suffix: match (made.is_empty(), m.kind.name(), js_name(m)) {
+            (false, Some(ours), Some(js)) => ours.strip_prefix(js).unwrap_or_default().to_string(),
+            _ => String::new(),
+        },
     })
 }
 

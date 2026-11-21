@@ -150,4 +150,8 @@ async fn literal_fields_are_filled_by_the_binding() {
     assert_eq!(text.unwrap(), "k:ttl=60,type=text");
     assert_eq!(options.type_(), Some(JsValue::from_str("json")));
     assert_eq!(store.open(&StoreReader::new()), "mode=byob");
+    // A dictionary of constants alone is the call's to make.
+    assert_eq!(store.get_reader(), "default");
+    assert_eq!(store.get_reader_byob(), "mode=byob".len() as f64);
+    assert_eq!(store.lock(), "mode=exclusive");
 }

@@ -12,4 +12,6 @@ export const store = () => ({
   },
   tail: seen,
   open: seen,
+  getReader: (options) => (options === undefined ? "default" : seen(options).length),
+  lock: seen,
 });

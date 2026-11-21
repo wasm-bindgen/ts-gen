@@ -231,6 +231,9 @@ pub struct ExpandedSignature {
     /// The literals the binding fills dictionary parameters with, where it
     /// has no cohort: `(position, field, literal)`.
     pub fills: Vec<(usize, String, String)>,
+    /// The positions of dictionary parameters the binding makes itself,
+    /// filled with constants alone: its wrapper drops them.
+    pub made: Vec<usize>,
 }
 
 /// One value assignment for the string-literal parameters of an
@@ -271,6 +274,9 @@ pub struct LiteralSpec {
     /// fill the parameters there rather than replace them: the wrapper
     /// keeps the parameter and passes a copy of it with the fields set.
     pub fields: Vec<String>,
+    /// Those of `positions` whose parameter the wrapper drops, passing an
+    /// object it makes with the fields set.
+    pub made: Vec<usize>,
 }
 
 impl LiteralSpec {
@@ -281,13 +287,15 @@ impl LiteralSpec {
             stem,
             binding: String::new(),
             fields: Vec::new(),
+            made: Vec::new(),
         }
     }
 
     /// The spec of a binding `name` filling `fills`, if any.
-    fn filling(fills: &[(usize, String, String)], name: &str) -> Option<Self> {
+    fn filling(fills: &[(usize, String, String)], made: &[usize], name: &str) -> Option<Self> {
         (!fills.is_empty()).then(|| Self {
             fields: fills.iter().map(|f| f.1.clone()).collect(),
+            made: made.to_vec(),
             ..Self::new(
                 fills.iter().map(|f| f.0).collect(),
                 vec![(
@@ -310,6 +318,7 @@ impl LiteralSpec {
             .collect();
         Self {
             fields: self.fields.clone(),
+            made: self.made.clone(),
             ..Self::new(self.positions.clone(), arms, f(&self.stem))
         }
     }
@@ -684,6 +693,7 @@ pub fn expand_signatures(
                 params: leading(&params, overload),
                 literal_arms,
                 fills: Vec::new(),
+                made: Vec::new(),
             }
         })
         .collect()
@@ -1023,7 +1033,7 @@ pub(crate) fn build_signatures_postfixed(
                 units.push(Unit {
                     params: exp.params.clone(),
                     overload: arm.overload,
-                    literal: LiteralSpec::filling(&arm.fills, &name),
+                    literal: LiteralSpec::filling(&arm.fills, &[], &name),
                     primary_name: name,
                 });
             }
@@ -1038,7 +1048,7 @@ pub(crate) fn build_signatures_postfixed(
             units.push(Unit {
                 params: exp.params,
                 overload: exp.overload,
-                literal: LiteralSpec::filling(&exp.fills, &name),
+                literal: LiteralSpec::filling(&exp.fills, &exp.made, &name),
                 primary_name: name,
             });
             continue;

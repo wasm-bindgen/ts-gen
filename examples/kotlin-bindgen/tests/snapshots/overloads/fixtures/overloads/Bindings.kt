@@ -164,6 +164,21 @@ fun Store.write(key: String, value: String, options: StoreWriteOptions): tsgen.r
     return tsgen.runtime.Future<Boolean>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_bool_2(f); (r1 != 0) }, { f -> futureErrorErr(f) })
 }
 
+fun Store.getReader(): String {
+    val r0 = try { fixtures.overloads.flat.Store_getReader(this) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0!!.unsafeCast<JsString>().toString()
+}
+
+fun Store.getReaderByob(): Double {
+    val r0 = try { fixtures.overloads.flat.Store_getReaderByob(this) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0
+}
+
+fun Store.lock(): String {
+    val r0 = try { fixtures.overloads.flat.Store_lock(this) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0!!.unsafeCast<JsString>().toString()
+}
+
 external interface StoreReader : JsAny
 
 val StoreReader.mode: String
@@ -208,6 +223,30 @@ var StoreWriteOptions.ttl: Double
     set(value) {
         fixtures.overloads.flat.StoreWriteOptions_set_ttl_f64(this, value)
     }
+
+external interface StoreGetReaderOptions : JsAny
+
+val StoreGetReaderOptions.mode: String
+    get() {
+        val r0 = fixtures.overloads.flat.StoreGetReaderOptions_get_mode(this)
+        return r0!!.unsafeCast<JsString>().toString()
+    }
+
+fun StoreGetReaderOptions.setModeByob() {
+    fixtures.overloads.flat.StoreGetReaderOptions_set_modeByob(this)
+}
+
+external interface StoreHow : JsAny
+
+val StoreHow.mode: String
+    get() {
+        val r0 = fixtures.overloads.flat.StoreHow_get_mode(this)
+        return r0!!.unsafeCast<JsString>().toString()
+    }
+
+fun StoreHow.setModeExclusive() {
+    fixtures.overloads.flat.StoreHow_set_modeExclusive(this)
+}
 
 external interface PartialGetOptionsUndefined : JsAny
 
@@ -298,6 +337,16 @@ fun StoreOptions(): StoreOptions {
 fun StoreWriteOptions(): StoreWriteOptions {
     val r0 = fixtures.overloads.flat.StoreWriteOptions_new()
     return r0!!.unsafeCast<StoreWriteOptions>()
+}
+
+fun StoreGetReaderOptions(): StoreGetReaderOptions {
+    val r0 = fixtures.overloads.flat.StoreGetReaderOptions_new()
+    return r0!!.unsafeCast<StoreGetReaderOptions>()
+}
+
+fun StoreHow(): StoreHow {
+    val r0 = fixtures.overloads.flat.StoreHow_new()
+    return r0!!.unsafeCast<StoreHow>()
 }
 
 fun PartialGetOptionsUndefined(): PartialGetOptionsUndefined {
