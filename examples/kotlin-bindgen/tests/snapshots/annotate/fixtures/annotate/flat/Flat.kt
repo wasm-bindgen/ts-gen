@@ -11,6 +11,14 @@ external fun Response_get_status(p0: JsAny?): Int
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun Response_get_ok(p0: JsAny?): Int
 
+/** tw:js/global Response#get:url() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Response_get_url(p0: JsAny?): JsAny?
+
+/** tw:js/global Response#get:type() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Response_get_type(p0: JsAny?): JsAny?
+
 /** tw:err TypeErr */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun err_TypeErr(p0: JsAny?): Int

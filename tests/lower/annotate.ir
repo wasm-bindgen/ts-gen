@@ -3,6 +3,8 @@ ir 1;
 class Response {
   get status(): u16;
   get ok(): bool;
+  get url(): str;
+  get type(): str;
   /// Creates a clone of the response.
   ///
   /// ## Errors

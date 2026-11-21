@@ -179,6 +179,16 @@ export extension class Response on externref {
       return __Response_status((this as externref));
     }
   }
+  type_: String {
+    get {
+      return __Response_type((this as externref));
+    }
+  }
+  url: String {
+    get {
+      return __Response_url((this as externref));
+    }
+  }
   /**
    * Creates a clone of the response.
    *
@@ -341,6 +351,12 @@ declare function __Response_status(p0: externref): u16;
 
 @external("tw:js/global", "Response#get:ok()", "tw")
 declare function __Response_ok(p0: externref): boolean;
+
+@external("tw:js/global", "Response#get:url()", "tw")
+declare function __Response_url(p0: externref): String;
+
+@external("tw:js/global", "Response#get:type()", "tw")
+declare function __Response_type(p0: externref): String;
 
 @external("tw:js/global", "Response#clone()", "tw, throws:TypeErr")
 declare function __Response_clone(p0: externref): Response;

@@ -17,6 +17,18 @@ val Response.ok: Boolean
         return (r0 != 0)
     }
 
+val Response.url: String
+    get() {
+        val r0 = fixtures.annotate.flat.Response_get_url(this)
+        return r0!!.unsafeCast<JsString>().toString()
+    }
+
+val Response.type: String
+    get() {
+        val r0 = fixtures.annotate.flat.Response_get_type(this)
+        return r0!!.unsafeCast<JsString>().toString()
+    }
+
 /**
  * Creates a clone of the response.
  *

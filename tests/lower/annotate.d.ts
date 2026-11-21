@@ -8,6 +8,10 @@
 declare abstract class Response {
   readonly status: number;
   readonly ok: boolean;
+  // Writable here, read-only at runtime: the side file's `readonly` drops
+  // the setter.
+  url: string;
+  type: string;
   /** Creates a clone of the response. */
   clone(): Response;
 }

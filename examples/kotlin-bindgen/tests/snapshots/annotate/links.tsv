@@ -1,5 +1,7 @@
 js_code	fixtures.annotate.flat.Response_get_status	tw:js/global	Response#get:status()
 js_code	fixtures.annotate.flat.Response_get_ok	tw:js/global	Response#get:ok()
+js_code	fixtures.annotate.flat.Response_get_url	tw:js/global	Response#get:url()
+js_code	fixtures.annotate.flat.Response_get_type	tw:js/global	Response#get:type()
 js_code	fixtures.annotate.flat.Response_clone	tw:js/global	Response#clone()
 js_code	fixtures.annotate.flat.err_TypeErr	tw:err	TypeErr
 js_code	fixtures.annotate.flat.ret_externref	tw:ret	externref

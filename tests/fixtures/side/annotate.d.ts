@@ -8,6 +8,9 @@ interface Response {
   readonly status: number;
   /** A note that is not carried over. */
   readonly ok: boolean;
+  // A property with no setter here is read-only in the input too.
+  readonly url: string;
+  get type(): string;
   /**
    * Creates a clone of the response.
    * @throws {TypeError} if the body has already been used

@@ -13,6 +13,10 @@ extern "C" {
     pub fn status(this: &Response) -> u16;
     #[wasm_bindgen(method, getter)]
     pub fn ok(this: &Response) -> bool;
+    #[wasm_bindgen(method, getter)]
+    pub fn url(this: &Response) -> String;
+    #[wasm_bindgen(method, getter, js_name = "type")]
+    pub fn type_(this: &Response) -> String;
     #[doc = " Creates a clone of the response."]
     #[doc = ""]
     #[doc = " ## Errors"]

@@ -3980,6 +3980,12 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
   reaches its setter too. Parameters match by name.
 * A `{@slice}` tag in a side `@param` applies to the input's parameter of
   that name, whatever type the side file gives it.
+* A side property with no setter (`readonly url: string`, `get url()`)
+  makes the input's read-only: its setter is not emitted. Upstream drops
+  `readonly` on properties the runtime defines read-only (workers-types'
+  `Response.status`, `WebSocket.url`), whose setters throw a `TypeError`.
+  Such a member counts as tagged; a side file that tags a writable
+  property declares it writable (`/** @tw-abi u16 */ status: number;`).
 * `@throws` replaces the input member's failure mode. Getters are
   infallible, so on a property it contributes only its doc.
 * A side member applies to every overload of the input method or
