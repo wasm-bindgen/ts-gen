@@ -1597,6 +1597,130 @@ extern "C" {
         options: bool,
     ) -> Result<(), JsValue>;
 }
+pub fn add_event_listener_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+) {
+    add_event_listener(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+    )
+}
+pub fn try_add_event_listener_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+) -> Result<(), JsValue> {
+    try_add_event_listener(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+    )
+}
+pub fn add_event_listener_with_event_listener_object_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+) {
+    add_event_listener_with_event_listener_object(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+    )
+}
+pub fn try_add_event_listener_with_event_listener_object_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+) -> Result<(), JsValue> {
+    try_add_event_listener_with_event_listener_object(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+    )
+}
+pub fn add_event_listener_with_function_and_options_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    options: &EventTargetAddEventListenerOptions,
+) {
+    add_event_listener_with_function_and_options(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn try_add_event_listener_with_function_and_options_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    options: &EventTargetAddEventListenerOptions,
+) -> Result<(), JsValue> {
+    try_add_event_listener_with_function_and_options(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn add_event_listener_with_event_listener_object_and_options_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    options: &EventTargetAddEventListenerOptions,
+) {
+    add_event_listener_with_event_listener_object_and_options(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn try_add_event_listener_with_event_listener_object_and_options_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    options: &EventTargetAddEventListenerOptions,
+) -> Result<(), JsValue> {
+    try_add_event_listener_with_event_listener_object_and_options(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn add_event_listener_with_function_and_bool_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    options: bool,
+) {
+    add_event_listener_with_function_and_bool(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn try_add_event_listener_with_function_and_bool_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    options: bool,
+) -> Result<(), JsValue> {
+    try_add_event_listener_with_function_and_bool(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn add_event_listener_with_event_listener_object_and_bool_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    options: bool,
+) {
+    add_event_listener_with_event_listener_object_and_bool(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn try_add_event_listener_with_event_listener_object_and_bool_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    options: bool,
+) -> Result<(), JsValue> {
+    try_add_event_listener_with_event_listener_object_and_bool(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "removeEventListener")]
@@ -1697,6 +1821,136 @@ extern "C" {
         handler: &EventListenerObject,
         options: bool,
     ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+) {
+    remove_event_listener(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+    )
+}
+pub fn try_remove_event_listener_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+) -> Result<(), JsValue> {
+    try_remove_event_listener(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+    )
+}
+pub fn remove_event_listener_with_event_listener_object_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+) {
+    remove_event_listener_with_event_listener_object(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+    )
+}
+pub fn try_remove_event_listener_with_event_listener_object_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+) -> Result<(), JsValue> {
+    try_remove_event_listener_with_event_listener_object(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+    )
+}
+pub fn remove_event_listener_with_function_and_options_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    options: &EventTargetEventListenerOptions,
+) {
+    remove_event_listener_with_function_and_options(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn try_remove_event_listener_with_function_and_options_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    options: &EventTargetEventListenerOptions,
+) -> Result<(), JsValue> {
+    try_remove_event_listener_with_function_and_options(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn remove_event_listener_with_event_listener_object_and_options_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    options: &EventTargetEventListenerOptions,
+) {
+    remove_event_listener_with_event_listener_object_and_options(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn try_remove_event_listener_with_event_listener_object_and_options_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    options: &EventTargetEventListenerOptions,
+) -> Result<(), JsValue> {
+    try_remove_event_listener_with_event_listener_object_and_options(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn remove_event_listener_with_function_and_bool_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    options: bool,
+) {
+    remove_event_listener_with_function_and_bool(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn try_remove_event_listener_with_function_and_bool_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    options: bool,
+) -> Result<(), JsValue> {
+    try_remove_event_listener_with_function_and_bool(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn remove_event_listener_with_event_listener_object_and_bool_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    options: bool,
+) {
+    remove_event_listener_with_event_listener_object_and_bool(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn try_remove_event_listener_with_event_listener_object_and_bool_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    options: bool,
+) -> Result<(), JsValue> {
+    try_remove_event_listener_with_event_listener_object_and_bool(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
 }
 #[wasm_bindgen]
 extern "C" {
@@ -4725,6 +4979,338 @@ extern "C" {
         this: &EventTarget<EventMap>,
         event: &Event,
     ) -> Result<bool, JsValue>;
+}
+impl<EventMap: ::wasm_bindgen::JsGeneric> EventTarget<EventMap> {
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+    ) {
+        self.add_event_listener(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+    ) {
+        self.add_event_listener_with_event_listener_object(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_with_event_listener_object_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_event_listener_object(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_function_and_options_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+        options: &EventTargetAddEventListenerOptions,
+    ) {
+        self.add_event_listener_with_function_and_options(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_with_function_and_options_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_function_and_options(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_and_options_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+        options: &EventTargetAddEventListenerOptions,
+    ) {
+        self.add_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_with_event_listener_object_and_options_typed<
+        K: MapKey<EventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_function_and_bool_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) {
+        self.add_event_listener_with_function_and_bool(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_with_function_and_bool_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_function_and_bool(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_and_bool_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+        options: bool,
+    ) {
+        self.add_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_with_event_listener_object_and_bool_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+}
+impl<EventMap: ::wasm_bindgen::JsGeneric> EventTarget<EventMap> {
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+    ) {
+        self.remove_event_listener(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+    ) {
+        self.remove_event_listener_with_event_listener_object(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_with_event_listener_object_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener_with_event_listener_object(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_function_and_options_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+        options: &EventTargetEventListenerOptions,
+    ) {
+        self.remove_event_listener_with_function_and_options(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_with_function_and_options_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener_with_function_and_options(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_and_options_typed<
+        K: MapKey<EventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+        options: &EventTargetEventListenerOptions,
+    ) {
+        self.remove_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_with_event_listener_object_and_options_typed<
+        K: MapKey<EventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_function_and_bool_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) {
+        self.remove_event_listener_with_function_and_bool(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_with_function_and_bool_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener_with_function_and_bool(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_and_bool_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+        options: bool,
+    ) {
+        self.remove_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_with_event_listener_object_and_bool_typed<
+        K: MapKey<EventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -67148,4 +67734,770 @@ pub enum ExcludeVectorizeVectorMetadataValueStringArray {
     String(String),
     F64(f64),
     Bool(bool),
+}
+#[doc = r" A key of the map `M`: the property it names, and the type"]
+#[doc = r" of that property's value."]
+pub trait MapKey<M: ?Sized> {
+    type Value: ::wasm_bindgen::JsGeneric;
+    const KEY: &'static str;
+}
+#[doc = "The keys of [`WorkerGlobalScopeEventMap`]."]
+pub mod worker_global_scope_event_map {
+    #[allow(unused_imports)]
+    use super::*;
+    #[doc = "`fetch` of [`WorkerGlobalScopeEventMap`]."]
+    pub struct Fetch;
+    impl MapKey<WorkerGlobalScopeEventMap> for Fetch {
+        type Value = FetchEvent;
+        const KEY: &'static str = "fetch";
+    }
+    #[doc = "`scheduled` of [`WorkerGlobalScopeEventMap`]."]
+    pub struct Scheduled;
+    impl MapKey<WorkerGlobalScopeEventMap> for Scheduled {
+        type Value = ScheduledEvent;
+        const KEY: &'static str = "scheduled";
+    }
+    #[doc = "`unhandledrejection` of [`WorkerGlobalScopeEventMap`]."]
+    pub struct Unhandledrejection;
+    impl MapKey<WorkerGlobalScopeEventMap> for Unhandledrejection {
+        type Value = PromiseRejectionEvent;
+        const KEY: &'static str = "unhandledrejection";
+    }
+    #[doc = "`rejectionhandled` of [`WorkerGlobalScopeEventMap`]."]
+    pub struct Rejectionhandled;
+    impl MapKey<WorkerGlobalScopeEventMap> for Rejectionhandled {
+        type Value = PromiseRejectionEvent;
+        const KEY: &'static str = "rejectionhandled";
+    }
+}
+#[doc = "The keys of [`WebSocketEventMap`]."]
+pub mod web_socket_event_map {
+    #[allow(unused_imports)]
+    use super::*;
+    #[doc = "`close` of [`WebSocketEventMap`]."]
+    pub struct Close;
+    impl MapKey<WebSocketEventMap> for Close {
+        type Value = CloseEvent;
+        const KEY: &'static str = "close";
+    }
+    #[doc = "`message` of [`WebSocketEventMap`]."]
+    pub struct Message;
+    impl MapKey<WebSocketEventMap> for Message {
+        type Value = MessageEvent;
+        const KEY: &'static str = "message";
+    }
+    #[doc = "`open` of [`WebSocketEventMap`]."]
+    pub struct Open;
+    impl MapKey<WebSocketEventMap> for Open {
+        type Value = Event;
+        const KEY: &'static str = "open";
+    }
+    #[doc = "`error` of [`WebSocketEventMap`]."]
+    pub struct Error;
+    impl MapKey<WebSocketEventMap> for Error {
+        type Value = ErrorEvent;
+        const KEY: &'static str = "error";
+    }
+}
+impl WorkerGlobalScope {
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    ) {
+        self.add_event_listener(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    ) {
+        self.add_event_listener_with_event_listener_object(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_with_event_listener_object_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_event_listener_object(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_function_and_options_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+        options: &EventTargetAddEventListenerOptions,
+    ) {
+        self.add_event_listener_with_function_and_options(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_with_function_and_options_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_function_and_options(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_and_options_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+        options: &EventTargetAddEventListenerOptions,
+    ) {
+        self.add_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_with_event_listener_object_and_options_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_function_and_bool_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) {
+        self.add_event_listener_with_function_and_bool(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_with_function_and_bool_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_function_and_bool(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_and_bool_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+        options: bool,
+    ) {
+        self.add_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_with_event_listener_object_and_bool_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    ) {
+        self.remove_event_listener(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    ) {
+        self.remove_event_listener_with_event_listener_object(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_with_event_listener_object_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener_with_event_listener_object(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_function_and_options_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+        options: &EventTargetEventListenerOptions,
+    ) {
+        self.remove_event_listener_with_function_and_options(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_with_function_and_options_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener_with_function_and_options(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_and_options_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+        options: &EventTargetEventListenerOptions,
+    ) {
+        self.remove_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_with_event_listener_object_and_options_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_function_and_bool_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) {
+        self.remove_event_listener_with_function_and_bool(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_with_function_and_bool_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener_with_function_and_bool(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_and_bool_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+        options: bool,
+    ) {
+        self.remove_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_with_event_listener_object_and_bool_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+}
+impl WebSocket {
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+    ) {
+        self.add_event_listener(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+    ) {
+        self.add_event_listener_with_event_listener_object(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_with_event_listener_object_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_event_listener_object(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_function_and_options_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+        options: &EventTargetAddEventListenerOptions,
+    ) {
+        self.add_event_listener_with_function_and_options(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_with_function_and_options_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_function_and_options(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_and_options_typed<
+        K: MapKey<WebSocketEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+        options: &EventTargetAddEventListenerOptions,
+    ) {
+        self.add_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_with_event_listener_object_and_options_typed<
+        K: MapKey<WebSocketEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_function_and_bool_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) {
+        self.add_event_listener_with_function_and_bool(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_with_function_and_bool_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_function_and_bool(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_and_bool_typed<
+        K: MapKey<WebSocketEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+        options: bool,
+    ) {
+        self.add_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn try_add_event_listener_with_event_listener_object_and_bool_typed<
+        K: MapKey<WebSocketEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+    ) {
+        self.remove_event_listener(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+    ) {
+        self.remove_event_listener_with_event_listener_object(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_with_event_listener_object_typed<
+        K: MapKey<WebSocketEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener_with_event_listener_object(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_function_and_options_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+        options: &EventTargetEventListenerOptions,
+    ) {
+        self.remove_event_listener_with_function_and_options(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_with_function_and_options_typed<
+        K: MapKey<WebSocketEventMap>,
+    >(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener_with_function_and_options(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_and_options_typed<
+        K: MapKey<WebSocketEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+        options: &EventTargetEventListenerOptions,
+    ) {
+        self.remove_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_with_event_listener_object_and_options_typed<
+        K: MapKey<WebSocketEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_function_and_bool_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) {
+        self.remove_event_listener_with_function_and_bool(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_with_function_and_bool_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener_with_function_and_bool(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_and_bool_typed<
+        K: MapKey<WebSocketEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+        options: bool,
+    ) {
+        self.remove_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn try_remove_event_listener_with_event_listener_object_and_bool_typed<
+        K: MapKey<WebSocketEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.try_remove_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
 }

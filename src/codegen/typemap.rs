@@ -244,6 +244,8 @@ pub struct CodegenContext<'a> {
     pub ir: Option<crate::codegen::from_ir::IrDecls>,
     /// The readings the IR zip takes from the parse, when they're asked for.
     pub zip: Option<crate::codegen::ir_callables::Zip>,
+    /// The IR with its keys kept, for the twins of keyed members.
+    pub keyed: Option<crate::codegen::keyed::Keyed>,
     /// The type declaration being emitted.
     pub current_decl: std::cell::Cell<Option<crate::context::TypeId>>,
     /// The statics the module being emitted sees, which a parameter or
@@ -1167,6 +1169,7 @@ impl<'a> CodegenContext<'a> {
             lib_name: module.lib_name.clone(),
             emit_path: RefCell::new(Vec::new()),
             ir: None,
+            keyed: None,
             zip: options.zip_diffs.then(Default::default),
             current_decl: std::cell::Cell::new(None),
             statics_in_scope: RefCell::new(HashSet::new()),
@@ -1241,6 +1244,7 @@ impl<'a> CodegenContext<'a> {
             lib_name: None,
             emit_path: RefCell::new(Vec::new()),
             ir: None,
+            keyed: None,
             zip: None,
             current_decl: std::cell::Cell::new(None),
             statics_in_scope: RefCell::new(HashSet::new()),
