@@ -2743,6 +2743,34 @@ still has no argument to infer `T` from, so it hands back the wrapper
 at its default (see [uninferrable type
 parameters](#uninferrable-method-type-parameters)).
 
+## `[Symbol.iterator]()` makes a reference iterable
+
+A declared `[Symbol.iterator]()` binds as `iterator()` with its
+`try_iterator` companion, like the one a synthesized `Iterable<T>`
+wrapper has, and either makes a reference to the type iterable:
+
+```ts
+declare class Headers {
+  [Symbol.iterator](): IterableIterator<[key: string, value: string]>;
+}
+```
+
+```rust
+for (name, value) in &headers {
+    // name: JsString, value: JsString
+}
+```
+
+The item is what the iterator yields: a tuple `[K, V]` as the Rust tuple
+`(K, V)`, any other as itself (`SqlStorageCursor<T>` yields `T`). A
+throwing `[Symbol.iterator]()` or `next()` rethrows, as `for…of` does;
+`try_iterator()` and `Iterator::next()` catch it.
+
+On a generic type the impl bounds each item type that names a parameter
+by `JsGeneric + FromWasmAbi`, which is what js-sys needs to read it out
+of the iterator with and without `js_sys_unstable_apis`. Async iteration
+has no such impl.
+
 ## In-scope generic type parameters
 
 Bare type-parameter references (`T` in `put<T>(value: T)`) survive
