@@ -389,6 +389,28 @@ Inside a built-in container (`Promise<Array<T>>`, `Map<K, Array<V>>`,
 both the stable js-sys API and `js_sys_unstable_apis`, where container
 elements are real generics.
 
+A union element with no common supertype erases to `JsValue`. Under
+[per-monomorphization](#per-monomorphization) it takes its
+[dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums)
+instead, read or written, so a list mixes its arms. An element admitting
+`null` reads in `Option` and is written in `Nullable`, which crosses as
+`null`. A union of literals alone still crosses as its primitive.
+
+```ts
+declare function marks(): (Mark | string)[];
+declare function describe(values: (Mark | string | null)[]): string;
+```
+
+```rust
+pub fn marks() -> Vec<MarkOrStr>;
+pub fn describe(values: &[Nullable<MarkOrStr>]) -> String;
+
+pub enum MarkOrStr {
+    Mark(Mark),
+    String(String),
+}
+```
+
 ### Slice modes
 
 wasm-bindgen's `#[wasm_bindgen(slice = view | array | copy)]` selects

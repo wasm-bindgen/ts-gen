@@ -12,7 +12,8 @@ extern "C" {
     #[doc = " Mixed primitives + objects — no LUB, becomes a dynamic union."]
     #[wasm_bindgen(method, getter)]
     pub fn content(this: &Erased) -> ErasedContentKind;
-    #[doc = " Inner-erased generic — outer Array stays as `Vec<JsValue>`."]
+    #[doc = " Inner-erased generic — outer Array stays as `Vec<JsValue>`, or takes"]
+    #[doc = " the union's enum as its element under per-monomorphization."]
     #[wasm_bindgen(method, getter)]
     pub fn tags(this: &Erased) -> Vec<JsValue>;
 }
