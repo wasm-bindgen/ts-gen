@@ -30,10 +30,10 @@ fn families_read_through_their_traits(instant: &Instant, date_time: &PlainDateTi
     let to = RoundToOptions::<TimeUnit>::new(PluralizeTimeUnit::Minutes);
     // A child instantiating its parent derefs to it.
     let _: Option<PluralizeTimeUnit> = smallest(&to);
-    let _ = instant.round_with_round_to_options(&to);
+    let _ = instant.round_with_round_to(&to);
 
     let day = RoundToOptions::<DayOrTimeUnit>::builder(PluralizeDayOrTimeUnit::Day).build();
-    let _ = date_time.round_with_round_to_options(&day);
+    let _ = date_time.round_with_round_to(&day);
 
     let largest = RoundingOptionsWithLargestUnit::<DateUnitOrTimeUnit>::builder()
         .smallest_unit(PluralizeUnit::Hours)
