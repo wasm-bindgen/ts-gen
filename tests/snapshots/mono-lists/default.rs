@@ -422,6 +422,111 @@ extern "C" {
     pub fn try_describe_mark_options(options: &MarkOptions) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Mode {
+    Fast = "fast",
+    Slow = "slow",
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    pub fn modes(values: &[String]) -> Vec<String>;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "modes")]
+    pub fn try_modes(values: &[String]) -> Result<Vec<String>, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    pub fn levels(#[wasm_bindgen(slice = "array")] values: &[f64]) -> Vec<f64>;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "levels")]
+    pub fn try_levels(#[wasm_bindgen(slice = "array")] values: &[f64])
+        -> Result<Vec<f64>, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    #[wasm_bindgen(js_name = "maybeKinds")]
+    pub fn maybe_kinds(values: &[JsNullable<JsString>]) -> Vec<JsNullable<JsString>>;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "maybeKinds")]
+    pub fn try_maybe_kinds(
+        values: &[JsNullable<JsString>],
+    ) -> Result<Vec<JsNullable<JsString>>, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ModeOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn modes(this: &ModeOptions) -> Option<Vec<String>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_modes(this: &ModeOptions, val: &[String]);
+    #[wasm_bindgen(method, getter)]
+    pub fn kinds(this: &ModeOptions) -> Option<Vec<String>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_kinds(this: &ModeOptions, val: &[String]);
+    #[wasm_bindgen(method, getter)]
+    pub fn levels(this: &ModeOptions) -> Option<Vec<f64>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_levels(this: &ModeOptions, #[wasm_bindgen(slice = "array")] val: &[f64]);
+}
+impl ModeOptions {
+    pub fn new() -> ModeOptions {
+        Self::builder().build()
+    }
+    pub fn builder() -> ModeOptionsBuilder {
+        ModeOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for ModeOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct ModeOptionsBuilder {
+    inner: ModeOptions,
+}
+impl ModeOptionsBuilder {
+    pub fn modes(self, val: &[String]) -> Self {
+        self.inner.set_modes(val);
+        self
+    }
+    pub fn kinds(self, val: &[String]) -> Self {
+        self.inner.set_kinds(val);
+        self
+    }
+    pub fn levels(self, val: &[f64]) -> Self {
+        self.inner.set_levels(val);
+        self
+    }
+    pub fn build(self) -> ModeOptions {
+        self.inner
+    }
+}
+impl From<ModeOptions> for ModeOptionsBuilder {
+    fn from(inner: ModeOptions) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    #[wasm_bindgen(js_name = "describeModeOptions")]
+    pub fn describe_mode_options(options: &ModeOptions) -> String;
+}
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeModeOptions")]
+    pub fn try_describe_mode_options(options: &ModeOptions) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum GetValueKind {
     String(String),

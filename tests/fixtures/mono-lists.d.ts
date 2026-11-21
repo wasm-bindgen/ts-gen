@@ -64,3 +64,16 @@ export interface MarkOptions {
   marks?: (Mark | string)[];
 }
 export declare function describeMarkOptions(options: MarkOptions): string;
+
+// A list of literals alone takes their enum as its element too, in a
+// getter and the setter matching it.
+export type Mode = "fast" | "slow";
+export declare function modes(values: Mode[]): Mode[];
+export declare function levels(values: (1 | 2)[]): (1 | 2)[];
+export declare function maybeKinds(values: ("x" | "y" | null)[]): ("x" | "y" | null)[];
+export interface ModeOptions {
+  modes?: Mode[];
+  kinds?: ("x" | "y")[];
+  levels?: (1 | 2)[];
+}
+export declare function describeModeOptions(options: ModeOptions): string;

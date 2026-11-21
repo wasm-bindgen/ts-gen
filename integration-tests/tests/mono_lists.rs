@@ -143,3 +143,38 @@ fn union_lists_keep_the_enum_as_their_element() {
     );
     assert_eq!(options.marks().map(|marks| marks.len()), Some(2));
 }
+
+#[wasm_bindgen_test]
+fn literal_lists_keep_the_enum_as_their_element() {
+    assert_eq!(modes(&[Mode::Slow, Mode::Fast]), [Mode::Slow, Mode::Fast]);
+    assert_eq!(
+        levels(&[LevelsReturn::N2, LevelsReturn::N1]),
+        [LevelsReturn::N2, LevelsReturn::N1]
+    );
+    assert_eq!(
+        maybe_kinds(&[
+            Nullable::Value(MaybeKindsReturn::Y),
+            Nullable::Null,
+            Nullable::Value(MaybeKindsReturn::X),
+        ]),
+        [Some(MaybeKindsReturn::Y), None, Some(MaybeKindsReturn::X)]
+    );
+
+    // A getter reads what its setter wrote.
+    let options = ModeOptions::builder()
+        .modes(&[Mode::Fast])
+        .kinds(&[ModeOptionsKinds::Y, ModeOptionsKinds::X])
+        .levels(&[ModeOptionsLevels::N2])
+        .build();
+    assert_eq!(
+        describe_mode_options(&options),
+        "Array(string:fast) Array(string:y,string:x) Array(number:2)"
+    );
+    assert_eq!(options.modes(), Some(vec![Mode::Fast]));
+    assert_eq!(
+        options.kinds(),
+        Some(vec![ModeOptionsKinds::Y, ModeOptionsKinds::X])
+    );
+    options.set_levels(&options.levels().unwrap());
+    assert_eq!(options.levels(), Some(vec![ModeOptionsLevels::N2]));
+}

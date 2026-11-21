@@ -444,6 +444,97 @@ extern "C" {
     pub fn describe_mark_options_js_string(options: &MarkOptions) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Mode {
+    Fast = "fast",
+    Slow = "slow",
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn modes(values: &[Mode]) -> Result<Vec<Mode>, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn levels(values: &[LevelsReturn]) -> Result<Vec<LevelsReturn>, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "maybeKinds")]
+    pub fn maybe_kinds(
+        values: &[Nullable<MaybeKindsReturn>],
+    ) -> Result<Vec<Option<MaybeKindsReturn>>, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ModeOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn modes(this: &ModeOptions) -> Option<Vec<Mode>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_modes(this: &ModeOptions, val: &[Mode]);
+    #[wasm_bindgen(method, getter)]
+    pub fn kinds(this: &ModeOptions) -> Option<Vec<ModeOptionsKinds>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_kinds(this: &ModeOptions, val: &[ModeOptionsKinds]);
+    #[wasm_bindgen(method, getter)]
+    pub fn levels(this: &ModeOptions) -> Option<Vec<ModeOptionsLevels>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_levels(this: &ModeOptions, val: &[ModeOptionsLevels]);
+}
+impl ModeOptions {
+    pub fn new() -> ModeOptions {
+        Self::builder().build()
+    }
+    pub fn builder() -> ModeOptionsBuilder {
+        ModeOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for ModeOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct ModeOptionsBuilder {
+    inner: ModeOptions,
+}
+impl ModeOptionsBuilder {
+    pub fn modes(self, val: &[Mode]) -> Self {
+        self.inner.set_modes(val);
+        self
+    }
+    pub fn kinds(self, val: &[ModeOptionsKinds]) -> Self {
+        self.inner.set_kinds(val);
+        self
+    }
+    pub fn levels(self, val: &[ModeOptionsLevels]) -> Self {
+        self.inner.set_levels(val);
+        self
+    }
+    pub fn build(self) -> ModeOptions {
+        self.inner
+    }
+}
+impl From<ModeOptions> for ModeOptionsBuilder {
+    fn from(inner: ModeOptions) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeModeOptions")]
+    pub fn describe_mode_options(options: &ModeOptions) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeModeOptions")]
+    pub fn describe_mode_options_js_string(options: &ModeOptions) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum GetValueKind {
     String(String),
@@ -454,4 +545,28 @@ pub enum GetValueKind {
 pub enum MarkOrStr {
     Mark(Mark),
     String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LevelsReturn {
+    N1 = 1,
+    N2 = 2,
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MaybeKindsReturn {
+    X = "x",
+    Y = "y",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ModeOptionsKinds {
+    X = "x",
+    Y = "y",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ModeOptionsLevels {
+    N1 = 1,
+    N2 = 2,
 }

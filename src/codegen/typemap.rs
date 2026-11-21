@@ -4524,6 +4524,8 @@ pub fn param_slice_mode(
     let core = p.type_ref.split_empties().map(|(core, _)| core);
     let ty = core.as_ref().unwrap_or(&p.type_ref);
     let inferred = match ty {
+        // A list of an enum crosses as the enum's own list.
+        TypeRef::Array(elem) if ctx.is_some_and(|c| is_enum_element(elem, c, scope)) => None,
         TypeRef::Array(elem)
             if is_numeric_array_element(elem, ctx, scope)
                 || is_mono_type_param(elem, ctx, scope) =>
@@ -4594,6 +4596,20 @@ fn union_element(
     from_module: &ModuleContext,
 ) -> Option<TokenStream> {
     let c = ctx.filter(|c| c.experimental_generic_mono)?;
+    let carried = |elem: TokenStream, n: Option<ir::Nullability>| match n {
+        None => elem,
+        Some(n) if pos.is_argument() => nullable_carrier(elem, n, true),
+        Some(n) => read_carrier(elem, n, true),
+    };
+    // A declared enum is the element itself.
+    let (own, n) = match elem.split_empties() {
+        Some((core, n)) => (core, Some(n)),
+        None => (elem.clone(), None),
+    };
+    if c.enum_kind(&own, scope).is_some() {
+        let own = to_syn_type(&own, TypePosition::RETURN, ctx, scope, from_module);
+        return Some(carried(own, n));
+    }
     let read = resolve_union_aliases(elem, ctx, scope);
     let (core, n) = match read.split_empties() {
         Some((core, n)) => (core, Some(n)),
@@ -4603,25 +4619,27 @@ fn union_element(
         return None;
     };
     let members = u.members();
-    // An enum of literals alone crosses as the primitive it carries.
-    if is_integer_literal_union(members)
+    let name = c.ir_enum_name(members, scope)?;
+    // Literals alone are the enum the IR declares for them.
+    let literals = is_integer_literal_union(members)
         || members
             .iter()
-            .all(|m| matches!(m, TypeRef::StringLiteral(_)))
-    {
-        return None;
-    }
-    let name = c.ir_enum_name(members, scope)?;
-    let arms = dynamic_union_members(members, ctx, scope, from_module)?;
-    let name = c.synthesise_dynamic_union(
-        members,
-        &arms,
-        &name,
-        None,
-        IrEnum::Named(&name),
-        scope,
-        from_module,
-    );
+            .all(|m| matches!(m, TypeRef::StringLiteral(_)));
+    let name = match literals {
+        true => c.synthesise_literal_enum(&name, members, true, scope, from_module)?,
+        false => {
+            let arms = dynamic_union_members(members, ctx, scope, from_module)?;
+            c.synthesise_dynamic_union(
+                members,
+                &arms,
+                &name,
+                None,
+                IrEnum::Named(&name),
+                scope,
+                from_module,
+            )
+        }
+    };
     let ident = make_ident(&name);
     let elem = quote! { #ident };
     Some(match n {
@@ -4688,6 +4706,8 @@ fn mono_string_like(
     let borrow = top.then(|| quote! { & });
     let (peeled, scope) = peel_mono(ty, ctx, scope, &mut HashSet::new());
     match peeled.as_ref() {
+        // A list of an enum takes the enum, not its strings.
+        TypeRef::Array(elem) if top && is_enum_element(elem, ctx, scope) => None,
         TypeRef::Array(elem) => {
             let elem = mono_string_like(elem, false, ctx, scope, from_module)?;
             Some(if top {
@@ -4753,7 +4773,8 @@ pub(crate) fn is_mono_string_list_return(
     let (peeled, scope) = peel_mono(&list, ctx, scope, &mut HashSet::new());
     matches!(
         peeled.as_ref(),
-        TypeRef::Array(elem) if is_string_array_element(elem, ctx, scope)
+        TypeRef::Array(elem)
+            if is_string_array_element(elem, ctx, scope) && !is_enum_element(elem, ctx, scope)
     )
 }
 
@@ -4781,6 +4802,33 @@ fn native_array_leaf<'t>(
             None => peel_mono(elem, c, scope, &mut HashSet::new()).0,
         },
         None => std::borrow::Cow::Borrowed(elem),
+    }
+}
+
+/// Whether, under per-monomorphization, a top-level `T[]` element is an
+/// enum of literals alone, declared or the IR's for the union: the list
+/// then takes the enum as its element (see [`union_element`]).
+fn is_enum_element(elem: &TypeRef, c: &CodegenContext<'_>, scope: ScopeId) -> bool {
+    if !c.experimental_generic_mono {
+        return false;
+    }
+    let core = |t: &TypeRef| {
+        t.split_empties()
+            .map_or_else(|| t.clone(), |(core, _)| core)
+    };
+    if c.enum_kind(&core(elem), scope).is_some() {
+        return true;
+    }
+    match core(&resolve_union_aliases(elem, Some(c), scope)) {
+        TypeRef::Union(u) => {
+            let members = u.members();
+            (is_integer_literal_union(members)
+                || members
+                    .iter()
+                    .all(|m| matches!(m, TypeRef::StringLiteral(_))))
+                && c.ir_enum_name(members, scope).is_some()
+        }
+        _ => false,
     }
 }
 
@@ -5115,10 +5163,12 @@ mod tests {
             };
             let numbers =
                 TypeRef::union([TypeRef::NumberLiteral(1.0), TypeRef::NumberLiteral(2.0)]);
-            for elem in [TypeRef::Number, TypeRef::ident("Level"), numbers] {
+            for elem in [TypeRef::Number, numbers] {
                 assert_eq!(mode(&elem), Some(SliceMode::Array), "for {elem:?}");
             }
+            // A declared enum is the element itself.
             for elem in [
+                TypeRef::ident("Level"),
                 TypeRef::String,
                 TypeRef::ident("IdChain"),
                 TypeRef::ident("Mode"),
@@ -6061,8 +6111,9 @@ mod tests {
             let like = "impl :: wasm_bindgen :: JsStringLike";
             let slice = format!("& [{like}]");
             assert_eq!(arg(list(TypeRef::String)), Some(slice.clone()));
-            assert_eq!(arg(list(TypeRef::ident("IdChain"))), Some(slice.clone()));
-            assert_eq!(arg(list(TypeRef::ident("ModeAlias"))), Some(slice));
+            assert_eq!(arg(list(TypeRef::ident("IdChain"))), Some(slice));
+            // A declared enum is the element itself.
+            assert_eq!(arg(list(TypeRef::ident("ModeAlias"))), None);
             assert_eq!(
                 arg(TypeRef::generic("ArrayLike", vec![TypeRef::String])),
                 Some(format!("& Array < {like} >"))

@@ -394,7 +394,9 @@ A union element with no common supertype erases to `JsValue`. Under
 [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums)
 instead, read or written, so a list mixes its arms. An element admitting
 `null` reads in `Option` and is written in `Nullable`, which crosses as
-`null`. A union of literals alone still crosses as its primitive.
+`null`. A union of literals alone takes its enum too, declared or
+anonymous, so a getter reads what its setter writes. Without the flag it
+crosses as its primitive.
 
 ```ts
 declare function marks(): (Mark | string)[];
@@ -427,7 +429,9 @@ the copy shape instead:
 * A `T[]` parameter is a plain JS `Array` the callee may keep, so a
   slice of numbers (`&[f64]` or `Option<&[f64]>`)
   gets `slice = "array"`, after resolving aliases, literal unions and
-  numeric enums.
+  numeric enums. Under per-monomorphization a literal union or enum is
+  [the element itself](#array-and-slice-types), a slice of the enum,
+  which takes no mode.
 * Under [per-monomorphization](#in-scope-generic-type-parameters), a
   `T[]` whose element is a type parameter gets `slice = "array"` too:
   wasm-bindgen resolves the mode per instantiation, so `T = f64` reaches

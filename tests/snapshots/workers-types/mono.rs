@@ -12182,11 +12182,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "startAfter")]
     pub fn set_start_after(this: &R2ListOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn include(this: &R2ListOptions) -> Option<Vec<String>>;
-    #[wasm_bindgen(method, getter, js_name = "include")]
-    pub fn include_js_string(this: &R2ListOptions) -> Option<Array<JsString>>;
+    pub fn include(this: &R2ListOptions) -> Option<Vec<R2ListOptionsInclude>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_include(this: &R2ListOptions, val: &[impl ::wasm_bindgen::JsStringLike]);
+    pub fn set_include(this: &R2ListOptions, val: &[R2ListOptionsInclude]);
 }
 impl R2ListOptions {
     pub fn new() -> R2ListOptions {
@@ -12227,7 +12225,7 @@ impl R2ListOptionsBuilder {
         self.inner.set_start_after(val);
         self
     }
-    pub fn include(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
+    pub fn include(self, val: &[R2ListOptionsInclude]) -> Self {
         self.inner.set_include(val);
         self
     }
@@ -20843,11 +20841,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "conversation")]
     fn __set_conversation_with_null(this: &ResponsesInput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn include(this: &ResponsesInput) -> Option<Vec<String>>;
-    #[wasm_bindgen(method, getter, js_name = "include")]
-    pub fn include_js_string(this: &ResponsesInput) -> Option<Array<JsString>>;
+    pub fn include(this: &ResponsesInput) -> Option<Vec<ResponseIncludable>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_include(this: &ResponsesInput, val: &[impl ::wasm_bindgen::JsStringLike]);
+    pub fn set_include(this: &ResponsesInput, val: &[ResponseIncludable]);
     #[wasm_bindgen(method, setter, js_name = "include")]
     fn __set_include_with_null(this: &ResponsesInput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
@@ -21043,7 +21039,7 @@ impl ResponsesInputBuilder {
         self.inner.set_conversation_with_null();
         self
     }
-    pub fn include(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
+    pub fn include(self, val: &[ResponseIncludable]) -> Self {
         self.inner.set_include(val);
         self
     }
@@ -70995,6 +70991,12 @@ pub enum RequestInitCache {
 pub enum RequestInitEncodeResponseBody {
     Automatic = "automatic",
     Manual = "manual",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum R2ListOptionsInclude {
+    HttpMetadata = "httpMetadata",
+    CustomMetadata = "customMetadata",
 }
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]

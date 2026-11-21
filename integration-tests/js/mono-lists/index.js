@@ -64,3 +64,8 @@ export const maybeMarks = () => [new Mark("m"), null, "s"];
 export const describeMarks = describe;
 export const describeMaybeMarks = describe;
 export const describeMarkOptions = (options) => describe(options.marks);
+export const modes = (values) => values;
+export const levels = (values) => values;
+export const maybeKinds = (values) => values;
+export const describeModeOptions = (options) =>
+  [options.modes, options.kinds, options.levels].map(describe).join(" ");

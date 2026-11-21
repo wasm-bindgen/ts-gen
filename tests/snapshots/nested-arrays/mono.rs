@@ -119,19 +119,12 @@ extern "C" {
 #[wasm_bindgen(module = "nested-arrays", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn modes(values: &[impl ::wasm_bindgen::JsStringLike]) -> Result<Vec<String>, JsValue>;
-}
-#[wasm_bindgen(module = "nested-arrays", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "modes")]
-    pub fn modes_js_string(
-        values: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<Array<JsString>, JsValue>;
+    pub fn modes(values: &[ModesReturn]) -> Result<Vec<ModesReturn>, JsValue>;
 }
 #[wasm_bindgen(module = "nested-arrays", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn counts(#[wasm_bindgen(slice = "array")] values: &[f64]) -> Result<Vec<f64>, JsValue>;
+    pub fn counts(values: &[CountsReturn]) -> Result<Vec<CountsReturn>, JsValue>;
 }
 #[wasm_bindgen(module = "nested-arrays", experimental_generic_mono)]
 extern "C" {
@@ -142,4 +135,16 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch)]
     pub fn grids(values: &[Grid]) -> Result<Vec<Grid>, JsValue>;
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ModesReturn {
+    A = "a",
+    B = "b",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CountsReturn {
+    N1 = 1,
+    N2 = 2,
 }
