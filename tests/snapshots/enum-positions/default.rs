@@ -84,6 +84,11 @@ impl<T: ::wasm_bindgen::JsGeneric> DetailsBuilder<T> {
         self.inner
     }
 }
+impl<T: ::wasm_bindgen::JsGeneric> From<Details<T>> for DetailsBuilder<T> {
+    fn from(inner: Details<T>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "enum-positions")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

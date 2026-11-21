@@ -211,6 +211,11 @@ impl<R: ::wasm_bindgen::JsGeneric> RangeBuilder<R> {
         self.inner
     }
 }
+impl<R: ::wasm_bindgen::JsGeneric> From<Range<R>> for RangeBuilder<R> {
+    fn from(inner: Range<R>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -266,6 +271,11 @@ impl<R: ::wasm_bindgen::JsGeneric> ReadResultBuilder<R> {
         self.inner
     }
 }
+impl<R: ::wasm_bindgen::JsGeneric> From<ReadResult<R>> for ReadResultBuilder<R> {
+    fn from(inner: ReadResult<R>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -305,6 +315,11 @@ impl ListingBuilder {
     }
     pub fn build(self) -> Listing {
         self.inner
+    }
+}
+impl From<Listing> for ListingBuilder {
+    fn from(inner: Listing) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]
