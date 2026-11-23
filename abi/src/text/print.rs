@@ -210,7 +210,12 @@ fn arm(out: &mut String, indent: &str, a: &Arm) {
     if a.meta.attrs.once {
         out.push_str("@once ");
     }
-    out.push_str(&name(&a.name));
+    // A `static` arm would read back as a static member.
+    if a.name == "static" {
+        out.push_str(&quote(&a.name));
+    } else {
+        out.push_str(&name(&a.name));
+    }
     if !a.payload.is_empty() {
         let tys: Vec<String> = a.payload.iter().map(ty).collect();
         let _ = write!(out, "({})", tys.join(", "));
@@ -236,6 +241,11 @@ fn member(m: &Member) -> String {
         s.push_str("static ");
     }
     match &m.kind {
+        // `new(` would read back as a constructor.
+        MemberKind::Method(n) if n == "new" => {
+            s.push_str(&quote(n));
+            s.push_str(&tparams(&m.tparams));
+        }
         MemberKind::Method(n) => {
             s.push_str(&name(n));
             s.push_str(&tparams(&m.tparams));
@@ -254,7 +264,15 @@ fn member(m: &Member) -> String {
     let params: Vec<String> = m.params.iter().map(param).collect();
     let _ = write!(s, "({})", params.join(", "));
     if matches!(m.kind, MemberKind::Get(_)) || m.result != Type::Unit {
-        let _ = write!(s, ": {}", ty(&m.result));
+        // A function result without `throws` would take the member's.
+        match &m.result {
+            Type::Fn(f) if f.throws.is_none() && m.throws.is_some() => {
+                let _ = write!(s, ": ({})", ty(&m.result));
+            }
+            t => {
+                let _ = write!(s, ": {}", ty(t));
+            }
+        }
     }
     s.push_str(&throws(&m.throws));
     s.push(';');
