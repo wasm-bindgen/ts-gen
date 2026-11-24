@@ -64,6 +64,12 @@ export interface MarkOptions {
   marks?: (Mark | string)[];
 }
 export declare function describeMarkOptions(options: MarkOptions): string;
+// A union's own arm can be a list of a union.
+export interface MarkRoute {
+  to?: Mark | string | (Mark | string)[];
+}
+export declare function route(): MarkRoute;
+export declare function describeRoute(route: MarkRoute): string;
 
 // A list of literals alone takes their enum as its element too, in a
 // getter and the setter matching it.

@@ -64,6 +64,8 @@ export const maybeMarks = () => [new Mark("m"), null, "s"];
 export const describeMarks = describe;
 export const describeMaybeMarks = describe;
 export const describeMarkOptions = (options) => describe(options.marks);
+export const route = () => ({ to: [new Mark("m"), "s"] });
+export const describeRoute = (route) => describe(route.to);
 export const modes = (values) => values;
 export const levels = (values) => values;
 export const maybeKinds = (values) => values;
