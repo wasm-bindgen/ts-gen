@@ -42,3 +42,13 @@ export declare class Gate {
    */
   readonly value: number;
 }
+
+/**
+ * Iterable where every binding catches: `iterator()` is a `Result` of the
+ * `--error-type` default under `--fallible`, which only converts from a
+ * thrown value.
+ */
+export declare class Kinds {
+  constructor();
+  [Symbol.iterator](): IterableIterator<string>;
+}
