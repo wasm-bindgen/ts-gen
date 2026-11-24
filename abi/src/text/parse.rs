@@ -606,7 +606,7 @@ impl<'a> Parser<'a> {
         if !self.eat_kw("throws") {
             return Ok(None);
         }
-        if self.is_name_at(0) {
+        if self.is_name_at(0) || self.is(".") && self.is_name_at(1) {
             self.path("an error enum").map(Some)
         } else {
             Ok(Some(Path::err()))
@@ -686,7 +686,11 @@ impl<'a> Parser<'a> {
     }
 
     pub(super) fn ty(&mut self) -> Res<Type> {
-        if self.is("@") && is_kw(self.peek_at(1), "js") && is_kw(self.peek_at(3), "null") {
+        if self.is("@")
+            && is_kw(self.peek_at(1), "js")
+            && is_p(self.peek_at(2), "(")
+            && is_kw(self.peek_at(3), "null")
+        {
             let at = self.here();
             for _ in 0..4 {
                 self.bump();

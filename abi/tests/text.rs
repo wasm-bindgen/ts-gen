@@ -361,6 +361,10 @@ fn errors_are_positioned() {
             "ir 1;\ninterface I<U in (A)> { type P = match U {}; }",
             "2:42: an empty `match`",
         ),
+        (
+            "ir 1;\nf(a: @js[null) u8?);",
+            "2:6: expected a type, found `@`",
+        ),
     ];
     for (src, want) in cases {
         let got = text::parse(src).map(|_| ()).unwrap_err().to_string();
@@ -386,4 +390,39 @@ fn associated_types() {
     // `type` stays a member name.
     let ir = parse("ir 1;\nclass A { type(): str; get type(): str; }");
     assert!(class(&ir, "A").assoc.is_empty());
+}
+
+#[test]
+fn keyword_names_print_quoted() {
+    let src = "ir 1;\n\nclass C {\n  \"new\"(): u8;\n  static \"new\"<T>(): T;\n}\n\nenum E {\n  \"static\";\n}\n";
+    let ir = parse(src);
+    let c = class(&ir, "C");
+    assert_eq!(c.members[0].kind, MemberKind::Method("new".into()));
+    assert_eq!(c.members[1].kind, MemberKind::Method("new".into()));
+    assert_eq!(text::print(&ir), src);
+}
+
+#[test]
+fn member_throws_keeps_its_function_result() {
+    let src = "ir 1;\n\nclass C {\n  get a(): (fn(str)) throws;\n  get b(): fn(str) throws;\n}\nf(): (fn() -> u8) throws E;\n";
+    let ir = parse(src);
+    let c = class(&ir, "C");
+    let fn_throws = |m: &Member| matches!(&m.result, Type::Fn(f) if f.throws.is_some());
+    assert!(c.members[0].throws.is_some() && !fn_throws(&c.members[0]));
+    assert!(c.members[1].throws.is_none() && fn_throws(&c.members[1]));
+    // `fn(str) throws` prints with its `-> unit` so the `throws` stays the function's.
+    let printed = text::print(&ir);
+    assert_eq!(parse(&printed), ir);
+    assert!(printed.contains("get a(): (fn(str)) throws;"), "{printed}");
+    assert!(printed.contains("f(): (fn() -> u8) throws E;"), "{printed}");
+}
+
+#[test]
+fn throws_takes_a_root_path() {
+    let ir = parse("ir 1;\nf() throws .E;");
+    let Decl::Member(m) = &ir.items[0] else {
+        panic!()
+    };
+    assert_eq!(m.throws.as_ref().map(|p| &p.base), Some(&Base::Root));
+    assert_eq!(parse(&text::print(&ir)), ir);
 }
