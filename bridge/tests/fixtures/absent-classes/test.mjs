@@ -4,14 +4,14 @@ import { setNext } from "./host.mjs";
 class Present {}
 let next;
 const ret = () => next;
-Object.assign(globalThis, { Present, absent: ret, maybe: ret, deep: ret, pick: ret, only: ret, present: ret });
+Object.assign(globalThis, { Present, absent: ret, maybe: ret, deep: ret, pick: ret, only: ret, present: ret, later: ret, laterPresent: ret });
 
 const { instantiate, take } = await import("./bridge.js");
 const fs = await import("node:fs");
 const compile = (f) => new WebAssembly.Module(fs.readFileSync(f));
 const L = lang(
   instantiate(compile("lang.wasm"), compile("bridge.wasm"), {
-    "test:impl": { "take(Absent)": () => 7 },
+    "test:impl": { "take(Absent)": () => 7, "tw:future/wake": () => {} },
   }),
 );
 const call = (key, v) => {
@@ -42,6 +42,26 @@ L.throwsType(() => call("present()", o), /Present/);
 // Arguments too.
 assert.equal(take(o), 7);
 assert.throws(() => take(1), TypeError);
+
+// A future's resolution checks the same way (a host array's elements:
+// absent-classes-host).
+const tick = () => new Promise((r) => setTimeout(r, 0));
+{
+  let f = call("later()", Promise.resolve(o));
+  await tick();
+  assert.equal(L.call("future:poll", f, -1), 1);
+  assert.equal(L.call("future:take<Absent>", f), o);
+  L.call("future:drop", f);
+  f = call("later()", Promise.resolve(5));
+  await tick();
+  assert.equal(L.call("future:poll", f, -1), 2);
+  assert.match(L.call("future:error<err>", f)[1], /Absent/);
+  L.call("future:drop", f);
+  f = call("laterPresent()", Promise.resolve(o));
+  await tick();
+  assert.equal(L.call("future:poll", f, -1), 2, "a present class stays nominal");
+  L.call("future:drop", f);
+}
 
 // Its union arm never matches, so discrimination falls through.
 const p = new Present();

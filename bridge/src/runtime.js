@@ -148,6 +148,12 @@ function $isInstance(v, C) {
   return typeof C === "function" && v instanceof C;
 }
 
+// Whether `v` is a valid value of class `C`: an instance, or any object
+// when the class has no value (§8).
+function $isValue(v, C) {
+  return C === null ? $isObject(v) : v instanceof C;
+}
+
 function $isObject(v) {
   return (typeof v === "object" && v !== null) || typeof v === "function";
 }

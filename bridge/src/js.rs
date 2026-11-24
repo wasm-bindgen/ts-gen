@@ -1370,7 +1370,7 @@ impl<'a, 'b> Glue<'a, 'b> {
         let value = value.clone();
         self.helper(key, move |g, name| {
             let mut b = Body::default();
-            let t = g.test(&value, "v")?;
+            let t = g.value_test(&value, "v")?;
             if t != "true" {
                 b.line(format!("if (!({t})) $fail({}, v);", js_str(&value.ty)));
             }
@@ -1405,7 +1405,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                     "out[i] = $str(e);"
                 }),
                 _ => {
-                    let t = g.test(&elem, "e")?;
+                    let t = g.value_test(&elem, "e")?;
                     if t != "true" {
                         b.line(format!("if (!({t})) $fail({}, e);", js_str(&elem.ty)));
                     }
@@ -1713,6 +1713,16 @@ impl<'a, 'b> Glue<'a, 'b> {
 
     /// A dispatch test for an arm payload (§8, "Arm tests").
     pub(crate) fn test(&mut self, r: &Repr, v: &str) -> Result<String> {
+        self.test_as(r, v, true)
+    }
+
+    /// Whether `v` is a valid `r`, for a value check rather than an arm
+    /// test: a class with no value checks as an interface (§8).
+    fn value_test(&mut self, r: &Repr, v: &str) -> Result<String> {
+        self.test_as(r, v, false)
+    }
+
+    fn test_as(&mut self, r: &Repr, v: &str, arm: bool) -> Result<String> {
         let base = match &r.kind {
             Kind::Scalar(Scalar::Bool) | Kind::NullScalar(Scalar::Bool, _) => {
                 format!("typeof {v} === \"boolean\"")
@@ -1736,10 +1746,15 @@ impl<'a, 'b> Glue<'a, 'b> {
                     path,
                     interface: false,
                     ..
-                } => format!("$isInstance({v}, {})", self.class_value(path)?),
+                } if arm => format!("$isInstance({v}, {})", self.class_value(path)?),
+                Host::Class {
+                    path,
+                    interface: false,
+                    ..
+                } => format!("$isValue({v}, {})", self.class_value(path)?),
                 Host::Class { .. } => format!("$isObject({v})"),
                 Host::Any => format!("{v} != null"),
-                Host::Box(inner) => return self.test(inner, v),
+                Host::Box(inner) => return self.test_as(inner, v, arm),
                 Host::Future { .. } => format!("$isThenable({v})"),
             },
             Kind::Enum { layout, .. } => {
