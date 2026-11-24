@@ -346,9 +346,110 @@ pub mod cloudflare {
         }
     }
 }
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Notice;
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &Notice) -> String;
+    #[wasm_bindgen(method, getter, js_name = "text")]
+    pub fn text_js_string(this: &Notice) -> JsString;
+}
+impl Notice {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Notice {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type NoticeListener<E = Notice>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Listeners<M = Object<Notice>>;
+    #[wasm_bindgen(method, catch)]
+    pub fn on<M>(
+        this: &Listeners<M>,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &NoticeListener,
+    ) -> Result<(), JsValue>;
+}
+impl<M> Listeners<M> {
+    pub fn on_typed<K: MapKey<M>>(
+        &self,
+        handler: &NoticeListener<<K as MapKey<M>>::Value>,
+    ) -> Result<(), JsValue> {
+        self.on(
+            <K as MapKey<M>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type FeedEvents;
+    #[wasm_bindgen(method, getter)]
+    pub fn notice(this: &FeedEvents) -> Notice;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_notice(this: &FeedEvents, val: &Notice);
+}
+impl FeedEvents {
+    pub fn new(notice: &Notice) -> FeedEvents {
+        let inner: FeedEvents = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_notice(notice);
+        inner
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Listeners , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Feed;
+    #[wasm_bindgen(method, catch)]
+    pub fn latest(this: &Feed) -> Result<Notice, JsValue>;
+}
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SocketOptionsSecureTransport {
     Off = "off",
     On = "on",
+}
+#[doc = r" A key of the map `M`: the property it names, and the type"]
+#[doc = r" of that property's value."]
+pub trait MapKey<M: ?Sized> {
+    type Value: ::wasm_bindgen::JsGeneric;
+    const KEY: &'static str;
+}
+#[doc = "The keys of [`FeedEvents`]."]
+pub mod feed_events {
+    #[allow(unused_imports)]
+    use super::*;
+    #[doc = "`notice` of [`FeedEvents`]."]
+    pub struct Notice;
+    impl MapKey<FeedEvents> for Notice {
+        type Value = Notice;
+        const KEY: &'static str = "notice";
+    }
+}
+impl Feed {
+    pub fn on_typed<K: MapKey<FeedEvents>>(
+        &self,
+        handler: &NoticeListener<<K as MapKey<FeedEvents>>::Value>,
+    ) -> Result<(), JsValue> {
+        self.on(
+            <K as MapKey<FeedEvents>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
 }

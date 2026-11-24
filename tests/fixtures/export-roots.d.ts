@@ -1,4 +1,4 @@
-//! @ts-gen --export Bucket --export openBucket --export listBuckets --export cloudflare:sockets
+//! @ts-gen --export Bucket --export openBucket --export listBuckets --export Feed --export cloudflare:sockets
 
 // Root selection: `Bucket`, `openBucket` and `listBuckets` are roots; the
 // closure reaches `BucketObject`, `GetOptions`, `Checksums` (through a method
@@ -6,6 +6,9 @@
 // options bag), `Socket` (through the exported module), the
 // `BucketKind` enum, and `ListDefaults` (through a later overload's own
 // type-parameter default). `Unrelated` and `Dangling` are never reached.
+// `Feed` reaches `Listeners` and its map `FeedEvents`, so its keyed `on`
+// has a `_typed` twin; `Hidden` and its map `HiddenEvents` are not
+// reached, and neither is named by a twin or a key.
 
 interface Checksums {
   md5?: string;
@@ -61,3 +64,33 @@ interface SocketOptions {
 declare module "cloudflare:sockets" {
   function connect(address: string, options?: SocketOptions): Socket;
 }
+
+interface Notice {
+  readonly text: string;
+}
+
+interface Secret {
+  readonly code: number;
+}
+
+interface NoticeListener<E extends Notice = Notice> {
+  (event: E): void;
+}
+
+declare class Listeners<M extends Record<string, Notice> = Record<string, Notice>> {
+  on<K extends keyof M>(type: K, handler: NoticeListener<M[K]>): void;
+}
+
+interface FeedEvents {
+  notice: Notice;
+}
+
+declare class Feed extends Listeners<FeedEvents> {
+  latest(): Notice;
+}
+
+interface HiddenEvents {
+  secret: Secret;
+}
+
+declare class Hidden extends Listeners<HiddenEvents> {}
