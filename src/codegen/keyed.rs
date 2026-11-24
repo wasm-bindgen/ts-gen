@@ -23,8 +23,7 @@ use crate::parse::scope::ScopeId;
 pub struct Keyed {
     ir: abi::Ir,
     libs: Vec<&'static abi::Ir>,
-    /// The declarations the output emits: a twin, a key module and a key
-    /// name only these.
+    /// The declarations of the input the output emits.
     emitted: HashSet<TypeId>,
     /// The key modules emitted, by map.
     modules: RefCell<Vec<(String, TokenStream)>>,
@@ -357,11 +356,12 @@ impl Keyed {
         }
     }
 
+    /// Whether `path` names something the output has: anything but a
+    /// declaration of the input that `--export` leaves out.
     fn emitted(&self, path: &[String], at: At<'_>) -> bool {
-        at.cgctx
-            .gctx
-            .resolve_path(at.scope, &path.join("."))
-            .is_some_and(|id| self.emitted.contains(&id))
+        let gctx = at.cgctx.gctx;
+        gctx.resolve_path(at.scope, &path.join("."))
+            .is_none_or(|id| self.emitted.contains(&id) || gctx.builtin_type_ids.contains(&id))
     }
 
     fn named(&self, path: &[String], at: At<'_>) -> TokenStream {

@@ -7,8 +7,9 @@
 // `BucketKind` enum, and `ListDefaults` (through a later overload's own
 // type-parameter default). `Unrelated` and `Dangling` are never reached.
 // `Feed` reaches `Listeners` and its map `FeedEvents`, so its keyed `on`
-// has a `_typed` twin; `Hidden` and its map `HiddenEvents` are not
-// reached, and neither is named by a twin or a key.
+// has a `_typed` twin and a key for each of the map's values; `Hidden` and
+// its map `HiddenEvents` are not reached, and neither is named by a twin
+// or a key.
 
 interface Checksums {
   md5?: string;
@@ -73,16 +74,25 @@ interface Secret {
   readonly code: number;
 }
 
-interface NoticeListener<E extends Notice = Notice> {
+interface NoticeListener<E = Notice> {
   (event: E): void;
 }
 
-declare class Listeners<M extends Record<string, Notice> = Record<string, Notice>> {
+declare class Listeners<M extends Record<string, object> = Record<string, object>> {
   on<K extends keyof M>(type: K, handler: NoticeListener<M[K]>): void;
 }
 
+declare namespace Feeds {
+  interface Tick {
+    readonly count: number;
+  }
+}
+
+// A builtin and a namespace's member are values the roots can't leave out.
 interface FeedEvents {
   notice: Notice;
+  opened: Date;
+  tick: Feeds.Tick;
 }
 
 declare class Feed extends Listeners<FeedEvents> {

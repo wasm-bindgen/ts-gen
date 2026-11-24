@@ -416,13 +416,7 @@ fn generate_tokens(
             ..Default::default()
         };
         let keyed = crate::lower::lower_with(module, gctx, &opts).ir;
-        let emitted = module
-            .types
-            .iter()
-            .copied()
-            .filter(|&id| !surface.get(id).is_empty())
-            .collect();
-        cgctx.keyed = Some(keyed::Keyed::new(keyed, vec![std_ir()], emitted));
+        cgctx.keyed = Some(keyed::Keyed::new(keyed, vec![std_ir()], surface.emitted()));
     }
     let cgctx = cgctx;
 

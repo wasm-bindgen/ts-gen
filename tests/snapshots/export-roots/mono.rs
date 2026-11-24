@@ -375,12 +375,12 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Listeners<M = Object<Notice>>;
+    pub type Listeners<M = Object<Object>>;
     #[wasm_bindgen(method, catch)]
     pub fn on<M>(
         this: &Listeners<M>,
         r#type: impl ::wasm_bindgen::JsStringLike,
-        handler: &NoticeListener,
+        handler: &NoticeListener<Object>,
     ) -> Result<(), JsValue>;
 }
 impl<M> Listeners<M> {
@@ -394,6 +394,27 @@ impl<M> Listeners<M> {
         )
     }
 }
+pub mod feeds {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Tick;
+        #[wasm_bindgen(method, getter)]
+        pub fn count(this: &Tick) -> f64;
+    }
+    impl Tick {
+        #[allow(clippy::new_without_default)]
+        pub fn new() -> Tick {
+            #[allow(unused_unsafe)]
+            unsafe {
+                JsValue::from(js_sys::Object::new()).unchecked_into()
+            }
+        }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -403,11 +424,21 @@ extern "C" {
     pub fn notice(this: &FeedEvents) -> Notice;
     #[wasm_bindgen(method, setter)]
     pub fn set_notice(this: &FeedEvents, val: &Notice);
+    #[wasm_bindgen(method, getter)]
+    pub fn opened(this: &FeedEvents) -> Date;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_opened(this: &FeedEvents, val: &Date);
+    #[wasm_bindgen(method, getter)]
+    pub fn tick(this: &FeedEvents) -> feeds::Tick;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tick(this: &FeedEvents, val: &feeds::Tick);
 }
 impl FeedEvents {
-    pub fn new(notice: &Notice) -> FeedEvents {
+    pub fn new(notice: &Notice, opened: &Date, tick: &feeds::Tick) -> FeedEvents {
         let inner: FeedEvents = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_notice(notice);
+        inner.set_opened(opened);
+        inner.set_tick(tick);
         inner
     }
 }
@@ -440,6 +471,18 @@ pub mod feed_events {
     impl MapKey<FeedEvents> for Notice {
         type Value = Notice;
         const KEY: &'static str = "notice";
+    }
+    #[doc = "`opened` of [`FeedEvents`]."]
+    pub struct Opened;
+    impl MapKey<FeedEvents> for Opened {
+        type Value = Date;
+        const KEY: &'static str = "opened";
+    }
+    #[doc = "`tick` of [`FeedEvents`]."]
+    pub struct Tick;
+    impl MapKey<FeedEvents> for Tick {
+        type Value = feeds::Tick;
+        const KEY: &'static str = "tick";
     }
 }
 impl Feed {
