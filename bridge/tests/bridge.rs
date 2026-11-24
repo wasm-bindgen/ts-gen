@@ -1,5 +1,6 @@
 //! Bridge fixtures: each `tests/fixtures/<name>/` has an `ir.ts`, an
-//! optional `profile`, and a `test.mjs`. The language module is the
+//! optional `profile`, an optional empty `factory` (generating with
+//! `Options::factory`), and a `test.mjs`. The language module is the
 //! fixture's `lang.wat` (with `{RUNTIME}` standing for the runtime below), or by default a pass-through module that imports
 //! every IR member (and each `protocol` line) and re-exports it as
 //! `call:<key>` (`call:<group>:<name>` for protocol imports), over the counting runtime in `tests/runtime.wat`.
@@ -629,7 +630,10 @@ fn fixture(name: &str) {
         None => lang_src,
     };
     let lang = wat::parse_str(&lang_src).unwrap_or_else(|e| panic!("lang.wat: {e}\n{lang_src}"));
-    let bridge = ts_gen_bridge::generate_with(&ir, &libs, &profile, &lang)
+    let opts = ts_gen_bridge::Options {
+        factory: read("factory").is_some(),
+    };
+    let bridge = ts_gen_bridge::generate_opts(&ir, &libs, &profile, &lang, opts)
         .unwrap_or_else(|e| panic!("{name}: {e}"));
     snapshot(name, "js", &bridge.js);
     snapshot(name, "wat", &bridge.wat);
@@ -723,6 +727,7 @@ fixtures! {
     absent_classes_host => "absent-classes-host",
     erased_futures => "erased-futures",
     erased_futures_gc => "erased-futures-gc",
+    factory => "factory",
     rest_callbacks => "rest-callbacks",
     never => "never",
     constructor_values => "constructor-values",
@@ -898,6 +903,28 @@ fn spill_and_js_throws_need_their_settings() {
     assert!(err("all-host\nresults = single", &f("i32 externref")).contains("C#f()"));
     let table = "(table (export \"tw:table\") 132 externref) (global (export \"tw:table/stack_base\") i32 (i32.const 1)) (global (export \"tw:table/const_base\") i32 (i32.const 128)) (global (export \"tw:table/heap_base\") i32 (i32.const 132))";
     assert!(err("all-host\nresults = single", table).contains("the language must not export one"));
+}
+
+#[test]
+fn factory_keeps_its_own_fields() {
+    let gen = |src: &str| {
+        let ir = text::parse(src).unwrap();
+        let p = Profile::parse("all-host").unwrap();
+        let lang = wat::parse_str(passthrough(&ir, &[], &p, "")).unwrap();
+        let opts = ts_gen_bridge::Options { factory: true };
+        ts_gen_bridge::generate_opts(&ir, &[], &p, &lang, opts).map(|b| b.js)
+    };
+    for name in ["instantiate", "scratchUse"] {
+        let e = gen(&format!("ir 1;\nexport {name}(): u32;\n")).unwrap_err();
+        assert!(
+            e.to_string()
+                .contains(&format!("`{name}` is a bridge's own field")),
+            "{e}"
+        );
+    }
+    let js = gen("ir 1;\n@js(name = \"__proto__\")\nexport proto(): u32;\n").unwrap();
+    assert!(js.contains("[\"__proto__\"]: "), "{js}");
+    assert!(!js.contains(" __proto__: "), "{js}");
 }
 
 #[test]

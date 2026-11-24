@@ -627,9 +627,9 @@ impl<'a, 'b> Glue<'a, 'b> {
         out
     }
 
-    /// The JS of every export: the classes, the namespace objects and the
-    /// ESM export list.
-    pub fn exports(&mut self) -> Result<String> {
+    /// The JS of every export, the classes and the namespace objects, and
+    /// the export list: each exported name with the variable holding it.
+    pub fn exports(&mut self) -> Result<(String, Vec<(String, String)>)> {
         let mut keys: Vec<Keyed<'a>> = Vec::new();
         for k in self.l.keys.members() {
             if k.role == Role::Export {
@@ -695,22 +695,7 @@ impl<'a, 'b> Glue<'a, 'b> {
             let v = emit_ns(child, &mut out, &mut n);
             esm.push((name, v));
         }
-        let list: Vec<String> = esm
-            .iter()
-            .map(|(name, v)| {
-                if name == v {
-                    v.clone()
-                } else if is_export_ident(name) {
-                    format!("{v} as {name}")
-                } else {
-                    format!("{v} as {}", js_str(name))
-                }
-            })
-            .collect();
-        if !list.is_empty() {
-            let _ = writeln!(out, "export {{ {} }};", list.join(", "));
-        }
-        Ok(out)
+        Ok((out, esm))
     }
 
     /// A generic export as the language provides it (§13): its erased key
@@ -1177,7 +1162,28 @@ fn is_export_ident(s: &str) -> bool {
         && cs.all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '$')
 }
 
-fn method_key(s: &str) -> String {
+/// `export { ... };` for `esm`, or nothing when it's empty.
+pub fn export_list(esm: &[(String, String)]) -> String {
+    let list: Vec<String> = esm
+        .iter()
+        .map(|(name, v)| {
+            if name == v {
+                v.clone()
+            } else if is_export_ident(name) {
+                format!("{v} as {name}")
+            } else {
+                format!("{v} as {}", js_str(name))
+            }
+        })
+        .collect();
+    if list.is_empty() {
+        String::new()
+    } else {
+        format!("export {{ {} }};\n", list.join(", "))
+    }
+}
+
+pub fn method_key(s: &str) -> String {
     if is_export_ident(s) {
         s.to_string()
     } else {

@@ -19,7 +19,7 @@ layouts and the `tw` protocol. This crate implements §11–§19 of it.
 
 ```text
 ts-gen-bridge link <in.wasm> <links.tsv>... -o <out.wasm>
-ts-gen-bridge generate <file.ir> <language.wasm> -o <dir> [--profile <profile>] [--with <lib.ir>]... [--wat]
+ts-gen-bridge generate <file.ir> <language.wasm> -o <dir> [--profile <profile>] [--with <lib.ir>]... [--wat] [--factory]
 ```
 
 `generate` reads the language module as `.wasm` or `.wat`, and writes
@@ -28,7 +28,8 @@ ts-gen-bridge generate <file.ir> <language.wasm> -o <dir> [--profile <profile>] 
 (`all-host, results = single, throws = js`). It defaults to `all-linear`.
 The settings are IR.md §12's; `strict-null = on`, for example, makes a
 `@js(null) T?` reject `undefined` from JS.
-`--with` supplies the lib IRs the IR's `with` names.
+`--with` supplies the lib IRs the IR's `with` names. `--factory` shapes
+`bridge.js` as a factory (below).
 
 `link` is for languages that can't choose an import's `(module, name)`.
 Kotlin/Wasm, for example, imports every `@JsFun` from `js_code` under the
@@ -68,6 +69,19 @@ const instance = instantiate(
 then the language module, and returns the language instance. A glue module
 holds one instance. The IR's exports are the glue module's named exports.
 They're usable once `instantiate` has returned.
+
+A host running several instances of the language module (a pool, say)
+generates with `--factory`. `bridge.js` then exports only `createBridge()`,
+which returns a new bridge each call, over its own state: an object holding
+`instantiate`, the diagnostics and the IR's exports.
+
+```js
+import { createBridge } from "./out/bridge.js";
+
+const b = createBridge();
+b.instantiate(language, bridge, imports);
+b.util.add(1, 2);
+```
 
 Two diagnostics are exported for tests:
 
