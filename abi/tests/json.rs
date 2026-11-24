@@ -259,3 +259,24 @@ fn erased_future_ops() {
     assert!(gc.contains("\"name\": \"take<Any?>\""), "{gc}");
     assert!(gc.contains("\"anyref\""), "{gc}");
 }
+
+/// A namespace keeps its JS name, as members do.
+#[test]
+fn namespace_js_name() {
+    let ir = text::parse(
+        "ir 1;\n\n@js(name = \"default\")\nexport namespace default_ {\n  fetch(): u32;\n}\n\nnamespace plain {\n  f(): u32;\n}\n",
+    )
+    .unwrap();
+    let out = json::lower(&ir, &Profile::all_linear()).pretty();
+    check(&out);
+    let ns = |name: &str| {
+        let at = out
+            .find(&format!("\"name\": \"{name}\""))
+            .unwrap_or_else(|| panic!("{name}:\n{out}"));
+        let start = out[..at].rfind('{').unwrap();
+        let end = at + out[at..].find('}').unwrap();
+        out[start..end].to_string()
+    };
+    assert!(ns("default_").contains("\"jsName\": \"default\""), "{out}");
+    assert!(ns("plain").contains("\"jsName\": null"), "{out}");
+}

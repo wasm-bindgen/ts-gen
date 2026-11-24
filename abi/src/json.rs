@@ -360,6 +360,7 @@ fn walk_decls<'a>(
                         .set("module", Json::opt_str(cx.module))
                         .set("name", Json::str(&n.name))
                         .set("export", Json::Bool(exported || n.export))
+                        .set("jsName", js_name(&n.meta))
                         .set("doc", doc(&n.meta))
                         .done(),
                 );
