@@ -78,6 +78,9 @@ export declare function concat(parts: BufferSource[]): string;
 export declare function owned(data: BufferSource): boolean;
 /** @param data {@slice view} read before the call returns */
 export declare function ownedView(data: BufferSource): boolean;
+// The view beside a second parameter of several types.
+/** @param data {@slice view} read before the call returns */
+export declare function peekAs(label: string | Item, data: BufferSource): string;
 
 export declare function slab(kind: string): ArrayBuffer | ArrayBufferView;
 export declare function maybeSlab(kind?: string): BufferSource | undefined;

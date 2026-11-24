@@ -836,6 +836,81 @@ extern "C" {
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
+    #[wasm_bindgen(js_name = "peekAs")]
+    fn __peek_as(label: &str, data: BufferSource) -> String;
+}
+#[doc = " * `data` - read before the call returns"]
+pub fn peek_as(label: &str, data: impl ::core::convert::Into<BufferSource>) -> String {
+    __peek_as(label, data.into())
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "peekAs")]
+    fn __try_peek_as(label: &str, data: BufferSource) -> Result<String, JsValue>;
+}
+#[doc = " * `data` - read before the call returns"]
+pub fn try_peek_as(
+    label: &str,
+    data: impl ::core::convert::Into<BufferSource>,
+) -> Result<String, JsValue> {
+    __try_peek_as(label, data.into())
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "peekAs")]
+    fn __peek_as_with_item(label: &Item, data: BufferSource) -> String;
+}
+#[doc = " * `data` - read before the call returns"]
+pub fn peek_as_with_item(label: &Item, data: impl ::core::convert::Into<BufferSource>) -> String {
+    __peek_as_with_item(label, data.into())
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "peekAs")]
+    fn __try_peek_as_with_item(label: &Item, data: BufferSource) -> Result<String, JsValue>;
+}
+#[doc = " * `data` - read before the call returns"]
+pub fn try_peek_as_with_item(
+    label: &Item,
+    data: impl ::core::convert::Into<BufferSource>,
+) -> Result<String, JsValue> {
+    __try_peek_as_with_item(label, data.into())
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[doc = " * `data` - read before the call returns"]
+    #[wasm_bindgen(js_name = "peekAs")]
+    pub fn peek_as_with_slice(label: &str, #[wasm_bindgen(slice = "view")] data: &[u8]) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[doc = " * `data` - read before the call returns"]
+    #[wasm_bindgen(catch, js_name = "peekAs")]
+    pub fn try_peek_as_with_slice(
+        label: &str,
+        #[wasm_bindgen(slice = "view")] data: &[u8],
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[doc = " * `data` - read before the call returns"]
+    #[wasm_bindgen(js_name = "peekAs")]
+    pub fn peek_as_with_item_and_slice(
+        label: &Item,
+        #[wasm_bindgen(slice = "view")] data: &[u8],
+    ) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[doc = " * `data` - read before the call returns"]
+    #[wasm_bindgen(catch, js_name = "peekAs")]
+    pub fn try_peek_as_with_item_and_slice(
+        label: &Item,
+        #[wasm_bindgen(slice = "view")] data: &[u8],
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
     #[wasm_bindgen(js_name = "slab")]
     pub fn slab_js_buffer(kind: &str) -> EchoReturnKind;
     #[wasm_bindgen(js_name = "slab")]
