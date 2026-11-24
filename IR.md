@@ -796,8 +796,9 @@ module: workers-types declares `DurableObjectNamespace` as a class, but
 workerd has no such global. The bridge resolves each class path once, at
 instantiate time, and for a class with no value:
 
-* a plain result or argument check degrades to the interface test (a
-  non-null object);
+* a value check (a plain result or argument, a future's resolution, a
+  host array's element) degrades to the interface test (a non-null
+  object);
 * its arm test never matches, so discrimination falls through to later
   arms;
 * `("tw:instanceof", ...)` returns 0.

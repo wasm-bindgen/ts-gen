@@ -1,3 +1,9 @@
 tw:instanceof Absent
 tw:instanceof Present
 tw:instanceof ns.Deep
+tw:future poll
+tw:future take<Absent>
+tw:future take<Present>
+tw:future error<err>
+tw:future drop
+export tw:future/wake

@@ -24,6 +24,8 @@ deep(): ns.Deep;
 pick(): Pick;
 only(): Only;
 present(): Present;
+later(): future<Absent>;
+laterPresent(): future<Present>;
 export take(a: Absent): u32;
 
 module "./host.mjs" {

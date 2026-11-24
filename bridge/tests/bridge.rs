@@ -720,6 +720,7 @@ fixtures! {
     linear_wtf16 => "linear-wtf16",
     nested_enums => "nested-enums",
     absent_classes => "absent-classes",
+    absent_classes_host => "absent-classes-host",
     rest_callbacks => "rest-callbacks",
     never => "never",
     constructor_values => "constructor-values",
