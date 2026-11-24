@@ -816,6 +816,55 @@ fn type_args(args: &[TypeArg]) -> Json {
     Json::Arr(args.iter().map(arg).collect())
 }
 
+/// A future operation's subject with each of `value`'s type parameters
+/// erased to `Any`: a type parameter names nothing outside its member, so
+/// the operation on it is the one on its erasure (§16). `take<T?>` is
+/// `take<Any?>`, `take<D1Result<T>>` is `take<D1Result<Any>>`. The names
+/// come from `value`'s layout, so a type parameter that shadows a
+/// declaration (`get<Box>(): future<Box?>`) is erased too.
+fn erased_op_type(l: &Layouts<'_>, value: &Repr) -> String {
+    let mut names = Vec::new();
+    type_params(value, &mut names);
+    if names.is_empty() {
+        return value.ty.clone();
+    }
+    let Ok(t) = crate::text::parse_type(&value.ty) else {
+        return value.ty.clone();
+    };
+    let t = t.map_named(&|r| {
+        let param = matches!(&r.path.segments[..], [n] if names.contains(n)) && r.args.is_empty();
+        param.then_some(Type::Any)
+    });
+    l.keys.ty(&t, &Context::default())
+}
+
+/// The type parameters `r` names, in its layout.
+fn type_params(r: &Repr, out: &mut Vec<String>) {
+    match &r.kind {
+        Kind::Erased { .. } => out.push(r.ty.trim_end_matches('?').into()),
+        Kind::Array { elem, .. } => type_params(elem, out),
+        Kind::Tuple { elems, .. } => elems.iter().for_each(|e| type_params(e, out)),
+        Kind::Host { of, .. } => match of {
+            Host::Class { args, .. } => args.iter().for_each(|a| arg_params(a, out)),
+            Host::Box(inner) => type_params(inner, out),
+            Host::Future { value, .. } => type_params(value, out),
+            Host::Any => {}
+        },
+        _ => {}
+    }
+}
+
+fn arg_params(a: &TypeArg, out: &mut Vec<String>) {
+    match &a.of {
+        ArgOf::Param(n) => out.push(n.clone()),
+        ArgOf::Class { args, .. } | ArgOf::Tuple(args) => {
+            args.iter().for_each(|a| arg_params(a, out))
+        }
+        ArgOf::Array(e) => arg_params(e, out),
+        _ => {}
+    }
+}
+
 /// A type's layout: its canonical spelling, its wire values, and what it is.
 pub fn repr(l: &Layouts<'_>, r: &Repr) -> Json {
     let w = l.wire(r).map(|w| wire(&w)).unwrap_or(Json::Null);
@@ -918,10 +967,16 @@ pub fn repr(l: &Layouts<'_>, r: &Repr) -> Json {
                     .set("of", Json::str("future"))
                     .set("value", repr(l, value))
                     .set("rejection", enum_layout(l, error))
-                    .set("take", import(protocol::future_take(&value.ty)))
+                    .set(
+                        "take",
+                        import(protocol::future_take(&erased_op_type(l, value))),
+                    )
                     .set("errorOp", import(protocol::future_error(&error.path)))
                     .set("new", import(protocol::future_new()))
-                    .set("resolve", import(protocol::future_resolve(&value.ty)))
+                    .set(
+                        "resolve",
+                        import(protocol::future_resolve(&erased_op_type(l, value))),
+                    )
                     .set("reject", import(protocol::future_reject(&error.path))),
             };
             nullable(o, *n)
