@@ -79,7 +79,9 @@ const refs = (fs) => {
   return [base, fs.length];
 };
 const states = (fs) => [...L.take(...L.call("future:states", ...refs(fs)))];
-const watch = (fs, w) => L.call("future:watch_race", ...refs(fs), w);
+const listen = (f, w) => L.call("future:add_listener", f, w);
+const listenAll = (fs, w) => L.call("future:add_listener_all", ...refs(fs), w);
+const unlistenAll = (fs, w) => L.call("future:remove_listener_all", ...refs(fs), w);
 const err = L.ex["tag:err"];
 const fetchError = L.ex["tag:FetchError"];
 // A read's failure, thrown to the future's `E` with its message.
@@ -91,16 +93,20 @@ api.next = new Promise((r) => (resolve = r));
 let f = L.call("Api#fetch(str)", api, ...L.str("u"));
 assert.equal(state(f), 0);
 assert.deepEqual(L.call("future:get<str,FetchError>", f), [0, 0, 0], "no value yet");
-L.call("future:watch", f, 7);
-L.call("future:watch", f, 7);
-L.call("future:watch", f, 8);
+listen(f, 7);
+listen(f, 7);
+listen(f, 8);
+listen(f, 5);
+L.call("future:remove_listener", f, 5);
+// Removing a listener that isn't there does nothing.
+L.call("future:remove_listener", f, 4);
 resolve("body");
 await tick();
-assert.deepEqual(wakes, [7, 8], "a waker is woken once");
+assert.deepEqual(wakes, [7, 8], "a listener is woken once, and a removed one not at all");
 assert.equal(state(f), 1);
 assert.deepEqual(states([f]), [1]);
 // A settled future wakes nothing.
-L.call("future:watch", f, 6);
+listen(f, 6);
 // `get` is the value's option, lowered afresh at each read.
 for (let i = 0; i < 2; i++) {
   const [present, ...s] = L.call("future:get<str,FetchError>", f);
@@ -108,7 +114,8 @@ for (let i = 0; i < 2; i++) {
   assert.equal(L.takeStr(...s), "body");
 }
 L.throwsType(() => L.call("future:get<str,FetchError>", {}), /a future/);
-L.throwsType(() => L.call("future:watch", {}, 1), /a future/);
+L.throwsType(() => listen({}, 1), /a future/);
+L.throwsType(() => L.call("future:remove_listener", {}, 1), /a future/);
 
 // Rejections map through `E`, read as often as asked.
 api.next = Promise.reject(new DOMException("gone", "AbortError"));
@@ -174,7 +181,7 @@ assert.match(L.call("future:error<err>", f)[1], /never/);
 // settles as its promise does.
 f = L.call("Api#slow(str)", api, ...L.str("u"));
 assert.equal(state(f), 0);
-L.call("future:watch", f, 9);
+listen(f, 9);
 L.call("future:cancel", f);
 assert.ok(api.signal.aborted);
 assert.equal(state(f), 0);
@@ -186,9 +193,8 @@ assert.match(L.call("future:error<err>", f)[1], /aborted/);
 L.call("future:cancel", f);
 assert.equal(state(f), 2);
 
-// Futures are watched together through the language's own array: one
-// wake for the first of them to settle, and none until they're watched
-// again.
+// A listener is added to, and removed from, several futures at once
+// through the language's own array: it's woken as each of them settles.
 {
   const rs = [];
   const fs = [0, 1, 2].map(() => {
@@ -197,42 +203,37 @@ assert.equal(state(f), 2);
   });
   assert.deepEqual(states(fs), [0, 0, 0]);
   wakes.length = 0;
-  watch(fs, 20);
-  // A future is in as many watches as name it.
-  watch([fs[1]], 21);
-  L.call("future:watch", fs[1], 22);
+  listenAll(fs, 20);
+  // A future holds a listener once, however it was added.
+  listenAll([fs[1]], 20);
+  listen(fs[1], 20);
+  listen(fs[1], 21);
   rs[1](1);
+  await tick();
+  assert.deepEqual(wakes, [20, 21], "one wake a listener for a future");
+  assert.deepEqual(states(fs), [0, 1, 0], "a state says nothing of the value");
+  // The rest still hold it, until it's removed from them.
   rs[2]("x");
   await tick();
-  assert.deepEqual(wakes, [20, 21, 22], "one wake a watch");
-  assert.deepEqual(states(fs), [0, 1, 1], "a state says nothing of the value");
-  // Settled futures wake nothing, and a spent watch stays spent.
-  watch([fs[1], fs[2]], 23);
+  assert.deepEqual(wakes, [20, 21, 20]);
+  unlistenAll(fs, 20);
   rs[0](0);
   await tick();
-  assert.deepEqual(wakes, [20, 21, 22]);
-  assert.equal(state(fs[0]), 1);
+  assert.deepEqual(wakes, [20, 21, 20]);
+  assert.deepEqual(states(fs), [1, 1, 1]);
+  // Settled futures wake nothing.
+  listenAll(fs, 22);
+  await tick();
+  assert.deepEqual(wakes, [20, 21, 20]);
   L.throwsType(() => states([fs[0], {}]), /a future/);
-  L.throwsType(() => watch([{}], 1), /a future/);
-}
-
-// A future holds a waker once, however often it's watched with it.
-{
-  const rs = [];
-  const fs = [0, 1].map(() => {
-    api.next = new Promise((r) => rs.push(r));
-    return L.call("Api#number()", api);
-  });
-  wakes.length = 0;
-  for (let i = 0; i < 3; i++) watch(fs, 30);
-  L.call("future:watch", fs[1], 31);
-  watch([fs[1]], 31);
-  rs[0](0);
+  // An element that isn't a future fails the whole call.
+  api.next = new Promise((r) => rs.push(r));
+  const g = L.call("Api#number()", api);
+  L.throwsType(() => listenAll([g, {}], 23), /a future/);
+  L.throwsType(() => unlistenAll([g, {}], 23), /a future/);
+  rs[3](0);
   await tick();
-  assert.deepEqual(wakes, [30]);
-  rs[1](1);
-  await tick();
-  assert.deepEqual(wakes, [30, 31]);
+  assert.deepEqual(wakes, [20, 21, 20]);
 }
 
 // A cancel signal joins the caller's: the caller's own aborts the call,

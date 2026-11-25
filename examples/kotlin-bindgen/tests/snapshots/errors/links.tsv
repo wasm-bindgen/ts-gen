@@ -50,5 +50,5 @@ js_code	fixtures.errors.flat.unbox_StorageOrDOMExceptionErr	tw:unbox	StorageOrDO
 js_code	fixtures.errors.flat.box_StorageOrDOMExceptionErr	tw:box	StorageOrDOMExceptionErr
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

@@ -2034,8 +2034,9 @@ impl<'a> Layouts<'a> {
         })
     }
 
-    /// `("tw:future", "watch_race")`: `(W(arr<Any>), i32)` (§16).
-    pub fn future_watch_race(&self) -> Result<Signature> {
+    /// `("tw:future", "add_listener_all")` and `remove_listener_all`:
+    /// `(W(arr<Any>), i32)` (§16).
+    pub fn future_listener_all(&self) -> Result<Signature> {
         let cx = Context::default();
         let waker = self.lower(&Type::Scalar(Scalar::I32), &cx, Flow::ToJs)?;
         Ok(Signature {
@@ -2052,8 +2053,8 @@ impl<'a> Layouts<'a> {
         self.position(Pos::Param(0), r)
     }
 
-    /// `("tw:future", "suspend_race")`: `(W(arr<Any>)) -> i32` (§16).
-    pub fn future_suspend_race(&self) -> Result<Signature> {
+    /// `("tw:future", "suspend_all")`: `(W(arr<Any>)) -> i32` (§16).
+    pub fn future_suspend_all(&self) -> Result<Signature> {
         let cx = Context::default();
         Ok(Signature {
             params: vec![self.futures(&cx)?],
@@ -2183,7 +2184,9 @@ impl<'a> Layouts<'a> {
             (Some(tw::FUTURE), "cancel") => f(vec![EXTERNREF], vec![]),
             (Some(tw::FUTURE), "suspend") if self.profile.jspi => f(vec![EXTERNREF], vec![I32]),
             (Some(tw::FUTURE), "new") => f(vec![], vec![EXTERNREF, EXTERNREF]),
-            (Some(tw::FUTURE), "watch") => f(vec![EXTERNREF, I32], vec![]),
+            (Some(tw::FUTURE), "add_listener" | "remove_listener") => {
+                f(vec![EXTERNREF, I32], vec![])
+            }
             (Some(tw::LOOP), "work_available" | "drop") => f(vec![I32], vec![]),
             (None, tw::REALLOC) => {
                 let p = ptr?;

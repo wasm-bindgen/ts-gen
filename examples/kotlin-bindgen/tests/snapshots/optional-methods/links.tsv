@@ -52,5 +52,5 @@ js_code	fixtures.optional_methods.flat.box_fn_str	tw:box	fn(str)
 js_code	fixtures.optional_methods.flat.unbox_fn_str	tw:unbox	fn(str)
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

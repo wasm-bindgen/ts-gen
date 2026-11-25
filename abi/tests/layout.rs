@@ -746,7 +746,14 @@ fn protocol_operations() {
     assert_eq!(op(&lin, None, "tw:loop/next_sleep"), "(i32) -> (i64)");
     assert_eq!(op(&lin, Some("tw:future"), "state"), "(externref) -> (i32)");
     assert_eq!(op(&lin, Some("tw:future"), "cancel"), "(externref)");
-    assert_eq!(op(&lin, Some("tw:future"), "watch"), "(externref, i32)");
+    assert_eq!(
+        op(&lin, Some("tw:future"), "add_listener"),
+        "(externref, i32)"
+    );
+    assert_eq!(
+        op(&lin, Some("tw:future"), "remove_listener"),
+        "(externref, i32)"
+    );
     let host = profile("all-host");
     for (p, states, watch) in [
         (&lin, "(i32, i32) -> (i32, i32)", "(i32, i32, i32)"),
@@ -759,7 +766,7 @@ fn protocol_operations() {
     ] {
         let l = Layouts::new(&ir, p);
         assert_eq!(l.future_states().unwrap().core().to_string(), states);
-        assert_eq!(l.future_watch_race().unwrap().core().to_string(), watch);
+        assert_eq!(l.future_listener_all().unwrap().core().to_string(), watch);
     }
     assert_eq!(
         op(&lin, Some("tw:future"), "new"),

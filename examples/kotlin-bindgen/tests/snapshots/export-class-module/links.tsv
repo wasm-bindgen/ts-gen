@@ -23,5 +23,5 @@ js_code	fixtures.export_class_module.flat.box_fn_future_unit	tw:box	fn()->future
 js_code	fixtures.export_class_module.flat.unbox_fn_future_unit	tw:unbox	fn()->future<unit>
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

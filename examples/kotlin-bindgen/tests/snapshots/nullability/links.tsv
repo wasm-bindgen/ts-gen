@@ -32,5 +32,5 @@ js_code	fixtures.nullability.flat.box_fn_str_str	tw:box	fn(str?)->str
 js_code	fixtures.nullability.flat.unbox_fn_str_str	tw:unbox	fn(str?)->str
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

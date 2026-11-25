@@ -219,5 +219,5 @@ js_code	fixtures.generics.flat.call_fn_Event	tw:call	fn(Event)
 js_code	fixtures.generics.flat.call_fn_MessageEventOrCloseEvent	tw:call	fn(MessageEventOrCloseEvent)
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

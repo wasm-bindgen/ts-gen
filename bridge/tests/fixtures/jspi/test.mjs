@@ -49,7 +49,7 @@ const peeks = [app.peek(), app.peek()];
 s.resolvers[0](7);
 assert.deepEqual(await Promise.all(peeks), [1, 1]);
 
-// `suspend_race` resumes with the first future to settle, leaving the
+// `suspend_all` resumes with the first future to settle, leaving the
 // others to the language, and with the lowest of those already settled.
 const r = new Api();
 const raced = app.race(r);

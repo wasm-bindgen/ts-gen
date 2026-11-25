@@ -17,5 +17,5 @@ js_code	fixtures.construct_values.flat.Count_count	remote	Count#count()
 js_code	fixtures.construct_values.flat.Count_new_f64	remote	Count.new(f64)
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

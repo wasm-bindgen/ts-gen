@@ -39,7 +39,7 @@ const list = (fs) => {
   api.list = fs;
   return ex["call:Api#futures()"](api);
 };
-ex["call:future:watch"](f, 4);
+ex["call:future:add_listener"](f, 4);
 await tick();
 assert.deepEqual(wakes, [4]);
 assert.equal(ex["call:future:state"](f), 1);
@@ -56,7 +56,7 @@ assert.deepEqual(scratchUse(), base);
 let res;
 api.next = new Promise((r) => (res = r));
 const g = ex["call:Api#fetch()"](api);
-ex["call:future:watch_race"](list([f, g]), 5);
+ex["call:future:add_listener_all"](list([f, g]), 5);
 ex["tw:terminated"].value = 1;
 res("x");
 await tick();

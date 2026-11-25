@@ -210,8 +210,12 @@ pub fn future_cancel() -> Import {
     Import::new(FUTURE, "cancel")
 }
 
-pub fn future_watch() -> Import {
-    Import::new(FUTURE, "watch")
+pub fn future_add_listener() -> Import {
+    Import::new(FUTURE, "add_listener")
+}
+
+pub fn future_remove_listener() -> Import {
+    Import::new(FUTURE, "remove_listener")
 }
 
 /// `(externref f) -> i32`, under `jspi = on`: suspends until `f` settles.
@@ -235,14 +239,18 @@ pub fn future_states() -> Import {
     Import::new(FUTURE, "states")
 }
 
-pub fn future_watch_race() -> Import {
-    Import::new(FUTURE, "watch_race")
+pub fn future_add_listener_all() -> Import {
+    Import::new(FUTURE, "add_listener_all")
+}
+
+pub fn future_remove_listener_all() -> Import {
+    Import::new(FUTURE, "remove_listener_all")
 }
 
 /// `(W(arr<Any>)) -> i32`, under `jspi = on`: suspends until one of the
 /// futures settles.
-pub fn future_suspend_race() -> Import {
-    Import::new(FUTURE, "suspend_race")
+pub fn future_suspend_all() -> Import {
+    Import::new(FUTURE, "suspend_all")
 }
 
 pub fn loop_work_available() -> Import {

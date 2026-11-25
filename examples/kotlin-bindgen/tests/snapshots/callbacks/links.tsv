@@ -19,5 +19,5 @@ js_code	fixtures.callbacks.flat.box_fn_Next_f64_f64_f64	tw:box	fn(Next<f64>,f64)
 js_code	fixtures.callbacks.flat.unbox_fn_Next_f64_f64_f64	tw:unbox	fn(Next<f64>,f64)->f64
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

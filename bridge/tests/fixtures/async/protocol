@@ -7,9 +7,11 @@ tw:future get<unit>
 tw:future error<FetchError>
 tw:future error<err>
 tw:future cancel
-tw:future watch
+tw:future add_listener
+tw:future remove_listener
 tw:future states
-tw:future watch_race
+tw:future add_listener_all
+tw:future remove_listener_all
 tw:future new
 tw:future resolve<u32>
 tw:future reject<err>

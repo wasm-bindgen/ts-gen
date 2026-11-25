@@ -5,5 +5,5 @@ js_code	fixtures.never_params.flat.unbox_Unit	tw:unbox	Unit_
 js_code	fixtures.never_params.flat.box_Unit	tw:box	Unit_
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

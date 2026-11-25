@@ -19,5 +19,5 @@ js_code	fixtures.sequences.flat.write_f64_Float32Array	tw:js/global	write(f64,Fl
 js_code	fixtures.sequences.flat.write_f64_f32	tw:js/global	write(f64,f32[])
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

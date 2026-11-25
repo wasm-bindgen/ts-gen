@@ -97,7 +97,7 @@ Async: an exported `suspend` function makes its future with
 it with `resolve<T>`, or `reject<E>` with the task's exception as `E`.
 `Future.await` reads the future's value through `get<T>`, an option. With
 none it reads the `state`: while the future is pending the task parks, with
-a waker `watch` leaves on the future. `tw:future/wake` reposts the task,
+a waker `add_listener` leaves on the future. `tw:future/wake` reposts the task,
 and the bridge ticks the loop through `tw:loop/tick` and `next_sleep`. A
 rejected JS future throws its typed exception, through `error<E>`, and so
 does a fulfilled one whose value `get<T>` finds is no `T`, through

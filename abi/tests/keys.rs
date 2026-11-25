@@ -340,9 +340,23 @@ fn protocol_names() {
         i("tw:future", "error<FetchError>")
     );
     assert_eq!(protocol::future_cancel(), i("tw:future", "cancel"));
-    assert_eq!(protocol::future_watch(), i("tw:future", "watch"));
+    assert_eq!(
+        protocol::future_add_listener(),
+        i("tw:future", "add_listener")
+    );
+    assert_eq!(
+        protocol::future_remove_listener(),
+        i("tw:future", "remove_listener")
+    );
     assert_eq!(protocol::future_states(), i("tw:future", "states"));
-    assert_eq!(protocol::future_watch_race(), i("tw:future", "watch_race"));
+    assert_eq!(
+        protocol::future_add_listener_all(),
+        i("tw:future", "add_listener_all")
+    );
+    assert_eq!(
+        protocol::future_remove_listener_all(),
+        i("tw:future", "remove_listener_all")
+    );
     assert_eq!(protocol::future_new(), i("tw:future", "new"));
     assert_eq!(
         protocol::future_resolve("u32"),

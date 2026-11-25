@@ -19,5 +19,5 @@ js_code	fixtures.export_class.flat.get_Response	tw:future	get<Response>
 js_code	fixtures.export_class.flat.error_err	tw:future	error<err>
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

@@ -90,7 +90,7 @@ function. The bindings run one tw loop over Zena's microtask queue:
 awaiting a JS future reads its value with `get<T>`, which has one once the
 future is fulfilled, and validates it: a value that isn't a `T` fails the
 await with the error a rejection would. With no value it reads the
-`state`, and while that's pending parks a waker on the future (`watch`);
+`state`, and while that's pending leaves a waker on the future (`add_listener`);
 `tw:future/wake` reads it again. A completion (or a callback's return)
 asks the bridge for a tick (`work_available`), which drains the queue in
 `tw:loop/tick`. Cancelling an awaiter requests the JS future's

@@ -539,7 +539,7 @@ class $Future {
     this.promise = promise;
     this.state = 0;
     this.value = undefined;
-    this.watchers = null;
+    this.listeners = null;
     this.cancel = cancel;
     promise.then(
       (v) => {
@@ -560,9 +560,9 @@ class $Future {
     this.state = state;
     this.value = value;
     this.cancel = null;
-    const ws = this.watchers;
-    this.watchers = null;
-    if (ws) for (const [w, watch] of ws) watch === true ? $wake(w) : watch.fire(this);
+    const ls = this.listeners;
+    this.listeners = null;
+    if (ls) for (const l of ls) typeof l === "number" ? $wake(l) : l.fire(this);
   }
 }
 
@@ -573,20 +573,6 @@ function $future(v, check, cancel) {
 // A synchronous throw folded into a rejected future (§16).
 function $rejected(e) {
   return new $Future(Promise.reject(e), null, null);
-}
-
-// A suspension parked on futures, among their watchers under itself:
-// `done(i)` runs once, when the first of them, `futures[i]`, settles.
-class $Park {
-  constructor(futures, done) {
-    this.futures = futures;
-    this.done = done;
-  }
-
-  fire(f) {
-    for (const g of this.futures) g.watchers?.delete(this);
-    this.done(this.futures.indexOf(f));
-  }
 }
 
 function $promise(v) {
@@ -623,33 +609,20 @@ function $cancelFuture(f) {
   }
 }
 
-// Parks a waker on a pending future (IR.md §16): it's woken once, when
-// the future settles. A future holds a waker once, as `true` or as the
-// `$Watch` it shares with other futures, and the latest watch replaces it.
-// A parked suspension (`$Park`) is among them too.
-function $watch(f, w) {
-  if ($isFuture(f).state === 0) (f.watchers ??= new Map()).set(w, true);
+// A pending future's listeners (IR.md §16): the wakers the language adds,
+// each woken when it settles, and the suspensions parked on it.
+function $addListener(f, w) {
+  if ($isFuture(f).state === 0) (f.listeners ??= new Set()).add(w);
 }
 
-// One waker parked on several futures, spent by the first to settle.
-class $Watch {
-  constructor(waker, futures) {
-    this.waker = waker;
-    this.futures = futures;
-  }
-
-  fire() {
-    const w = this.waker;
-    for (const f of this.futures) if (f.watchers?.get(w) === this) f.watchers.delete(w);
-    $wake(w);
-  }
+function $removeListener(f, w) {
+  $isFuture(f).listeners?.delete(w);
 }
 
-function $watchRace(fs, w) {
-  const pending = [];
-  for (const f of fs) if ($isFuture(f).state === 0) pending.push(f);
-  const watch = new $Watch(w, pending);
-  for (const f of pending) (f.watchers ??= new Map()).set(w, watch);
+// `each(f, w)` for every future of `fs`, or for none if one isn't a future.
+function $each(fs, each, w) {
+  for (const f of fs) $isFuture(f);
+  for (const f of fs) each(f, w);
 }
 
 function $states(fs) {
@@ -1110,13 +1083,18 @@ function $f23(f) {
   $cancelFuture(f);
 }
 
-// ("tw:future", "watch")
+// ("tw:future", "add_listener")
 function $f24(f, w) {
-  $watch(f, w);
+  $addListener(f, w);
+}
+
+// ("tw:future", "remove_listener")
+function $f25(f, w) {
+  $removeListener(f, w);
 }
 
 // ("tw:future", "states")
-function $f25(w0_0, w0_1) {
+function $f26(w0_0, w0_1) {
   const cx = $cx;
   const cxm = cx.n;
   try {
@@ -1135,33 +1113,38 @@ function $f25(w0_0, w0_1) {
   }
 }
 
-// ("tw:future", "watch_race")
-function $f26(w0_0, w0_1, w1_0) {
-  $watchRace($h6(w0_0, w0_1), w1_0);
+// ("tw:future", "add_listener_all")
+function $f27(w0_0, w0_1, w1_0) {
+  $each($h6(w0_0, w0_1), $addListener, w1_0);
+}
+
+// ("tw:future", "remove_listener_all")
+function $f28(w0_0, w0_1, w1_0) {
+  $each($h6(w0_0, w0_1), $removeListener, w1_0);
 }
 
 // ("tw:future", "new")
-function $f27() {
+function $f29() {
   return $newFuture();
 }
 
 // ("tw:future", "resolve<u32>")
-function $f28(w0_0, w1_0) {
+function $f30(w0_0, w1_0) {
   $resolver(w0_0).resolve((w1_0 >>> 0));
 }
 
 // ("tw:future", "reject<err>")
-function $f29(w0_0, w1_0, w1_1) {
+function $f31(w0_0, w1_0, w1_1) {
   $resolver(w0_0).reject($h7(w1_0, w1_1));
 }
 
 // ("tw:loop", "work_available")
-function $f30(l) {
+function $f32(l) {
   $loops.available(l);
 }
 
 // ("tw:loop", "drop")
-function $f31(l) {
+function $f33(l) {
   $loops.drop(l);
 }
 
@@ -1211,7 +1194,7 @@ export function instantiate(language, bridge, imports = {}) {
   if ($B) throw new Error("this bridge is already instantiated");
   $cls0 = $class(globalThis.AbortSignal);
   $B = new WebAssembly.Instance(bridge, {
-    "tw:glue": { r18: $f18, r19: $f19, r21: $f21$r, r22: $f22$r, r25: $f25 },
+    "tw:glue": { r18: $f18, r19: $f19, r21: $f21$r, r22: $f22$r, r26: $f26 },
   }).exports;
   $S = new $Scratch($B);
   const instance = new WebAssembly.Instance(language, {
@@ -1243,16 +1226,18 @@ export function instantiate(language, bridge, imports = {}) {
       "error<FetchError>": $B.f21,
       "error<err>": $B.f22,
       "cancel": $f23,
-      "watch": $f24,
-      "states": $B.f25,
-      "watch_race": $f26,
-      "new": $f27,
-      "resolve<u32>": $f28,
-      "reject<err>": $f29,
+      "add_listener": $f24,
+      "remove_listener": $f25,
+      "states": $B.f26,
+      "add_listener_all": $f27,
+      "remove_listener_all": $f28,
+      "new": $f29,
+      "resolve<u32>": $f30,
+      "reject<err>": $f31,
     },
     "tw:loop": {
-      "work_available": $f30,
-      "drop": $f31,
+      "work_available": $f32,
+      "drop": $f33,
     },
     "tw:tag": {
       "err": $tag0,

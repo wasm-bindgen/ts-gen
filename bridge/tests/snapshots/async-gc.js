@@ -227,7 +227,7 @@ class $Future {
     this.promise = promise;
     this.state = 0;
     this.value = undefined;
-    this.watchers = null;
+    this.listeners = null;
     this.cancel = cancel;
     promise.then(
       (v) => {
@@ -248,9 +248,9 @@ class $Future {
     this.state = state;
     this.value = value;
     this.cancel = null;
-    const ws = this.watchers;
-    this.watchers = null;
-    if (ws) for (const [w, watch] of ws) watch === true ? $wake(w) : watch.fire(this);
+    const ls = this.listeners;
+    this.listeners = null;
+    if (ls) for (const l of ls) typeof l === "number" ? $wake(l) : l.fire(this);
   }
 }
 
@@ -261,20 +261,6 @@ function $future(v, check, cancel) {
 // A synchronous throw folded into a rejected future (§16).
 function $rejected(e) {
   return new $Future(Promise.reject(e), null, null);
-}
-
-// A suspension parked on futures, among their watchers under itself:
-// `done(i)` runs once, when the first of them, `futures[i]`, settles.
-class $Park {
-  constructor(futures, done) {
-    this.futures = futures;
-    this.done = done;
-  }
-
-  fire(f) {
-    for (const g of this.futures) g.watchers?.delete(this);
-    this.done(this.futures.indexOf(f));
-  }
 }
 
 function $promise(v) {
@@ -293,33 +279,16 @@ function $option(f, unit) {
   return unit ? [] : [f.value];
 }
 
-// Parks a waker on a pending future (IR.md §16): it's woken once, when
-// the future settles. A future holds a waker once, as `true` or as the
-// `$Watch` it shares with other futures, and the latest watch replaces it.
-// A parked suspension (`$Park`) is among them too.
-function $watch(f, w) {
-  if ($isFuture(f).state === 0) (f.watchers ??= new Map()).set(w, true);
+// A pending future's listeners (IR.md §16): the wakers the language adds,
+// each woken when it settles, and the suspensions parked on it.
+function $addListener(f, w) {
+  if ($isFuture(f).state === 0) (f.listeners ??= new Set()).add(w);
 }
 
-// One waker parked on several futures, spent by the first to settle.
-class $Watch {
-  constructor(waker, futures) {
-    this.waker = waker;
-    this.futures = futures;
-  }
-
-  fire() {
-    const w = this.waker;
-    for (const f of this.futures) if (f.watchers?.get(w) === this) f.watchers.delete(w);
-    $wake(w);
-  }
-}
-
-function $watchRace(fs, w) {
-  const pending = [];
-  for (const f of fs) if ($isFuture(f).state === 0) pending.push(f);
-  const watch = new $Watch(w, pending);
-  for (const f of pending) (f.watchers ??= new Map()).set(w, watch);
+// `each(f, w)` for every future of `fs`, or for none if one isn't a future.
+function $each(fs, each, w) {
+  for (const f of fs) $isFuture(f);
+  for (const f of fs) each(f, w);
 }
 
 function $states(fs) {
@@ -451,9 +420,9 @@ function $f3(w0_0) {
   }
 }
 
-// ("tw:future", "watch")
+// ("tw:future", "add_listener")
 function $f4(f, w) {
-  $watch(f, w);
+  $addListener(f, w);
 }
 
 // ("tw:future", "states")
@@ -467,9 +436,9 @@ function $f5(w0_0, w0_1) {
   return t2;
 }
 
-// ("tw:future", "watch_race")
+// ("tw:future", "add_listener_all")
 function $f6(w0_0, w0_1, w1_0) {
-  $watchRace($h3(w0_0, w0_1), w1_0);
+  $each($h3(w0_0, w0_1), $addListener, w1_0);
 }
 
 // ("tw:future", "new")
@@ -533,9 +502,9 @@ export function instantiate(language, bridge, imports = {}) {
     "tw:future": {
       "state": $f2,
       "get<str>": $B.f3,
-      "watch": $f4,
+      "add_listener": $f4,
       "states": $B.f5,
-      "watch_race": $B.f6,
+      "add_listener_all": $B.f6,
       "new": $f7,
       "resolve<str>": $B.f8,
     },
@@ -544,7 +513,10 @@ export function instantiate(language, bridge, imports = {}) {
   $T = $table($X["tw:table"], $X["tw:table/stack_base"].value, $X["tw:table/const_base"].value, $X["tw:table/heap_base"].value);
   $E[0] = $X["app.run()"];
   $checkLive = () => {
-    if (instance.exports["tw:terminated"].value !== 0) throw new Error("Module terminated");
+    if (instance.exports["tw:terminated"].value !== 0) {
+      const e = new Error("Module terminated");
+      throw e;
+    }
   };
   return instance;
 }

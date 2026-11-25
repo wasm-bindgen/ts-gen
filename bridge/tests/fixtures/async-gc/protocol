@@ -1,8 +1,8 @@
 tw:future state
 tw:future get<str>
-tw:future watch
+tw:future add_listener
 tw:future states
-tw:future watch_race
+tw:future add_listener_all
 tw:future new
 tw:future resolve<str>
 export tw:future/wake

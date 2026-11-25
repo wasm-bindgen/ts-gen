@@ -17,8 +17,11 @@ declare function __tw_future_get_any(future: externref): inline (i32, externref 
 @external("tw:future", "error<err>", "tw")
 declare function __tw_future_error(future: externref): inline (i32, String);
 
-@external("tw:future", "watch", "tw")
-declare function __tw_future_watch(future: externref, waker: i32): void;
+@external("tw:future", "add_listener", "tw")
+declare function __tw_future_add_listener(future: externref, waker: i32): void;
+
+@external("tw:future", "remove_listener", "tw")
+declare function __tw_future_remove_listener(future: externref, waker: i32): void;
 
 @external("tw:future", "cancel", "tw")
 declare function __tw_future_cancel(future: externref): void;
@@ -73,7 +76,7 @@ class __TwAwait<T> implements __TwPoll {
       }
       let state = __tw_future_state(this.future);
       if (state == 0) {
-        __tw_future_watch(this.future, this.waker);
+        __tw_future_add_listener(this.future, this.waker);
         __tw_polls[this.waker] = this;
         return;
       }
@@ -103,6 +106,7 @@ export async function __tw_await_with<T>(
     return await a.completer.future;
   } cancel {
     __tw_polls.delete(waker);
+    __tw_future_remove_listener(future, waker);
     __tw_future_cancel(future);
   }
 }

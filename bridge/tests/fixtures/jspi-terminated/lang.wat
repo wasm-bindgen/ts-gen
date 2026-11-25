@@ -33,4 +33,10 @@
     (local.set $fut)
     (call $resolve (local.get $res) (local.get $v))
     (local.get $fut))
+
+  ;; Suspends holding a string argument, which the bridge frees once the
+  ;; call settles.
+  (func (export "app.echo(Api,str)") (param $api externref) (param $p i32) (param $n i32) (result externref)
+    (drop (call $suspend (call $later (local.get $api))))
+    (ref.null extern))
 )

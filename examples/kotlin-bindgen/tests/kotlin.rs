@@ -199,7 +199,7 @@ fn runtime(out: &mut Surface) {
     for (m, n, t) in [
         ("tw:future", "state", "(externref) -> (i32)"),
         ("tw:future", "cancel", "(externref) -> ()"),
-        ("tw:future", "watch", "(externref, i32) -> ()"),
+        ("tw:future", "add_listener", "(externref, i32) -> ()"),
         ("tw:loop", "work_available", "(i32) -> ()"),
     ] {
         out.optional.insert((m.into(), n.into()), t.into());

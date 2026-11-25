@@ -283,7 +283,7 @@ class $Future {
     this.promise = promise;
     this.state = 0;
     this.value = undefined;
-    this.watchers = null;
+    this.listeners = null;
     this.cancel = cancel;
     promise.then(
       (v) => {
@@ -304,9 +304,9 @@ class $Future {
     this.state = state;
     this.value = value;
     this.cancel = null;
-    const ws = this.watchers;
-    this.watchers = null;
-    if (ws) for (const [w, watch] of ws) watch === true ? $wake(w) : watch.fire(this);
+    const ls = this.listeners;
+    this.listeners = null;
+    if (ls) for (const l of ls) typeof l === "number" ? $wake(l) : l.fire(this);
   }
 }
 

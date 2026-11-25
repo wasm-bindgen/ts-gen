@@ -5,6 +5,7 @@
   (import "tw:glue" "g1" (func $g1 (param externref) (result i32)))
   (import "tw:glue" "r2" (func $r2 (param externref) (result i32)))
   (type $ft0 (func (param externref) (result externref)))
+  (type $ft1 (func (param externref i32 i32) (result externref)))
   (memory $m (export "memory") 1)
   (table $st (export "table") 0 externref)
   (global (export "hdr") i32 (i32.const 0))
@@ -65,7 +66,7 @@
   (func $leave
     (if (global.get $suspended)
       (then (call $restore (i32.const 72) (i32.const 0)) (global.set $suspended (i32.const 0)))))
-  (table $entries (export "entries") 1 funcref)
+  (table $entries (export "entries") 2 funcref)
   (func $s1 (export "s1") (param $p0 externref) (result i32)
     (local $l1 i32)
     (local.set $l1 (call $g1 (local.get $p0)))
@@ -87,6 +88,22 @@
     (block $done
     (local.set $l2 (block $catch (result exnref) (try_table (catch_all_ref $catch)
       (call_indirect $entries (type $ft0) (local.get $p0) (i32.const 0))
+      local.set $l1
+    ) (br $done)))
+    (call $leave)
+    (throw_ref (local.get $l2)))
+    (call $leave)
+    local.get $l1
+  )
+  (func $p1 (export "p1") (param $p0 externref) (param $p1 i32) (param $p2 i32) (result externref)
+    (local $l1 externref)
+    (local $l2 exnref)
+    (global.set $base (call $sp))
+    (global.set $tbase (call $tsp))
+    (global.set $suspended (i32.const 0))
+    (block $done
+    (local.set $l2 (block $catch (result exnref) (try_table (catch_all_ref $catch)
+      (call_indirect $entries (type $ft1) (local.get $p0) (local.get $p1) (local.get $p2) (i32.const 1))
       local.set $l1
     ) (br $done)))
     (call $leave)

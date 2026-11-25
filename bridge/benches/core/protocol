@@ -8,5 +8,5 @@ tw:unbox f64
 tw:call fn(i32)->i32
 export tw:call:fn(i32)->i32
 tw:future get<u32>
-tw:future watch
+tw:future add_listener
 export tw:future/wake

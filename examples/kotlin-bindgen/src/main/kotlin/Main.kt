@@ -44,7 +44,7 @@ fun checkProfile(p: Map<String, String>): String? {
 val RUNTIME_LINKS = listOf(
     "tsgen.runtime.futureState" to Import("tw:future", "state"),
     "tsgen.runtime.futureCancel" to Import("tw:future", "cancel"),
-    "tsgen.runtime.futureWatch" to Import("tw:future", "watch"),
+    "tsgen.runtime.futureAddListener" to Import("tw:future", "add_listener"),
     "tsgen.runtime.loopWorkAvailable" to Import("tw:loop", "work_available"),
 )
 

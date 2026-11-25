@@ -205,7 +205,7 @@ pub fn generate_opts(
             }
             _ => name.clone(),
         };
-        let suspends = matches!(func.op, plan::Op::Suspend | plan::Op::SuspendRace);
+        let suspends = matches!(func.op, plan::Op::Suspend | plan::Op::SuspendAll);
         let value = if gc {
             let export = format!("f{i}");
             w.forwarder(&export, &format!("g{i}"), func, area.as_ref())?;
@@ -288,12 +288,12 @@ pub fn generate_opts(
         });
     }
     // The language exports driving futures and loops (§16).
-    let watches = plan
+    let listens = plan
         .funcs
         .iter()
-        .any(|f| matches!(f.op, plan::Op::FutureWatch | plan::Op::WatchRace));
+        .any(|f| matches!(f.op, plan::Op::AddListener | plan::Op::AddListenerAll));
     let mut driving = Vec::new();
-    if watches {
+    if listens {
         driving.push(protocol::FUTURE_WAKE);
     }
     if g.loops {
@@ -314,7 +314,7 @@ pub fn generate_opts(
         || plan
             .funcs
             .iter()
-            .any(|f| matches!(f.op, plan::Op::Suspend | plan::Op::SuspendRace))
+            .any(|f| matches!(f.op, plan::Op::Suspend | plan::Op::SuspendAll))
     {
         glue_imports.push("wait: new WebAssembly.Suspending($wait)".into());
         glue_imports.push("stash: $stash".into());
@@ -363,7 +363,7 @@ pub fn generate_opts(
     } else {
         ""
     };
-    if watches || g.loops {
+    if listens || g.loops || profile.jspi {
         let live = if profile.termination_flag {
             "try {\n    $checkLive();\n    return true;\n  } catch {\n    return false;\n  }"
         } else {
@@ -371,21 +371,16 @@ pub fn generate_opts(
         };
         let _ = writeln!(js, "function $live() {{\n  {live}\n}}");
     }
-    if watches {
+    if listens {
         let wake = prop("$X", profile.name(protocol::FUTURE_WAKE));
         let _ = writeln!(js, "function $wake(w) {{\n  if ($live()) {wake}(w);\n}}");
     }
     if profile.jspi {
         // Once the language has terminated (§15), a parked stack stays
-        // parked, and the calls parked reject instead.
-        let check = if profile.termination_flag {
-            "  try {\n    $checkLive();\n  } catch (e) {\n    $terminate(e);\n    return;\n  }\n"
-        } else {
-            ""
-        };
+        // parked.
         let _ = writeln!(
             js,
-            "// Resumes a parked suspension with `v` (§16).\nfunction $resume(r, v) {{\n{check}  r(v);\n}}"
+            "// Resumes a parked suspension with `v` (§16).\nfunction $resume(r, v) {{\n  if ($live()) r(v);\n}}"
         );
     }
     if g.loops {
@@ -841,12 +836,14 @@ fn instantiate(
         } else {
             format!("{g}.value")
         };
+        // Under JSPI the calls in flight reject where it's first seen,
+        // their stacks left parked (§16).
+        let terminate = if p.jspi { "$terminate(e);\n      " } else { "" };
         let _ = writeln!(s, "  $checkLive = () => {{");
-        let _ = writeln!(
-            s,
-            "    if ({state} !== {}) throw new Error(\"Module terminated\");",
-            protocol::LIVE
-        );
+        let _ = writeln!(s, "    if ({state} !== {}) {{", protocol::LIVE);
+        let _ = writeln!(s, "      const e = new Error(\"Module terminated\");");
+        let _ = writeln!(s, "      {terminate}throw e;");
+        let _ = writeln!(s, "    }}");
         let _ = writeln!(s, "  }};");
     }
     let _ = writeln!(s, "  return instance;");

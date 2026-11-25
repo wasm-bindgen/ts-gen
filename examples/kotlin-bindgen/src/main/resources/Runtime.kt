@@ -18,9 +18,9 @@ internal external fun futureState(f: JsAny?): Int
 @JsFun("(f) => { throw new Error('ts-gen: unlinked import') }")
 internal external fun futureCancel(f: JsAny?)
 
-/** tw:future watch */
+/** tw:future add_listener */
 @JsFun("(f, w) => { throw new Error('ts-gen: unlinked import') }")
-internal external fun futureWatch(f: JsAny?, waker: Int)
+internal external fun futureAddListener(f: JsAny?, waker: Int)
 
 /** tw:loop work_available */
 @JsFun("(l) => { throw new Error('ts-gen: unlinked import') }")
@@ -98,8 +98,8 @@ fun copyInto(a: JsAny, v: DoubleArray) = doubleArray(a).copyInto(v)
 
 /**
  * A `future<T, E>` from JS. [await] reads its value and, while it is
- * pending, parks the task on the [Loop] with a waker `watch` leaves on
- * it, until `tw:future/wake`. [get] reads the resolution through
+ * pending, parks the task on the [Loop] with a waker `add_listener` leaves
+ * on it, until `tw:future/wake`. [get] reads the resolution through
  * `get<T>`, which checks it as an import that `throws E` checks its
  * result and gives none until the future is fulfilled, and [error] the
  * rejection through `error<E>`: both as `E`'s typed exception.
@@ -114,7 +114,7 @@ class Future<T>(val raw: JsAny, private val get: (JsAny) -> Fulfilled<T>?, priva
                 2 -> throw error(raw)
             }
             val w = loop.waker()
-            futureWatch(raw, w)
+            futureAddListener(raw, w)
             suspendCoroutine<Unit> { loop.park(w, it) }
         }
     }

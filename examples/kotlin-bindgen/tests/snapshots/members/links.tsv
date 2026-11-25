@@ -46,5 +46,5 @@ js_code	fixtures.members.flat.Lock_get_species	tw:js/global	Lock#get:species()
 js_code	fixtures.members.flat.Lock_toPrimitive2_str	tw:js/global	Lock#toPrimitive2(str)
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

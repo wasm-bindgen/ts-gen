@@ -87,5 +87,5 @@ js_code	fixtures.enums.flat.unbox_Theme	tw:unbox	Theme
 js_code	fixtures.enums.flat.box_Theme	tw:box	Theme
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

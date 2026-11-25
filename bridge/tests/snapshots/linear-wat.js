@@ -582,7 +582,10 @@ export function instantiate(language, bridge, imports = {}) {
   $E[4] = $X["app.terminate()"];
   $L = new $Lang(instance.exports, { memory: "memory", table: "tw:table", realloc: "tw:realloc", free: "tw:free", talloc: "tw:table/alloc", tfree: "tw:table/free" }, false);
   $checkLive = () => {
-    if ($L.u8()[Number(instance.exports["tw:terminated"].value)] !== 0) throw new Error("Module terminated");
+    if ($L.u8()[Number(instance.exports["tw:terminated"].value)] !== 0) {
+      const e = new Error("Module terminated");
+      throw e;
+    }
   };
   return instance;
 }

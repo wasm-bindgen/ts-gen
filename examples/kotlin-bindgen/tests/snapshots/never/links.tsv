@@ -20,5 +20,5 @@ js_code	fixtures.never.flat.result_Result_unit	tw:js/global	result(Result<unit>)
 js_code	fixtures.never.flat.fetcher_Result_unit	tw:js/global	fetcher(Result<unit>)
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

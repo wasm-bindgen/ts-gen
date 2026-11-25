@@ -77,5 +77,5 @@ js_code	fixtures.union_params.flat.unbox_BufferSource	tw:unbox	BufferSource
 js_code	fixtures.union_params.flat.box_BufferSource	tw:box	BufferSource
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

@@ -6,7 +6,7 @@
   (type $list (array (mut externref)))
   (import "tw:js/global" "Api#later()" (func $later (param externref) (result externref)))
   (import "tw:future" "suspend" (func $suspend (param externref) (result i32)))
-  (import "tw:future" "suspend_race" (func $race (param (ref $list)) (result i32)))
+  (import "tw:future" "suspend_all" (func $race (param (ref $list)) (result i32)))
   (import "tw:future" "get<u32>" (func $get (param externref) (result i32)))
   (import "tw:ret" "i32" (func $pop_i32 (result i32)))
   (import "tw:js/global" "Api#mark()" (func $mark (param externref)))

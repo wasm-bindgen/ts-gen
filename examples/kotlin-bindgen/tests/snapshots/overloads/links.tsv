@@ -83,5 +83,5 @@ js_code	fixtures.overloads.flat.box_fn_arr_Any	tw:box	fn(...arr<Any?>)
 js_code	fixtures.overloads.flat.unbox_fn_arr_Any	tw:unbox	fn(...arr<Any?>)
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

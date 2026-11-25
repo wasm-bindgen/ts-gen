@@ -383,7 +383,10 @@ function $hold(cx, m, f) {
   if (cx.n === m) return;
   const held = { a: cx.a.slice(m, cx.n), n: cx.n - m };
   cx.n = m;
-  const done = () => $release(held, 0);
+  // A terminated language isn't entered again, even to free (§15).
+  const done = () => {
+    if ($live()) $release(held, 0);
+  };
   f.promise.then(done, done);
 }
 
@@ -501,7 +504,7 @@ class $Future {
     this.promise = promise;
     this.state = 0;
     this.value = undefined;
-    this.watchers = null;
+    this.listeners = null;
     this.cancel = cancel;
     promise.then(
       (v) => {
@@ -522,9 +525,9 @@ class $Future {
     this.state = state;
     this.value = value;
     this.cancel = null;
-    const ws = this.watchers;
-    this.watchers = null;
-    if (ws) for (const [w, watch] of ws) watch === true ? $wake(w) : watch.fire(this);
+    const ls = this.listeners;
+    this.listeners = null;
+    if (ls) for (const l of ls) typeof l === "number" ? $wake(l) : l.fire(this);
   }
 }
 
@@ -555,11 +558,11 @@ function $suspend(f) {
   return -0x80000000;
 }
 
-// `tw:future suspend_race`: the index of a settled future, the lowest if
+// `tw:future suspend_all`: the index of a settled future, the lowest if
 // several are, or once parked the first to settle. The others are left as
 // they are.
-function $suspendRace(fs) {
-  if (fs.length === 0) throw new TypeError("`suspend_race` on an empty list");
+function $suspendAll(fs) {
+  if (fs.length === 0) throw new TypeError("`suspend_all` on an empty list");
   for (const f of fs) $isFuture(f);
   const i = fs.findIndex((f) => f.state !== 0);
   if (i !== -1) return i;
@@ -567,7 +570,7 @@ function $suspendRace(fs) {
   return -0x80000000;
 }
 
-// A suspension parked on futures, among their watchers under itself:
+// A suspension parked on futures, among their listeners:
 // `done(i)` runs once, when the first of them, `futures[i]`, settles.
 class $Park {
   constructor(futures, done) {
@@ -576,14 +579,14 @@ class $Park {
   }
 
   fire(f) {
-    for (const g of this.futures) g.watchers?.delete(this);
+    for (const g of this.futures) g.listeners?.delete(this);
     this.done(this.futures.indexOf(f));
   }
 }
 
 function $park(fs, done) {
   const p = new $Park(fs, done);
-  for (const f of fs) (f.watchers ??= new Map()).set(p, p);
+  for (const f of fs) (f.listeners ??= new Set()).add(p);
 }
 
 // The scratch above a suspending stack's base, `[b, sp)` and the table's
@@ -681,9 +684,12 @@ let $B = null;
 let $X = null;
 let $T = null;
 const $E = [];
+function $live() {
+  return true;
+}
 // Resumes a parked suspension with `v` (§16).
 function $resume(r, v) {
-  r(v);
+  if ($live()) r(v);
 }
 function $drop(name, h) {
   $X[name](h);
@@ -758,9 +764,9 @@ function $f1(f) {
   return $suspend(f);
 }
 
-// ("tw:future", "suspend_race")
+// ("tw:future", "suspend_all")
 function $f2(w0_0, w0_1) {
-  return $suspendRace($h1(w0_0, w0_1));
+  return $suspendAll($h1(w0_0, w0_1));
 }
 
 // ("tw:future", "get<u32>")
@@ -981,7 +987,7 @@ export function instantiate(language, bridge, imports = {}) {
     },
     "tw:future": {
       "suspend": $B.s1,
-      "suspend_race": $B.s2,
+      "suspend_all": $B.s2,
       "get<u32>": $B.f3,
       "new": $f4,
       "resolve<u32>": $f5,

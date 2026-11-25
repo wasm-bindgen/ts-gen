@@ -20,5 +20,5 @@ js_code	fixtures.cancel_unjoined.flat.send_str_RequestInit	tw:js/global	send(str
 js_code	fixtures.cancel_unjoined.flat.ping	tw:js/global	ping()
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

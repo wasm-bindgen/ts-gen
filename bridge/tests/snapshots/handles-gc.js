@@ -677,7 +677,10 @@ export function instantiate(language, bridge, imports = {}) {
   $B.entries.set(9, $X["util.each(arr<Counter>)"]);
   $E[10] = $B.e9;
   $checkLive = () => {
-    if (instance.exports["tw:terminated"].value !== 0) throw new Error("Module terminated");
+    if (instance.exports["tw:terminated"].value !== 0) {
+      const e = new Error("Module terminated");
+      throw e;
+    }
   };
   return instance;
 }

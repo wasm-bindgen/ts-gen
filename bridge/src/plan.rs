@@ -46,15 +46,17 @@ pub enum Op<'a> {
     Get,
     FutureError(Rc<EnumLayout>),
     FutureCancel,
-    FutureWatch,
+    AddListener,
+    RemoveListener,
     FutureNew,
     /// Several futures together, as the profile's `arr<Any>`.
     States,
-    WatchRace,
-    /// `suspend` and `suspend_race`, under `jspi = on`: the bridge
+    AddListenerAll,
+    RemoveListenerAll,
+    /// `suspend` and `suspend_all`, under `jspi = on`: the bridge
     /// module's suspending wrappers over these.
     Suspend,
-    SuspendRace,
+    SuspendAll,
     Resolve(Option<Repr>),
     Reject(Rc<EnumLayout>),
     /// `("tw:ret", vt)` and `("tw:ret", "push:vt")` (§12): served by the
@@ -81,7 +83,8 @@ impl Op<'_> {
                 | Op::Constant(_)
                 | Op::FutureState
                 | Op::FutureCancel
-                | Op::FutureWatch
+                | Op::AddListener
+                | Op::RemoveListener
                 | Op::Suspend
                 | Op::FutureNew
                 | Op::WorkAvailable
@@ -313,10 +316,12 @@ impl<'a> Plan<'a> {
                 match i.name.as_str() {
                     "state" => (Op::FutureState, empty),
                     "cancel" => (Op::FutureCancel, empty),
-                    "watch" => (Op::FutureWatch, empty),
+                    "add_listener" => (Op::AddListener, empty),
+                    "remove_listener" => (Op::RemoveListener, empty),
                     "states" => (Op::States, l.future_states()?),
-                    "watch_race" => (Op::WatchRace, l.future_watch_race()?),
-                    "suspend" | "suspend_race" if !p.jspi => {
+                    "add_listener_all" => (Op::AddListenerAll, l.future_listener_all()?),
+                    "remove_listener_all" => (Op::RemoveListenerAll, l.future_listener_all()?),
+                    "suspend" | "suspend_all" if !p.jspi => {
                         return Err(Error::Import(format!(
                             "{}: `{}` needs `jspi = on`",
                             what(),
@@ -324,7 +329,7 @@ impl<'a> Plan<'a> {
                         )));
                     }
                     "suspend" => (Op::Suspend, empty),
-                    "suspend_race" => (Op::SuspendRace, l.future_suspend_race()?),
+                    "suspend_all" => (Op::SuspendAll, l.future_suspend_all()?),
                     "new" => (Op::FutureNew, empty),
                     _ => {
                         if let Some(s) = arg("get<") {

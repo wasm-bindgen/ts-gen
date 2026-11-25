@@ -17,5 +17,5 @@ js_code	fixtures.containers.flat.Any_get_kind	tw:js/global	Any_#get:kind()
 js_code	fixtures.containers.flat.any	tw:js/global	any()
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
-js_code	tsgen.runtime.futureWatch	tw:future	watch
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

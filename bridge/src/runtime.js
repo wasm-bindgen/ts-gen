@@ -572,7 +572,10 @@ function $hold(cx, m, f) {
   if (cx.n === m) return;
   const held = { a: cx.a.slice(m, cx.n), n: cx.n - m };
   cx.n = m;
-  const done = () => $release(held, 0);
+  // A terminated language isn't entered again, even to free (§15).
+  const done = () => {
+    if ($live()) $release(held, 0);
+  };
   f.promise.then(done, done);
 }
 
@@ -859,7 +862,7 @@ class $Future {
     this.promise = promise;
     this.state = 0;
     this.value = undefined;
-    this.watchers = null;
+    this.listeners = null;
     this.cancel = cancel;
     promise.then(
       (v) => {
@@ -880,9 +883,9 @@ class $Future {
     this.state = state;
     this.value = value;
     this.cancel = null;
-    const ws = this.watchers;
-    this.watchers = null;
-    if (ws) for (const [w, watch] of ws) watch === true ? $wake(w) : watch.fire(this);
+    const ls = this.listeners;
+    this.listeners = null;
+    if (ls) for (const l of ls) typeof l === "number" ? $wake(l) : l.fire(this);
   }
 }
 
@@ -913,11 +916,11 @@ function $suspend(f) {
   return -0x80000000;
 }
 
-// `tw:future suspend_race`: the index of a settled future, the lowest if
+// `tw:future suspend_all`: the index of a settled future, the lowest if
 // several are, or once parked the first to settle. The others are left as
 // they are.
-function $suspendRace(fs) {
-  if (fs.length === 0) throw new TypeError("`suspend_race` on an empty list");
+function $suspendAll(fs) {
+  if (fs.length === 0) throw new TypeError("`suspend_all` on an empty list");
   for (const f of fs) $isFuture(f);
   const i = fs.findIndex((f) => f.state !== 0);
   if (i !== -1) return i;
@@ -925,7 +928,7 @@ function $suspendRace(fs) {
   return -0x80000000;
 }
 
-// A suspension parked on futures, among their watchers under itself:
+// A suspension parked on futures, among their listeners:
 // `done(i)` runs once, when the first of them, `futures[i]`, settles.
 class $Park {
   constructor(futures, done) {
@@ -934,14 +937,14 @@ class $Park {
   }
 
   fire(f) {
-    for (const g of this.futures) g.watchers?.delete(this);
+    for (const g of this.futures) g.listeners?.delete(this);
     this.done(this.futures.indexOf(f));
   }
 }
 
 function $park(fs, done) {
   const p = new $Park(fs, done);
-  for (const f of fs) (f.watchers ??= new Map()).set(p, p);
+  for (const f of fs) (f.listeners ??= new Set()).add(p);
 }
 
 // The scratch above a suspending stack's base, `[b, sp)` and the table's
@@ -1049,33 +1052,20 @@ function $cancelFuture(f) {
   }
 }
 
-// Parks a waker on a pending future (IR.md §16): it's woken once, when
-// the future settles. A future holds a waker once, as `true` or as the
-// `$Watch` it shares with other futures, and the latest watch replaces it.
-// A parked suspension (`$Park`) is among them too.
-function $watch(f, w) {
-  if ($isFuture(f).state === 0) (f.watchers ??= new Map()).set(w, true);
+// A pending future's listeners (IR.md §16): the wakers the language adds,
+// each woken when it settles, and the suspensions parked on it.
+function $addListener(f, w) {
+  if ($isFuture(f).state === 0) (f.listeners ??= new Set()).add(w);
 }
 
-// One waker parked on several futures, spent by the first to settle.
-class $Watch {
-  constructor(waker, futures) {
-    this.waker = waker;
-    this.futures = futures;
-  }
-
-  fire() {
-    const w = this.waker;
-    for (const f of this.futures) if (f.watchers?.get(w) === this) f.watchers.delete(w);
-    $wake(w);
-  }
+function $removeListener(f, w) {
+  $isFuture(f).listeners?.delete(w);
 }
 
-function $watchRace(fs, w) {
-  const pending = [];
-  for (const f of fs) if ($isFuture(f).state === 0) pending.push(f);
-  const watch = new $Watch(w, pending);
-  for (const f of pending) (f.watchers ??= new Map()).set(w, watch);
+// `each(f, w)` for every future of `fs`, or for none if one isn't a future.
+function $each(fs, each, w) {
+  for (const f of fs) $isFuture(f);
+  for (const f of fs) each(f, w);
 }
 
 function $states(fs) {
