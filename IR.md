@@ -1567,6 +1567,8 @@ enumerates them.
     as-is. A language handle goes through `tw:box` and `tw:unbox` (above).
 * The cost is one bridge call per box/unbox, on erased paths only.
   Converting to a JS value has to happen anyway.
+* A future of an erased `T` takes and resolves on its erasure, `Any`
+  ([§16](#16-async)).
 
 ### Bounds
 
@@ -1969,6 +1971,15 @@ interleaving of macrotasks.
 | `new` | `() -> (externref future, externref resolver)` | a language-created future; JS sees a Promise |
 | `resolve<T>` | `(externref resolver, T wire)` | |
 | `reject<E>` | `(externref resolver, E wire)` | the JS rejection value is the outgoing mapping of `E` |
+
+A type parameter names nothing outside its member, so an operation on a
+future whose value names one is named by its erasure: each type parameter
+becomes `Any` (`get<T>(): future<T?>` takes through `take<Any?>`,
+`all<T>(): future<D1Result<T>>` through `take<D1Result<Any>>`). Its wire is
+the erasure's, `externref`, in every profile. Under GC handles the erased
+value itself is `anyref` ([§13](#13-boxes-reference-wire-types-and-generics)),
+so the language converts with `any.convert_extern` after `take` and
+`extern.convert_any` before `resolve`, as it does around `("tw:unbox", T)`.
 
 ### Cancellation (guest only)
 

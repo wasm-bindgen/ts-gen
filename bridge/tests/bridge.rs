@@ -721,6 +721,8 @@ fixtures! {
     nested_enums => "nested-enums",
     absent_classes => "absent-classes",
     absent_classes_host => "absent-classes-host",
+    erased_futures => "erased-futures",
+    erased_futures_gc => "erased-futures-gc",
     rest_callbacks => "rest-callbacks",
     never => "never",
     constructor_values => "constructor-values",
