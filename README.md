@@ -6,16 +6,54 @@ the ts-gen IR and the `tw` bridge, Kotlin/Wasm and Zena.
 
 ## Overview
 
-`ts-gen` reads TypeScript `.d.ts` files. It writes Rust source with
-`#[wasm_bindgen]` extern blocks directly ([Rust](#rust-wasm-bindgen)), or the
-**ts-gen IR**, a language-neutral description of a JS API that any Wasm
-language can bind against.
+`ts-gen` reads TypeScript `.d.ts` files. By default it runs a language
+generator on them: `ts-gen-wasm-bindgen`, which writes Rust source with
+`#[wasm_bindgen]` extern blocks ([Rust](#rust-wasm-bindgen)). It also writes
+the **ts-gen IR**, a language-neutral description of a JS API that any Wasm
+language can bind against, and the later stages built on it.
 
 ```text
-.d.ts -ts-gen-------> Rust (#[wasm_bindgen])
-.d.ts -ts-gen --ir--> app.tw -ts-gen-abi lower-> JSON -> Kotlin / Zena bindings -> app.wasm
-                      app.tw + app.wasm -ts-gen-bridge-> bridge.js + bridge.wasm
+.d.ts -ts-gen----------> Rust (#[wasm_bindgen])
+.d.ts -ts-gen --ir-----> app.tw
+app.tw -ts-gen --json--> JSON -> Kotlin / Zena bindings -> app.wasm
+app.tw + app.wasm -ts-gen --bridge-> bridge.js + bridge.wasm
 ```
+
+## CLI
+
+```text
+ts-gen --input <x.d.ts...|dir|app.tw> [--output <out>] [emit] [options] [-- <generator flags>]
+```
+
+The input is `.d.ts` files and directories, or one IR file (`.tw`). One
+flag picks what a run emits:
+
+| emit | output | `--output` |
+|---|---|---|
+| `--lang <L>` (default, `wasm-bindgen`) | bindings, by running the generator `ts-gen-<L>` | passed to the generator |
+| `--ir` | the IR; a `.tw` input is validated and printed again | a file, or stdout |
+| `--json` | the IR lowered to JSON under `--profile` | a file, or stdout |
+| `--bridge <language.wasm>` | `bridge.js` and `bridge.wasm` under `--profile` | a directory |
+
+`.d.ts` input is lowered on the way, so `ts-gen --input worker.d.ts
+--bridge worker.wasm -o out` needs no `.tw` in between. `ts-gen --help`
+describes every option.
+
+A language generator is its own binary. `ts-gen` passes it the input, the
+output, the `.d.ts` options it was given, and the arguments after `--`:
+
+```sh
+ts-gen --input types.d.ts --output src/bindings.rs -- --fallible
+```
+
+It finds `ts-gen-<L>` in this order:
+
+1. the path in `TS_GEN_<L>` (`TS_GEN_WASM_BINDGEN`), for a local build;
+2. ts-gen's cache directory, under its own version;
+3. `cargo install ts-gen-<L>` at the same version, into that cache.
+
+`PATH` isn't searched, so the generator always matches the `ts-gen`
+running it.
 
 ## The ts-gen IR
 
@@ -33,38 +71,38 @@ the profile and layout rules, and the `tw` protocol names. It lowers an IR
 to per-member wire layouts for generators that don't link it:
 
 ```sh
-ts-gen --input worker.d.ts --provides ExportedHandler.fetch --ir worker.tw
-ts-gen-abi lower worker.tw --profile "all-host, results = single, throws = js" > worker.json
+ts-gen --input worker.d.ts --provides ExportedHandler.fetch --ir -o worker.tw
+ts-gen --input worker.tw --json --profile "all-host, results = single, throws = js" > worker.json
 ```
 
-`--ir` takes the producer options: `--provides`, `--once`, `--no-cancel`,
-`--bound`, `--with`, `--emit-lib`, `--root` and `--strict-nullable`. See
-`ts-gen --help` for each.
+`.d.ts` input takes the producer options: `--provides`, `--once`,
+`--no-cancel`, `--bound`, `--with`, `--emit-lib`, `--root` and
+`--strict-nullable`. See `ts-gen --help` for each.
 
 ## The tw bridge
 
-[`ts-gen-bridge`](bridge) generates the JS side for a compiled language
-module, its IR and its profile. `bridge.js` is the ESM glue: it converts and
+`ts-gen --bridge` ([`ts-gen-bridge`](bridge)) generates the JS side for a
+compiled language module, its IR and its profile. `bridge.js` is the ESM glue: it converts and
 validates values, dispatches overloads and maps errors, and exports the
 IR's exports as JS classes and functions. `bridge.wasm` translates GC values
 that JS can't read. See [bridge/README.md](bridge/README.md).
 
 ## Languages
 
-`ts-gen` itself generates Rust. Other languages are their own projects: a
-generator reads the IR, or `ts-gen-abi lower`'s JSON, and the bridge
-supplies the JS side. Two example generators live under
+Each language is its own generator: it reads the IR, or `ts-gen --json`'s
+lowering of it, and the bridge supplies the JS side. Rust's is
+[`ts-gen-wasm-bindgen`](wasm-bindgen), which `ts-gen` runs by default. Two example generators live under
 [examples](examples), to check the IR, the profiles and the bridge against
 real compilers.
 
 | language | profile | generator | status |
 |---|---|---|---|
-| Rust | wasm-bindgen | `ts-gen` (this crate) | the CLI below; every type read from the IR |
+| Rust | wasm-bindgen | [`ts-gen-wasm-bindgen`](wasm-bindgen) | the flags below; every type read from the IR |
 | Kotlin/Wasm | `all-host, results = single, throws = js` | [examples/kotlin-bindgen](examples/kotlin-bindgen) | imports, exports and async, through the bridge |
 | Zena | `all-gc` with host strings | [examples/zena-bindgen](examples/zena-bindgen) | imports, monomorphized generics |
 
 **Kotlin**: `kotlin-bindgen <lowered.json> <out-dir> [--package <pkg>]
-[--runtime]` writes Kotlin externals from `ts-gen-abi lower`'s JSON. Kotlin
+[--runtime]` writes Kotlin externals from `ts-gen --json`'s output. Kotlin
 names its own imports, so it also writes a `links.tsv`, and `kotlin-bindgen
 link` renames the compiled module's imports to their keys. Build the generator with `./gradlew installDist` in
 `examples/kotlin-bindgen` (JDK 21). [examples/kotlin-bindgen/example](examples/kotlin-bindgen/example)
@@ -110,14 +148,21 @@ and separate jobs run each toolchain. `BLESS=1` re-blesses snapshots.
 cargo install ts-gen
 ```
 
+`ts-gen` installs `ts-gen-wasm-bindgen` the first time it generates Rust.
+`cargo install ts-gen-wasm-bindgen` installs the generator alone, which
+takes the same flags without the `--`.
+
 #### Library
 
 ```sh
+cargo add ts-gen-wasm-bindgen
 cargo add ts-gen --no-default-features
 ```
 
-The `cli` feature (enabled by default) pulls in `clap` and `walkdir` for the
-binary. Disable it if you only need the library API.
+`ts-gen` holds the parser and `ts-gen-wasm-bindgen` the Rust generator. The
+`cli` feature of `ts-gen` (enabled by default) pulls in `clap` and the
+bridge generator for the binary. Disable it if you only need the library
+API.
 
 ### Usage
 
@@ -126,6 +171,10 @@ binary. Disable it if you only need the library API.
 ```sh
 ts-gen --input types.d.ts --output src/bindings.rs
 ```
+
+The generator's own flags go after `--`. `--lib-name`, `--annotate` and
+`--strict-nullable` shape how the `.d.ts` is read for every output, so they
+are `ts-gen`'s.
 
 Process a directory of declaration files:
 
@@ -136,7 +185,7 @@ ts-gen --input ./typings/ --output src/bindings.rs --lib-name my-js-lib
 Map external types from other crates:
 
 ```sh
-ts-gen --input types.d.ts --output src/bindings.rs \
+ts-gen --input types.d.ts --output src/bindings.rs -- \
   --external "Blob=::web_sys::Blob" \
   --external "node:buffer=node_buffer_sys" \
   --external "Intl.DateTimeFormatOptions=::my_intl::Options"
@@ -146,14 +195,14 @@ Route untyped JS exceptions into your own error type (must implement
 `From<JsValue>`):
 
 ```sh
-ts-gen --input types.d.ts --output src/bindings.rs --error-type crate::Error
+ts-gen --input types.d.ts --output src/bindings.rs -- --error-type crate::Error
 ```
 
 Keep `@throws {A | B}` unions as a generated `JsException` enum instead of
 collapsing them to their common ancestor:
 
 ```sh
-ts-gen --input types.d.ts --output src/bindings.rs --error-enum
+ts-gen --input types.d.ts --output src/bindings.rs -- --error-enum
 ```
 
 Select the output surface. `--input` defines the type universe; `--export`
@@ -162,7 +211,7 @@ specifier (its declarations, in the module's `pub mod`), or a declaration name
 (that export of any file or module, plus the types its bindings reference):
 
 ```sh
-ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts --output src/bindings.rs \
+ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts --output src/bindings.rs -- \
   --export Request --export Response --export KVNamespace --export cloudflare:workers
 ```
 
@@ -179,14 +228,14 @@ Opt generic imports into wasm-bindgen's experimental per-monomorphization
 codegen:
 
 ```sh
-ts-gen --input types.d.ts --output src/bindings.rs --experimental-generic-mono
+ts-gen --input types.d.ts --output src/bindings.rs -- --experimental-generic-mono
 ```
 
 Emit one `Result` form per sync method and function instead of a trapping
 primary plus a `try_<name>` companion:
 
 ```sh
-ts-gen --input types.d.ts --output src/bindings.rs --fallible
+ts-gen --input types.d.ts --output src/bindings.rs -- --fallible
 ```
 
 Choose how a `Promise`-returning method or function is bound. `both`, the
@@ -197,7 +246,7 @@ returning `Promise<T, E>`, started at the call and awaited with
 `name().await`. `async` binds only the `async fn`:
 
 ```sh
-ts-gen --input types.d.ts --output src/bindings.rs --promise-returns promise
+ts-gen --input types.d.ts --output src/bindings.rs -- --promise-returns promise
 ```
 
 Keep `T | null | undefined` three-state. By default a return, awaited value or
@@ -214,7 +263,8 @@ ts-gen --input types.d.ts --output src/bindings.rs --strict-nullable
 #### Library API
 
 ```rust
-use ts_gen::{parse_source, codegen};
+use ts_gen::parse_source;
+use ts_gen_wasm_bindgen::{generate, generate_with_options, GenerateOptions, PromiseReturns};
 
 let source = r#"
   export declare class Greeter {
@@ -224,7 +274,7 @@ let source = r#"
 "#;
 
 let (module, gctx) = parse_source(source, Some("my-lib"))?;
-let rust_code = codegen::generate(&module, &gctx)?;
+let rust_code = generate(&module, &gctx)?;
 println!("{rust_code}");
 ```
 
@@ -232,12 +282,12 @@ Options are set through `GenerateOptions` builder methods (its fields are
 private):
 
 ```rust
-let options = codegen::GenerateOptions::new()
+let options = GenerateOptions::new()
     .error_type("crate::Error")
     .experimental_generic_mono(true)
-    .promise_returns(codegen::PromiseReturns::Both)
+    .promise_returns(PromiseReturns::Both)
     .strict_nullable(false);
-let rust_code = codegen::generate_with_options(&module, &gctx, &options)?;
+let rust_code = generate_with_options(&module, &gctx, &options)?;
 ```
 
 ### Supported TypeScript constructs

@@ -765,7 +765,7 @@ The bindings also spell the Rust prelude bare (`Result<T, JsValue>` on
 every fallible binding, `String`, `Option<T>`, `From`/`Default`/`Clone`
 in impls), so a declaration named like anything the 2021 prelude exports
 (`Result`, `Option`, `Box`, `Default`, `From`, …; the full list is
-`RUST_PRELUDE_RESERVED` in `codegen/typemap.rs`) is suffixed the same
+`RUST_PRELUDE_RESERVED` in `wasm-bindgen/src/typemap.rs`) is suffixed the same
 way. It is not re-exported, since `pub use Result_ as Result;` would
 shadow the prelude `Result` again, so consumers write `Result_`.
 
@@ -4388,14 +4388,14 @@ default** — module emission is always opt-in via an explicit `--export
 disabled and only what's listed contributes to the output. So
 
 ```sh
-ts-gen --input types/email.d.ts --export cloudflare:email
+ts-gen --input types/email.d.ts -- --export cloudflare:email
 ```
 
 emits ONLY the `cloudflare:email` module (as `cloudflare::email`), not the
 file's other globals. To get both you list both:
 
 ```sh
-ts-gen --input types/email.d.ts \
+ts-gen --input types/email.d.ts -- \
        --export types/email.d.ts \
        --export cloudflare:email
 ```
@@ -4410,7 +4410,7 @@ all-or-nothing. Naming declarations keeps the whole file as the type
 universe while emitting only what a chosen surface needs:
 
 ```sh
-ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
+ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts -- \
        --export Request --export Response --export KVNamespace
 ```
 

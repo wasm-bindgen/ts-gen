@@ -88,7 +88,7 @@ struct Entry {
     /// Whether the test file opts into the strict nullable IR.
     strict_nullable: bool,
     /// How the test file binds promise returns.
-    promise_returns: ts_gen::codegen::PromiseReturns,
+    promise_returns: ts_gen_wasm_bindgen::PromiseReturns,
     /// Whether the fixture declares its own `--lib-name` (module mode).
     /// Script-mode fixtures parse without one and export by `--export`.
     module_mode: bool,
@@ -194,7 +194,7 @@ struct Directive {
     /// Whether `--strict-nullable` is present.
     strict_nullable: bool,
     /// The `--promise-returns <mode>`, `both` when absent.
-    promise_returns: ts_gen::codegen::PromiseReturns,
+    promise_returns: ts_gen_wasm_bindgen::PromiseReturns,
     /// All `--export <spec>` (or `-E <spec>`) values.
     export_specs: Vec<String>,
     /// All `--input <path>` (or `-i <path>`) values.
@@ -214,7 +214,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
     let mut experimental_generic_mono = false;
     let mut fallible = false;
     let mut strict_nullable = false;
-    let mut promise_returns = ts_gen::codegen::PromiseReturns::Both;
+    let mut promise_returns = ts_gen_wasm_bindgen::PromiseReturns::Both;
     let mut export_specs = Vec::new();
     let mut inputs = Vec::new();
     let mut error_enum = None;
@@ -249,9 +249,9 @@ fn parse_directive(dts_path: &Path) -> Directive {
                     }
                     "--promise-returns" if i + 1 < args.len() => {
                         promise_returns = match args[i + 1].as_str() {
-                            "both" => ts_gen::codegen::PromiseReturns::Both,
-                            "promise" => ts_gen::codegen::PromiseReturns::Promise,
-                            "async" => ts_gen::codegen::PromiseReturns::Async,
+                            "both" => ts_gen_wasm_bindgen::PromiseReturns::Both,
+                            "promise" => ts_gen_wasm_bindgen::PromiseReturns::Promise,
+                            "async" => ts_gen_wasm_bindgen::PromiseReturns::Async,
                             mode => panic!("unknown `--promise-returns {mode}`"),
                         };
                         i += 2;
@@ -355,16 +355,18 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
     // so codegen emits it at global scope. A script-mode fixture lists its
     // own `--export`s, which resolve as in the CLI: an existing path is a
     // file export, anything else a module specifier.
-    let mut exports: std::collections::HashSet<ts_gen::codegen::ExportSpec> =
+    let mut exports: std::collections::HashSet<ts_gen_wasm_bindgen::ExportSpec> =
         std::collections::HashSet::new();
     if entry.module_mode {
-        exports.insert(ts_gen::codegen::ExportSpec::Module(entry.lib_name.clone()));
+        exports.insert(ts_gen_wasm_bindgen::ExportSpec::Module(
+            entry.lib_name.clone(),
+        ));
         // Ambient declarations in a `--lib-name` fixture are file exports.
         let canonical = entry
             .dts_path
             .canonicalize()
             .unwrap_or(entry.dts_path.clone());
-        exports.insert(ts_gen::codegen::ExportSpec::File(canonical));
+        exports.insert(ts_gen_wasm_bindgen::ExportSpec::File(canonical));
     }
     let workspace_dir = entry
         .dts_path
@@ -378,12 +380,12 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
         let as_path = workspace_dir.join(spec);
         if as_path.exists() {
             let canonical = as_path.canonicalize().unwrap_or(as_path);
-            exports.insert(ts_gen::codegen::ExportSpec::File(canonical));
+            exports.insert(ts_gen_wasm_bindgen::ExportSpec::File(canonical));
         } else {
-            exports.insert(ts_gen::codegen::ExportSpec::Module(spec.clone()));
+            exports.insert(ts_gen_wasm_bindgen::ExportSpec::Module(spec.clone()));
         }
     }
-    let mut options = ts_gen::codegen::GenerateOptions::new()
+    let mut options = ts_gen_wasm_bindgen::GenerateOptions::new()
         .experimental_generic_mono(entry.experimental_generic_mono)
         .fallible(entry.fallible)
         .strict_nullable(entry.strict_nullable)
@@ -395,7 +397,7 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
     if let Some(path) = &entry.error_type {
         options = options.error_type(path);
     }
-    let rust_code = ts_gen::codegen::generate_with_options(&module, &gctx, &options)
+    let rust_code = ts_gen_wasm_bindgen::generate_with_options(&module, &gctx, &options)
         .unwrap_or_else(|e| panic!("codegen failed for {}: {e}", entry.mod_name));
 
     // Generated code uses inner attributes (`#![...]`, `//!`) which are only

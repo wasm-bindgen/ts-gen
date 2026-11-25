@@ -3,17 +3,17 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::codegen::signatures::{
+use crate::signatures::{
     generate_callable_params, is_void_return, public_rust_name, render_generic_bounds,
     CallableSpec, FunctionSignature, Overload, SignatureKind,
 };
-use crate::codegen::typemap::{to_return_type, to_syn_type, CodegenContext, TypePosition};
-use crate::parse::scope::ScopeId;
-use crate::util::naming::{ident_chars, naming_priority, LocalScope, Suffix};
+use crate::typemap::{to_return_type, to_syn_type, CodegenContext, TypePosition};
 use std::collections::{HashMap, HashSet};
+use ts_gen::parse::scope::ScopeId;
+use ts_gen::util::naming::{ident_chars, naming_priority, LocalScope, Suffix};
 
-use crate::context::TypeId;
-use crate::ir::{FunctionDecl, Member, ModuleContext, TypeDeclaration, TypeKind, VariableDecl};
+use ts_gen::context::TypeId;
+use ts_gen::ir::{FunctionDecl, Member, ModuleContext, TypeDeclaration, TypeKind, VariableDecl};
 
 /// Generate wasm_bindgen extern blocks for a free function.
 ///
@@ -198,7 +198,7 @@ fn generate_expanded_free_function(
 /// for a free function, or empty when no type parameters are
 /// referenced. Walks the params + return type and consults the
 /// signature's `body_scope` to pick out names that bind as
-/// [`crate::parse::scope::Binding::TypeParam`].
+/// [`ts_gen::parse::scope::Binding::TypeParam`].
 fn generic_bounds_for_function(
     sig: &FunctionSignature,
     cgctx: Option<&CodegenContext<'_>>,
@@ -414,7 +414,7 @@ fn construct_targets(
     let value = value.join(".");
     let mut targets = Vec::new();
     for construct in &decl.constructs {
-        let crate::ir::TypeRef::Reference { segments, .. } = &construct.return_type else {
+        let ts_gen::ir::TypeRef::Reference { segments, .. } = &construct.return_type else {
             return None;
         };
         let id = cgctx
@@ -425,7 +425,7 @@ fn construct_targets(
             TypeKind::Class(c) => (&c.members, false),
             TypeKind::Interface(i) => (
                 &i.members,
-                i.classification == crate::ir::InterfaceClassification::Dictionary,
+                i.classification == ts_gen::ir::InterfaceClassification::Dictionary,
             ),
             _ => return None,
         };
@@ -433,7 +433,7 @@ fn construct_targets(
         let name = match cgctx.ir.as_ref() {
             Some(ir) => match ir.value_constructor(id, &value)? {
                 Some(name) => name.to_string(),
-                None if new => crate::util::naming::to_snake_case(&decl.js_name),
+                None if new => ts_gen::util::naming::to_snake_case(&decl.js_name),
                 None => "new".to_string(),
             },
             None if dictionary || new || cgctx.constructed.borrow().contains(&id) => return None,
@@ -460,7 +460,7 @@ fn member_is_new(member: &Member) -> bool {
         Member::StaticMethod(m) => &m.js_name,
         _ => return false,
     };
-    crate::util::naming::to_snake_case(js_name) == "new"
+    ts_gen::util::naming::to_snake_case(js_name) == "new"
 }
 
 /// A constructor-shaped variable whose name a type alias takes as the type

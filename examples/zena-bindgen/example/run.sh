@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Builds the Zena worker end to end into out/:
 #   ts-gen --ir -> zena-bindgen --entry -> zena build -t js
-#   -> ts-gen-bridge generate.
+#   -> ts-gen --bridge.
 # `./run.sh node` then runs the routes node can serve; `./run.sh serve`
 # serves the worker in workerd and curls every route.
 #
@@ -16,7 +16,7 @@ BIN="$ROOT/target/debug"
 STD="$ROOT/std/std.tw"
 PROFILE="all-gc, str = host"
 
-(cd "$ROOT" && cargo build --quiet --bins -p ts-gen -p ts-gen-bridge -p zena-bindgen)
+(cd "$ROOT" && cargo build --quiet --bins -p ts-gen -p zena-bindgen)
 rm -rf "$B" "$OUT"
 mkdir -p "$B" "$OUT"
 
@@ -25,7 +25,7 @@ mkdir -p "$B" "$OUT"
 #    and what the module provides (provides.d.ts).
 "$BIN/ts-gen" -i "$ROOT/tests/fixtures/workers-types.d.ts" -i "$EX/env.d.ts" \
   --annotate "$EX/annotate.d.ts" --provides "$EX/provides.d.ts" \
-  --with "$STD" --ir "$B/worker.tw" 2>"$B/ts-gen.log"
+  --with "$STD" --ir -o "$B/worker.tw" 2>"$B/ts-gen.log"
 
 # 2. The bindings, the standard library's, and the entry module
 #    exporting what the module provides under its keys.
@@ -38,7 +38,7 @@ cp -r "$EX/app.zena" "$EX/app" "$B/"
 "${ZENA:-zena-cli}" build "$B/worker.zena" -t js -o "$OUT/worker.wasm"
 
 # 4. The bridge, under the profile zena-bindgen binds (GC, host strings).
-"$BIN/ts-gen-bridge" generate "$B/worker.tw" "$OUT/worker.wasm" --with "$STD" \
+"$BIN/ts-gen" -i "$B/worker.tw" --bridge "$OUT/worker.wasm" --with "$STD" \
   --profile "$PROFILE" -o "$OUT"
 cp "$EX/loader.js" "$EX/config.capnp" "$EX/node.mjs" "$EX/helper.js" "$OUT/"
 # The Durable Objects' storage, empty for each build.

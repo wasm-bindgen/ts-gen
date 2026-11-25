@@ -5,14 +5,14 @@
 //! named apart by the Rust `_with_` vocabulary. A callable stays on the
 //! parse when the IR doesn't yet carry what its Rust form reads.
 
-use crate::codegen::signatures::{
+use crate::signatures::{
     build_signatures, build_signatures_from, expand_signatures, CallableSpec, ConcreteParam,
     ExpandedSignature, FunctionSignature, LiteralArm, Overload,
 };
-use crate::codegen::typemap::CodegenContext;
-use crate::ir::{Throws, TypeRef};
-use crate::parse::scope::ScopeId;
-use crate::util::naming::LocalScope;
+use crate::typemap::CodegenContext;
+use ts_gen::ir::{Throws, TypeRef};
+use ts_gen::parse::scope::ScopeId;
+use ts_gen::util::naming::LocalScope;
 
 /// Which members of a container are the callable's overloads.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -127,7 +127,7 @@ pub fn build(
             params: &o.params,
             // A constructor's result is its class, which the IR leaves out.
             return_type: match spec.kind {
-                crate::codegen::signatures::SignatureKind::Constructor => first.return_type,
+                crate::signatures::SignatureKind::Constructor => first.return_type,
                 _ => &o.return_type,
             },
             body_scope,
@@ -185,14 +185,14 @@ fn restated(
     let mut overloads = ir.callable(cgctx.gctx, site, spec.js_name, scope, &bound)?;
     // Each overload's typed array parameters, beside which Rust reads an
     // element array as a view of one.
-    let typed: Vec<Vec<Option<crate::ir::TypedArrayElement>>> = overloads
+    let typed: Vec<Vec<Option<ts_gen::ir::TypedArrayElement>>> = overloads
         .iter()
         .map(|o| {
             o.params
                 .iter()
                 .map(|p| match &p.type_ref {
                     TypeRef::Reference { segments, .. } if segments.len() == 1 => {
-                        crate::ir::TypedArrayElement::of_typed_array(&segments[0])
+                        ts_gen::ir::TypedArrayElement::of_typed_array(&segments[0])
                     }
                     _ => None,
                 })
@@ -247,7 +247,7 @@ fn restated(
             if !o.tparams.is_empty() {
                 let mut kept = Vec::new();
                 for t in e.params.iter().map(|p| &p.type_ref).chain([parsed]) {
-                    crate::codegen::signatures::collect_type_params(t, cgctx, scope, &mut kept);
+                    crate::signatures::collect_type_params(t, cgctx, scope, &mut kept);
                 }
                 let (tparams, defaults) = (
                     std::mem::take(&mut o.tparams),
@@ -315,7 +315,7 @@ fn restated(
                     if t.is_none()
                         && ours
                             .split_empties()
-                            .is_some_and(|(_, n)| n == crate::ir::Nullability::Undefined)
+                            .is_some_and(|(_, n)| n == ts_gen::ir::Nullability::Undefined)
                     {
                         let plain = ours.without_undefined();
                         if let Some(stated) = state(cgctx, scope, &plain, theirs) {
@@ -385,7 +385,7 @@ fn restated(
                                     (TypeRef::Array(_), TypeRef::TypedSlice(e, _))
                                         if members.iter().any(|m| matches!(m,
                                             TypeRef::Reference { segments, .. } if segments.len() == 1
-                                                && crate::ir::TypedArrayElement::of_typed_array(&segments[0]) == Some(*e))) =>
+                                                && ts_gen::ir::TypedArrayElement::of_typed_array(&segments[0]) == Some(*e))) =>
                                     {
                                         theirs.clone()
                                     }
@@ -540,7 +540,7 @@ fn restated(
             .iter()
             .map(|&k| expansions[k].params.clone())
             .collect();
-        let suffixes = crate::codegen::signatures::compute_suffixes_pub(&params);
+        let suffixes = crate::signatures::compute_suffixes_pub(&params);
         for (k, s) in plain.into_iter().zip(suffixes) {
             expansions[k].name_suffix = s;
         }
@@ -556,7 +556,7 @@ fn restated(
                             TypeRef::TypedSlice(e, _),
                             TypeRef::Reference { segments, .. },
                         ) if segments.len() == 1
-                            && crate::ir::TypedArrayElement::of_typed_array(&segments[0]) == Some(*e)))
+                            && ts_gen::ir::TypedArrayElement::of_typed_array(&segments[0]) == Some(*e)))
             })
     };
     let unbound =
@@ -606,7 +606,7 @@ fn matching(
     use super::ir_types::Arg;
     // A slice the callee views, rather than copies.
     let view = |t: &TypeRef, mode| {
-        matches!(t, TypeRef::TypedSlice(..)) && mode == Some(crate::ir::SliceModeHint::View)
+        matches!(t, TypeRef::TypedSlice(..)) && mode == Some(ts_gen::ir::SliceModeHint::View)
     };
     let candidates: Vec<usize> = (0..overloads.len())
         .filter(|&i| {
@@ -799,7 +799,7 @@ fn accessor_at(
     let copy = |t: &TypeRef| {
         matches!(t, TypeRef::TypedSlice(e, _) if arms.iter().any(|a| matches!(a,
             TypeRef::Reference { segments, .. } if segments.len() == 1
-                && crate::ir::TypedArrayElement::of_typed_array(&segments[0]) == Some(*e))))
+                && ts_gen::ir::TypedArrayElement::of_typed_array(&segments[0]) == Some(*e))))
     };
     let core = parsed.split_empties().map_or(parsed.clone(), |(c, _)| c);
     let slices = matches!(core, TypeRef::Union(_))
@@ -1080,11 +1080,11 @@ fn map_types(t: &TypeRef, f: &impl Fn(&TypeRef) -> TypeRef) -> TypeRef {
         TypeRef::Union(u) => TypeRef::union(u.members().iter().map(f)),
         TypeRef::Array(x) => TypeRef::Array(Box::new(f(x))),
         TypeRef::Tuple(ts) => TypeRef::Tuple(ts.iter().map(f).collect()),
-        TypeRef::Function(sig) => TypeRef::Function(crate::ir::FunctionSig {
+        TypeRef::Function(sig) => TypeRef::Function(ts_gen::ir::FunctionSig {
             params: sig
                 .params
                 .iter()
-                .map(|p| crate::ir::Param {
+                .map(|p| ts_gen::ir::Param {
                     type_ref: f(&p.type_ref),
                     ..p.clone()
                 })
@@ -1101,7 +1101,7 @@ fn map_types(t: &TypeRef, f: &impl Fn(&TypeRef) -> TypeRef) -> TypeRef {
 fn inferred_native(cgctx: &CodegenContext<'_>, scope: ScopeId, t: &TypeRef) -> TypeRef {
     let plain = t.without_undefined();
     let mut found = Vec::new();
-    crate::codegen::signatures::collect_type_params(&plain, cgctx, scope, &mut found);
+    crate::signatures::collect_type_params(&plain, cgctx, scope, &mut found);
     match plain != *t && !found.is_empty() {
         true => plain,
         false => t.clone(),
@@ -1188,7 +1188,7 @@ fn exact(
 /// `t` with `drop` left out of each union admitting both empties, its
 /// aliases' included.
 fn collapsed(cgctx: &CodegenContext<'_>, scope: ScopeId, t: &TypeRef, drop: &TypeRef) -> TypeRef {
-    let both = |n| n == crate::ir::Nullability::Both;
+    let both = |n| n == ts_gen::ir::Nullability::Both;
     let t = match super::typemap::split_empties_in(t, Some(cgctx), scope) {
         Some((core, n, _)) if both(n) && t.split_empties().is_none_or(|(_, m)| !both(m)) => {
             TypeRef::union([core, TypeRef::Null, TypeRef::Undefined])
@@ -1246,7 +1246,7 @@ fn family(
         return None;
     }
     let mut found = Vec::new();
-    crate::codegen::signatures::collect_type_params(theirs, cgctx, scope, &mut found);
+    crate::signatures::collect_type_params(theirs, cgctx, scope, &mut found);
     // The parse lowers a family to its widest row's enum, whatever its
     // arguments.
     let whole = || {
@@ -1256,7 +1256,7 @@ fn family(
             .is_some_and(|id| {
                 matches!(
                     cgctx.gctx.get_type(id).kind,
-                    crate::ir::TypeKind::StringEnum(_)
+                    ts_gen::ir::TypeKind::StringEnum(_)
                 )
             })
     };
@@ -1273,7 +1273,7 @@ fn inferred(
     theirs: &TypeRef,
 ) -> Option<TypeRef> {
     let mut found = Vec::new();
-    crate::codegen::signatures::collect_type_params(theirs, cgctx, scope, &mut found);
+    crate::signatures::collect_type_params(theirs, cgctx, scope, &mut found);
     (ours != theirs && ours.without_undefined() == *theirs && !found.is_empty())
         .then(|| theirs.clone())
 }
@@ -1286,7 +1286,7 @@ fn widens(ours: &TypeRef, theirs: &TypeRef) -> bool {
         (None, None) => (ours.clone(), theirs.clone()),
         _ => return false,
     };
-    let numbers = |u: &crate::ir::Union| {
+    let numbers = |u: &ts_gen::ir::Union| {
         u.members()
             .iter()
             .all(|m| matches!(m, TypeRef::Number | TypeRef::NumberLiteral(_)))
@@ -1402,12 +1402,12 @@ fn settle(ours: &TypeRef, theirs: &TypeRef) -> TypeRef {
                 .collect(),
         },
         (TypeRef::Function(f), TypeRef::Function(g)) if f.params.len() == g.params.len() => {
-            TypeRef::Function(crate::ir::FunctionSig {
+            TypeRef::Function(ts_gen::ir::FunctionSig {
                 params: f
                     .params
                     .iter()
                     .zip(&g.params)
-                    .map(|(p, q)| crate::ir::Param {
+                    .map(|(p, q)| ts_gen::ir::Param {
                         type_ref: settle(&p.type_ref, &q.type_ref),
                         ..p.clone()
                     })
@@ -1514,10 +1514,10 @@ fn adopt(ours: &TypeRef, theirs: &TypeRef) -> TypeRef {
         // A copy reads the buffer whatever its sharing, which only a view
         // states (`@js(unshared)`).
         (
-            TypeRef::TypedSlice(a, crate::ir::SharedMemory::Accepted),
-            TypeRef::TypedSlice(b, crate::ir::SharedMemory::Rejected),
+            TypeRef::TypedSlice(a, ts_gen::ir::SharedMemory::Accepted),
+            TypeRef::TypedSlice(b, ts_gen::ir::SharedMemory::Rejected),
         ) if a.rust() == b.rust() => return theirs.clone(),
-        (TypeRef::BigInt, TypeRef::AbiScalar(crate::ir::AbiScalar::I64)) => return theirs.clone(),
+        (TypeRef::BigInt, TypeRef::AbiScalar(ts_gen::ir::AbiScalar::I64)) => return theirs.clone(),
         (TypeRef::Reference { .. }, TypeRef::Unresolved(s)) if s == "this" => {
             return theirs.clone();
         }
@@ -1558,12 +1558,12 @@ fn adopt(ours: &TypeRef, theirs: &TypeRef) -> TypeRef {
         (TypeRef::Array(x), TypeRef::Array(y)) => TypeRef::Array(Box::new(adopt(x, y))),
         // The IR names a callback's parameters by position.
         (TypeRef::Function(f), TypeRef::Function(g)) if f.params.len() == g.params.len() => {
-            TypeRef::Function(crate::ir::FunctionSig {
+            TypeRef::Function(ts_gen::ir::FunctionSig {
                 params: f
                     .params
                     .iter()
                     .zip(&g.params)
-                    .map(|(p, q)| crate::ir::Param {
+                    .map(|(p, q)| ts_gen::ir::Param {
                         name: q.name.clone(),
                         type_ref: adopt(&p.type_ref, &q.type_ref),
                         ..p.clone()
@@ -1643,12 +1643,12 @@ fn take(
             each(u.members(), v.members()).map_or(ours.clone(), TypeRef::union)
         }
         (TypeRef::Function(f), TypeRef::Function(g)) if f.params.len() == g.params.len() => {
-            TypeRef::Function(crate::ir::FunctionSig {
+            TypeRef::Function(ts_gen::ir::FunctionSig {
                 params: f
                     .params
                     .iter()
                     .zip(&g.params)
-                    .map(|(p, q)| crate::ir::Param {
+                    .map(|(p, q)| ts_gen::ir::Param {
                         type_ref: take(&p.type_ref, &q.type_ref, at),
                         ..p.clone()
                     })
@@ -1678,7 +1678,7 @@ fn unaliased(
     let id = cgctx.gctx.resolve_path(scope, &segments.join("."))?;
     if !matches!(
         cgctx.gctx.get_type(id).kind,
-        crate::ir::TypeKind::TypeAlias(_)
+        ts_gen::ir::TypeKind::TypeAlias(_)
     ) {
         return None;
     }
@@ -1718,12 +1718,12 @@ fn aliased(
                     .any(|a| mentions(a, &|t| matches!(t, TypeRef::Reference { .. }))) =>
                 {
                     let id = cgctx.gctx.resolve_path(scope, &segments.join("."))?;
-                    let crate::ir::TypeKind::TypeAlias(alias) = &cgctx.gctx.get_type(id).kind
+                    let ts_gen::ir::TypeKind::TypeAlias(alias) = &cgctx.gctx.get_type(id).kind
                     else {
                         return None;
                     };
                     Some((
-                        crate::codegen::typemap::alias_instance(alias, generic_args),
+                        crate::typemap::alias_instance(alias, generic_args),
                         alias.body_scope,
                     ))
                 }
@@ -1802,7 +1802,7 @@ fn defaulted(
     if a != b {
         return None;
     }
-    if x.is_empty() && crate::ir::TypedArrayElement::of_typed_array(&a.join(".")).is_some() {
+    if x.is_empty() && ts_gen::ir::TypedArrayElement::of_typed_array(&a.join(".")).is_some() {
         return Some(theirs.clone());
     }
     // The parse's arguments the IR leaves to their defaults.
@@ -1847,12 +1847,12 @@ fn type_params<'a>(
     cgctx: &'a CodegenContext<'_>,
     scope: ScopeId,
     segments: &[String],
-) -> Option<&'a [crate::ir::TypeParam]> {
+) -> Option<&'a [ts_gen::ir::TypeParam]> {
     let id = cgctx.gctx.resolve_path(scope, &segments.join("."))?;
     match &cgctx.gctx.get_type(id).kind {
-        crate::ir::TypeKind::Class(c) => Some(&c.type_params),
-        crate::ir::TypeKind::Interface(i) => Some(&i.type_params),
-        crate::ir::TypeKind::TypeAlias(a) => Some(&a.type_params),
+        ts_gen::ir::TypeKind::Class(c) => Some(&c.type_params),
+        ts_gen::ir::TypeKind::Interface(i) => Some(&i.type_params),
+        ts_gen::ir::TypeKind::TypeAlias(a) => Some(&a.type_params),
         _ => None,
     }
 }
@@ -1984,7 +1984,7 @@ fn lossy_at(t: &TypeRef, cgctx: &CodegenContext<'_>, scope: ScopeId, top: bool) 
             let alias = cgctx.gctx.resolve_path(scope, &name).is_some_and(|id| {
                 matches!(
                     cgctx.gctx.get_type(id).kind,
-                    crate::ir::TypeKind::TypeAlias(_)
+                    ts_gen::ir::TypeKind::TypeAlias(_)
                 )
             });
             alias || cgctx.resolve_alias(&name, scope).is_some() || generic_args.iter().any(lossy)

@@ -17,12 +17,15 @@ layouts and the `tw` protocol. This crate implements §11–§19 of it.
 
 ## CLI
 
+The crate is a library; `ts-gen --bridge` is its command line.
+
 ```text
-ts-gen-bridge generate <file.tw> <language.wasm> -o <dir> [--profile <profile>] [--with <lib.tw>]... [--wat] [--factory]
+ts-gen --input <file.tw> --bridge <language.wasm> -o <dir> [--profile <profile>] [--with <lib.tw>...] [--wat] [--factory]
 ```
 
-`generate` reads the language module as `.wasm` or `.wat`, and writes
+It reads the language module as `.wasm` or `.wat`, and writes
 `bridge.js` and `bridge.wasm` to `<dir>` (plus `bridge.wat` with `--wat`).
+The input can also be the `.d.ts` files, lowered on the way.
 `<profile>` is a file holding the profile text, or the text itself
 (`all-host, results = single, throws = js`). It defaults to `all-linear`.
 The settings are IR.md §12's; `strict-null = on`, for example, makes a
@@ -34,9 +37,9 @@ The language module imports each IR member under its `tw` key. A Rust or
 Zena module does so directly:
 
 ```sh
-ts-gen --input worker.d.ts --ir worker.tw
+ts-gen --input worker.d.ts --ir -o worker.tw
 # ... compile the language module against the IR's bindings ...
-ts-gen-bridge generate worker.tw worker.wasm --profile all-gc -o out
+ts-gen --input worker.tw --bridge worker.wasm --profile all-gc -o out
 ```
 
 A language that can't choose an import's `(module, name)` renames its
@@ -46,7 +49,7 @@ itself ([examples/kotlin-bindgen/example](../examples/kotlin-bindgen/example)):
 
 ```sh
 kotlin-bindgen link worker.wasm bindings/links.tsv -o out/worker.wasm
-ts-gen-bridge generate worker.tw out/worker.wasm \
+ts-gen --input worker.tw --bridge out/worker.wasm \
   --profile "all-host, results = single, throws = js" -o out
 ```
 

@@ -14,14 +14,14 @@ use std::collections::HashSet;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::codegen::subtyping::builtin_parents;
-use crate::codegen::surface::Surface;
-use crate::codegen::typemap::{self, CodegenContext, TypePosition};
-use crate::context::TypeId;
-use crate::external_map::JS_SYS_RESERVED;
-use crate::ir::{Heritage, Member, ModuleContext, Throws, TypeDeclaration, TypeKind, TypeRef};
-use crate::parse::scope::ScopeId;
-use crate::util::naming::to_pascal_case;
+use crate::subtyping::builtin_parents;
+use crate::surface::Surface;
+use crate::typemap::{self, CodegenContext, TypePosition};
+use ts_gen::context::TypeId;
+use ts_gen::external_map::JS_SYS_RESERVED;
+use ts_gen::ir::{Heritage, Member, ModuleContext, Throws, TypeDeclaration, TypeKind, TypeRef};
+use ts_gen::parse::scope::ScopeId;
+use ts_gen::util::naming::to_pascal_case;
 
 /// A `@throws` type name (`Fault`, `Ns.Fault`) and the scope of the declaration
 /// carrying it, which its names resolve from like any other reference.
@@ -48,7 +48,7 @@ pub fn collect_throws_names(ids: &[TypeId], surface: &Surface<'_>) -> Vec<Throws
 /// `@throws` names has a variant, `RangeError` too, and a throws enum's
 /// fallback, `Error`, is one wherever there's a throws enum at all.
 ///
-/// [`IrDecls::error_classes`]: crate::codegen::from_ir::IrDecls::error_classes
+/// [`IrDecls::error_classes`]: crate::from_ir::IrDecls::error_classes
 pub fn ir_throws_names(
     parsed: Vec<ThrowsName>,
     classes: &[Result<TypeId, String>],
@@ -465,7 +465,7 @@ pub fn generate_error_enum(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::codegen::GenerateOptions;
+    use crate::GenerateOptions;
 
     fn with_ctx(src: &str, f: impl FnOnce(&CodegenContext<'_>, &[ThrowsName])) {
         with_ctx_external(src, &[], f)
@@ -476,7 +476,7 @@ mod tests {
         externals: &[&str],
         f: impl FnOnce(&CodegenContext<'_>, &[ThrowsName]),
     ) {
-        let (module, mut gctx) = crate::parse_source(src, None).unwrap();
+        let (module, mut gctx) = ts_gen::parse_source(src, None).unwrap();
         for mapping in externals {
             gctx.external_map.add_mapping(mapping);
         }
@@ -687,9 +687,9 @@ mod tests {
     /// The variants of the enum the whole pipeline emits for `src`, through
     /// the IR's throws enums.
     fn emitted_variants(src: &str) -> Vec<String> {
-        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, None).unwrap();
         let options = GenerateOptions::new().error_enum("JsException");
-        let code = crate::codegen::generate_with_options(&module, &gctx, &options).unwrap();
+        let code = crate::generate_with_options(&module, &gctx, &options).unwrap();
         let file = syn::parse_file(&code).unwrap();
         file.items
             .iter()

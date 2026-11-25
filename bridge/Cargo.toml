@@ -7,7 +7,7 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/wasm-bindgen/ts-gen"
 
 [dependencies]
-ts-gen-abi = { path = "../abi" }
+ts-gen-abi = { path = "../abi", version = "0.1.0" }
 wasmparser = "0.263"
 wat = "1.263"
 

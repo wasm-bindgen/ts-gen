@@ -31,7 +31,7 @@ const WRAPS_ATTR: &str = "ts_gen_wraps";
 /// `#[ts_gen_literal(binding(__get), positions(1), arm("text", get_text), arm("json", get_json))]`.
 /// The extern is renamed to `binding`; positions index the parameters
 /// after `this`.
-pub(crate) fn literal_attr(sig: &crate::codegen::signatures::FunctionSignature) -> TokenStream {
+pub(crate) fn literal_attr(sig: &crate::signatures::FunctionSignature) -> TokenStream {
     let Some(spec) = &sig.literal else {
         return quote! {};
     };
@@ -727,7 +727,7 @@ mod tests {
 
         // `null_arms` runs after and leaves the rewritten extern alone.
         let mut file: syn::File = syn::parse_str(&out).unwrap();
-        crate::codegen::null_arms::apply(&mut file.items);
+        crate::null_arms::apply(&mut file.items);
         assert_eq!(prettyplease::unparse(&file), out);
     }
 
@@ -746,7 +746,7 @@ mod tests {
         assert!(out.contains("pub fn step_previous(&self, other: impl ::core::convert::Into<DayLike>) -> f64 {\n        self.__step(\"previous\", other.into())"), "{out}");
         // Nothing is left for `null_arms` to wrap again.
         let mut file: syn::File = syn::parse_str(&out).unwrap();
-        crate::codegen::null_arms::apply(&mut file.items);
+        crate::null_arms::apply(&mut file.items);
         assert_eq!(prettyplease::unparse(&file), out);
     }
 

@@ -4,6 +4,7 @@ members = [
     "bridge",
     "examples/zena-bindgen",
     "integration-tests",
+    "wasm-bindgen",
 ]
 exclude = [
     "examples/cloudflare-worker",
@@ -11,7 +12,8 @@ exclude = [
 resolver = "2"
 
 [workspace.dependencies]
-ts-gen = { path = "." }
+ts-gen = { path = ".", version = "0.1.0", default-features = false }
+ts-gen-wasm-bindgen = { path = "wasm-bindgen", version = "0.1.0" }
 
 # wasm-bindgen ecosystem — used by integration-tests.
 # Companion crates version independently but in lockstep with wasm-bindgen:
@@ -34,7 +36,7 @@ wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", tag 
 
 [package]
 categories = ["wasm", "development-tools::ffi"]
-description = "Generate wasm-bindgen Rust bindings from TypeScript .d.ts files"
+description = "Generate Wasm language bindings from TypeScript .d.ts files"
 edition = "2021"
 keywords = ["wasm", "wasm-bindgen", "typescript", "codegen", "ffi"]
 license = "MIT OR Apache-2.0"
@@ -44,7 +46,7 @@ repository = "https://github.com/wasm-bindgen/ts-gen"
 version = "0.1.0"
 
 [features]
-cli = ["clap"]
+cli = ["dep:clap", "dep:ts-gen-bridge", "dep:wat"]
 default = ["cli"]
 
 [[bin]]
@@ -57,7 +59,8 @@ path = "src/lib.rs"
 
 [dependencies]
 anyhow = "1"
-ts-gen-abi = { path = "abi" }
+ts-gen-abi = { path = "abi", version = "0.1.0" }
+ts-gen-bridge = { path = "bridge", version = "0.1.0", optional = true }
 clap = { version = "4", features = ["derive"], optional = true }
 convert_case = "0.6"
 indexmap = "2"
@@ -66,11 +69,8 @@ oxc_ast = "0.154"
 oxc_parser = "0.154"
 oxc_resolver = "11"
 oxc_span = "0.154"
-prettyplease = "0.2"
-proc-macro2 = "1"
-quote = "1"
-syn = { version = "2", features = ["full", "extra-traits", "printing"] }
 walkdir = "2"
+wat = { version = "1.263", optional = true }
 
 [dev-dependencies]
 similar = "2"

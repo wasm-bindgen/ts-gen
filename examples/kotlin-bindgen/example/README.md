@@ -63,14 +63,14 @@ The declarations beside the app:
 
 1. `ts-gen --ir`, with `--annotate annotate.d.ts`, `--with std.tw` and
    `--provides provides.d.ts`: the IR.
-2. `ts-gen-abi lower --profile "all-host, results = single, throws = js"`,
+2. `ts-gen --json --profile "all-host, results = single, throws = js"`,
    then `kotlin-bindgen`, for `std.tw` and for the worker: the bindings
    (`build/std/` with `tsgen.runtime`, and `build/bindings/` over them
    with `--lib std=std`), each with a `links.tsv`.
 3. Gradle: the Kotlin/Wasm module, from the bindings and the app.
 4. `kotlin-bindgen link`: Kotlin imports every `@JsFun` from `js_code` under
    its qualified name; the link step renames the ones the `links.tsv`
-   files list to their tw keys. `ts-gen-bridge generate` then writes the
+   files list to their tw keys. `ts-gen --bridge` then writes the
    bridge for the linked module.
 
 `loader.js` instantiates the linked module through the bridge's

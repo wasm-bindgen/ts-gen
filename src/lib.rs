@@ -1,7 +1,8 @@
-//! `ts-gen`: Generate `wasm-bindgen` Rust bindings from TypeScript `.d.ts` files.
+//! `ts-gen`: read TypeScript `.d.ts` files and lower them to the ts-gen IR.
 //!
-//! This crate provides both a library API and a CLI tool for converting
-//! TypeScript declaration files into Rust `#[wasm_bindgen]` extern blocks.
+//! This crate is the language-neutral front end: the parser, the parsed
+//! model ([`ir`]) and its lowering to the IR ([`lower`]). A language
+//! generator builds on it; `ts-gen-wasm-bindgen` is the one for Rust.
 //!
 //! # Pipeline
 //!
@@ -11,10 +12,9 @@
 //!   → First Pass phase 1: collect all type names into TypeRegistry
 //!   → First Pass phase 2: populate full IR (resolve references, merge var+interface patterns)
 //!   → Assembly: group by ModuleContext, resolve inheritance chains, classify types
-//!   → Code Generation: IR → syn::File → prettyplease → .rs files
+//!   → Lowering: the ts-gen IR (`IR.md`), or a language generator
 //! ```
 
-pub mod codegen;
 pub mod context;
 pub mod external_map;
 pub mod input;
@@ -39,7 +39,7 @@ pub const STD_IR: &str = include_str!("../std/std.tw");
 /// inspect or display them as needed (e.g., `ctx.diagnostics.emit()`).
 ///
 /// External type mappings can be configured on the returned `GlobalContext`
-/// before passing it to `codegen::generate`.
+/// before passing it to a generator.
 pub fn parse(
     paths: &[impl AsRef<Path>],
     lib_name: Option<&str>,

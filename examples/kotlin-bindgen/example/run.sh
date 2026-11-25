@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Builds the Kotlin worker end to end into out/:
-#   ts-gen --ir -> ts-gen-abi lower -> kotlin-bindgen -> Kotlin/Wasm
-#   -> kotlin-bindgen link -> ts-gen-bridge generate.
+#   ts-gen --ir -> ts-gen --json -> kotlin-bindgen -> Kotlin/Wasm
+#   -> kotlin-bindgen link -> ts-gen --bridge.
 # `./run.sh serve` then serves it in workerd and curls every route;
 # `./run.sh node` runs the routes node can serve.
 #
@@ -18,7 +18,7 @@ STD="$ROOT/std/std.tw"
 PROFILE="all-host, results = single, throws = js"
 KOTLIN="$ROOT/examples/kotlin-bindgen/build/install/kotlin-bindgen/bin/kotlin-bindgen"
 
-(cd "$ROOT" && cargo build --quiet --bins -p ts-gen -p ts-gen-abi -p ts-gen-bridge)
+(cd "$ROOT" && cargo build --quiet --bins -p ts-gen)
 [ -n "${TSGEN_KOTLIN_BUILT:-}" ] || "$ROOT/examples/kotlin-bindgen/gradlew" --quiet -p "$ROOT/examples/kotlin-bindgen" installDist
 mkdir -p "$B"
 
@@ -27,12 +27,12 @@ mkdir -p "$B"
 #    std.tw, and what the module provides (provides.d.ts).
 "$BIN/ts-gen" -i "$ROOT/tests/fixtures/workers-types.d.ts" -i "$EX/env.d.ts" \
   --annotate "$EX/annotate.d.ts" --with "$STD" \
-  --provides "$EX/provides.d.ts" --ir "$B/worker.tw" 2>/dev/null
+  --provides "$EX/provides.d.ts" --ir -o "$B/worker.tw" 2>/dev/null
 
 # 2. The bindings: std's (with the runtime: futures and the loop), then
 #    the worker's over them.
-"$BIN/ts-gen-abi" lower "$STD" --profile "$PROFILE" > "$B/std.json"
-"$BIN/ts-gen-abi" lower "$B/worker.tw" --with "$STD" --profile "$PROFILE" > "$B/worker.json"
+"$BIN/ts-gen" -i "$STD" --json --profile "$PROFILE" > "$B/std.json"
+"$BIN/ts-gen" -i "$B/worker.tw" --with "$STD" --json --profile "$PROFILE" > "$B/worker.json"
 "$KOTLIN" "$B/std.json" "$B/std" --package std --runtime
 "$KOTLIN" "$B/worker.json" "$B/bindings" --package workers --app-package app --lib std=std
 
@@ -44,7 +44,7 @@ mkdir -p "$B"
 rm -rf "$OUT"
 mkdir -p "$OUT"
 "$KOTLIN" link "$KOUT/worker.wasm" "$B/std/links.tsv" "$B/bindings/links.tsv" -o "$OUT/worker.wasm"
-"$BIN/ts-gen-bridge" generate "$B/worker.tw" "$OUT/worker.wasm" --with "$STD" --profile "$PROFILE" -o "$OUT"
+"$BIN/ts-gen" -i "$B/worker.tw" --bridge "$OUT/worker.wasm" --with "$STD" --profile "$PROFILE" -o "$OUT"
 cp "$EX/loader.js" "$EX/backend.js" "$EX/config.capnp" "$EX/node.mjs" "$KOUT/worker.import-object.mjs" "$KOUT/worker.js-builtins.mjs" "$OUT/"
 echo "built $OUT"
 

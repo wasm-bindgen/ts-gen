@@ -13,9 +13,9 @@
 use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
 
-use crate::context::{GlobalContext, TypeId};
-use crate::ir::{Member, Module, ModuleContext, Root, TypeDeclaration, TypeKind, TypeRef};
-use crate::parse::scope::{Binding, ScopeId};
+use ts_gen::context::{GlobalContext, TypeId};
+use ts_gen::ir::{Member, Module, ModuleContext, Root, TypeDeclaration, TypeKind, TypeRef};
+use ts_gen::parse::scope::{Binding, ScopeId};
 
 use super::{ExportSpec, GenerateOptions};
 
@@ -315,14 +315,14 @@ impl<'d> Builder<'_, 'd> {
                 _ => false,
             });
             if taken {
-                crate::util::naming::to_snake_case(public)
+                ts_gen::util::naming::to_snake_case(public)
             } else {
                 name
             }
         };
         let form = match &decl.kind {
             TypeKind::Function(f) if f.js_name != public => Cow::Owned(TypeDeclaration {
-                kind: TypeKind::Function(crate::ir::FunctionDecl {
+                kind: TypeKind::Function(ts_gen::ir::FunctionDecl {
                     name: rust_name(&f.js_name),
                     js_name: public.to_string(),
                     ..f.clone()
@@ -330,7 +330,7 @@ impl<'d> Builder<'_, 'd> {
                 ..decl.clone()
             }),
             TypeKind::Variable(v) if v.js_name != public => Cow::Owned(TypeDeclaration {
-                kind: TypeKind::Variable(crate::ir::VariableDecl {
+                kind: TypeKind::Variable(ts_gen::ir::VariableDecl {
                     name: rust_name(&v.js_name),
                     js_name: public.to_string(),
                     ..v.clone()
@@ -379,7 +379,7 @@ impl<'d> Builder<'_, 'd> {
             return;
         }
         forms.push(Cow::Owned(TypeDeclaration {
-            kind: TypeKind::TypeAlias(crate::ir::TypeAliasDecl {
+            kind: TypeKind::TypeAlias(ts_gen::ir::TypeAliasDecl {
                 name: public.to_string(),
                 type_params: vec![],
                 target: TypeRef::ident(local.to_string()),
@@ -493,7 +493,7 @@ impl<'d> Builder<'_, 'd> {
         }
         let mut mod_names = HashMap::new();
         for (_, ids) in containers {
-            let mut taken = crate::util::naming::LocalScope::default();
+            let mut taken = ts_gen::util::naming::LocalScope::default();
             let own = |id: TypeId| match &gctx.get_type(id).kind {
                 TypeKind::Namespace(ns) => ns.name.clone(),
                 _ => unreachable!(),
@@ -510,14 +510,14 @@ impl<'d> Builder<'_, 'd> {
                 let name = exported_mod_name(names, &own(id));
                 taken.claim(name.clone());
                 for public in names.iter().filter(|&p| p != "default") {
-                    taken.claim(crate::util::naming::to_snake_case(public));
+                    taken.claim(ts_gen::util::naming::to_snake_case(public));
                 }
                 mod_names.insert(id, name);
             }
             for id in local {
                 let name = taken.declare(
-                    &crate::util::naming::to_snake_case(&own(id)),
-                    crate::util::naming::Suffix::Snake,
+                    &ts_gen::util::naming::to_snake_case(&own(id)),
+                    ts_gen::util::naming::Suffix::Snake,
                 );
                 mod_names.insert(id, name);
             }
@@ -553,7 +553,7 @@ impl<'d> Builder<'_, 'd> {
         let own = |id: TypeId| gctx.get_type(id).kind.name();
         let mut renamed = HashMap::new();
         for ids in containers.into_values() {
-            let mut taken = crate::util::naming::LocalScope::default();
+            let mut taken = ts_gen::util::naming::LocalScope::default();
             let (exported, local): (Vec<_>, Vec<_>) = ids
                 .into_iter()
                 .partition(|id| self.names.get(id).is_some_and(|n| !n.is_empty()));
@@ -564,7 +564,7 @@ impl<'d> Builder<'_, 'd> {
                 }
             }
             for id in local {
-                let name = taken.declare(own(id), crate::util::naming::Suffix::Pascal);
+                let name = taken.declare(own(id), ts_gen::util::naming::Suffix::Pascal);
                 if name != own(id) {
                     if let Some(form) = self.items.get_mut(&id).and_then(|f| f.first_mut()) {
                         rename_type(&mut form.to_mut().kind, &name);
@@ -612,12 +612,12 @@ fn exported_mod_name(names: &[String], own: &str) -> String {
         Some(first) if !names.iter().any(|n| n == own) => first,
         _ => own,
     };
-    crate::util::naming::to_snake_case(name)
+    ts_gen::util::naming::to_snake_case(name)
 }
 
 /// The Rust name of a function or variable `local` exported as `public`.
 fn public_rust_name(local: &str, public: &str) -> String {
-    crate::util::naming::to_snake_case(crate::parse::first_pass::rust_name(local, public))
+    ts_gen::util::naming::to_snake_case(ts_gen::parse::first_pass::rust_name(local, public))
 }
 
 /// Every type name `decl` refers to, with the scope it is resolved from.
@@ -690,7 +690,7 @@ fn declaration_refs(decl: &TypeDeclaration, out: &mut Vec<(String, ScopeId)>) {
     }
 }
 
-fn function(f: &crate::ir::FunctionDecl, walk: &mut impl FnMut(&TypeRef, ScopeId)) {
+fn function(f: &ts_gen::ir::FunctionDecl, walk: &mut impl FnMut(&TypeRef, ScopeId)) {
     type_params(&f.type_params, f.body_scope, walk);
     for p in &f.params {
         walk(&p.type_ref, f.body_scope);
@@ -709,7 +709,7 @@ fn function(f: &crate::ir::FunctionDecl, walk: &mut impl FnMut(&TypeRef, ScopeId
 }
 
 fn type_params(
-    params: &[crate::ir::TypeParam],
+    params: &[ts_gen::ir::TypeParam],
     scope: ScopeId,
     walk: &mut impl FnMut(&TypeRef, ScopeId),
 ) {
@@ -862,7 +862,7 @@ mod tests {
             export declare function f(k: K, a: Alias, i: NS.Inner): void;
             export {};
         "#;
-        let (module, gctx) = crate::parse_source(src, Some("m")).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, Some("m")).unwrap();
         let surface = surface_of(&module, &gctx, "m");
         let emitted = |name| !surface.get(find(&module, &gctx, name)).is_empty();
         for name in ["f", "K", "Alias", "Opts", "NS", "Inner"] {
@@ -890,7 +890,7 @@ mod tests {
                 function other(): void;
             }
         "#;
-        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, None).unwrap();
         let exports = ["f", "NS.Inner", "connect", "Nope"]
             .map(|name| ExportSpec::Decl(name.to_string()))
             .into_iter()
@@ -916,7 +916,7 @@ mod tests {
             declare class _D {}
             export { _Bar as Foo, _N as N1, _N as N2, _C as C1, _C, _C as C2, _D as D };
         "#;
-        let (module, gctx) = crate::parse_source(src, Some("m")).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, Some("m")).unwrap();
         let surface = surface_of(&module, &gctx, "m");
         let id = |name| find(&module, &gctx, name);
         // A local declaration sharing a public name is not that export.
@@ -953,7 +953,7 @@ mod tests {
             export declare function f(t: Hidden.T): void;
             export { make as create, own, own as other, D as default };
         "#;
-        let (module, gctx) = crate::parse_source(src, Some("m")).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, Some("m")).unwrap();
         let surface = surface_of(&module, &gctx, "m");
         let id = |name| {
             let mut stack = module.types.clone();
@@ -979,7 +979,7 @@ mod tests {
     fn values_are_emitted_under_each_public_name() {
         /// The (Rust name, JS name) pairs `name` is bound under.
         fn forms(src: &str, name: &str) -> Vec<(String, String)> {
-            let (module, gctx) = crate::parse_source(src, Some("m")).unwrap();
+            let (module, gctx) = ts_gen::parse_source(src, Some("m")).unwrap();
             let surface = surface_of(&module, &gctx, "m");
             surface
                 .get(find(&module, &gctx, name))
@@ -1030,7 +1030,7 @@ mod tests {
                 path
             })
             .collect();
-        let result = crate::parse(&paths, None);
+        let result = ts_gen::parse(&paths, None);
         std::fs::remove_dir_all(&dir).unwrap();
         let (module, gctx) = result.unwrap();
         let surface = surface_of(&module, &gctx, "m");

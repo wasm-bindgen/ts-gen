@@ -4,9 +4,10 @@ Guidance for AI agents and human contributors working in `ts-gen`.
 
 ## What this project does
 
-`ts-gen` is a TypeScript-to-Rust binding generator. It reads `.d.ts`
-files and emits Rust source containing `#[wasm_bindgen] extern "C"`
-blocks. The output is meant to compile cleanly against `wasm-bindgen`
+`ts-gen` is a TypeScript binding generator. It reads `.d.ts` files and
+lowers them to a language-neutral IR; its Rust generator,
+`ts-gen-wasm-bindgen`, emits Rust source containing
+`#[wasm_bindgen] extern "C"` blocks. The output is meant to compile cleanly against `wasm-bindgen`
 and let downstream Rust code interact with JS APIs that are described
 purely by their TypeScript declarations.
 
@@ -15,6 +16,9 @@ purely by their TypeScript declarations.
 ```text
 src/
 ├── lib.rs                     # public API (`parse_source`, re-exports)
+├── main.rs                    # the `ts-gen` CLI: --lang / --ir / --json / --bridge
+├── generator.rs               # `--lang <L>`: find, install and run `ts-gen-<L>`
+├── input.rs                   # input file resolution, parse + `--annotate`
 ├── ir.rs                      # IR types (TypeRef, ClassDecl, …)
 ├── context.rs                 # GlobalContext (scopes, registry, externals)
 ├── external_map.rs            # `--external Foo=::path::Bar` resolution
@@ -31,8 +35,12 @@ src/
 │   │   ├── collect.rs         # phase 1: name registry
 │   │   └── populate.rs        # phase 2: full IR
 │   └── mod.rs                 # post-passes (merge_class_pairs, …)
-├── codegen/                   # IR → Rust source
-│   ├── mod.rs                 # entry, `generate(...)`
+└── util/                      # naming, diagnostics, dedup helpers
+
+wasm-bindgen/                  # the `ts-gen-wasm-bindgen` crate: IR → Rust source
+├── src/
+│   ├── lib.rs                 # entry, `generate(...)`
+│   ├── main.rs                # the generator's CLI (the Rust flags)
 │   ├── classes.rs             # extern blocks for class-like types
 │   ├── functions.rs           # free function / variable bindings
 │   ├── enums.rs               # string + numeric enums
@@ -42,12 +50,12 @@ src/
 │   ├── surface.rs             # output surface: export roots, `--export <Name>`, closure
 │   ├── type_params.rs         # erase method type params no argument infers
 │   └── typemap.rs             # TypeRef → syn tokens, `to_return_type`, externals
-└── util/                      # naming, diagnostics, dedup helpers
+└── tests/snapshot.rs          # the snapshot harness, over the root `tests/`
 
 tests/
 ├── fixtures/*.d.ts            # input declarations
 ├── snapshots/<name>/*.rs      # expected output per CLI configuration (default, mono)
-└── snapshot.rs                # the snapshot harness
+└── cli.rs                     # the `ts-gen` binary, with stand-in generators
 
 integration-tests/
 ├── tests/*.rs                 # hand-written integration tests
@@ -106,9 +114,10 @@ Three layers:
    internal helpers (parse logic, naming, subtyping LUB, signature
    expansion). New behaviour should ship with unit tests in the
    relevant module's `#[cfg(test)] mod tests`.
-2. **Snapshot tests** (`cargo test --test snapshot`) — fixture-driven.
+2. **Snapshot tests** (`cargo test -p ts-gen-wasm-bindgen --test snapshot`)
+   — fixture-driven.
    Every fixture under `tests/fixtures/` is rendered under each CLI
-   configuration in `tests/snapshot.rs` (`default`, and `mono` for
+   configuration in `wasm-bindgen/tests/snapshot.rs` (`default`, and `mono` for
    `--experimental-generic-mono --fallible`) into `tests/snapshots/<name>/`.
    Re-bless
    with `BLESS=1 cargo test`. Snapshot

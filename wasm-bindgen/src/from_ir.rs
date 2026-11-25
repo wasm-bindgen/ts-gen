@@ -14,7 +14,7 @@ use ts_gen_abi::ir::JsEntries;
 use ts_gen_abi::resolve::{Context, Location, Symbols, TypeDecl};
 
 use super::{ir_callables, ir_types};
-use crate::context::TypeId;
+use ts_gen::context::TypeId;
 
 /// The lowered IR, and where each parsed declaration is in it.
 pub struct IrDecls {
@@ -32,7 +32,7 @@ impl IrDecls {
         Symbols::with_libs(&self.ir, &[super::std_ir()])
     }
 
-    pub fn new(lowered: crate::lower::Lowered) -> Self {
+    pub fn new(lowered: ts_gen::lower::Lowered) -> Self {
         let ids = lowered
             .locations
             .iter()
@@ -61,9 +61,9 @@ impl IrDecls {
         cgctx: &super::typemap::CodegenContext<'_>,
         t: &abi::Type,
         at: &Location,
-        scope: crate::parse::scope::ScopeId,
-        from_module: &crate::ir::ModuleContext,
-    ) -> Option<crate::ir::TypeRef> {
+        scope: ts_gen::parse::scope::ScopeId,
+        from_module: &ts_gen::ir::ModuleContext,
+    ) -> Option<ts_gen::ir::TypeRef> {
         let abi::Type::Named(r) = t else {
             return None;
         };
@@ -74,7 +74,7 @@ impl IrDecls {
             .resolve_path(scope, &segments.join("."))
             .is_some()
         {
-            return Some(crate::ir::TypeRef::Reference {
+            return Some(ts_gen::ir::TypeRef::Reference {
                 segments: segments.clone(),
                 generic_args: Vec::new(),
             });
@@ -102,13 +102,13 @@ impl IrDecls {
         if flat.shape != Shape::Unit {
             return None;
         }
-        let literals: Vec<crate::ir::TypeRef> = flat
+        let literals: Vec<ts_gen::ir::TypeRef> = flat
             .arms
             .iter()
-            .map(|a| literal(a.arm).map(|l| crate::ir::TypeRef::StringLiteral(l.into())))
+            .map(|a| literal(a.arm).map(|l| ts_gen::ir::TypeRef::StringLiteral(l.into())))
             .collect::<Option<_>>()?;
         let name = cgctx.synthesise_literal_enum(name, &literals, true, scope, from_module)?;
-        Some(crate::ir::TypeRef::ident(name))
+        Some(ts_gen::ir::TypeRef::ident(name))
     }
 
     /// Each error class the throws enums of the IR's members match, first
@@ -275,11 +275,11 @@ impl IrDecls {
     /// signature model. `None` when any can't be, or the IR declares none.
     pub fn callable(
         &self,
-        gctx: &crate::context::GlobalContext,
+        gctx: &ts_gen::context::GlobalContext,
         site: &ir_callables::Site<'_>,
         js_name: &str,
-        scope: crate::parse::scope::ScopeId,
-        bound: &[crate::parse::scope::ScopeId],
+        scope: ts_gen::parse::scope::ScopeId,
+        bound: &[ts_gen::parse::scope::ScopeId],
     ) -> Option<Vec<ir_types::Overload>> {
         self.members(gctx, site, js_name, scope, bound, |cx, members| {
             let overloads: Vec<_> = null_arms(members)
@@ -294,11 +294,11 @@ impl IrDecls {
     /// setter writes. `None` when the setter writes more than one type.
     pub fn accessor(
         &self,
-        gctx: &crate::context::GlobalContext,
+        gctx: &ts_gen::context::GlobalContext,
         site: &ir_callables::Site<'_>,
         js_name: &str,
-        scope: crate::parse::scope::ScopeId,
-    ) -> Option<crate::ir::TypeRef> {
+        scope: ts_gen::parse::scope::ScopeId,
+    ) -> Option<ts_gen::ir::TypeRef> {
         match &self.accessors(gctx, site, js_name, scope)?.0[..] {
             [t] => Some(t.clone()),
             _ => None,
@@ -308,11 +308,11 @@ impl IrDecls {
     /// What the getter `js_name` at `site` throws.
     pub fn getter_throws(
         &self,
-        gctx: &crate::context::GlobalContext,
+        gctx: &ts_gen::context::GlobalContext,
         site: &ir_callables::Site<'_>,
         js_name: &str,
-        scope: crate::parse::scope::ScopeId,
-    ) -> Option<crate::ir::Throws> {
+        scope: ts_gen::parse::scope::ScopeId,
+    ) -> Option<ts_gen::ir::Throws> {
         self.members(
             gctx,
             site,
@@ -332,11 +332,11 @@ impl IrDecls {
     /// parameters to, which the child reads as the parent declares it.
     pub fn accessors(
         &self,
-        gctx: &crate::context::GlobalContext,
+        gctx: &ts_gen::context::GlobalContext,
         site: &ir_callables::Site<'_>,
         js_name: &str,
-        scope: crate::parse::scope::ScopeId,
-    ) -> Option<(Vec<crate::ir::TypeRef>, bool)> {
+        scope: ts_gen::parse::scope::ScopeId,
+    ) -> Option<(Vec<ts_gen::ir::TypeRef>, bool)> {
         self.members(gctx, site, js_name, scope, &[], |cx, members| {
             let ts = null_arms(members)
                 .iter()
@@ -350,11 +350,11 @@ impl IrDecls {
     /// The members at `site` that bind `js_name` in its form.
     fn members<R>(
         &self,
-        gctx: &crate::context::GlobalContext,
+        gctx: &ts_gen::context::GlobalContext,
         site: &ir_callables::Site<'_>,
         js_name: &str,
-        scope: crate::parse::scope::ScopeId,
-        bound: &[crate::parse::scope::ScopeId],
+        scope: ts_gen::parse::scope::ScopeId,
+        bound: &[ts_gen::parse::scope::ScopeId],
         f: impl Fn(&ir_types::Cx<'_>, Vec<&abi::Member>) -> Option<R>,
     ) -> Option<R> {
         // A module's export list binds its declarations to their public
@@ -374,11 +374,11 @@ impl IrDecls {
     #[allow(clippy::too_many_arguments)]
     fn members_at<R>(
         &self,
-        gctx: &crate::context::GlobalContext,
+        gctx: &ts_gen::context::GlobalContext,
         site: &ir_callables::Site<'_>,
         js_name: &str,
-        scope: crate::parse::scope::ScopeId,
-        bound: &[crate::parse::scope::ScopeId],
+        scope: ts_gen::parse::scope::ScopeId,
+        bound: &[ts_gen::parse::scope::ScopeId],
         public: bool,
         f: &impl Fn(&ir_types::Cx<'_>, Vec<&abi::Member>) -> Option<R>,
     ) -> Option<R> {

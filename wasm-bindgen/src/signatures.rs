@@ -45,11 +45,11 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::codegen::typemap::{self, CodegenContext, TypePosition};
-use crate::codegen::PromiseReturns;
-use crate::ir::{ModuleContext, Nullability, Param, SharedMemory, Throws, TypeRef};
-use crate::parse::scope::ScopeId;
-use crate::util::naming::{ident_chars, snake_ident, to_snake_case, LocalScope, Suffix};
+use crate::typemap::{self, CodegenContext, TypePosition};
+use crate::PromiseReturns;
+use ts_gen::ir::{ModuleContext, Nullability, Param, SharedMemory, Throws, TypeRef};
+use ts_gen::parse::scope::ScopeId;
+use ts_gen::util::naming::{ident_chars, snake_ident, to_snake_case, LocalScope, Suffix};
 
 /// What kind of callable an emitter is producing — drives default-naming
 /// (`new`, `set_x`, snake-case, …) and which `wasm_bindgen` attributes to
@@ -194,10 +194,10 @@ pub struct ConcreteParam {
     pub type_ref: TypeRef,
     /// Whether this param is variadic (only the last param can be).
     pub variadic: bool,
-    /// `{@slice mode}` hint from the source [`crate::ir::Param`], applied
+    /// `{@slice mode}` hint from the source [`ts_gen::ir::Param`], applied
     /// where this alternative's lowering is slice-shaped (see
-    /// [`crate::codegen::typemap::param_slice_mode`]).
-    pub slice_mode: Option<crate::ir::SliceModeHint>,
+    /// [`crate::typemap::param_slice_mode`]).
+    pub slice_mode: Option<ts_gen::ir::SliceModeHint>,
     /// Whether this is the first arm of an omittable parameter, which takes
     /// `undefined` as `None` when a later argument follows it (see
     /// [`take_leading_undefined`]).
@@ -347,7 +347,7 @@ impl FunctionSignature {
 /// from `ty`, in source-appearance order, deduped.
 ///
 /// A name in `ty` is treated as a type parameter when the scope chain
-/// resolves it to [`crate::parse::scope::Binding::TypeParam`]. Used
+/// resolves it to [`ts_gen::parse::scope::Binding::TypeParam`]. Used
 /// by `classes.rs` / `functions.rs` to compute the `<T: JsGeneric, …>`
 /// declaration for each emitted method or type.
 pub fn collect_type_params(
@@ -356,7 +356,7 @@ pub fn collect_type_params(
     scope: ScopeId,
     out: &mut Vec<String>,
 ) {
-    use crate::parse::scope::Binding;
+    use ts_gen::parse::scope::Binding;
     match ty {
         TypeRef::Reference {
             segments,
@@ -466,7 +466,7 @@ pub fn expand_signatures(
     // Phase 2: Cross-overload dedup — remove signatures that are identical
     // structurally OR after lowering to Rust type tokens (so `"inline"` and
     // `"attachment"` literal arms both collapse to a single `&str` overload).
-    let from_module = crate::ir::ModuleContext::Global;
+    let from_module = ts_gen::ir::ModuleContext::Global;
     let render = |sig: &[ConcreteParam], scope: ScopeId| -> Vec<String> {
         sig.iter()
             .map(|p| {
@@ -1526,7 +1526,7 @@ fn pair_typed_array_slice(
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) {
-    use crate::ir::TypedArrayElement as E;
+    use ts_gen::ir::TypedArrayElement as E;
     fn peel_nullable(t: &TypeRef) -> (TypeRef, Option<Nullability>) {
         match t.split_empties() {
             Some((core, n)) => (core, Some(n)),
@@ -1696,7 +1696,7 @@ fn flatten_into(
 /// whose normal flatten would exceed
 /// [`FLATTEN_ALTERNATIVE_LIMIT`].
 ///
-/// Returns [`crate::codegen::subtyping::lub_union`] for unions
+/// Returns [`crate::subtyping::lub_union`] for unions
 /// (and aliases that chase through to one); otherwise returns the
 /// input unchanged. The empties stay beside the collapsed rest.
 fn flatten_collapse_to_lub(
@@ -1713,7 +1713,7 @@ fn flatten_collapse_to_lub(
             flatten_collapse_to_lub(&core, cgctx, scope).with_empties(n)
         }
         TypeRef::Union(u) => {
-            crate::codegen::subtyping::lub_union(u.members(), cgctx, scope).unwrap_or(TypeRef::Any)
+            crate::subtyping::lub_union(u.members(), cgctx, scope).unwrap_or(TypeRef::Any)
         }
         TypeRef::PropertyKey => TypeRef::Any,
         TypeRef::Reference {
@@ -2134,7 +2134,7 @@ pub fn generate_concrete_params(
     params: &[ConcreteParam],
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
-    from_module: &crate::ir::ModuleContext,
+    from_module: &ts_gen::ir::ModuleContext,
 ) -> TokenStream {
     let items: Vec<_> = params
         .iter()
@@ -2220,7 +2220,7 @@ pub(crate) fn generate_callable_params(
     params: &[ConcreteParam],
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
-    from_module: &crate::ir::ModuleContext,
+    from_module: &ts_gen::ir::ModuleContext,
     bounds: &mut Vec<TokenStream>,
 ) -> TokenStream {
     let Some(ctx) = cgctx else {
@@ -2234,7 +2234,7 @@ pub(crate) fn generate_callable_params(
         let shadows = typemap::is_prelude_reserved(&candidate)
             || matches!(
                 ctx.gctx.scopes.resolve_binding(scope, &candidate),
-                Some(crate::parse::scope::Binding::Declared(_))
+                Some(ts_gen::parse::scope::Binding::Declared(_))
             );
         if !shadows {
             return candidate;
@@ -2286,7 +2286,7 @@ pub(crate) fn render_param_type(
     param: &ConcreteParam,
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
-    from_module: &crate::ir::ModuleContext,
+    from_module: &ts_gen::ir::ModuleContext,
 ) -> TokenStream {
     let mono = cgctx.filter(|ctx| ctx.experimental_generic_mono);
     if param.variadic && !typemap::variadic_spreads_list(&param.type_ref, cgctx, scope) {
@@ -2366,7 +2366,7 @@ pub fn generate_dictionary_params(
     params: &[ConcreteParam],
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
-    from_module: &crate::ir::ModuleContext,
+    from_module: &ts_gen::ir::ModuleContext,
 ) -> DictionaryParams {
     generate_dictionary_params_in(
         params,
@@ -2385,7 +2385,7 @@ pub fn generate_dictionary_params_in(
     scopes: &[ScopeId],
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
-    from_module: &crate::ir::ModuleContext,
+    from_module: &ts_gen::ir::ModuleContext,
 ) -> DictionaryParams {
     let mut generic_idents: Vec<syn::Ident> = Vec::new();
     let mut extern_items: Vec<TokenStream> = Vec::new();
@@ -2807,9 +2807,9 @@ pub fn is_void_return(ty: &TypeRef) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::codegen::typemap::CodegenContext;
-    use crate::context::GlobalContext;
-    use crate::ir::{Nullability, TypeRef};
+    use crate::typemap::CodegenContext;
+    use ts_gen::context::GlobalContext;
+    use ts_gen::ir::{Nullability, TypeRef};
 
     fn no_used() -> LocalScope {
         LocalScope::default()
@@ -3204,7 +3204,7 @@ mod tests {
                 &params,
                 Some(cgctx),
                 scope,
-                &crate::ir::ModuleContext::Global,
+                &ts_gen::ir::ModuleContext::Global,
                 &mut Vec::new(),
             )
             .to_string()
@@ -3233,7 +3233,7 @@ mod tests {
                 &params,
                 Some(cgctx),
                 scope,
-                &crate::ir::ModuleContext::Global,
+                &ts_gen::ir::ModuleContext::Global,
             )
         };
 
@@ -3270,7 +3270,7 @@ mod tests {
             &params,
             Some(&cgctx),
             scope,
-            &crate::ir::ModuleContext::Global,
+            &ts_gen::ir::ModuleContext::Global,
         );
         assert_eq!(rendered.params.to_string(), "a : & U , b : & W");
     }
@@ -5169,7 +5169,7 @@ mod tests {
                 interface Inner { shadow: boolean; }
             }
         "#;
-        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, None).unwrap();
         let cgctx = CodegenContext::from_module(&module, &gctx);
         let file = module.file_scopes[0];
         let shadow = gctx.scopes.resolve_namespace(file, "Shadow").unwrap();
@@ -5203,7 +5203,7 @@ mod tests {
             type Kind = "a" | "b";
             type Loose<T> = T | string;
         "#;
-        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, None).unwrap();
         let cgctx = CodegenContext::from_module(&module, &gctx);
         let file = module.file_scopes[0];
         let flat = |ty: TypeRef| flatten_type(&ty, Some(&cgctx), file);
@@ -5245,7 +5245,7 @@ mod tests {
 
     #[test]
     fn typed_array_pairs_with_its_element_array() {
-        use crate::ir::TypedArrayElement as E;
+        use ts_gen::ir::TypedArrayElement as E;
         let array = |elem: TypeRef| TypeRef::Array(Box::new(elem));
         let flat = |members: Vec<TypeRef>| flatten_no_ctx(&TypeRef::union(members));
         assert_eq!(

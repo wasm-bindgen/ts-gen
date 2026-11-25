@@ -74,7 +74,7 @@ The declarations beside workers-types:
    members under their IR keys with `@export`, over `app.zena`.
 3. `zena build -t js`: the module. Generic members import per
    instantiation under their templated keys.
-4. `ts-gen-bridge generate`: the bridge for the module. No link step is
+4. `ts-gen --bridge`: the bridge for the module. No link step is
    needed, as Zena names every import and export itself.
 
 `loader.js` instantiates the module through the bridge's `instantiate`,
