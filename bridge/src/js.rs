@@ -2084,9 +2084,9 @@ impl<'a, 'b> Glue<'a, 'b> {
                 b.line("return $suspend(f);");
                 return Ok(b.finish(&format!("function {name}(f)")));
             }
-            Op::ListSuspend => {
+            Op::SuspendRace => {
                 let fs = self.lift(&func.sig.params[0].repr, &wires[0])?;
-                b.line(format!("return $suspendAny({fs});"));
+                b.line(format!("return $suspendRace({fs});"));
             }
             Op::FutureState => {
                 b.line("return $isFuture(f).state;");
@@ -2139,14 +2139,14 @@ impl<'a, 'b> Glue<'a, 'b> {
                 let throws = func.sig.throws.clone();
                 self.complete(&mut b, &call, Some(r), throws, false, &[])?;
             }
-            Op::ListStates => {
+            Op::States => {
                 let fs = self.lift(&func.sig.params[0].repr, &wires[0])?;
                 let call = format!("$states({fs})");
                 self.complete(&mut b, &call, func.sig.results.first(), None, false, &[])?;
             }
-            Op::ListWatch => {
+            Op::WatchRace => {
                 let fs = self.lift(&func.sig.params[0].repr, &wires[0])?;
-                b.line(format!("$watchAll({fs}, {});", wires[1][0]));
+                b.line(format!("$watchRace({fs}, {});", wires[1][0]));
             }
             Op::FutureError(e) => {
                 let map = self.error_map(e)?;

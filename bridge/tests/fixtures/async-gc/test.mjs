@@ -44,7 +44,7 @@ await tick();
 assert.deepEqual(wakes, [4]);
 assert.equal(ex["call:future:state"](f), 1);
 // The states are a GC array too.
-assert.equal(typeof ex["call:future-list:states"](list([f])), "object");
+assert.equal(typeof ex["call:future:states"](list([f])), "object");
 const [present, s] = ex["call:future:get<str>"](f);
 assert.equal(present, 1);
 const p = app.run();
@@ -56,7 +56,7 @@ assert.deepEqual(scratchUse(), base);
 let res;
 api.next = new Promise((r) => (res = r));
 const g = ex["call:Api#fetch()"](api);
-ex["call:future-list:watch"](list([f, g]), 5);
+ex["call:future:watch_race"](list([f, g]), 5);
 ex["tw:terminated"].value = 1;
 res("x");
 await tick();

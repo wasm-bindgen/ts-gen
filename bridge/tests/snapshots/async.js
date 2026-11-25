@@ -645,7 +645,7 @@ class $Watch {
   }
 }
 
-function $watchAll(fs, w) {
+function $watchRace(fs, w) {
   const pending = [];
   for (const f of fs) if ($isFuture(f).state === 0) pending.push(f);
   const watch = new $Watch(w, pending);
@@ -1115,7 +1115,7 @@ function $f24(f, w) {
   $watch(f, w);
 }
 
-// ("tw:future-list", "states")
+// ("tw:future", "states")
 function $f25(w0_0, w0_1) {
   const cx = $cx;
   const cxm = cx.n;
@@ -1135,9 +1135,9 @@ function $f25(w0_0, w0_1) {
   }
 }
 
-// ("tw:future-list", "watch")
+// ("tw:future", "watch_race")
 function $f26(w0_0, w0_1, w1_0) {
-  $watchAll($h6(w0_0, w0_1), w1_0);
+  $watchRace($h6(w0_0, w0_1), w1_0);
 }
 
 // ("tw:future", "new")
@@ -1244,13 +1244,11 @@ export function instantiate(language, bridge, imports = {}) {
       "error<err>": $B.f22,
       "cancel": $f23,
       "watch": $f24,
+      "states": $B.f25,
+      "watch_race": $f26,
       "new": $f27,
       "resolve<u32>": $f28,
       "reject<err>": $f29,
-    },
-    "tw:future-list": {
-      "states": $B.f25,
-      "watch": $f26,
     },
     "tw:loop": {
       "work_available": $f30,

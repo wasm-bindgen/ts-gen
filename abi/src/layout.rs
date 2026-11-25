@@ -2019,8 +2019,8 @@ impl<'a> Layouts<'a> {
         })
     }
 
-    /// `("tw:future-list", "states")`: `(W(arr<Any>)) -> W(u8[])` (§16).
-    pub fn future_list_states(&self) -> Result<Signature> {
+    /// `("tw:future", "states")`: `(W(arr<Any>)) -> W(u8[])` (§16).
+    pub fn future_states(&self) -> Result<Signature> {
         let cx = Context::default();
         let r = self.lower(
             &Type::Vec(Box::new(Type::Scalar(Scalar::U8))),
@@ -2028,18 +2028,18 @@ impl<'a> Layouts<'a> {
             Flow::ToLang,
         )?;
         Ok(Signature {
-            params: vec![self.future_list(&cx)?],
+            params: vec![self.futures(&cx)?],
             results: self.result(&r)?,
             throws: None,
         })
     }
 
-    /// `("tw:future-list", "watch")`: `(W(arr<Any>), i32)` (§16).
-    pub fn future_list_watch(&self) -> Result<Signature> {
+    /// `("tw:future", "watch_race")`: `(W(arr<Any>), i32)` (§16).
+    pub fn future_watch_race(&self) -> Result<Signature> {
         let cx = Context::default();
         let waker = self.lower(&Type::Scalar(Scalar::I32), &cx, Flow::ToJs)?;
         Ok(Signature {
-            params: vec![self.future_list(&cx)?, self.position(Pos::Param(1), waker)?],
+            params: vec![self.futures(&cx)?, self.position(Pos::Param(1), waker)?],
             results: Vec::new(),
             throws: None,
         })
@@ -2047,16 +2047,16 @@ impl<'a> Layouts<'a> {
 
     /// Futures in the profile's own array: a future is an `Any` there,
     /// whatever its `T`.
-    fn future_list(&self, cx: &Context<'_>) -> Result<Position> {
+    fn futures(&self, cx: &Context<'_>) -> Result<Position> {
         let r = self.lower(&Type::Array(Box::new(Type::Any)), cx, Flow::ToJs)?;
         self.position(Pos::Param(0), r)
     }
 
-    /// `("tw:future-list", "suspend")`: `(W(arr<Any>)) -> i32` (§16).
-    pub fn future_list_suspend(&self) -> Result<Signature> {
+    /// `("tw:future", "suspend_race")`: `(W(arr<Any>)) -> i32` (§16).
+    pub fn future_suspend_race(&self) -> Result<Signature> {
         let cx = Context::default();
         Ok(Signature {
-            params: vec![self.future_list(&cx)?],
+            params: vec![self.futures(&cx)?],
             results: vec![self.fixed(Pos::Result, "i32", Kind::Scalar(Scalar::I32))?],
             throws: None,
         })
@@ -2165,8 +2165,8 @@ impl<'a> Layouts<'a> {
     }
 
     /// The `tw` operations with fixed signatures (§19), by default name:
-    /// `tw:instanceof`, `tw:arr` `len`, the untyped `tw:future`,
-    /// `tw:future-list` and `tw:loop` imports, and the language exports. `None` for a name that
+    /// `tw:instanceof`, `tw:arr` `len`, the untyped `tw:future` and
+    /// `tw:loop` imports, and the language exports. `None` for a name that
     /// isn't one, or whose profile requirement (a linear memory) is unmet.
     pub fn fixed_op(&self, module: Option<&str>, name: &str) -> Option<FuncType> {
         use crate::protocol as tw;

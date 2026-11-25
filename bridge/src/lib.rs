@@ -205,7 +205,7 @@ pub fn generate_opts(
             }
             _ => name.clone(),
         };
-        let suspends = matches!(func.op, plan::Op::Suspend | plan::Op::ListSuspend);
+        let suspends = matches!(func.op, plan::Op::Suspend | plan::Op::SuspendRace);
         let value = if gc {
             let export = format!("f{i}");
             w.forwarder(&export, &format!("g{i}"), func, area.as_ref())?;
@@ -291,7 +291,7 @@ pub fn generate_opts(
     let watches = plan
         .funcs
         .iter()
-        .any(|f| matches!(f.op, plan::Op::FutureWatch | plan::Op::ListWatch));
+        .any(|f| matches!(f.op, plan::Op::FutureWatch | plan::Op::WatchRace));
     let mut driving = Vec::new();
     if watches {
         driving.push(protocol::FUTURE_WAKE);
@@ -314,7 +314,7 @@ pub fn generate_opts(
         || plan
             .funcs
             .iter()
-            .any(|f| matches!(f.op, plan::Op::Suspend | plan::Op::ListSuspend))
+            .any(|f| matches!(f.op, plan::Op::Suspend | plan::Op::SuspendRace))
     {
         glue_imports.push("wait: new WebAssembly.Suspending($wait)".into());
         glue_imports.push("stash: $stash".into());

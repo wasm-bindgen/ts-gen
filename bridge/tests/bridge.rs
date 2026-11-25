@@ -383,7 +383,7 @@ fn passthrough(ir: &Ir, libs: &[Ir], profile: &Profile, protocol: &str) -> Strin
                 .unwrap()
                 .core(),
             "tw:destroy" => l.handle_op().unwrap(),
-            "tw:future" | "tw:future-list" | "tw:loop" => {
+            "tw:future" | "tw:loop" => {
                 let arg = |p: &str| name.strip_prefix(p).and_then(|n| n.strip_suffix('>'));
                 let path = |e: &str| match ty(e) {
                     ts_gen_abi::ir::Type::Named(r) => r.path,
@@ -391,10 +391,10 @@ fn passthrough(ir: &Ir, libs: &[Ir], profile: &Profile, protocol: &str) -> Strin
                 };
                 if let Some(f) = l.fixed_op(Some(module), name) {
                     f
-                } else if module == "tw:future-list" && name == "states" {
-                    l.future_list_states().unwrap().core()
-                } else if module == "tw:future-list" && name == "watch" {
-                    l.future_list_watch().unwrap().core()
+                } else if name == "states" {
+                    l.future_states().unwrap().core()
+                } else if name == "watch_race" {
+                    l.future_watch_race().unwrap().core()
                 } else if let Some(s) = arg("get<") {
                     let (t, e) = protocol::split_future_subject(s);
                     l.future_get(&ty(t), &path(e), &cx).unwrap().core()
@@ -814,9 +814,9 @@ fn termination_flag_needs_its_global() {
 #[test]
 fn suspend_needs_jspi() {
     let ir = text::parse("ir 1;\nclass C { f(): u32; }").unwrap();
-    let err = |module: &str, ty: &str, p: &str| {
+    let err = |name: &str, ty: &str, p: &str| {
         let lang = wat::parse_str(format!(
-            "(module (import \"{module}\" \"suspend\" (func {ty})) (memory (export \"memory\") 1) (table (export \"tw:table\") 132 externref) (global (export \"tw:table/stack_base\") i32 (i32.const 1)) (global (export \"tw:table/const_base\") i32 (i32.const 128)) (global (export \"tw:table/heap_base\") i32 (i32.const 132)) (func (export \"tw:table/alloc\") (param i32) (result i32) unreachable) (func (export \"tw:table/free\") (param i32 i32)))"
+            "(module (import \"tw:future\" \"{name}\" (func {ty})) (memory (export \"memory\") 1) (table (export \"tw:table\") 132 externref) (global (export \"tw:table/stack_base\") i32 (i32.const 1)) (global (export \"tw:table/const_base\") i32 (i32.const 128)) (global (export \"tw:table/heap_base\") i32 (i32.const 132)) (func (export \"tw:table/alloc\") (param i32) (result i32) unreachable) (func (export \"tw:table/free\") (param i32 i32)))"
         ))
         .unwrap();
         match ts_gen_bridge::generate(&ir, &Profile::parse(p).unwrap(), &lang) {
@@ -827,13 +827,13 @@ fn suspend_needs_jspi() {
     let suspend = "(param externref) (result i32)";
     let race = "(param i32 i32) (result i32)";
     assert!(
-        err("tw:future", suspend, "all-linear").contains("`suspend` needs `jspi = on`"),
+        err("suspend", suspend, "all-linear").contains("`suspend` needs `jspi = on`"),
         "{}",
-        err("tw:future", suspend, "all-linear")
+        err("suspend", suspend, "all-linear")
     );
-    assert!(err("tw:future-list", race, "all-linear").contains("`suspend` needs `jspi = on`"));
-    assert_eq!(err("tw:future", suspend, "jspi = on"), "");
-    assert_eq!(err("tw:future-list", race, "jspi = on"), "");
+    assert!(err("suspend_race", race, "all-linear").contains("`suspend_race` needs `jspi = on`"));
+    assert_eq!(err("suspend", suspend, "jspi = on"), "");
+    assert_eq!(err("suspend_race", race, "jspi = on"), "");
 }
 
 #[test]

@@ -913,11 +913,11 @@ function $suspend(f) {
   return -0x80000000;
 }
 
-// `tw:future-list suspend`: the index of a settled future, the lowest if
+// `tw:future suspend_race`: the index of a settled future, the lowest if
 // several are, or once parked the first to settle. The others are left as
 // they are.
-function $suspendAny(fs) {
-  if (fs.length === 0) throw new TypeError("`suspend` on an empty list");
+function $suspendRace(fs) {
+  if (fs.length === 0) throw new TypeError("`suspend_race` on an empty list");
   for (const f of fs) $isFuture(f);
   const i = fs.findIndex((f) => f.state !== 0);
   if (i !== -1) return i;
@@ -1071,7 +1071,7 @@ class $Watch {
   }
 }
 
-function $watchAll(fs, w) {
+function $watchRace(fs, w) {
   const pending = [];
   for (const f of fs) if ($isFuture(f).state === 0) pending.push(f);
   const watch = new $Watch(w, pending);

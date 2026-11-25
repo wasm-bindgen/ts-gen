@@ -49,7 +49,7 @@ const peeks = [app.peek(), app.peek()];
 s.resolvers[0](7);
 assert.deepEqual(await Promise.all(peeks), [1, 1]);
 
-// A list's `suspend` resumes with the first future to settle, leaving the
+// `suspend_race` resumes with the first future to settle, leaving the
 // others to the language, and with the lowest of those already settled.
 const r = new Api();
 const raced = app.race(r);
@@ -68,6 +68,16 @@ const c = new Api();
 const called = cb(c);
 c.resolvers[0](2);
 assert.equal(await called, 42);
+// And keeps its environment while it's parked, though JS has let the
+// function go.
+const envs = instance.exports["test:envs"];
+const dropped = envs();
+const c2 = new Api();
+const parked = app.plus(1)(c2);
+await collect();
+assert.equal(envs(), dropped);
+c2.resolvers[0](2);
+assert.equal(await parked, 3);
 
 // A suspended call keeps its arguments until it settles.
 const e = new Api();

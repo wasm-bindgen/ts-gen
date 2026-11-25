@@ -315,7 +315,7 @@ class $Watch {
   }
 }
 
-function $watchAll(fs, w) {
+function $watchRace(fs, w) {
   const pending = [];
   for (const f of fs) if ($isFuture(f).state === 0) pending.push(f);
   const watch = new $Watch(w, pending);
@@ -456,7 +456,7 @@ function $f4(f, w) {
   $watch(f, w);
 }
 
-// ("tw:future-list", "states")
+// ("tw:future", "states")
 function $f5(w0_0, w0_1) {
   const r = $states($h3(w0_0, w0_1));
   const t1 = $lowerVec($S, $typed(r, Uint8Array, "u8[]"), Uint8Array, null);
@@ -467,9 +467,9 @@ function $f5(w0_0, w0_1) {
   return t2;
 }
 
-// ("tw:future-list", "watch")
+// ("tw:future", "watch_race")
 function $f6(w0_0, w0_1, w1_0) {
-  $watchAll($h3(w0_0, w0_1), w1_0);
+  $watchRace($h3(w0_0, w0_1), w1_0);
 }
 
 // ("tw:future", "new")
@@ -534,12 +534,10 @@ export function instantiate(language, bridge, imports = {}) {
       "state": $f2,
       "get<str>": $B.f3,
       "watch": $f4,
+      "states": $B.f5,
+      "watch_race": $B.f6,
       "new": $f7,
       "resolve<str>": $B.f8,
-    },
-    "tw:future-list": {
-      "states": $B.f5,
-      "watch": $B.f6,
     },
   });
   $X = instance.exports;

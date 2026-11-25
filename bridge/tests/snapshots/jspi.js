@@ -555,11 +555,11 @@ function $suspend(f) {
   return -0x80000000;
 }
 
-// `tw:future-list suspend`: the index of a settled future, the lowest if
+// `tw:future suspend_race`: the index of a settled future, the lowest if
 // several are, or once parked the first to settle. The others are left as
 // they are.
-function $suspendAny(fs) {
-  if (fs.length === 0) throw new TypeError("`suspend` on an empty list");
+function $suspendRace(fs) {
+  if (fs.length === 0) throw new TypeError("`suspend_race` on an empty list");
   for (const f of fs) $isFuture(f);
   const i = fs.findIndex((f) => f.state !== 0);
   if (i !== -1) return i;
@@ -717,7 +717,7 @@ function $h4(f, h, a0) {
     try {
       const t1 = $instance(a0, $cls0, "Api");
       const r = $E[10](env, t1);
-      $keep(r, [a0]);
+      $keep(r, [f, a0]);
       return $promise(r);
     } catch (e) {
       throw $outgoing(e);
@@ -758,9 +758,9 @@ function $f1(f) {
   return $suspend(f);
 }
 
-// ("tw:future-list", "suspend")
+// ("tw:future", "suspend_race")
 function $f2(w0_0, w0_1) {
-  return $suspendAny($h1(w0_0, w0_1));
+  return $suspendRace($h1(w0_0, w0_1));
 }
 
 // ("tw:future", "get<u32>")
@@ -981,12 +981,10 @@ export function instantiate(language, bridge, imports = {}) {
     },
     "tw:future": {
       "suspend": $B.s1,
+      "suspend_race": $B.s2,
       "get<u32>": $B.f3,
       "new": $f4,
       "resolve<u32>": $f5,
-    },
-    "tw:future-list": {
-      "suspend": $B.s2,
     },
   });
   $X = instance.exports;

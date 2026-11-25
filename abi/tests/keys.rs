@@ -341,11 +341,8 @@ fn protocol_names() {
     );
     assert_eq!(protocol::future_cancel(), i("tw:future", "cancel"));
     assert_eq!(protocol::future_watch(), i("tw:future", "watch"));
-    assert_eq!(
-        protocol::future_list_states(),
-        i("tw:future-list", "states")
-    );
-    assert_eq!(protocol::future_list_watch(), i("tw:future-list", "watch"));
+    assert_eq!(protocol::future_states(), i("tw:future", "states"));
+    assert_eq!(protocol::future_watch_race(), i("tw:future", "watch_race"));
     assert_eq!(protocol::future_new(), i("tw:future", "new"));
     assert_eq!(
         protocol::future_resolve("u32"),

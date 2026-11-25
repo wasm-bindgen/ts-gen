@@ -1367,7 +1367,7 @@ generator. The IR is unchanged by it.
 | exported-class finalizers | on \| off |
 | `results` | `multi` (default) \| `single` |
 | `throws` | `tag` (default) \| `js` (§15) |
-| `jspi` | off (default) \| on: the language may suspend in `tw:future suspend` and `tw:future-list suspend` (§16) |
+| `jspi` | off (default) \| on: the language may suspend in `tw:future suspend` and `suspend_race` (§16) |
 | protocol names | defaults (§19), each overridable |
 
 Presets:
@@ -1418,7 +1418,7 @@ scratch return area. It applies to every core function between the
 language and the bridge whose flattened results are more than one value,
 in both directions: IR imports
 and exports, callback trampolines and calls, and the `tw` protocol
-operations (`tw:future` `new` and `get<T>`, `tw:future-list` `states`,
+operations (`tw:future` `new`, `get<T>` and `states`,
 `tw:unbox`, `tw:arr get<T>`, `tw:err`). Multi-value parameters are unaffected.
 
 * The language declares slot 0 as the only result. Slots `1..n` go through
@@ -2102,7 +2102,7 @@ future settles. Under `jspi = on` the bridge provides two
   returns its state, 1 fulfilled or 2 rejected. It reads nothing: the
   language reads the value with `get`, or the rejection with `error`, as
   usual.
-* `("tw:future-list", "suspend")(fs: arr<Any>) -> i32` suspends until one
+* `("tw:future", "suspend_race")(fs: arr<Any>) -> i32` suspends until one
   of the futures in `fs` settles, and returns its index: the lowest one
   already settled, or else the first to settle. The others are left as
   they are. An empty list is a `TypeError`.
@@ -2208,19 +2208,19 @@ into the language only where it's read.
 * A `future<never>` that fulfils is rejected instead, with a `TypeError`
   (§3): it has no value to read.
 
-### Future lists (bridge imports, group `tw:future-list`)
+### Several futures together
 
 Several futures are read and watched together as an `arr<Any>` of them,
 the profile's own array ([§11](#11-sequences-and-memory)): a future is an
-`externref` there whatever its `T`.
+`externref` there whatever its `T`. These are `tw:future` imports too.
 
 | name | signature | meaning |
 |---|---|---|
 | `states` | `(arr<Any> wire) -> u8[] wire` | each future's state, by index |
-| `watch` | `(arr<Any> wire, i32 waker)` | parks a waker on the futures together |
-| `suspend` | `(arr<Any> wire) -> i32` | `jspi = on`: suspends until one settles; its index |
+| `watch_race` | `(arr<Any> wire, i32 waker)` | parks a waker on the futures together |
+| `suspend_race` | `(arr<Any> wire) -> i32` | `jspi = on`: suspends until one settles; its index |
 
-* `watch` calls `tw:future/wake(waker)` once, when the first of the
+* `watch_race` calls `tw:future/wake(waker)` once, when the first of the
   futures that were pending settles. Futures settling in the same turn
   share that one wake, and the rest wake nothing until they're watched
   again.
@@ -2505,9 +2505,9 @@ Notation in the tables:
 | `tw:future` | `new` | `() -> (externref, externref)` | future, resolver |
 | `tw:future` | `resolve<T>` | `(externref, W(T))` | |
 | `tw:future` | `reject<E>` | `(externref, W(E))` | |
-| `tw:future-list` | `states` | `(W(arr<Any>)) -> W(u8[])` | §16 |
-| `tw:future-list` | `watch` | `(W(arr<Any>), i32 waker)` | |
-| `tw:future-list` | `suspend` | `(W(arr<Any>)) -> i32` | `jspi = on`; suspending |
+| `tw:future` | `states` | `(W(arr<Any>)) -> W(u8[])` | futures as `arr<Any>` |
+| `tw:future` | `watch_race` | `(W(arr<Any>), i32 waker)` | |
+| `tw:future` | `suspend_race` | `(W(arr<Any>)) -> i32` | `jspi = on`; suspending |
 | `tw:loop` | `work_available` | `(i32 loop)` | |
 | `tw:loop` | `drop` | `(i32 loop)` | |
 | `tw:ret` | `<vt>` | `() -> vt` | `results = single`: pop the next spilled slot |

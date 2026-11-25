@@ -1,10 +1,10 @@
 ;; A hand-written language with no async of its own, which blocks on
 ;; futures under JSPI: it suspends in `tw:future suspend` and
-;; `tw:future-list suspend`, and returns futures of its own.
+;; `suspend_race`, and returns futures of its own.
 (module
   (import "tw:js/global" "Api#later()" (func $later (param externref) (result externref)))
   (import "tw:future" "suspend" (func $suspend (param externref) (result i32)))
-  (import "tw:future-list" "suspend" (func $race (param i32 i32) (result i32)))
+  (import "tw:future" "suspend_race" (func $race (param i32 i32) (result i32)))
   (import "tw:future" "get<u32>" (func $get (param externref) (result i32 i32)))
   (import "tw:future" "new" (func $new (result externref externref)))
   (import "tw:future" "resolve<u32>" (func $resolve (param externref i32)))
@@ -85,7 +85,10 @@
   (func (export "app.plus(u32)") (param $n i32) (result i32) (local.get $n))
   (func (export "tw:call:fn(Api)->future<u32>") (param $env i32) (param $api externref) (result externref)
     (call $ready (i32.add (call $await (call $later (local.get $api))) (local.get $env))))
-  (func (export "tw:drop:fn(Api)->future<u32>") (param $env i32))
+  (global $envs (mut i32) (i32.const 0))
+  (func (export "test:envs") (result i32) (global.get $envs))
+  (func (export "tw:drop:fn(Api)->future<u32>") (param $env i32)
+    (global.set $envs (i32.add (global.get $envs) (i32.const 1))))
 
   ;; A task's handle is the table slot holding its `Api`, which its drop
   ;; clears: one dropped while its run is suspended reads null.

@@ -78,8 +78,8 @@ const refs = (fs) => {
   fs.forEach((f, i) => L.ex["tw:table"].set(base + i, f));
   return [base, fs.length];
 };
-const states = (fs) => [...L.take(...L.call("future-list:states", ...refs(fs)))];
-const watch = (fs, w) => L.call("future-list:watch", ...refs(fs), w);
+const states = (fs) => [...L.take(...L.call("future:states", ...refs(fs)))];
+const watch = (fs, w) => L.call("future:watch_race", ...refs(fs), w);
 const err = L.ex["tag:err"];
 const fetchError = L.ex["tag:FetchError"];
 // A read's failure, thrown to the future's `E` with its message.

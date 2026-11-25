@@ -104,10 +104,15 @@ impl<'a, 'b> Glue<'a, 'b> {
         for (p, a) in sig.params.iter().zip(args) {
             match a {
                 Arg::Raw(e) => {
-                    if matches!(p.role, Pos::This | Pos::Handle)
-                        && !keep.iter().any(|k| k == "this")
-                    {
-                        keep.push("this".to_string());
+                    // A callback's environment lives as long as its JS
+                    // function, `f`.
+                    let owner = match p.role {
+                        Pos::This | Pos::Handle => Some("this"),
+                        Pos::Env => Some("f"),
+                        _ => None,
+                    };
+                    if let Some(o) = owner.filter(|o| !keep.iter().any(|k| k == o)) {
+                        keep.push(o.to_string());
                     }
                     wire.push(e.clone());
                 }

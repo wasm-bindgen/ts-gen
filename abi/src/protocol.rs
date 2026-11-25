@@ -39,7 +39,6 @@ pub const TRUE: &str = "tw:true";
 pub const FALSE: &str = "tw:false";
 pub const TAG: &str = "tw:tag";
 pub const FUTURE: &str = "tw:future";
-pub const FUTURE_LIST: &str = "tw:future-list";
 pub const LOOP: &str = "tw:loop";
 /// `results = single` (§12): spilled result slots, popped by value type
 /// (`("tw:ret", "i32")`) or pushed (`("tw:ret", "push:i32")`).
@@ -232,18 +231,18 @@ pub fn future_reject(e: &str) -> Import {
     Import::new(FUTURE, format!("reject<{e}>"))
 }
 
-pub fn future_list_states() -> Import {
-    Import::new(FUTURE_LIST, "states")
+pub fn future_states() -> Import {
+    Import::new(FUTURE, "states")
 }
 
-pub fn future_list_watch() -> Import {
-    Import::new(FUTURE_LIST, "watch")
+pub fn future_watch_race() -> Import {
+    Import::new(FUTURE, "watch_race")
 }
 
 /// `(W(arr<Any>)) -> i32`, under `jspi = on`: suspends until one of the
 /// futures settles.
-pub fn future_list_suspend() -> Import {
-    Import::new(FUTURE_LIST, "suspend")
+pub fn future_suspend_race() -> Import {
+    Import::new(FUTURE, "suspend_race")
 }
 
 pub fn loop_work_available() -> Import {
@@ -264,8 +263,7 @@ pub fn drop_export(subject: &str) -> String {
     format!("tw:drop:{subject}")
 }
 
-/// A future's state: `("tw:future", "state")`, and each byte of
-/// `("tw:future-list", "states")`.
+/// A future's state: `("tw:future", "state")`, and each byte of `states`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(i32)]
 pub enum FutureState {

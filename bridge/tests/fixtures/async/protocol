@@ -8,8 +8,8 @@ tw:future error<FetchError>
 tw:future error<err>
 tw:future cancel
 tw:future watch
-tw:future-list states
-tw:future-list watch
+tw:future states
+tw:future watch_race
 tw:future new
 tw:future resolve<u32>
 tw:future reject<err>

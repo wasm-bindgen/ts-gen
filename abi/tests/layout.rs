@@ -758,8 +758,8 @@ fn protocol_operations() {
         (&host, "(externref) -> (externref)", "(externref, i32)"),
     ] {
         let l = Layouts::new(&ir, p);
-        assert_eq!(l.future_list_states().unwrap().core().to_string(), states);
-        assert_eq!(l.future_list_watch().unwrap().core().to_string(), watch);
+        assert_eq!(l.future_states().unwrap().core().to_string(), states);
+        assert_eq!(l.future_watch_race().unwrap().core().to_string(), watch);
     }
     assert_eq!(
         op(&lin, Some("tw:future"), "new"),

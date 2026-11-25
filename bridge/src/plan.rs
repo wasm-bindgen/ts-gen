@@ -48,13 +48,13 @@ pub enum Op<'a> {
     FutureCancel,
     FutureWatch,
     FutureNew,
-    /// `("tw:future-list", ...)` (§16).
-    ListStates,
-    ListWatch,
-    /// `suspend`, under `jspi = on`: the bridge module's suspending
-    /// wrappers over these.
+    /// Several futures together, as the profile's `arr<Any>`.
+    States,
+    WatchRace,
+    /// `suspend` and `suspend_race`, under `jspi = on`: the bridge
+    /// module's suspending wrappers over these.
     Suspend,
-    ListSuspend,
+    SuspendRace,
     Resolve(Option<Repr>),
     Reject(Rc<EnumLayout>),
     /// `("tw:ret", vt)` and `("tw:ret", "push:vt")` (§12): served by the
@@ -153,7 +153,6 @@ impl<'a> Plan<'a> {
             protocol::FALSE,
             protocol::TAG,
             protocol::FUTURE,
-            protocol::FUTURE_LIST,
             protocol::LOOP,
             protocol::RET,
             protocol::ERR,
@@ -315,8 +314,17 @@ impl<'a> Plan<'a> {
                     "state" => (Op::FutureState, empty),
                     "cancel" => (Op::FutureCancel, empty),
                     "watch" => (Op::FutureWatch, empty),
-                    "suspend" if !p.jspi => return Err(needs_jspi(&what(), &i.name)),
+                    "states" => (Op::States, l.future_states()?),
+                    "watch_race" => (Op::WatchRace, l.future_watch_race()?),
+                    "suspend" | "suspend_race" if !p.jspi => {
+                        return Err(Error::Import(format!(
+                            "{}: `{}` needs `jspi = on`",
+                            what(),
+                            i.name
+                        )));
+                    }
                     "suspend" => (Op::Suspend, empty),
+                    "suspend_race" => (Op::SuspendRace, l.future_suspend_race()?),
                     "new" => (Op::FutureNew, empty),
                     _ => {
                         if let Some(s) = arg("get<") {
@@ -341,19 +349,6 @@ impl<'a> Plan<'a> {
                                 what()
                             )));
                         }
-                    }
-                }
-            } else if i.module == group(protocol::FUTURE_LIST) {
-                match i.name.as_str() {
-                    "states" => (Op::ListStates, l.future_list_states()?),
-                    "watch" => (Op::ListWatch, l.future_list_watch()?),
-                    "suspend" if !p.jspi => return Err(needs_jspi(&what(), &i.name)),
-                    "suspend" => (Op::ListSuspend, l.future_list_suspend()?),
-                    _ => {
-                        return Err(Error::Import(format!(
-                            "{}: not a future list operation",
-                            what()
-                        )))
                     }
                 }
             } else if i.module == group(protocol::RET) {
@@ -484,10 +479,6 @@ impl<'a> Plan<'a> {
         }
         Ok(plan)
     }
-}
-
-fn needs_jspi(what: &str, name: &str) -> Error {
-    Error::Import(format!("{what}: `{name}` needs `jspi = on`"))
 }
 
 fn spill_type(vt: &str) -> ValType {
