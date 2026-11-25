@@ -1518,13 +1518,14 @@ impl<'a, 'b> Wat<'a, 'b> {
         if self.jspi {
             // A suspension that can't suspend throws (a `SuspendError`
             // outside a promising call), and scratch is put back first.
-            let wait = match self.l.profile.eh {
-                Eh::Modern => "(block $ok\n      (local.set $e (block $thrown (result exnref)\n        (try_table (catch_all_ref $thrown) (local.set $r (call $wait)))\n        (br $ok)))\n      (call $unpark (local.get $k) (local.get $sp) (local.get $tsp))\n      (throw_ref (local.get $e)))",
-                Eh::Legacy => "try\n      (local.set $r (call $wait))\n    catch_all\n      (call $unpark (local.get $k) (local.get $sp) (local.get $tsp))\n      rethrow 0\n    end",
+            let (locals, wait) = match self.l.profile.eh {
+                Eh::Modern => (" (local $e exnref)", "(block $ok\n      (local.set $e (block $thrown (result exnref)\n        (try_table (catch_all_ref $thrown) (local.set $r (call $wait)))\n        (br $ok)))\n      (call $unpark (local.get $k) (local.get $sp) (local.get $tsp))\n      (throw_ref (local.get $e)))"),
+                Eh::Legacy => ("", "try\n      (local.set $r (call $wait))\n    catch_all\n      (call $unpark (local.get $k) (local.get $sp) (local.get $tsp))\n      rethrow 0\n    end"),
             };
             s.push_str(
                 &JSPI
                     .replace("{SP}", &(hdr + 8 + RET_AREA).to_string())
+                    .replace("{LOCALS}", locals)
                     .replace("{WAIT}", wait),
             );
         }
@@ -1637,7 +1638,7 @@ const JSPI: &str = r#"  (global $base (export "base") (mut i32) (i32.const 0))
     (call $set_sp (local.get $sp))
     (call $set_tsp (local.get $tsp)))
   (func $parked (result i32)
-    (local $b i32) (local $tb i32) (local $sp i32) (local $tsp i32) (local $k externref) (local $r i32) (local $e exnref)
+    (local $b i32) (local $tb i32) (local $sp i32) (local $tsp i32) (local $k externref) (local $r i32){LOCALS}
     (local.set $b (global.get $base))
     (local.set $tb (global.get $tbase))
     (local.set $sp (call $sp))
