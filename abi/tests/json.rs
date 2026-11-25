@@ -267,16 +267,23 @@ fn namespace_js_name() {
         "ir 1;\n\n@js(name = \"default\")\nexport namespace default_ {\n  fetch(): u32;\n}\n\nnamespace plain {\n  f(): u32;\n}\n",
     )
     .unwrap();
-    let out = json::lower(&ir, &Profile::all_linear()).pretty();
-    check(&out);
-    let ns = |name: &str| {
-        let at = out
-            .find(&format!("\"name\": \"{name}\""))
-            .unwrap_or_else(|| panic!("{name}:\n{out}"));
-        let start = out[..at].rfind('{').unwrap();
-        let end = at + out[at..].find('}').unwrap();
-        out[start..end].to_string()
+    let out = json::lower(&ir, &Profile::all_linear());
+    check(&out.pretty());
+    let field = |d: &Json, k: &str| match d {
+        Json::Obj(fs) => fs.iter().find(|(f, _)| f == k).map(|(_, v)| v.clone()),
+        _ => None,
     };
-    assert!(ns("default_").contains("\"jsName\": \"default\""), "{out}");
-    assert!(ns("plain").contains("\"jsName\": null"), "{out}");
+    let Some(Json::Arr(decls)) = field(&out, "decls") else {
+        panic!("no decls");
+    };
+    let js_name = |name: &str| {
+        let d = decls
+            .iter()
+            .find(|d| field(d, "name") == Some(Json::Str(name.into())))
+            .unwrap_or_else(|| panic!("no `{name}`"));
+        assert_eq!(field(d, "kind"), Some(Json::Str("namespace".into())));
+        field(d, "jsName")
+    };
+    assert_eq!(js_name("default_"), Some(Json::Str("default".into())));
+    assert_eq!(js_name("plain"), Some(Json::Null));
 }

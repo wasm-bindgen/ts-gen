@@ -491,8 +491,8 @@
       "path": "crypto",
       "module": null,
       "name": "crypto",
-      "export": false,
       "jsName": null,
+      "export": false,
       "doc": null
     },
     {
@@ -553,8 +553,8 @@
       "path": "default",
       "module": null,
       "name": "default",
-      "export": true,
       "jsName": null,
+      "export": true,
       "doc": null
     },
     {
@@ -562,8 +562,8 @@
       "path": "stats",
       "module": null,
       "name": "stats",
-      "export": true,
       "jsName": null,
+      "export": true,
       "doc": null
     }
   ],
