@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use anyhow::{bail, Context, Result};
 use clap::Parser;
-use walkdir::WalkDir;
+use ts_gen::input::{resolve_input_files, Load};
 
 /// Generate wasm-bindgen Rust bindings from TypeScript .d.ts files.
 #[derive(Parser, Debug)]
@@ -235,17 +235,14 @@ fn main() -> Result<()> {
 
     eprintln!("[ts-gen] Processing {} file(s)...", input_files.len());
 
-    // `--ir` and `--output` each load the inputs; a diagnostic both report
-    // prints once.
-    let mut seen = Default::default();
     if let Some(ir_path) = &cli.ir {
-        let (module, mut gctx) = load(&cli, &input_files, &mut seen)?;
+        let (module, mut gctx) = load(&cli, &input_files)?;
         produce_ir(&cli, ir_path, &module, &mut gctx)?;
     }
     let Some(output) = cli.output.clone() else {
         return Ok(());
     };
-    let (module, gctx) = load(&cli, &input_files, &mut seen)?;
+    let (module, gctx) = load(&cli, &input_files)?;
 
     if cli.verbose {
         eprintln!("[ts-gen] Parsed {} declarations", module.types.len());
@@ -330,28 +327,6 @@ fn is_declaration_name(spec: &str) -> bool {
         matches!(chars.next(), Some(c) if c.is_alphabetic() || c == '_' || c == '$')
             && chars.all(|c| c.is_alphanumeric() || c == '_' || c == '$')
     })
-}
-
-/// Resolve input paths: expand directories to find all .d.ts files.
-fn resolve_input_files(paths: &[PathBuf]) -> Result<Vec<PathBuf>> {
-    let mut files = Vec::new();
-    for path in paths {
-        if path.is_dir() {
-            for entry in WalkDir::new(path) {
-                let entry = entry?;
-                if entry.file_type().is_file()
-                    && entry.file_name().to_string_lossy().ends_with(".d.ts")
-                {
-                    files.push(entry.into_path());
-                }
-            }
-        } else if path.is_file() {
-            files.push(path.clone());
-        } else {
-            bail!("Input path does not exist: {}", path.display());
-        }
-    }
-    Ok(files)
 }
 
 /// Pretty-print a declaration for debugging.
@@ -508,45 +483,23 @@ fn print_member(member: &ts_gen::ir::Member, indent: usize) {
     }
 }
 
-/// Parse the inputs, with `--external` and `--annotate` applied, printing
-/// the diagnostics not in `seen`.
+/// Parse the inputs, with `--external` and `--annotate` applied.
 fn load(
     cli: &Cli,
     input_files: &[PathBuf],
-    seen: &mut std::collections::HashSet<String>,
 ) -> Result<(ts_gen::ir::Module, ts_gen::context::GlobalContext)> {
-    let lib_name = cli.lib_name.as_deref();
-    let (module, mut gctx) = ts_gen::parse(input_files, lib_name)?;
-
-    if cli.no_web_sys {
-        gctx.external_map.clear_defaults();
-    }
-
-    // Apply external type mappings
-    for mapping in &cli.external {
-        gctx.external_map.add_mappings(mapping);
-    }
-
-    if !cli.annotate.is_empty() {
-        let files = resolve_input_files(&cli.annotate)?;
-        let (annotations, agctx) = ts_gen::parse(&files, lib_name)?;
-        agctx.diagnostics.emit_unseen(seen);
-        if agctx.diagnostics.has_errors() {
-            let files: Vec<String> = cli
-                .annotate
-                .iter()
-                .map(|p| p.display().to_string())
-                .collect();
-            bail!("--annotate: invalid tags in {}", files.join(", "));
+    let opts = Load {
+        lib_name: cli.lib_name.as_deref(),
+        annotate: &cli.annotate,
+    };
+    ts_gen::input::load(input_files, &opts, |externals| {
+        if cli.no_web_sys {
+            externals.clear_defaults();
         }
-        let errors = ts_gen::parse::annotate::apply(&mut gctx, &module, &annotations, &agctx);
-        if !errors.is_empty() {
-            bail!("--annotate:\n  {}", errors.join("\n  "));
+        for mapping in &cli.external {
+            externals.add_mappings(mapping);
         }
-    }
-
-    gctx.diagnostics.emit_unseen(seen);
-    Ok((module, gctx))
+    })
 }
 
 fn produce_ir(

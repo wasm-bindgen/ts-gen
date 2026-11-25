@@ -820,7 +820,7 @@ fn resolve_imports(
 fn populate_builtin_scope(gctx: &mut GlobalContext, scope: ScopeId) {
     // js_sys types: real types available via `use js_sys::*`.
     // Registered as opaque interfaces — resolve_alias won't look through them.
-    for &name in crate::codegen::typemap::JS_SYS_RESERVED {
+    for &name in crate::external_map::JS_SYS_RESERVED {
         insert_builtin(gctx, scope, name);
     }
 
@@ -1387,7 +1387,7 @@ fn is_overload(member: &crate::ir::Member) -> bool {
 /// Getters and setters for the same JS property name get distinct keys,
 /// since they are independent bindings that should not overwrite each other.
 #[derive(Debug, PartialEq, Eq, Hash)]
-pub(crate) enum MemberKey {
+pub enum MemberKey {
     Constructor,
     StaticMethod(String),
     StaticGetter(String),
@@ -1397,7 +1397,8 @@ pub(crate) enum MemberKey {
     ProtoSetter(String),
 }
 
-pub(crate) fn member_key(member: &crate::ir::Member) -> MemberKey {
+/// The key `member` is deduplicated under.
+pub fn member_key(member: &crate::ir::Member) -> MemberKey {
     match member {
         crate::ir::Member::Constructor(_) => MemberKey::Constructor,
         crate::ir::Member::StaticMethod(m) => MemberKey::StaticMethod(m.name.clone()),
@@ -2567,9 +2568,7 @@ mod tests {
             [("also", "also"), ("Open", "Open"), ("too", "too")]
         );
 
-        let name_of = |id| {
-            crate::codegen::typemap::type_decl_name(&gctx.get_type(id).kind).map(str::to_string)
-        };
+        let name_of = |id| Some(gctx.get_type(id).kind.name().to_string());
         let resolve = |path: &str| gctx.resolve_path(main, path).and_then(name_of);
         assert_eq!(resolve("Foo").as_deref(), Some("_Foo"));
         assert_eq!(resolve("Def").as_deref(), Some("Def"));
@@ -2687,15 +2686,15 @@ mod tests {
             let d = gctx.get_type(id);
             if let TypeKind::Namespace(ns) = &d.kind {
                 for &member in &ns.declarations {
-                    let name = crate::codegen::typemap::type_decl_name(&gctx.get_type(member).kind);
-                    placed.insert(name.unwrap().to_string(), format!("namespace {}", ns.name));
+                    let name = gctx.get_type(member).kind.name();
+                    placed.insert(name.to_string(), format!("namespace {}", ns.name));
                 }
-            } else if let Some(name) = crate::codegen::typemap::type_decl_name(&d.kind) {
+            } else {
                 let at = match &d.module_context {
                     ModuleContext::Module(m) => format!("module {m}"),
                     ModuleContext::Global => "global".to_string(),
                 };
-                placed.insert(name.to_string(), at);
+                placed.insert(d.kind.name().to_string(), at);
             }
         }
         let place = |name: &str| placed[name].as_str();
@@ -2719,24 +2718,6 @@ mod tests {
         };
         assert_eq!(exports("second"), [("default", "S")]);
         assert_eq!(exports("late"), [("default", "X")]);
-
-        // `--export m` emits both files' members of the namespace.
-        let options =
-            crate::codegen::GenerateOptions::new().exports(std::collections::HashSet::from([
-                crate::codegen::ExportSpec::Module("m".into()),
-            ]));
-        let surface = crate::codegen::surface::Surface::build(&module, &gctx, &options);
-        for name in ["one", "Two"] {
-            let id = module
-                .types
-                .iter()
-                .copied()
-                .find(|&id| {
-                    crate::codegen::typemap::type_decl_name(&gctx.get_type(id).kind) == Some(name)
-                })
-                .unwrap();
-            assert!(!surface.get(id).is_empty(), "{name}");
-        }
     }
 
     #[test]

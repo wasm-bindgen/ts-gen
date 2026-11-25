@@ -187,7 +187,7 @@ impl<'d> Builder<'_, 'd> {
             // them; a signature that still names it reaches it, and
             // `--export` can select it.
             let ids = gctx.declarations(bound_in(root, bindings), local);
-            if !ids.is_empty() && ids.iter().all(|id| gctx.type_level_only.contains(id)) {
+            if !ids.is_empty() && ids.iter().all(|&id| gctx.is_type_level_only(id)) {
                 continue;
             }
             self.entry(root, public, local, bindings);
@@ -372,8 +372,9 @@ impl<'d> Builder<'_, 'd> {
                 }
             }
         }
-        let own = super::typemap::type_decl_name(&decl.kind);
-        if matches!(decl.kind, TypeKind::Namespace(_)) || public == "default" || own == Some(public)
+        if matches!(decl.kind, TypeKind::Namespace(_))
+            || public == "default"
+            || decl.kind.name() == public
         {
             return;
         }
@@ -549,7 +550,7 @@ impl<'d> Builder<'_, 'd> {
             );
             containers.entry(key).or_default().push(id);
         }
-        let own = |id: TypeId| super::typemap::type_decl_name(&gctx.get_type(id).kind).unwrap();
+        let own = |id: TypeId| gctx.get_type(id).kind.name();
         let mut renamed = HashMap::new();
         for ids in containers.into_values() {
             let mut taken = crate::util::naming::LocalScope::default();
@@ -832,7 +833,12 @@ mod tests {
         let mut stack = module.types.clone();
         while let Some(id) = stack.pop() {
             let kind = &gctx.get_type(id).kind;
-            if crate::parse::binding_name(kind).as_deref() == Some(name) {
+            let bound = match kind {
+                TypeKind::Function(f) => &f.js_name,
+                TypeKind::Variable(v) => &v.js_name,
+                kind => kind.name(),
+            };
+            if bound == name {
                 return id;
             }
             if let TypeKind::Namespace(ns) = kind {
@@ -1001,5 +1007,38 @@ mod tests {
             forms("export default function f(): void;", "f"),
             pairs(&[("f", "default")])
         );
+    }
+
+    /// `--export m` emits what every file adds to the namespace `m` assigns.
+    #[test]
+    fn an_assigned_namespace_is_emitted_across_files() {
+        let dir = std::env::temp_dir().join(format!("ts-gen-assigned-ns-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let files = [
+            r#"
+                declare namespace S { function one(): void; }
+                declare module "m" { export = S; }
+            "#,
+            "declare namespace S { class Two {} }",
+        ];
+        let paths: Vec<_> = files
+            .iter()
+            .enumerate()
+            .map(|(i, src)| {
+                let path = dir.join(format!("f{i}.d.ts"));
+                std::fs::write(&path, src).unwrap();
+                path
+            })
+            .collect();
+        let result = crate::parse(&paths, None);
+        std::fs::remove_dir_all(&dir).unwrap();
+        let (module, gctx) = result.unwrap();
+        let surface = surface_of(&module, &gctx, "m");
+        for name in ["one", "Two"] {
+            assert!(
+                !surface.get(find(&module, &gctx, name)).is_empty(),
+                "{name}"
+            );
+        }
     }
 }

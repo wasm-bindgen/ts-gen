@@ -44,7 +44,7 @@ repository = "https://github.com/wasm-bindgen/ts-gen"
 version = "0.1.0"
 
 [features]
-cli = ["clap", "walkdir"]
+cli = ["clap"]
 default = ["cli"]
 
 [[bin]]
@@ -70,7 +70,7 @@ prettyplease = "0.2"
 proc-macro2 = "1"
 quote = "1"
 syn = { version = "2", features = ["full", "extra-traits", "printing"] }
-walkdir = { version = "2", optional = true }
+walkdir = "2"
 
 [dev-dependencies]
 similar = "2"

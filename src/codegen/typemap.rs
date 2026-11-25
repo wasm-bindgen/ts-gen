@@ -21,6 +21,7 @@ use quote::quote;
 use crate::codegen::signatures::PromiseForm;
 use crate::codegen::GenerateOptions;
 use crate::context::{GlobalContext, TypeId};
+use crate::external_map::JS_SYS_RESERVED;
 use crate::ir::{self, ModuleContext, Throws, TypeKind, TypeRef};
 use crate::parse::scope::ScopeId;
 use crate::util::diagnostics::DiagnosticCollector;
@@ -44,61 +45,6 @@ const DEDICATED_HEADS: &[&str] = &[
     "AsyncIterable",
     "Array",
     "ReadonlyArray",
-];
-
-/// js_sys type names reserved by the `use js_sys::*` glob import.
-/// User-defined types that collide with these will be renamed.
-pub const JS_SYS_RESERVED: &[&str] = &[
-    "AggregateError",
-    "Array",
-    "ArrayBuffer",
-    "ArrayTuple",
-    "AsyncGenerator",
-    "AsyncIterator",
-    "BigInt",
-    "BigInt64Array",
-    "BigUint64Array",
-    "Boolean",
-    "DataView",
-    "Date",
-    "Error",
-    "EvalError",
-    "Float32Array",
-    "Float64Array",
-    "Function",
-    "Generator",
-    "Global",
-    "Int16Array",
-    "Int32Array",
-    "Int8Array",
-    "Iterator",
-    "IteratorNext",
-    "JsNullable",
-    "JsOption",
-    "JsString",
-    "Map",
-    "Nullable",
-    "Number",
-    "Object",
-    "Promise",
-    "Proxy",
-    "RangeError",
-    "ReferenceError",
-    "RegExp",
-    "Set",
-    "SharedArrayBuffer",
-    "Symbol",
-    "SyntaxError",
-    "TypeError",
-    "Uint16Array",
-    "Uint32Array",
-    "Uint8Array",
-    "Uint8ClampedArray",
-    "Undefined",
-    "UriError",
-    "WeakMap",
-    "WeakRef",
-    "WeakSet",
 ];
 
 /// Prelude names the generated code spells bare, so a declaration with one
@@ -688,10 +634,10 @@ pub(crate) fn externalised_modules(module: &ir::Module, gctx: &GlobalContext) ->
     for &type_id in &module.types {
         let decl = gctx.get_type(type_id);
         if let ModuleContext::Module(m) = &decl.module_context {
-            let name = type_decl_name(&decl.kind);
-            if let Some(name) = name {
-                module_groups.entry(m.as_ref()).or_default().push(name);
-            }
+            module_groups
+                .entry(m.as_ref())
+                .or_default()
+                .push(decl.kind.name());
         }
     }
     let mut externalised_modules = HashSet::new();
@@ -2226,30 +2172,12 @@ impl<'a> CodegenContext<'a> {
         let mut unresolved = Vec::new();
         for &type_id in type_ids {
             let decl = self.gctx.get_type(type_id);
-            if let Some(name) = type_decl_name(&decl.kind) {
-                if self.gctx.external_map.resolve(name, spec).is_none() {
-                    unresolved.push(name.to_string());
-                }
+            let name = decl.kind.name();
+            if self.gctx.external_map.resolve(name, spec).is_none() {
+                unresolved.push(name.to_string());
             }
         }
         unresolved
-    }
-}
-
-/// Helper: get the public name of a declaration kind, if it has one.
-/// Mirrors the `kind` arms in `populate_builtin_scope::declaration_name`.
-pub(crate) fn type_decl_name(kind: &ir::TypeKind) -> Option<&str> {
-    match kind {
-        ir::TypeKind::Class(c) => Some(&c.name),
-        ir::TypeKind::Interface(i) => Some(&i.name),
-        ir::TypeKind::DiscriminatedUnion(d) => Some(&d.name),
-        ir::TypeKind::TypeAlias(a) => Some(&a.name),
-        ir::TypeKind::StringEnum(e) => Some(&e.name),
-        ir::TypeKind::NumericEnum(e) => Some(&e.name),
-        ir::TypeKind::TsEnum(e) => Some(&e.name),
-        ir::TypeKind::Function(f) => Some(&f.name),
-        ir::TypeKind::Variable(v) => Some(&v.name),
-        ir::TypeKind::Namespace(n) => Some(&n.name),
     }
 }
 
@@ -3017,8 +2945,7 @@ fn emit_type_name(name: &str, use_scope: ScopeId, ctx: &CodegenContext<'_>) -> T
             .renamed_types
             .get(&type_id)
             .map(String::as_str)
-            .or_else(|| type_decl_name(&ctx.gctx.get_type(type_id).kind))
-            .unwrap_or(ident_name);
+            .unwrap_or_else(|| ctx.gctx.get_type(type_id).kind.name());
         let rust_name = ctx
             .renamed_locals
             .get(declared)
@@ -4748,7 +4675,7 @@ mod tests {
             ty,
             TypePosition::ARGUMENT,
             None,
-            ScopeId(0),
+            ScopeId::DUMMY,
             &ModuleContext::Global,
         )
         .to_string()
@@ -4759,7 +4686,7 @@ mod tests {
             ty,
             TypePosition::RETURN,
             None,
-            ScopeId(0),
+            ScopeId::DUMMY,
             &ModuleContext::Global,
         )
         .to_string()
@@ -4793,7 +4720,7 @@ mod tests {
             ],
             target: TypeRef::union([ident("U"), ident("V"), ident("W")]),
             from_module: None,
-            body_scope: ScopeId(0),
+            body_scope: ScopeId::DUMMY,
         };
         assert_eq!(
             *alias_target_with_defaults(&alias),
@@ -4828,7 +4755,7 @@ mod tests {
             ty,
             TypePosition::RETURN.to_inner(),
             None,
-            ScopeId(0),
+            ScopeId::DUMMY,
             &ModuleContext::Global,
         )
         .to_string()
@@ -5266,7 +5193,7 @@ mod tests {
                 false,
                 None,
                 None,
-                ScopeId(0),
+                ScopeId::DUMMY,
                 &ModuleContext::Global,
                 ReturnAnchor {
                     base: "test",
@@ -5658,21 +5585,35 @@ mod tests {
         let ty = TypeRef::String;
         let g = &ModuleContext::Global;
         assert_eq!(
-            to_syn_type(&ty, TypePosition::ARGUMENT, None, ScopeId(0), g).to_string(),
+            to_syn_type(&ty, TypePosition::ARGUMENT, None, ScopeId::DUMMY, g).to_string(),
             "& str"
         );
         assert_eq!(
-            to_syn_type(&ty, TypePosition::RETURN, None, ScopeId(0), g).to_string(),
+            to_syn_type(&ty, TypePosition::RETURN, None, ScopeId::DUMMY, g).to_string(),
             "String"
         );
         // to_inner() → inner:true, so should give JsString
         assert_eq!(
-            to_syn_type(&ty, TypePosition::RETURN.to_inner(), None, ScopeId(0), g).to_string(),
+            to_syn_type(
+                &ty,
+                TypePosition::RETURN.to_inner(),
+                None,
+                ScopeId::DUMMY,
+                g
+            )
+            .to_string(),
             "JsString"
         );
         // Argument inner also gives JsString (inner overrides borrowing)
         assert_eq!(
-            to_syn_type(&ty, TypePosition::ARGUMENT.to_inner(), None, ScopeId(0), g).to_string(),
+            to_syn_type(
+                &ty,
+                TypePosition::ARGUMENT.to_inner(),
+                None,
+                ScopeId::DUMMY,
+                g
+            )
+            .to_string(),
             "JsString"
         );
     }
@@ -6192,7 +6133,8 @@ mod tests {
             Boolean, BooleanLiteral as B, Number, NumberLiteral as N, StringLiteral as S,
         };
         let members = |ms: &[TypeRef]| {
-            dynamic_union_members(ms, None, ScopeId(0), &ModuleContext::Global).map(|a| a.members)
+            dynamic_union_members(ms, None, ScopeId::DUMMY, &ModuleContext::Global)
+                .map(|a| a.members)
         };
         let ab = || TypeRef::ident("ArrayBuffer");
 

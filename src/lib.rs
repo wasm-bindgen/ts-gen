@@ -17,6 +17,7 @@
 pub mod codegen;
 pub mod context;
 pub mod external_map;
+pub mod input;
 pub mod ir;
 pub mod lower;
 pub mod parse;
@@ -28,6 +29,9 @@ use std::path::Path;
 use anyhow::Result;
 
 use crate::context::GlobalContext;
+
+/// `std/std.tw`, the JS standard library as a lib IR, as text.
+pub const STD_IR: &str = include_str!("../std/std.tw");
 
 /// Parse `.d.ts` files and return the module + global context.
 ///

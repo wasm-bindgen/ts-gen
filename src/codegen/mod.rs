@@ -378,9 +378,7 @@ fn rustfmt(code: &str) -> anyhow::Result<String> {
 /// `std/std.tw`, the JS standard library as a lib IR.
 fn std_ir() -> &'static ts_gen_abi::ir::Ir {
     static STD: std::sync::OnceLock<ts_gen_abi::ir::Ir> = std::sync::OnceLock::new();
-    STD.get_or_init(|| {
-        ts_gen_abi::text::parse(include_str!("../../std/std.tw")).expect("std/std.tw parses")
-    })
+    STD.get_or_init(|| ts_gen_abi::text::parse(crate::STD_IR).expect("std/std.tw parses"))
 }
 
 /// Generate the token stream for a full module.
@@ -826,7 +824,7 @@ fn generate_type_alias(
             .is_some_and(|id| cgctx.local_type_ids.contains(&id));
         if !is_type_param
             && !resolves_local
-            && !crate::codegen::typemap::JS_SYS_RESERVED.contains(&target_name)
+            && !crate::external_map::JS_SYS_RESERVED.contains(&target_name)
         {
             cgctx.warn(format!(
                 "Type alias `{}` targets unknown type `{target_name}`, skipping",

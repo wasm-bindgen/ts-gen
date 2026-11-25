@@ -16,8 +16,9 @@ use quote::quote;
 
 use crate::codegen::subtyping::builtin_parents;
 use crate::codegen::surface::Surface;
-use crate::codegen::typemap::{self, CodegenContext, TypePosition, JS_SYS_RESERVED};
+use crate::codegen::typemap::{self, CodegenContext, TypePosition};
 use crate::context::TypeId;
+use crate::external_map::JS_SYS_RESERVED;
 use crate::ir::{Heritage, Member, ModuleContext, Throws, TypeDeclaration, TypeKind, TypeRef};
 use crate::parse::scope::ScopeId;
 use crate::util::naming::to_pascal_case;
@@ -75,9 +76,7 @@ pub fn ir_throws_names(
                 Ok(id) => {
                     let decl = ctx.gctx.get_type(*id);
                     ThrowsName {
-                        path: typemap::type_decl_name(&decl.kind)
-                            .unwrap_or_default()
-                            .to_string(),
+                        path: decl.kind.name().to_string(),
                         scope: decl.scope_id,
                     }
                 }
@@ -211,7 +210,7 @@ fn variant_ident(path: &str, resolved: Option<TypeId>, ctx: &CodegenContext<'_>)
         return name.to_string();
     };
     let decl = ctx.gctx.get_type(id);
-    let declared = typemap::type_decl_name(&decl.kind).unwrap_or(name);
+    let declared = decl.kind.name();
     let declared = ctx
         .renamed_locals
         .get(declared)

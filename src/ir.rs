@@ -31,7 +31,7 @@ pub enum ModuleContext {
 
 impl ModuleContext {
     /// The JS module specifier, or `None` for globals.
-    pub(crate) fn specifier(&self) -> Option<&str> {
+    pub fn specifier(&self) -> Option<&str> {
         match self {
             ModuleContext::Global => None,
             ModuleContext::Module(module) => Some(module),
@@ -43,7 +43,7 @@ impl ModuleContext {
     /// `cloudflare:sockets`, `bun:sqlite`) or a bare Node builtin (`fs`).
     /// The host's async functions reject rather than throw, so calling one
     /// never throws synchronously.
-    pub(crate) fn is_builtin_or_global(&self) -> bool {
+    pub fn is_builtin_or_global(&self) -> bool {
         match self {
             ModuleContext::Global => true,
             ModuleContext::Module(module) => {
@@ -1126,6 +1126,24 @@ pub enum TypeKind {
     Function(FunctionDecl),
     Variable(VariableDecl),
     Namespace(NamespaceDecl),
+}
+
+impl TypeKind {
+    /// The declaration's name. A function or variable's is its Rust name.
+    pub fn name(&self) -> &str {
+        match self {
+            TypeKind::Class(c) => &c.name,
+            TypeKind::Interface(i) => &i.name,
+            TypeKind::DiscriminatedUnion(d) => &d.name,
+            TypeKind::TypeAlias(a) => &a.name,
+            TypeKind::StringEnum(e) => &e.name,
+            TypeKind::NumericEnum(e) => &e.name,
+            TypeKind::TsEnum(e) => &e.name,
+            TypeKind::Function(f) => &f.name,
+            TypeKind::Variable(v) => &v.name,
+            TypeKind::Namespace(n) => &n.name,
+        }
+    }
 }
 
 // ─── Class ───────────────────────────────────────────────────────────

@@ -12,7 +12,7 @@ use std::collections::HashMap;
 use ts_gen_abi::ir as abi;
 use ts_gen_abi::resolve::{Context, Location, Symbols, Target, TypeDecl};
 
-use crate::context::{GlobalContext, TypeId};
+use crate::context::{GlobalContext, TypeId, DECLARED};
 use crate::ir::{AbiScalar, FunctionSig, Param, Throws, TypeKind, TypeRef};
 use crate::parse::scope::ScopeId;
 
@@ -659,11 +659,6 @@ fn literals(cx: &Cx<'_>, t: &abi::Type) -> Option<TypeRef> {
 /// The first segment of the path [`ty`] reads an enum the producer
 /// synthesised as, which no TS name can be: the parse reads its union.
 pub const SYNTHESISED: &str = "#enum";
-
-/// The segment that names a declaration by its id, `#decl.<id>`, where
-/// the IR's path names it otherwise than the parse does in scope: in
-/// another module, or shadowed. The parse's name for it restates it.
-pub const DECLARED: &str = "#decl";
 
 fn declared_ref(id: crate::context::TypeId) -> TypeRef {
     TypeRef::Reference {

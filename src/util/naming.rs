@@ -100,12 +100,12 @@ pub fn to_snake_case(name: &str) -> String {
 /// the characters a Rust identifier can't hold removed (`$data` → `data`,
 /// `@cf/model` → `cfmodel`). Keywords and a leading digit are left to
 /// `make_ident`, after prefixes like `set_` are composed.
-pub(crate) fn snake_ident(js_name: &str) -> String {
+pub fn snake_ident(js_name: &str) -> String {
     ident_chars(&to_snake_case(js_name))
 }
 
 /// The characters of `name` a Rust identifier can hold.
-pub(crate) fn ident_chars(name: &str) -> String {
+pub fn ident_chars(name: &str) -> String {
     name.chars()
         .filter(|c| c.is_alphanumeric() || *c == '_')
         .collect()
@@ -116,7 +116,7 @@ pub(crate) fn ident_chars(name: &str) -> String {
 /// changes case (`fooBar`), then one that loses or spells out characters
 /// (`$ajax`, `[Symbol.iterator]`). The binding whose JS name reads as the
 /// Rust name keeps it, whatever the declaration order.
-pub(crate) fn naming_priority(js_name: &str, rust_name: &str) -> u8 {
+pub fn naming_priority(js_name: &str, rust_name: &str) -> u8 {
     if js_name == rust_name {
         0
     } else if js_name.chars().any(char::is_alphanumeric)
@@ -139,7 +139,7 @@ pub fn to_pascal_case(name: &str) -> String {
 /// Spell out the symbols of a name with no alphanumeric characters, which
 /// would otherwise sanitise to nothing: `$$` → `["dollar", "dollar"]`, so
 /// `$` and `$$` get usable, distinct names.
-pub(crate) fn symbol_words(name: &str) -> Option<Vec<&'static str>> {
+pub fn symbol_words(name: &str) -> Option<Vec<&'static str>> {
     if name.chars().any(char::is_alphanumeric) {
         return None;
     }
@@ -185,7 +185,7 @@ pub fn to_enum_variant(s: &str) -> String {
 }
 
 /// snake_case identifier fragment for a number literal: `1`, `0_5`, `neg_1`.
-pub(crate) fn number_literal_snake(n: f64) -> String {
+pub fn number_literal_snake(n: f64) -> String {
     let abs = n.abs().to_string().replace('.', "_");
     if n < 0.0 {
         format!("neg_{abs}")
@@ -195,7 +195,7 @@ pub(crate) fn number_literal_snake(n: f64) -> String {
 }
 
 /// PascalCase enum variant for a number literal: `N1`, `N0_5`, `Neg1`.
-pub(crate) fn number_literal_pascal(n: f64) -> String {
+pub fn number_literal_pascal(n: f64) -> String {
     let abs = n.abs().to_string().replace('.', "_");
     if n < 0.0 {
         format!("Neg{abs}")
