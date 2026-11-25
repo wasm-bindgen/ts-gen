@@ -1,6 +1,7 @@
 //! Bridge fixtures: each `tests/fixtures/<name>/` has an `ir.ts`, an
 //! optional `profile`, an optional empty `factory` (generating with
-//! `Options::factory`), and a `test.mjs`. The language module is the
+//! `Options::factory`), optional extra Node flags in `node`, and a
+//! `test.mjs`. The language module is the
 //! fixture's `lang.wat` (with `{RUNTIME}` standing for the runtime below), or by default a pass-through module that imports
 //! every IR member (and each `protocol` line) and re-exports it as
 //! `call:<key>` (`call:<group>:<name>` for protocol imports), over the counting runtime in `tests/runtime.wat`.
@@ -663,8 +664,10 @@ fn fixture(name: &str) {
     std::fs::write(out.join("bridge.js"), &bridge.js).unwrap();
     std::fs::write(out.join("bridge.wasm"), &bridge.wasm).unwrap();
     std::fs::write(out.join("lang.wasm"), &lang).unwrap();
+    let flags = read("node").unwrap_or_default();
     let run = Command::new(&node)
         .arg("--expose-gc")
+        .args(flags.split_whitespace())
         .arg("test.mjs")
         .current_dir(&out)
         .output()

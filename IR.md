@@ -1987,6 +1987,11 @@ Promising calls:
 * The bridge calls an export or callback returning a `future` through
   `WebAssembly.promising`. The JS result is the promise of the call's own
   future, and an error escaping the call rejects it.
+* Such a call returns to JS at its first suspension, but its arguments
+  stay borrowed until its future settles: the bridge frees them then, not
+  when the call first returns (§11). It also keeps the call's receiver and
+  JS arguments reachable until then, so a finalizer doesn't drop a handle
+  the call still uses (`await new Foo().run()`).
 * It enters the language through a root in the bridge module, which
   records the scratch base: a suspension moves what's live above it out of
   scratch while it's parked, and puts it back once resumed. The root also

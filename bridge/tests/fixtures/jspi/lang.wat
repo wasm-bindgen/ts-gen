@@ -33,6 +33,13 @@
     (local.set $b (call $later (local.get $api)))
     (call $ready (i32.add (call $await (local.get $a)) (call $await (local.get $b)))))
 
+  ;; Awaits before reading `s`, so the bridge must keep the argument's
+  ;; memory until the call settles.
+  (func (export "app.echo(Api,str)") (param $api externref) (param $p i32) (param $n i32) (result externref)
+    (local $v i32)
+    (local.set $v (call $await (call $later (local.get $api))))
+    (call $ready (i32.add (local.get $v) (i32.load8_u (local.get $p)))))
+
   ;; One future that several calls suspend on.
   (global $shared (mut externref) (ref.null extern))
   (func (export "app.share(Api)") (param $api externref) (result i32)
@@ -81,4 +88,25 @@
   (func (export "tw:call:fn(Api)->future<u32>") (param $env i32) (param $api externref) (result externref)
     (call $ready (i32.add (call $await (call $later (local.get $api))) (local.get $env))))
   (func (export "tw:drop:fn(Api)->future<u32>") (param $env i32))
+
+  ;; A task's handle is the table slot holding its `Api`, which its drop
+  ;; clears: one dropped while its run is suspended reads null.
+  (global $drops (mut i32) (i32.const 0))
+  (func (export "test:drops") (result i32) (global.get $drops))
+  (func (export "Task.new(Api)") (param $self externref) (param $api externref) (result i32)
+    (local $h i32)
+    (local.set $h (call $talloc (i32.const 1)))
+    (table.set $tab (local.get $h) (local.get $api))
+    (local.get $h))
+  (func (export "tw:drop:Task") (param $h i32)
+    (global.set $drops (i32.add (global.get $drops) (i32.const 1)))
+    (table.set $tab (local.get $h) (ref.null extern)))
+  (func (export "Task#run()") (param $self externref) (param $h i32) (result externref)
+    (local $v i32)
+    ;; A linear language doesn't keep `this`.
+    (local.set $self (ref.null extern))
+    (local.set $v (call $await (call $later (table.get $tab (local.get $h)))))
+    (if (ref.is_null (table.get $tab (local.get $h)))
+      (then (local.set $v (i32.add (local.get $v) (i32.const 1000)))))
+    (call $ready (local.get $v)))
 )

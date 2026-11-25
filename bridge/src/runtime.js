@@ -564,6 +564,18 @@ function $release(cx, m) {
   cx.n = m;
 }
 
+// Moves a suspended entry's argument records, those above `m`, off the
+// stack, and releases them once its future `f` settles: under JSPI the call
+// returns its future at its first suspension, and the language may read its
+// arguments after it resumes (IR.md §16).
+function $hold(cx, m, f) {
+  if (cx.n === m) return;
+  const held = { a: cx.a.slice(m, cx.n), n: cx.n - m };
+  cx.n = m;
+  const done = () => $release(held, 0);
+  f.promise.then(done, done);
+}
+
 // The bridge's return area, the first bytes of its scratch memory, where a
 // JS import writes its results past the first.
 let $ra = null;
@@ -995,6 +1007,13 @@ function $promising(f) {
     });
     return new $Future(call, null, null);
   };
+}
+
+// Keeps `vs` reachable until future `f` settles, so their finalizers don't
+// drop the handles a suspended call still uses (§16).
+function $keep(f, vs) {
+  const keep = () => vs;
+  f.promise.then(keep, keep);
 }
 
 function $promise(v) {

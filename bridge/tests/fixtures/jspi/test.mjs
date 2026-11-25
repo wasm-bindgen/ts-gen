@@ -1,4 +1,4 @@
-import { assert } from "./harness.mjs";
+import { assert, collect } from "./harness.mjs";
 
 class Api {
   constructor() {
@@ -10,10 +10,10 @@ class Api {
 }
 globalThis.Api = Api;
 
-const { instantiate, app, scratchUse } = await import("./bridge.js");
+const { instantiate, app, Task, scratchUse } = await import("./bridge.js");
 const fs = await import("node:fs");
 const compile = (f) => new WebAssembly.Module(fs.readFileSync(f));
-instantiate(compile("lang.wasm"), compile("bridge.wasm"));
+const instance = instantiate(compile("lang.wasm"), compile("bridge.wasm"));
 const empty = scratchUse();
 
 // The export runs up to its first suspension, then returns a promise.
@@ -73,6 +73,29 @@ const c = new Api();
 const called = cb(c);
 c.resolvers[0](2);
 assert.equal(await called, 42);
+
+// A suspended call keeps its arguments until it settles.
+const e = new Api();
+const live = instance.exports["test:live"];
+const before = live();
+const echoed = app.echo(e, "A");
+assert.equal(live(), before + 1);
+e.resolvers[0](1);
+assert.equal(await echoed, 66);
+assert.equal(live(), before);
+
+// And its receiver: a collected `Task` would drop the handle `run` still
+// uses. This runs optimized (`node` holds `--no-liftoff`), where a
+// suspended frame doesn't keep the values it no longer reads.
+const drops = instance.exports["test:drops"];
+const t = new Api();
+const ran = new Task(t).run();
+await collect();
+assert.equal(drops(), 0);
+t.resolvers[0](5);
+assert.equal(await ran, 5);
+await collect();
+assert.equal(drops(), 1);
 
 assert.deepEqual(scratchUse(), empty);
 console.log("ok");

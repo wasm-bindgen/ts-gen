@@ -4,12 +4,14 @@
   (import "tw:glue" "unstash" (func $unstash (param externref)))
   (import "tw:glue" "g1" (func $g1 (param externref) (result i32)))
   (import "tw:glue" "g2" (func $g2 (param i32 i32) (result i32)))
-  (type $ft0 (func (param externref) (result externref)))
-  (type $ft1 (func (result externref)))
-  (type $ft2 (func (param externref) (result externref)))
-  (type $ft3 (func (param externref) (result externref)))
-  (type $ft4 (func (result externref)))
-  (type $ft5 (func (param i32 externref) (result externref)))
+  (type $ft0 (func (param externref i32) (result externref)))
+  (type $ft1 (func (param externref) (result externref)))
+  (type $ft2 (func (param externref i32 i32) (result externref)))
+  (type $ft3 (func (result externref)))
+  (type $ft4 (func (param externref) (result externref)))
+  (type $ft5 (func (param externref) (result externref)))
+  (type $ft6 (func (result externref)))
+  (type $ft7 (func (param i32 externref) (result externref)))
   (memory $m (export "memory") 1)
   (table $st (export "table") 0 externref)
   (global (export "hdr") i32 (i32.const 0))
@@ -63,7 +65,7 @@
   (func $leave
     (if (global.get $suspended)
       (then (call $restore (i32.const 72) (i32.const 0)) (global.set $suspended (i32.const 0)))))
-  (table $entries (export "entries") 6 funcref)
+  (table $entries (export "entries") 8 funcref)
   (func $s1 (export "s1") (param $p0 externref) (result i32)
     (local $l1 i32)
     (local.set $l1 (call $g1 (local.get $p0)))
@@ -76,7 +78,7 @@
     (if (i32.eq (local.get $l1) (i32.const -2147483648)) (then (local.set $l1 (call $parked))))
     local.get $l1
   )
-  (func $p0 (export "p0") (param $p0 externref) (result externref)
+  (func $p0 (export "p0") (param $p0 externref) (param $p1 i32) (result externref)
     (local $l1 externref)
     (local $l2 exnref)
     (global.set $base (call $sp))
@@ -84,7 +86,7 @@
     (global.set $suspended (i32.const 0))
     (block $done
     (local.set $l2 (block $catch (result exnref) (try_table (catch_all_ref $catch)
-      (call_indirect $entries (type $ft0) (local.get $p0) (i32.const 0))
+      (call_indirect $entries (type $ft0) (local.get $p0) (local.get $p1) (i32.const 0))
       local.set $l1
     ) (br $done)))
     (call $leave)
@@ -92,7 +94,7 @@
     (call $leave)
     local.get $l1
   )
-  (func $p1 (export "p1") (result externref)
+  (func $p1 (export "p1") (param $p0 externref) (result externref)
     (local $l1 externref)
     (local $l2 exnref)
     (global.set $base (call $sp))
@@ -100,7 +102,7 @@
     (global.set $suspended (i32.const 0))
     (block $done
     (local.set $l2 (block $catch (result exnref) (try_table (catch_all_ref $catch)
-      (call_indirect $entries (type $ft1) (i32.const 1))
+      (call_indirect $entries (type $ft1) (local.get $p0) (i32.const 1))
       local.set $l1
     ) (br $done)))
     (call $leave)
@@ -108,7 +110,7 @@
     (call $leave)
     local.get $l1
   )
-  (func $p2 (export "p2") (param $p0 externref) (result externref)
+  (func $p2 (export "p2") (param $p0 externref) (param $p1 i32) (param $p2 i32) (result externref)
     (local $l1 externref)
     (local $l2 exnref)
     (global.set $base (call $sp))
@@ -116,7 +118,7 @@
     (global.set $suspended (i32.const 0))
     (block $done
     (local.set $l2 (block $catch (result exnref) (try_table (catch_all_ref $catch)
-      (call_indirect $entries (type $ft2) (local.get $p0) (i32.const 2))
+      (call_indirect $entries (type $ft2) (local.get $p0) (local.get $p1) (local.get $p2) (i32.const 2))
       local.set $l1
     ) (br $done)))
     (call $leave)
@@ -124,7 +126,7 @@
     (call $leave)
     local.get $l1
   )
-  (func $p3 (export "p3") (param $p0 externref) (result externref)
+  (func $p3 (export "p3") (result externref)
     (local $l1 externref)
     (local $l2 exnref)
     (global.set $base (call $sp))
@@ -132,7 +134,7 @@
     (global.set $suspended (i32.const 0))
     (block $done
     (local.set $l2 (block $catch (result exnref) (try_table (catch_all_ref $catch)
-      (call_indirect $entries (type $ft3) (local.get $p0) (i32.const 3))
+      (call_indirect $entries (type $ft3) (i32.const 3))
       local.set $l1
     ) (br $done)))
     (call $leave)
@@ -140,7 +142,7 @@
     (call $leave)
     local.get $l1
   )
-  (func $p4 (export "p4") (result externref)
+  (func $p4 (export "p4") (param $p0 externref) (result externref)
     (local $l1 externref)
     (local $l2 exnref)
     (global.set $base (call $sp))
@@ -148,7 +150,7 @@
     (global.set $suspended (i32.const 0))
     (block $done
     (local.set $l2 (block $catch (result exnref) (try_table (catch_all_ref $catch)
-      (call_indirect $entries (type $ft4) (i32.const 4))
+      (call_indirect $entries (type $ft4) (local.get $p0) (i32.const 4))
       local.set $l1
     ) (br $done)))
     (call $leave)
@@ -156,7 +158,7 @@
     (call $leave)
     local.get $l1
   )
-  (func $p5 (export "p5") (param $p0 i32) (param $p1 externref) (result externref)
+  (func $p5 (export "p5") (param $p0 externref) (result externref)
     (local $l1 externref)
     (local $l2 exnref)
     (global.set $base (call $sp))
@@ -164,7 +166,39 @@
     (global.set $suspended (i32.const 0))
     (block $done
     (local.set $l2 (block $catch (result exnref) (try_table (catch_all_ref $catch)
-      (call_indirect $entries (type $ft5) (local.get $p0) (local.get $p1) (i32.const 5))
+      (call_indirect $entries (type $ft5) (local.get $p0) (i32.const 5))
+      local.set $l1
+    ) (br $done)))
+    (call $leave)
+    (throw_ref (local.get $l2)))
+    (call $leave)
+    local.get $l1
+  )
+  (func $p6 (export "p6") (result externref)
+    (local $l1 externref)
+    (local $l2 exnref)
+    (global.set $base (call $sp))
+    (global.set $tbase (call $tsp))
+    (global.set $suspended (i32.const 0))
+    (block $done
+    (local.set $l2 (block $catch (result exnref) (try_table (catch_all_ref $catch)
+      (call_indirect $entries (type $ft6) (i32.const 6))
+      local.set $l1
+    ) (br $done)))
+    (call $leave)
+    (throw_ref (local.get $l2)))
+    (call $leave)
+    local.get $l1
+  )
+  (func $p7 (export "p7") (param $p0 i32) (param $p1 externref) (result externref)
+    (local $l1 externref)
+    (local $l2 exnref)
+    (global.set $base (call $sp))
+    (global.set $tbase (call $tsp))
+    (global.set $suspended (i32.const 0))
+    (block $done
+    (local.set $l2 (block $catch (result exnref) (try_table (catch_all_ref $catch)
+      (call_indirect $entries (type $ft7) (local.get $p0) (local.get $p1) (i32.const 7))
       local.set $l1
     ) (br $done)))
     (call $leave)

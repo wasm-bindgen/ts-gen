@@ -116,6 +116,7 @@ Each directory in `tests/fixtures/` holds the following:
   * a generated pass-through module, which imports each member, exports a
     `call:<key>` forwarder for it, and adds the trampolines and exports
     that `protocol` lists;
+* optional extra Node flags in `node`;
 * a `test.mjs`.
 
 The generated `bridge.js` and `bridge.wat` are snapshotted in
