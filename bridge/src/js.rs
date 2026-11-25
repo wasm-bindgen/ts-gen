@@ -1279,8 +1279,10 @@ impl<'a, 'b> Glue<'a, 'b> {
                 of: Host::Future { value, .. },
                 nullable,
             } => {
-                let check = self.resolution_check(value, m)?;
-                let e = format!("$future({v}, {check})");
+                let e = match never_check(value) {
+                    Some(check) => format!("$future({v}, {check})"),
+                    None => format!("$future({v})"),
+                };
                 vec![b.bind(if *nullable {
                     format!("({v} == null ? null : {e})")
                 } else {
@@ -1388,27 +1390,6 @@ impl<'a, 'b> Glue<'a, 'b> {
             _ => "null".into(),
         };
         format!("({v} == null ? {null} : {e})")
-    }
-
-    /// Validates a future's resolution against its `take<T>` type when it
-    /// settles, so a mismatch rejects it (§16); `null` when unchecked.
-    fn resolution_check(&mut self, value: &Repr, m: Mode) -> Result<String> {
-        if value.kind == Kind::Never {
-            return Ok("$neverResolves".into());
-        }
-        if !m.checked || value.kind == Kind::Unit {
-            return Ok("null".into());
-        }
-        let key = format!("resolves {:?}", value);
-        let value = value.clone();
-        self.helper(key, move |g, name| {
-            let mut b = Body::default();
-            let t = g.value_test(&value, "v")?;
-            if t != "true" {
-                b.line(format!("if (!({t})) $fail({}, v);", js_str(&value.ty)));
-            }
-            Ok(b.finish(&format!("function {name}(v)")))
-        })
     }
 
     /// A JS array as a host `T[]`: a fresh array of its elements, each
@@ -2099,21 +2080,25 @@ impl<'a, 'b> Glue<'a, 'b> {
                 };
                 b.line(format!("{reg}.destroy({});", wires[0][0]));
             }
-            Op::Poll => {
-                b.line("return $poll(f, w);");
-                return Ok(b.finish(&format!("function {name}(f, w)")));
-            }
             Op::Suspend => {
                 b.line("return $suspend(f);");
                 return Ok(b.finish(&format!("function {name}(f)")));
             }
-            Op::SuspendRace => {
-                let v = self.lift(&func.sig.params[0].repr, &wires[0])?;
-                b.line(format!("return $suspendRace({v});"));
+            Op::ListSuspend => {
+                let fs = self.lift(&func.sig.params[0].repr, &wires[0])?;
+                b.line(format!("return $suspendAny({fs});"));
             }
-            Op::FutureDrop => {
-                b.line("$dropFuture(f);");
+            Op::FutureState => {
+                b.line("return $isFuture(f).state;");
                 return Ok(b.finish(&format!("function {name}(f)")));
+            }
+            Op::FutureCancel => {
+                b.line("$cancelFuture(f);");
+                return Ok(b.finish(&format!("function {name}(f)")));
+            }
+            Op::FutureWatch => {
+                b.line("$watch(f, w);");
+                return Ok(b.finish(&format!("function {name}(f, w)")));
             }
             Op::FutureNew => {
                 b.line("return $newFuture();");
@@ -2143,17 +2128,29 @@ impl<'a, 'b> Glue<'a, 'b> {
                 b.line("$loops.drop(l);");
                 return Ok(b.finish(&format!("function {name}(l)")));
             }
-            Op::Take(r) => {
-                b.line(format!("const v = $settled({}, 1);", wires[0][0]));
-                if let Some(r) = r {
-                    let m = self.mode();
-                    let body = |g: &mut Self, b: &mut Body| g.lower(b, r, "v", m);
-                    self.returning(&mut b, body)?;
-                }
+            // The value lowers as an import's result does, a failure
+            // thrown to `E` (§16). A value that isn't a future is the
+            // language's failure, not the value's, so it's checked first.
+            Op::Get => {
+                b.line(format!("const f = $isFuture({});", wires[0][0]));
+                let r = func.sig.results.first().expect("the option");
+                let unit = matches!(&r.repr.kind, Kind::Tuple { elems, .. } if elems.is_empty());
+                let call = format!("$option(f, {unit})");
+                let throws = func.sig.throws.clone();
+                self.complete(&mut b, &call, Some(r), throws, false, &[])?;
+            }
+            Op::ListStates => {
+                let fs = self.lift(&func.sig.params[0].repr, &wires[0])?;
+                let call = format!("$states({fs})");
+                self.complete(&mut b, &call, func.sig.results.first(), None, false, &[])?;
+            }
+            Op::ListWatch => {
+                let fs = self.lift(&func.sig.params[0].repr, &wires[0])?;
+                b.line(format!("$watchAll({fs}, {});", wires[1][0]));
             }
             Op::FutureError(e) => {
                 let map = self.error_map(e)?;
-                b.line(format!("return {map}($settled({}, 2));", wires[0][0]));
+                b.line(format!("return {map}($rejection({}));", wires[0][0]));
             }
             Op::Resolve(r) => {
                 let v = match r {
@@ -2328,7 +2325,7 @@ impl<'a, 'b> Glue<'a, 'b> {
             b.line(format!("const {t} = {call};"));
             args.insert("$result", t.clone());
             let c = self.expr(e, &args, &cx)?;
-            let check = self.resolution_check(value, self.mode())?;
+            let check = never_check(value).unwrap_or("null");
             let f = b.fresh();
             b.line(format!(
                 "const {f} = $future({t}, {check}, () => {{ {c}(); }});"
@@ -2736,6 +2733,11 @@ fn ret(w: &[String]) -> String {
         1 => format!("return {};", w[0]),
         _ => format!("return [{}];", w.join(", ")),
     }
+}
+
+/// The settle-time rule of a `future<never>`, which only rejects (§3).
+fn never_check(value: &Repr) -> Option<&'static str> {
+    (value.kind == Kind::Never).then_some("$neverResolves")
 }
 
 /// Whether lowering `r` allocates in the language's space.

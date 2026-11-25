@@ -318,16 +318,34 @@ fn protocol_names() {
     assert_eq!(protocol::arr_get("str"), i("tw:arr", "get<str>"));
     assert_eq!(protocol::tag("KvError"), i("tw:tag", "KvError"));
     assert_eq!(protocol::tag(ERR), i("tw:tag", "err"));
-    assert_eq!(protocol::future_poll(), i("tw:future", "poll"));
+    assert_eq!(protocol::future_state(), i("tw:future", "state"));
     assert_eq!(
-        protocol::future_take("Response"),
-        i("tw:future", "take<Response>")
+        protocol::future_get("Response", ERR),
+        i("tw:future", "get<Response>")
+    );
+    assert_eq!(
+        protocol::future_get("(u32,str)", "FetchError"),
+        i("tw:future", "get<(u32,str),FetchError>")
+    );
+    assert_eq!(
+        protocol::split_future_subject("(u32,str),FetchError"),
+        ("(u32,str)", "FetchError")
+    );
+    assert_eq!(
+        protocol::split_future_subject("fn(u32,str)->Map<Str,f64>"),
+        ("fn(u32,str)->Map<Str,f64>", ERR)
     );
     assert_eq!(
         protocol::future_error("FetchError"),
         i("tw:future", "error<FetchError>")
     );
-    assert_eq!(protocol::future_drop(), i("tw:future", "drop"));
+    assert_eq!(protocol::future_cancel(), i("tw:future", "cancel"));
+    assert_eq!(protocol::future_watch(), i("tw:future", "watch"));
+    assert_eq!(
+        protocol::future_list_states(),
+        i("tw:future-list", "states")
+    );
+    assert_eq!(protocol::future_list_watch(), i("tw:future-list", "watch"));
     assert_eq!(protocol::future_new(), i("tw:future", "new"));
     assert_eq!(
         protocol::future_resolve("u32"),
@@ -373,7 +391,7 @@ fn protocol_names() {
             "tw:future/wake",
         ]
     );
-    assert_eq!(protocol::Poll::Rejected as i32, 2);
+    assert_eq!(protocol::FutureState::Rejected as i32, 2);
     assert_eq!(protocol::TICK_BUDGET, 64);
 }
 

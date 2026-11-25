@@ -19,6 +19,7 @@ js_code	fixtures.records.flat.NumberRecord_at_u32	tw:js/global	NumberRecord#at(u
 js_code	fixtures.records.flat.NumberRecord_setAt_u32_V	tw:js/global	NumberRecord#setAt(u32,V)
 js_code	fixtures.records.flat.unbox_EnvHeadersKind	tw:unbox	EnvHeadersKind
 js_code	fixtures.records.flat.box_EnvHeadersKind	tw:box	EnvHeadersKind
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureWatch	tw:future	watch
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

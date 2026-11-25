@@ -41,7 +41,7 @@ fun Pixels.first(): UInt? {
 
 fun Pixels.load(): tsgen.runtime.Future<UInt> {
     val r0 = fixtures.tags.flat.Pixels_load(this)
-    return tsgen.runtime.Future<UInt>(r0!!, { f -> val r1 = fixtures.tags.flat.take_u32(f); r1.toUInt() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<UInt>(r0!!, { f -> val r1 = try { fixtures.tags.flat.get_u32(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.tags.flat.ret_i32(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2.toUInt()) }, { f -> futureErrorErr(f) })
 }
 
 fun Pixels.clear() {
@@ -91,8 +91,8 @@ fun raiseErr(e: kotlin.js.JsException): ErrException {
 }
 
 fun futureErrorErr(f: JsAny): ErrException {
-    val r2 = fixtures.tags.flat.error_err(f)
-    val s3 = fixtures.tags.flat.ret_externref()
-    return ErrException(decodeErr(r2, s3)!!)
+    val r3 = fixtures.tags.flat.error_err(f)
+    val s4 = fixtures.tags.flat.ret_externref()
+    return ErrException(decodeErr(r3, s4)!!)
 }
 

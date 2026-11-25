@@ -58,12 +58,12 @@ fun Response.clone(): Response {
 
 fun Response.text(): tsgen.runtime.Future<String> {
     val r0 = fixtures.sample.flat.Response_text(this)
-    return tsgen.runtime.Future<String>(r0!!, { f -> val r1 = fixtures.sample.flat.take_str(f); r1!!.unsafeCast<JsString>().toString() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<String>(r0!!, { f -> val r1 = try { fixtures.sample.flat.get_str(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.sample.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2!!.unsafeCast<JsString>().toString()) }, { f -> futureErrorErr(f) })
 }
 
 fun Response.bytes(): tsgen.runtime.Future<ByteArray> {
     val r0 = fixtures.sample.flat.Response_bytes(this)
-    return tsgen.runtime.Future<ByteArray>(r0!!, { f -> val r1 = fixtures.sample.flat.take_u8(f); tsgen.runtime.byteArray(r1!!) }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<ByteArray>(r0!!, { f -> val r1 = try { fixtures.sample.flat.get_u8(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.sample.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled(tsgen.runtime.byteArray(s2!!)) }, { f -> futureErrorErr(f) })
 }
 
 object ResponseStatic {
@@ -196,17 +196,17 @@ external interface KVNamespace : JsAny
 
 fun KVNamespace.get(key: String): tsgen.runtime.Future<String?> {
     val r0 = fixtures.sample.flat.KVNamespace_get_str(this, key.toJsString())
-    return tsgen.runtime.Future<String?>(r0!!, { f -> val r1 = fixtures.sample.flat.take_str_2(f); r1?.unsafeCast<JsString>()?.toString() }, { f -> futureErrorKvError(f) })
+    return tsgen.runtime.Future<String?>(r0!!, { f -> val r3 = try { fixtures.sample.flat.get_str__KvError(f) } catch (e: kotlin.js.JsException) { throw raiseKvError(e) }; val s4 = fixtures.sample.flat.ret_externref(); if (r3 == 0) null else tsgen.runtime.Fulfilled(s4?.unsafeCast<JsString>()?.toString()) }, { f -> futureErrorKvError(f) })
 }
 
 fun KVNamespace.put(key: String, value: String, ttl: Long?): tsgen.runtime.Future<Unit> {
     val r0 = fixtures.sample.flat.KVNamespace_put_str_str_u53(this, key.toJsString(), value.toJsString(), (ttl ?: Long.MIN_VALUE))
-    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.sample.flat.take_unit(f); Unit }, { f -> futureErrorKvError(f) })
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> val r1 = try { fixtures.sample.flat.get_unit_KvError(f) } catch (e: kotlin.js.JsException) { throw raiseKvError(e) }; if (r1 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorKvError(f) })
 }
 
 fun KVNamespace.list(prefix: String?, limit: UInt?): tsgen.runtime.Future<List<JsString>> {
     val r0 = fixtures.sample.flat.KVNamespace_list_str_u32(this, prefix?.toJsString(), (if (limit == null) 0 else 1), (limit?.let { it.toInt() } ?: 0))
-    return tsgen.runtime.Future<List<JsString>>(r0!!, { f -> val r1 = fixtures.sample.flat.take_arr_Str(f); r1!!.unsafeCast<JsArray<JsString>>().let { a -> a.toList() } }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<List<JsString>>(r0!!, { f -> val r1 = try { fixtures.sample.flat.get_arr_Str(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.sample.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2!!.unsafeCast<JsArray<JsString>>().let { a -> a.toList() }) }, { f -> futureErrorErr(f) })
 }
 
 external interface Buffer : JsAny
@@ -442,9 +442,9 @@ fun raiseErr(e: kotlin.js.JsException): ErrException {
 }
 
 fun futureErrorErr(f: JsAny): ErrException {
-    val r2 = fixtures.sample.flat.error_err(f)
-    val s3 = fixtures.sample.flat.ret_externref()
-    return ErrException(decodeErr(r2, s3)!!)
+    val r3 = fixtures.sample.flat.error_err(f)
+    val s4 = fixtures.sample.flat.ret_externref()
+    return ErrException(decodeErr(r3, s4)!!)
 }
 
 fun rejectErr(resolver: JsAny?, e: kotlin.Throwable) {
@@ -464,9 +464,15 @@ private fun kvErrorMessage(error: KvError): String = when (error) {
 /** `e` as `KvError`: its own error, or the fallback arm with its message. */
 fun toKvError(e: kotlin.Throwable): KvError = if (e is KvErrorException) e.error else KvError.Error((e.message ?: e.toString()).toJsString())
 
+fun raiseKvError(e: kotlin.js.JsException): KvErrorException {
+    val r1 = fixtures.sample.flat.err_KvError(e.thrownValue)
+    val s2 = fixtures.sample.flat.ret_externref()
+    return KvErrorException(decodeKvError(r1, s2)!!)
+}
+
 fun futureErrorKvError(f: JsAny): KvErrorException {
-    val r2 = fixtures.sample.flat.error_KvError(f)
-    val s3 = fixtures.sample.flat.ret_externref()
-    return KvErrorException(decodeKvError(r2, s3)!!)
+    val r5 = fixtures.sample.flat.error_KvError(f)
+    val s6 = fixtures.sample.flat.ret_externref()
+    return KvErrorException(decodeKvError(r5, s6)!!)
 }
 

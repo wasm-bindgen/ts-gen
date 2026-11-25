@@ -9,8 +9,9 @@ js_code	fixtures.exports.flat.reject_err	tw:future	reject<err>
 js_code	fixtures.exports.flat.err_set_err	tw:err	set:err
 js_code	fixtures.exports.flat.unbox_HandlerFetchKind	tw:unbox	HandlerFetchKind
 js_code	fixtures.exports.flat.box_HandlerFetchKind	tw:box	HandlerFetchKind
-js_code	fixtures.exports.flat.take_Response	tw:future	take<Response>
+js_code	fixtures.exports.flat.get_Response	tw:future	get<Response>
 js_code	fixtures.exports.flat.error_err	tw:future	error<err>
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureWatch	tw:future	watch
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

@@ -39,6 +39,7 @@ pub const TRUE: &str = "tw:true";
 pub const FALSE: &str = "tw:false";
 pub const TAG: &str = "tw:tag";
 pub const FUTURE: &str = "tw:future";
+pub const FUTURE_LIST: &str = "tw:future-list";
 pub const LOOP: &str = "tw:loop";
 /// `results = single` (§12): spilled result slots, popped by value type
 /// (`("tw:ret", "i32")`) or pushed (`("tw:ret", "push:i32")`).
@@ -167,31 +168,56 @@ pub fn err_set(e: &str) -> Import {
     Import::new(ERR, format!("{ERR_SET}{e}"))
 }
 
-pub fn future_poll() -> Import {
-    Import::new(FUTURE, "poll")
+pub fn future_state() -> Import {
+    Import::new(FUTURE, "state")
 }
 
-pub fn future_take(t: &str) -> Import {
-    Import::new(FUTURE, format!("take<{t}>"))
+/// `get<T>`, or `get<T,E>` for a rejection enum other than `err` (§16).
+pub fn future_get(t: &str, e: &str) -> Import {
+    let subject = if e == crate::ir::ERR {
+        t.to_string()
+    } else {
+        format!("{t},{e}")
+    };
+    Import::new(FUTURE, format!("get<{subject}>"))
+}
+
+/// The `T` and `E` of a `get` name's subject: `E` follows the last comma
+/// outside every bracket, and is `err` when there's none.
+pub fn split_future_subject(s: &str) -> (&str, &str) {
+    let bytes = s.as_bytes();
+    let mut depth = 0i32;
+    let mut at = None;
+    for (i, &c) in bytes.iter().enumerate() {
+        match c {
+            b'<' | b'(' => depth += 1,
+            b'>' if i > 0 && bytes[i - 1] == b'-' => {}
+            b'>' | b')' => depth -= 1,
+            b',' if depth == 0 => at = Some(i),
+            _ => {}
+        }
+    }
+    match at {
+        Some(i) => (s[..i].trim(), s[i + 1..].trim()),
+        None => (s.trim(), crate::ir::ERR),
+    }
 }
 
 pub fn future_error(e: &str) -> Import {
     Import::new(FUTURE, format!("error<{e}>"))
 }
 
-pub fn future_drop() -> Import {
-    Import::new(FUTURE, "drop")
+pub fn future_cancel() -> Import {
+    Import::new(FUTURE, "cancel")
+}
+
+pub fn future_watch() -> Import {
+    Import::new(FUTURE, "watch")
 }
 
 /// `(externref f) -> i32`, under `jspi = on`: suspends until `f` settles.
 pub fn future_suspend() -> Import {
     Import::new(FUTURE, "suspend")
-}
-
-/// `(W(arr<Any>)) -> i32`, under `jspi = on`: suspends until one of the
-/// futures settles.
-pub fn future_suspend_race() -> Import {
-    Import::new(FUTURE, "suspend_race")
 }
 
 pub fn future_new() -> Import {
@@ -204,6 +230,20 @@ pub fn future_resolve(t: &str) -> Import {
 
 pub fn future_reject(e: &str) -> Import {
     Import::new(FUTURE, format!("reject<{e}>"))
+}
+
+pub fn future_list_states() -> Import {
+    Import::new(FUTURE_LIST, "states")
+}
+
+pub fn future_list_watch() -> Import {
+    Import::new(FUTURE_LIST, "watch")
+}
+
+/// `(W(arr<Any>)) -> i32`, under `jspi = on`: suspends until one of the
+/// futures settles.
+pub fn future_list_suspend() -> Import {
+    Import::new(FUTURE_LIST, "suspend")
 }
 
 pub fn loop_work_available() -> Import {
@@ -224,12 +264,13 @@ pub fn drop_export(subject: &str) -> String {
     format!("tw:drop:{subject}")
 }
 
-/// `("tw:future", "poll")` results.
+/// A future's state: `("tw:future", "state")`, and each byte of
+/// `("tw:future-list", "states")`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(i32)]
-pub enum Poll {
+pub enum FutureState {
     Pending = 0,
-    Resolved = 1,
+    Fulfilled = 1,
     Rejected = 2,
 }
 

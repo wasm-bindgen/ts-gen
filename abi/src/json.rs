@@ -829,8 +829,8 @@ fn type_args(args: &[TypeArg]) -> Json {
 
 /// A future operation's subject with each of `value`'s type parameters
 /// erased to `Any`: a type parameter names nothing outside its member, so
-/// the operation on it is the one on its erasure (§16). `take<T?>` is
-/// `take<Any?>`, `take<D1Result<T>>` is `take<D1Result<Any>>`. The names
+/// the operation on it is the one on its erasure (§16). `get<T?>` is
+/// `get<Any?>`, `get<D1Result<T>>` is `get<D1Result<Any>>`. The names
 /// come from `value`'s layout, so a type parameter that shadows a
 /// declaration (`get<Box>(): future<Box?>`) is erased too.
 fn erased_op_type(l: &Layouts<'_>, value: &Repr) -> String {
@@ -1001,8 +1001,8 @@ pub fn repr(l: &Layouts<'_>, r: &Repr) -> Json {
                     .set("value", repr(l, value))
                     .set("rejection", enum_layout(l, error))
                     .set(
-                        "take",
-                        import(protocol::future_take(&erased_op_type(l, value))),
+                        "get",
+                        import(protocol::future_get(&erased_op_type(l, value), &error.path)),
                     )
                     .set("errorOp", import(protocol::future_error(&error.path)))
                     .set("new", import(protocol::future_new()))

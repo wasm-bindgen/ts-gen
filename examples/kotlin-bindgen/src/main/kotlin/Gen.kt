@@ -508,19 +508,20 @@ class Gen(
                 "any" -> w
                 "box" -> cast(boxKt(r.inner))
                 "future" -> {
-                    // A future whose `take<T>` Kotlin can't import can still be passed on or dropped.
-                    val take = when {
-                        r.value.kind == "unit" -> "{ f -> ${takeCall(r)}; Unit }"
-                        r.value.kind == "never" -> "{ f -> ${takeCall(r)}; error(\"a never future resolved\") }"
-                        else -> {
-                            val pre = mutableListOf<String>()
-                            val ws = spilled(takeCall(r), r.value.wire.take(1), r.value.wire.drop(1), pre)
-                            "{ f -> ${(pre + fromWire(r.value, ws)).joinToString("; ")} }"
-                        }
+                    // A future whose `get<T>` Kotlin can't import can still be passed on or cancelled.
+                    // The option's flag is the result, so the value is all spilled: its
+                    // slots are popped whether or not it's present.
+                    val pre = mutableListOf<String>()
+                    val ws = spilled(getCall(r), listOf("i32"), r.value.wire, pre)
+                    val value = when (r.value.kind) {
+                        "unit" -> "tsgen.runtime.Fulfilled(Unit)"
+                        "never" -> "error(\"a never future resolved\")"
+                        else -> "tsgen.runtime.Fulfilled(${fromWire(r.value, ws.drop(1))})"
                     }
+                    val get = "{ f -> ${(pre + "if (${ws[0]} == 0) null else $value").joinToString("; ")} }"
                     val rejection = "{ f -> ${errors(r.rejection).futureError(r.errorOp)}(f) }"
                     val t = "tsgen.runtime.Future<${kt(r.value)}>"
-                    if (n) "$w?.let { $t(it, $take, $rejection) }" else "$t($w!!, $take, $rejection)"
+                    if (n) "$w?.let { $t(it, $get, $rejection) }" else "$t($w!!, $get, $rejection)"
                 }
                 else -> unsupported("host ${r.of}")
             }
@@ -615,18 +616,21 @@ class Gen(
         )
     }
 
-    /** `take<T>` of a future, on `f`; slots 1.. are left to pop. */
-    private fun takeCall(r: Repr): String {
-        val v = r.value
-        val name = takes.getOrPut(r.take.name) {
-            flatName("take_${r.value.ty}").also {
-                flatOut.append(flatImport(it, r.take, listOf("externref"), v.wire.take(1), "")).append('\n')
+    /**
+     * `get<T>` of a future, on `f`: whether it's fulfilled, with the value's
+     * slots left to pop. A resolution that isn't a `T` throws from it, as
+     * the rejection enum's exception.
+     */
+    private fun getCall(r: Repr): String {
+        val name = gets.getOrPut(r.get.name) {
+            flatName("get_${r.value.ty}" + r.rejection.let { if (it.origin == "err") "" else "_${it.path}" }).also {
+                flatOut.append(flatImport(it, r.get, listOf("externref"), listOf("i32"), "")).append('\n')
             }
         }
-        return "$flatPkg.$name(f)"
+        return guarded("$flatPkg.$name(f)", r.getThrows)
     }
 
-    private val takes = HashMap<String, String>()
+    private val gets = HashMap<String, String>()
 
     private fun callImport(r: Repr): String {
         val ty = r.ty.removeSuffix("?")

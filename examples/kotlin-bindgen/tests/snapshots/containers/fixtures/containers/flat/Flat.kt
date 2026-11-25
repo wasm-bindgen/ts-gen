@@ -51,9 +51,9 @@ external fun String_length(p0: JsAny?): Double
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
 external fun bytes(): JsAny?
 
-/** tw:future take<str> */
+/** tw:future get<str> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_str(p0: JsAny?): JsAny?
+external fun get_str(p0: JsAny?): Int
 
 /** tw:future error<err> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")

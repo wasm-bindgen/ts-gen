@@ -70,9 +70,13 @@ external fun ReadableStream_new(): JsAny?
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun ReadableStream_get_locked(p0: JsAny?): Int
 
-/** tw:future take<unit> */
+/** tw:future get<unit> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_unit(p0: JsAny?)
+external fun get_unit(p0: JsAny?): Int
+
+/** tw:err err */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun err_err(p0: JsAny?): Int
 
 /** tw:future error<err> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -94,17 +98,21 @@ external fun Cache_put_Response(p0: JsAny?, p1: JsAny?): JsAny?
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
 external fun Cache_put_Response_u32(p0: JsAny?, p1: JsAny?, p2: Int): JsAny?
 
-/** tw:future take<bool> */
+/** tw:future get<bool> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_bool(p0: JsAny?): Int
+external fun get_bool(p0: JsAny?): Int
+
+/** tw:ret i32 */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun ret_i32(): Int
 
 /** tw:js/global Storage#delete(str) */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun Storage_delete_str(p0: JsAny?, p1: JsAny?): JsAny?
 
-/** tw:future take<u32> */
+/** tw:future get<u32> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_u32(p0: JsAny?): Int
+external fun get_u32(p0: JsAny?): Int
 
 /** tw:js/global Storage#delete(arr<str>) */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
@@ -129,10 +137,6 @@ external fun Bucket_upload_str_buffer(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny
 /** tw:js/global get:console() */
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
 external fun get_console(): JsAny?
-
-/** tw:err err */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun err_err(p0: JsAny?): Int
 
 /** tw:js/global setTimeout(fn()) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -182,9 +186,9 @@ external fun Request_new(): JsAny?
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun Request_get_cf(p0: JsAny?): JsAny?
 
-/** tw:future take<Request<Any?,Incoming>> */
+/** tw:future get<Request<Any?,Incoming>> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_Request_Any_Incoming(p0: JsAny?): JsAny?
+external fun get_Request_Any_Incoming(p0: JsAny?): Int
 
 /** tw:js/global fetch(RequestInfo) */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")

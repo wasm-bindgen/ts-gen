@@ -11,6 +11,7 @@ js_code	fixtures.builtin_heads.flat.Outer_f64_Z_new	tw:js/global	Outer.f64_.Z.ne
 js_code	fixtures.builtin_heads.flat.Outer_f64_Z_get_c	tw:js/global	Outer.f64_.Z#get:c()
 js_code	fixtures.builtin_heads.flat.Outer_f64_Z_set_c_f64	tw:js/global	Outer.f64_.Z#set:c(f64)
 js_code	fixtures.builtin_heads.flat.Outer_take_Outer_f64_Z	tw:js/global	Outer.take(Outer.f64_.Z)
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureWatch	tw:future	watch
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

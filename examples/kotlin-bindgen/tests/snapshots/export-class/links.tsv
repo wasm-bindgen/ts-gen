@@ -15,8 +15,9 @@ js_code	fixtures.export_class.flat.box_Registry	tw:box	Registry
 js_code	fixtures.export_class.flat.unbox_Registry	tw:unbox	Registry
 js_code	fixtures.export_class.flat.unbox_DurableObjectFetchKind	tw:unbox	DurableObjectFetchKind
 js_code	fixtures.export_class.flat.box_DurableObjectFetchKind	tw:box	DurableObjectFetchKind
-js_code	fixtures.export_class.flat.take_Response	tw:future	take<Response>
+js_code	fixtures.export_class.flat.get_Response	tw:future	get<Response>
 js_code	fixtures.export_class.flat.error_err	tw:future	error<err>
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureWatch	tw:future	watch
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

@@ -47,14 +47,13 @@ function $isInstance(v, C) {
   return typeof C === "function" && v instanceof C;
 }
 
-// Whether `v` is a valid value of class `C`: an instance, or any object
-// when the class has no value (§8).
-function $isValue(v, C) {
-  return C === null ? $isObject(v) : v instanceof C;
-}
-
 function $isObject(v) {
   return (typeof v === "object" && v !== null) || typeof v === "function";
+}
+
+function $tuple(v, n, what) {
+  if (!Array.isArray(v) || v.length !== n) $fail(what, v);
+  return v;
 }
 
 // The error message of a caught value (IR.md §15): `String(err)` runs
@@ -225,14 +224,14 @@ function $fn(v, what) {
   return v;
 }
 
-// The cleanup stack (IR.md §15): `kind, ptr, size, align` records of the
-// allocations conversions make, memory (0), table slots (1), or the `size`
-// strings of an `arr<str>` at `ptr` (2), below `n`.
-// Each conversion marks `n`, and resets it once the language owns what it
-// pushed. One shared stack saves growing an array per call, and nested
-// conversions only ever touch the records above their own mark. `n` is kept
-// apart because setting an array's `length` is slow.
-const $cx = { a: [], n: 0 };
+// A language error as its JS error class (§15).
+function $construct(C, msg, props) {
+  const e = C === globalThis.DOMException ? new C(msg, props.name) : new C(msg);
+  for (const k in props) {
+    if (e[k] !== props[k]) Object.defineProperty(e, k, { value: props[k], configurable: true, writable: true });
+  }
+  return e;
+}
 
 function $cxPush(cx, kind, p, size, align) {
   const a = cx.a;
@@ -242,19 +241,6 @@ function $cxPush(cx, kind, p, size, align) {
   a[n + 2] = size;
   a[n + 3] = align;
   cx.n = n + 4;
-}
-
-// Releases a failed conversion's allocations: the records above `m`.
-function $release(cx, m) {
-  const a = cx.a;
-  for (let i = cx.n - 4; i >= m; i -= 4) {
-    try {
-      if (a[i] === 0) $L.free(a[i + 1], a[i + 2], a[i + 3]);
-      else if (a[i] === 1) $L.tfree(a[i + 1], a[i + 2]);
-      else $freeStrs(a[i + 1], a[i + 2]);
-    } catch {}
-  }
-  cx.n = m;
 }
 
 // The bridge's return area, the first bytes of its scratch memory, where a
@@ -274,19 +260,6 @@ function $ret() {
   return $ra;
 }
 
-// Frees the first `n` strings of the `(ptr, len)` descriptors at `p`.
-function $freeStrs(p, n) {
-  for (let i = 0; i < n; i++) {
-    const dv = $L.dv();
-    const len = dv.getUint32(p + i * 8 + 4, true);
-    if (len !== 0) {
-      try {
-        $L.free(dv.getUint32(p + i * 8, true), len, 1);
-      } catch {}
-    }
-  }
-}
-
 // TextDecoder's fixed cost is about that of decoding 24 ASCII bytes by hand.
 function $liftUtf8(s, p, len) {
   const u8 = s.u8();
@@ -302,33 +275,28 @@ function $liftUtf8(s, p, len) {
   return $td.decode(u8.subarray(p, p + len));
 }
 
-// A future the language holds (IR.md §16): a promise, settled state for
-// synchronous polls, and the waker to call when it settles. `check`
-// validates a resolution, which otherwise rejects with its TypeError.
+// A future the language holds (IR.md §16): a promise, with its state and
+// raw settlement kept for the language's synchronous reads. `check` is a
+// `future<never>`'s rule, which rejects a resolution.
 class $Future {
   constructor(promise, check, cancel) {
     this.promise = promise;
     this.state = 0;
     this.value = undefined;
-    this.waker = -1;
+    this.watchers = null;
     this.cancel = cancel;
-    this.dropped = false;
-    this.taken = false;
-    // The suspensions parked on it (§16).
-    this.parked = null;
     promise.then(
       (v) => {
-        if (this.dropped) return;
-        try {
-          if (check) check(v);
-          this.settle(1, v);
-        } catch (e) {
-          this.settle(2, e);
+        if (check) {
+          try {
+            check(v);
+          } catch (e) {
+            return this.settle(2, e);
+          }
         }
+        this.settle(1, v);
       },
-      (e) => {
-        if (!this.dropped) this.settle(2, e);
-      },
+      (e) => this.settle(2, e),
     );
   }
 
@@ -336,15 +304,14 @@ class $Future {
     this.state = state;
     this.value = value;
     this.cancel = null;
-    const w = this.waker;
-    this.waker = -1;
-    if (w !== -1) $wake(w);
-    $unpark(this, state);
+    const ws = this.watchers;
+    this.watchers = null;
+    if (ws) for (const [w, watch] of ws) watch === true ? $wake(w) : watch.fire(this);
   }
 }
 
 function $future(v, check, cancel) {
-  return v instanceof $Future ? v : new $Future(Promise.resolve(v), check, cancel ?? null);
+  return v instanceof $Future ? v : new $Future(Promise.resolve(v), check ?? null, cancel ?? null);
 }
 
 // A synchronous throw folded into a rejected future (§16).
@@ -354,49 +321,14 @@ function $rejected(e) {
 
 function $isFuture(f) {
   if (!(f instanceof $Future)) throw new TypeError(`expected a future, got ${$describe(f)}`);
-  if (f.dropped) throw new TypeError("a dropped future");
   return f;
 }
 
-function $poll(f, waker) {
-  $isFuture(f);
-  if (f.state === 0) f.waker = waker;
-  return f.state;
-}
-
-function $settled(f, state) {
-  $isFuture(f);
-  if (f.state !== state || f.taken) {
-    throw new TypeError(state === 1 ? "taking a future that isn't resolved" : "the error of a future that isn't rejected");
-  }
-  f.taken = true;
-  const v = f.value;
-  f.value = undefined;
-  return v;
-}
-
-// Dropping cancels: the cancel function runs once, its failure swallowed,
-// and a later settlement is ignored.
-// Resumes the suspensions parked on future `f` with `state`.
-function $unpark(f, state) {
-  const ps = f.parked;
-  f.parked = null;
-  if (ps) for (const w of ps) w(state);
-}
-
-function $dropFuture(f) {
-  if (!(f instanceof $Future) || f.dropped) return;
-  f.dropped = true;
-  f.waker = -1;
-  $unpark(f, 0);
-  f.value = undefined;
-  const c = f.state === 0 ? f.cancel : null;
-  f.cancel = null;
-  if (c) {
-    try {
-      c();
-    } catch {}
-  }
+// A future's value as `get` reads it: a tuple of it once the future is
+// fulfilled (empty for a `unit`), and none until then.
+function $option(f, unit) {
+  if (f.state !== 1) return null;
+  return unit ? [] : [f.value];
 }
 
 
@@ -406,37 +338,17 @@ let $B = null;
 let $X = null;
 let $T = null;
 const $E = [];
-function $live() {
-  return true;
-}
-function $wake(w) {
-  if ($live()) $X["tw:future/wake"](w);
-}
 
 let $cls0 = null;
+// tag:err
+const $tag0 = new WebAssembly.Tag({ parameters: ["i32", "externref"] });
 
-function $h1(v) {
+function $h1(e) {
+  if ((($isInstance(e, globalThis.TypeError)) || ($isInstance(e, globalThis.RangeError)))) return [1, $message(e)];
+  return [-1, $message(e)];
 }
 
-function $h2(v) {
-  if (!($isValue(v, $cls0))) $fail("Box<T>", v);
-}
-
-function $h3(v) {
-  if (!(typeof v === "function")) $fail("fn(T)->T", v);
-}
-
-function $h5(v) {
-  if (v === undefined) return true;
-  if (true) return true;
-  return false;
-}
-
-function $h4(v) {
-  if (!($h5(v))) $fail("T??", v);
-}
-
-function $h6(v, cx) {
+function $h2(v, cx) {
   if (v === undefined) {
     return [1, null];
   }
@@ -447,9 +359,12 @@ function $h6(v, cx) {
   $fail("Any??", v);
 }
 
-function $h7(e) {
-  if ((($isInstance(e, globalThis.TypeError)) || ($isInstance(e, globalThis.RangeError)))) return [1, $message(e)];
-  return [-1, $message(e)];
+function $h3(arm, m) {
+  const msg = m == null ? "" : String(m);
+  switch (arm) {
+    case 1: return $construct(globalThis.TypeError, msg, {  });
+  }
+  return new Error(msg);
 }
 
 // ("tw:js/global", "Kv#get(str)")
@@ -457,7 +372,7 @@ function $f0(w0_0, w1_0, w1_1) {
   const t1 = $liftUtf8($L, w1_0, w1_1);
   try {
     const r = w0_0.get(t1);
-    const t2 = $future(r, $h1);
+    const t2 = $future(r);
     return t2;
   } catch (e) {
     return $rejected(e);
@@ -468,7 +383,7 @@ function $f0(w0_0, w1_0, w1_1) {
 function $f1(w0_0) {
   try {
     const r = w0_0.boxed();
-    const t1 = $future(r, $h2);
+    const t1 = $future(r);
     return t1;
   } catch (e) {
     return $rejected(e);
@@ -479,7 +394,7 @@ function $f1(w0_0) {
 function $f2(w0_0) {
   try {
     const r = w0_0.mapper();
-    const t1 = $future(r, $h3);
+    const t1 = $future(r);
     return t1;
   } catch (e) {
     return $rejected(e);
@@ -490,108 +405,113 @@ function $f2(w0_0) {
 function $f3(w0_0) {
   try {
     const r = w0_0.nested();
-    const t1 = $future(r, $h4);
+    const t1 = $future(r);
     return t1;
   } catch (e) {
     return $rejected(e);
   }
 }
 
-// ("tw:future", "poll")
-function $f4(f, w) {
-  return $poll(f, w);
+// ("tw:future", "state")
+function $f4(f) {
+  return $isFuture(f).state;
 }
 
-// ("tw:future", "take<Any?>")
+// ("tw:future", "get<Any?>")
 function $f5(w0_0) {
-  const v = $settled(w0_0, 1);
-  const cx = $cx;
-  const cxm = cx.n;
+  const f = $isFuture(w0_0);
   try {
-    const t1 = (v == null ? null : $some(v, "Any?"));
-    return t1;
-  } catch (e) {
-    $release(cx, cxm);
-    throw e;
-  } finally {
-    cx.n = cxm;
-  }
-}
-
-// ("tw:future", "take<Box<Any>>")
-function $f6(w0_0) {
-  const v = $settled(w0_0, 1);
-  const cx = $cx;
-  const cxm = cx.n;
-  try {
-    const t1 = $instance(v, $cls0, "Box<Any>");
-    return t1;
-  } catch (e) {
-    $release(cx, cxm);
-    throw e;
-  } finally {
-    cx.n = cxm;
-  }
-}
-
-// ("tw:future", "take<fn(Any)->Any>")
-function $f7(w0_0) {
-  const v = $settled(w0_0, 1);
-  const cx = $cx;
-  const cxm = cx.n;
-  try {
-    const t1 = $fn(v, "fn(Any)->Any");
-    return t1;
-  } catch (e) {
-    $release(cx, cxm);
-    throw e;
-  } finally {
-    cx.n = cxm;
-  }
-}
-
-// ("tw:future", "take<Any??>")
-function $f8(w0_0) {
-  const v = $settled(w0_0, 1);
-  const cx = $cx;
-  const cxm = cx.n;
-  try {
-    const t1 = $h6(v, null);
-    const t2 = t1[0];
-    const t3 = t1[1];
+    const r = $option(f, false);
+    let t1 = 0, t2 = null;
+    if (r != null) {
+      $tuple(r, 1, "(Any?)?");
+      const t3 = r[0];
+      const t4 = (t3 == null ? null : $some(t3, "Any?"));
+      t1 = 1;
+      t2 = t4;
+    }
     const ra = $ret();
-    ra.i32[0] = t2;
+    ra.i32[0] = t1;
+    return t2;
+  } catch (e) {
+    if (e instanceof WebAssembly.Exception) throw e;
+    throw new WebAssembly.Exception($tag0, $h1(e));
+  }
+}
+
+// ("tw:future", "get<Box<Any>>")
+function $f6(w0_0) {
+  const f = $isFuture(w0_0);
+  try {
+    const r = $option(f, false);
+    let t1 = 0, t2 = null;
+    if (r != null) {
+      $tuple(r, 1, "(Box<Any>)?");
+      const t3 = r[0];
+      const t4 = $instance(t3, $cls0, "Box<Any>");
+      t1 = 1;
+      t2 = t4;
+    }
+    const ra = $ret();
+    ra.i32[0] = t1;
+    return t2;
+  } catch (e) {
+    if (e instanceof WebAssembly.Exception) throw e;
+    throw new WebAssembly.Exception($tag0, $h1(e));
+  }
+}
+
+// ("tw:future", "get<fn(Any)->Any>")
+function $f7(w0_0) {
+  const f = $isFuture(w0_0);
+  try {
+    const r = $option(f, false);
+    let t1 = 0, t2 = null;
+    if (r != null) {
+      $tuple(r, 1, "(fn(Any)->Any)?");
+      const t3 = r[0];
+      const t4 = $fn(t3, "fn(Any)->Any");
+      t1 = 1;
+      t2 = t4;
+    }
+    const ra = $ret();
+    ra.i32[0] = t1;
+    return t2;
+  } catch (e) {
+    if (e instanceof WebAssembly.Exception) throw e;
+    throw new WebAssembly.Exception($tag0, $h1(e));
+  }
+}
+
+// ("tw:future", "get<Any??>")
+function $f8(w0_0) {
+  const f = $isFuture(w0_0);
+  try {
+    const r = $option(f, false);
+    let t1 = 0, t2 = 0, t3 = null;
+    if (r != null) {
+      $tuple(r, 1, "(Any??)?");
+      const t4 = r[0];
+      const t5 = $h2(t4, null);
+      t1 = 1;
+      t2 = t5[0];
+      t3 = t5[1];
+    }
+    const ra = $ret();
+    ra.i32[0] = t1;
+    ra.i32[2] = t2;
     return t3;
   } catch (e) {
-    $release(cx, cxm);
-    throw e;
-  } finally {
-    cx.n = cxm;
+    if (e instanceof WebAssembly.Exception) throw e;
+    throw new WebAssembly.Exception($tag0, $h1(e));
   }
-}
-
-// ("tw:future", "error<err>")
-function $f9(w0_0) {
-  return $h7($settled(w0_0, 2));
-}
-
-function $f9$r(a0) {
-  const r = $f9(a0);
-  const ra = $ret();
-  ra.i32[0] = r[0];
-  return r[1];
-}
-
-// ("tw:future", "drop")
-function $f10(f) {
-  $dropFuture(f);
 }
 
 export function instantiate(language, bridge, imports = {}) {
   if ($B) throw new Error("this bridge is already instantiated");
   $cls0 = $class(globalThis.Box);
   $B = new WebAssembly.Instance(bridge, {
-    "tw:glue": { r8: $f8, r9: $f9$r },
+    "tw:glue": { r5: $f5, r6: $f6, r7: $f7, r8: $f8 },
   }).exports;
   $S = new $Scratch($B);
   const instance = new WebAssembly.Instance(language, {
@@ -603,13 +523,11 @@ export function instantiate(language, bridge, imports = {}) {
       "Kv#nested()": $f3,
     },
     "tw:future": {
-      "poll": $f4,
-      "take<Any?>": $f5,
-      "take<Box<Any>>": $f6,
-      "take<fn(Any)->Any>": $f7,
-      "take<Any??>": $B.f8,
-      "error<err>": $B.f9,
-      "drop": $f10,
+      "state": $f4,
+      "get<Any?>": $B.f5,
+      "get<Box<Any>>": $B.f6,
+      "get<fn(Any)->Any>": $B.f7,
+      "get<Any??>": $B.f8,
     },
   });
   $X = instance.exports;

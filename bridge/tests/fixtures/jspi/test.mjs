@@ -48,13 +48,8 @@ app.share(s);
 const peeks = [app.peek(), app.peek()];
 s.resolvers[0](7);
 assert.deepEqual(await Promise.all(peeks), [1, 1]);
-// Dropping a future a call is parked on resumes it with 0.
-app.share(new Api());
-const dropped = app.peek();
-app.unshare();
-assert.equal(await dropped, 0);
 
-// `suspend_race` resumes with the first future to settle, leaving the
+// A list's `suspend` resumes with the first future to settle, leaving the
 // others to the language, and with the lowest of those already settled.
 const r = new Api();
 const raced = app.race(r);

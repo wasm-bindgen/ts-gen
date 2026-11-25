@@ -175,7 +175,7 @@ fn files(dir: &Path, base: &Path, out: &mut BTreeMap<String, String>) {
 struct Surface {
     imports: BTreeMap<(String, String), String>,
     exports: BTreeMap<String, String>,
-    /// Imports a module may have but needn't: `take<T>` of the futures it
+    /// Imports a module may have but needn't: `get<T>` of the futures it
     /// reads, and the runtime's.
     optional: BTreeMap<(String, String), String>,
 }
@@ -197,8 +197,9 @@ fn runtime(out: &mut Surface) {
         );
     }
     for (m, n, t) in [
-        ("tw:future", "poll", "(externref, i32) -> (i32)"),
-        ("tw:future", "drop", "(externref) -> ()"),
+        ("tw:future", "state", "(externref) -> (i32)"),
+        ("tw:future", "cancel", "(externref) -> ()"),
+        ("tw:future", "watch", "(externref, i32) -> ()"),
         ("tw:loop", "work_available", "(i32) -> ()"),
     ] {
         out.optional.insert((m.into(), n.into()), t.into());
@@ -280,11 +281,11 @@ fn walk(j: &Json, out: &mut Surface) {
             if let (Some(t), Some(op)) = (get(o, "trampoline"), get(o, "op")) {
                 out.exports.insert(s(Some(t)), core(op));
             }
-            if let (Some(t), Some(Json::Obj(v))) = (get(o, "take"), get(o, "value")) {
+            if let (Some(t), Some(Json::Obj(v))) = (get(o, "get"), get(o, "value")) {
                 let wire = strs(get(v, "wire"));
-                let slot0 = wire.first().cloned().unwrap_or_default();
+                // The option's flag: the value's slots are spilled.
                 out.optional
-                    .insert(import_key(t), format!("(externref) -> ({slot0})"));
+                    .insert(import_key(t), "(externref) -> (i32)".into());
                 out.optional.insert(
                     import_key(get(o, "resolve").unwrap()),
                     format!(
@@ -301,6 +302,13 @@ fn walk(j: &Json, out: &mut Surface) {
                     import_key(get(o, "errorOp").unwrap()),
                     "(externref) -> (i32)".into(),
                 );
+                // What a `get` throws is read as a `throws` of the rejection enum.
+                if let Some(Json::Obj(e)) = get(o, "rejection") {
+                    out.optional.insert(
+                        ("tw:err".into(), s(get(e, "path"))),
+                        "(externref) -> (i32)".into(),
+                    );
+                }
                 out.optional.insert(
                     import_key(get(o, "reject").unwrap()),
                     format!("(externref, i32{slots}) -> ()"),
@@ -729,8 +737,10 @@ fn tour(mode: &str, recorded: &str) {
 /// through `reject<E>`, a suspend lambda is a callback's or a parameter's
 /// future, `T[]` and `arr<T>` copy into Kotlin arrays and lists, a spread
 /// parameter is a vararg, a task waits for a callback, an enum's function
-/// arm is a Kotlin lambda, a future of a type parameter settles, and host
-/// type arguments stay typed.
+/// arm is a Kotlin lambda, a future of a type parameter settles, host
+/// type arguments stay typed, a fulfilled future whose value is no `T`
+/// throws from `await` as its rejection enum, and a cancelled future
+/// rejects as its call does.
 #[test]
 fn kotlin_runtime() {
     if skipped(true) {
@@ -746,7 +756,8 @@ fn kotlin_runtime() {
          modes: [\"off\",5] 0 9\nadder: function 42 2\n\
          box nones: undefined undefined,null\nasync callback: 15\nmade: made!\n\
          bytes: 256\nwords: AB\njoin: a-b3\ncallback: soon\nlisten: a!nb\nattempt: attempted\n\
-         generic: word 42 1\nspill empty: true\n"
+         generic: word 42 1\nmistaken: a TypeError, a TypeError\n\
+         cancelled: rejected (stopped)\nspill empty: true\n"
     );
 }
 

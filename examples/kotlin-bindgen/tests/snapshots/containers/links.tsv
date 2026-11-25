@@ -11,10 +11,11 @@ js_code	fixtures.containers.flat.Widget_get_version	tw:js/global	Widget.get:vers
 js_code	fixtures.containers.flat.String_length	tw:js/global	String#length()
 js_code	fixtures.containers.flat.bytes	tw:js/global	bytes()
 js_code	fixtures.containers.flat.later	tw:js/global	later()
-js_code	fixtures.containers.flat.take_str	tw:future	take<str>
+js_code	fixtures.containers.flat.get_str	tw:future	get<str>
 js_code	fixtures.containers.flat.error_err	tw:future	error<err>
 js_code	fixtures.containers.flat.Any_get_kind	tw:js/global	Any_#get:kind()
 js_code	fixtures.containers.flat.any	tw:js/global	any()
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureWatch	tw:future	watch
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

@@ -1,7 +1,11 @@
 // The app behind tests/fixtures/unwind.tw's exports: where a JS
 // exception meets Zena.
 import { Future } from 'zena:async';
-import { boom, later, typed } from './unwind.zena';
+import { Option, Some, None } from 'zena:core';
+import {
+  boom, later, typed, mistyped, mistypedAs, maybe, maybeAs, maybeOf, ErrException, ErrArm,
+  TypeErrException, TypeErrArm,
+} from './unwind.zena';
 
 export function sync(): String {
   boom();
@@ -23,4 +27,84 @@ export async function typedAfter(): Future<String> {
   await later();
   typed();
   return "returned";
+}
+
+// A fulfilled value that isn't the future's type fails the await as a
+// rejection would, with the future's error.
+export async function mistypedValue(): Future<String> {
+  try {
+    await mistyped();
+    return "returned";
+  } catch (e) {
+    if (e is ErrException && e.arm == ErrArm.TypeError) {
+      return "err's TypeError";
+    }
+    return "another error";
+  }
+}
+
+export async function mistypedValueAs(): Future<String> {
+  try {
+    await mistypedAs();
+    return "returned";
+  } catch (e) {
+    if (e is TypeErrException && e.arm == TypeErrArm.TypeError) {
+      return "TypeErr's TypeError";
+    }
+    return "another error";
+  }
+}
+
+function shown(value: Option<f64>): String {
+  return match (value) {
+    case Some {value}: if (value == 2.0) "two" else "another number"
+    case None: "none"
+  };
+}
+
+// A `future<T?>` reads its none, its value, and a value that isn't a `T`.
+export async function optionalValue(): Future<String> {
+  let none = shown(await maybe(-1.0));
+  let some = shown(await maybe(2.0));
+  try {
+    await maybe(0.0);
+    return "returned";
+  } catch (e) {
+    if (e is ErrException && e.arm == ErrArm.TypeError) {
+      return `${none}, ${some}, err's TypeError`;
+    }
+    return "another error";
+  }
+}
+
+export async function optionalValueAs(): Future<String> {
+  let none = shown(await maybeAs(-1.0));
+  let some = shown(await maybeAs(2.0));
+  try {
+    await maybeAs(0.0);
+    return "returned";
+  } catch (e) {
+    if (e is TypeErrException && e.arm == TypeErrArm.TypeError) {
+      return `${none}, ${some}, TypeErr's TypeError`;
+    }
+    return "another error";
+  }
+}
+
+export async function optionalValueOf(): Future<String> {
+  let none = shown(await maybeOf<f64>(-1.0));
+  let some = shown(await maybeOf<f64>(2.0));
+  let text = match (await maybeOf<String>(0.0)) {
+    case Some {value}: value
+    case None: "none"
+  };
+  try {
+    await maybeOf<boolean>(2.0);
+    return "returned";
+  } catch (e) {
+    if (e is ErrException && e.arm == ErrArm.TypeError) {
+      return `${none}, ${some}, ${text}, err's TypeError`;
+    }
+    return "another error";
+  }
 }

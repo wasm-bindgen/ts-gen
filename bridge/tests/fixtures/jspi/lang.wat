@@ -1,12 +1,11 @@
 ;; A hand-written language with no async of its own, which blocks on
 ;; futures under JSPI: it suspends in `tw:future suspend` and
-;; `suspend_race`, and returns futures of its own.
+;; `tw:future-list suspend`, and returns futures of its own.
 (module
   (import "tw:js/global" "Api#later()" (func $later (param externref) (result externref)))
   (import "tw:future" "suspend" (func $suspend (param externref) (result i32)))
-  (import "tw:future" "suspend_race" (func $race (param i32 i32) (result i32)))
-  (import "tw:future" "take<u32>" (func $take (param externref) (result i32)))
-  (import "tw:future" "drop" (func $drop (param externref)))
+  (import "tw:future-list" "suspend" (func $race (param i32 i32) (result i32)))
+  (import "tw:future" "get<u32>" (func $get (param externref) (result i32 i32)))
   (import "tw:future" "new" (func $new (result externref externref)))
   (import "tw:future" "resolve<u32>" (func $resolve (param externref i32)))
 {RUNTIME}
@@ -19,13 +18,18 @@
     (call $resolve (local.get $res) (local.get $v))
     (local.get $fut))
 
-  ;; Suspends until `f` resolves, then takes and drops it.
-  (func $await (param $f externref) (result i32)
+  ;; The value of a fulfilled future.
+  (func $value (param $f externref) (result i32)
     (local $v i32)
-    (if (i32.ne (call $suspend (local.get $f)) (i32.const 1)) (then unreachable))
-    (local.set $v (call $take (local.get $f)))
-    (call $drop (local.get $f))
+    (call $get (local.get $f))
+    (local.set $v)
+    (if (i32.eqz) (then unreachable))
     (local.get $v))
+
+  ;; Suspends until `f` is fulfilled, then reads it.
+  (func $await (param $f externref) (result i32)
+    (if (i32.ne (call $suspend (local.get $f)) (i32.const 1)) (then unreachable))
+    (call $value (local.get $f)))
 
   (func (export "app.run(Api)") (param $api externref) (result externref)
     (local $a externref) (local $b externref)
@@ -47,19 +51,13 @@
     (i32.const 0))
   (func (export "app.peek()") (result externref)
     (call $ready (call $suspend (global.get $shared))))
-  (func (export "app.unshare()") (result i32)
-    (call $drop (global.get $shared))
-    (i32.const 0))
 
-  ;; Three futures in table slots 1 to 3, the list `suspend_race` takes.
+  ;; Three futures in table slots 1 to 3, the list the suspension takes.
   (func $three (param $api externref)
     (table.set $tab (i32.const 1) (call $later (local.get $api)))
     (table.set $tab (i32.const 2) (call $later (local.get $api)))
     (table.set $tab (i32.const 3) (call $later (local.get $api))))
   (func $drop3
-    (call $drop (table.get $tab (i32.const 1)))
-    (call $drop (table.get $tab (i32.const 2)))
-    (call $drop (table.get $tab (i32.const 3)))
     (table.fill $tab (i32.const 1) (ref.null extern) (i32.const 3)))
 
   ;; The winner's index times 100, plus its value.
@@ -67,7 +65,7 @@
     (local $i i32) (local $v i32)
     (call $three (local.get $api))
     (local.set $i (call $race (i32.const 1) (i32.const 3)))
-    (local.set $v (call $take (table.get $tab (i32.add (i32.const 1) (local.get $i)))))
+    (local.set $v (call $value (table.get $tab (i32.add (i32.const 1) (local.get $i)))))
     (call $drop3)
     (call $ready (i32.add (i32.mul (local.get $i) (i32.const 100)) (local.get $v))))
 

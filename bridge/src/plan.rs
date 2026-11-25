@@ -42,15 +42,19 @@ pub enum Op<'a> {
     /// `("tw:call", F)`: the language calls a JS function (§18).
     CallFn,
     /// `("tw:future", ...)` (§16).
-    Poll,
-    /// `suspend` and `suspend_race`, under `jspi = on`: the bridge
-    /// module's suspending wrappers over these.
-    Suspend,
-    SuspendRace,
-    Take(Option<Repr>),
+    FutureState,
+    Get,
     FutureError(Rc<EnumLayout>),
-    FutureDrop,
+    FutureCancel,
+    FutureWatch,
     FutureNew,
+    /// `("tw:future-list", ...)` (§16).
+    ListStates,
+    ListWatch,
+    /// `suspend`, under `jspi = on`: the bridge module's suspending
+    /// wrappers over these.
+    Suspend,
+    ListSuspend,
     Resolve(Option<Repr>),
     Reject(Rc<EnumLayout>),
     /// `("tw:ret", vt)` and `("tw:ret", "push:vt")` (§12): served by the
@@ -75,9 +79,10 @@ impl Op<'_> {
                 | Op::IsNullish
                 | Op::IsUndefined
                 | Op::Constant(_)
-                | Op::Poll
+                | Op::FutureState
+                | Op::FutureCancel
+                | Op::FutureWatch
                 | Op::Suspend
-                | Op::FutureDrop
                 | Op::FutureNew
                 | Op::WorkAvailable
                 | Op::LoopDrop
@@ -148,6 +153,7 @@ impl<'a> Plan<'a> {
             protocol::FALSE,
             protocol::TAG,
             protocol::FUTURE,
+            protocol::FUTURE_LIST,
             protocol::LOOP,
             protocol::RET,
             protocol::ERR,
@@ -306,22 +312,18 @@ impl<'a> Plan<'a> {
                         .and_then(|n| n.strip_suffix('>'))
                 };
                 match i.name.as_str() {
-                    "poll" => (Op::Poll, empty),
-                    "suspend" | "suspend_race" if !p.jspi => {
-                        return Err(Error::Import(format!(
-                            "{}: `{}` needs `jspi = on`",
-                            what(),
-                            i.name
-                        )));
-                    }
+                    "state" => (Op::FutureState, empty),
+                    "cancel" => (Op::FutureCancel, empty),
+                    "watch" => (Op::FutureWatch, empty),
+                    "suspend" if !p.jspi => return Err(needs_jspi(&what(), &i.name)),
                     "suspend" => (Op::Suspend, empty),
-                    "suspend_race" => (Op::SuspendRace, l.future_race(&cx)?),
-                    "drop" => (Op::FutureDrop, empty),
                     "new" => (Op::FutureNew, empty),
                     _ => {
-                        if let Some(t) = arg("take<") {
-                            let sig = l.future_take(&subject(t, &what)?, &cx)?;
-                            (Op::Take(sig.results.first().map(|r| r.repr.clone())), sig)
+                        if let Some(s) = arg("get<") {
+                            let (t, e) = protocol::split_future_subject(s);
+                            let sig =
+                                l.future_get(&subject(t, &what)?, &type_path(e, &what)?, &cx)?;
+                            (Op::Get, sig)
                         } else if let Some(t) = arg("resolve<") {
                             let sig = l.future_resolve(&subject(t, &what)?, &cx)?;
                             (Op::Resolve(sig.params.get(1).map(|p| p.repr.clone())), sig)
@@ -339,6 +341,19 @@ impl<'a> Plan<'a> {
                                 what()
                             )));
                         }
+                    }
+                }
+            } else if i.module == group(protocol::FUTURE_LIST) {
+                match i.name.as_str() {
+                    "states" => (Op::ListStates, l.future_list_states()?),
+                    "watch" => (Op::ListWatch, l.future_list_watch()?),
+                    "suspend" if !p.jspi => return Err(needs_jspi(&what(), &i.name)),
+                    "suspend" => (Op::ListSuspend, l.future_list_suspend()?),
+                    _ => {
+                        return Err(Error::Import(format!(
+                            "{}: not a future list operation",
+                            what()
+                        )))
                     }
                 }
             } else if i.module == group(protocol::RET) {
@@ -469,6 +484,10 @@ impl<'a> Plan<'a> {
         }
         Ok(plan)
     }
+}
+
+fn needs_jspi(what: &str, name: &str) -> Error {
+    Error::Import(format!("{what}: `{name}` needs `jspi = on`"))
 }
 
 fn spill_type(vt: &str) -> ValType {

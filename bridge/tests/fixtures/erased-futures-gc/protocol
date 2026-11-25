@@ -1,6 +1,3 @@
-tw:future poll
-tw:future take<Any?>
-tw:future take<Box<Any>>
-tw:future error<err>
-tw:future drop
-export tw:future/wake
+tw:future state
+tw:future get<Any?>
+tw:future get<Box<Any>>

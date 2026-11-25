@@ -85,6 +85,7 @@ js_code	fixtures.enums.flat.unbox_PaintMode	tw:unbox	PaintMode
 js_code	fixtures.enums.flat.box_PaintMode	tw:box	PaintMode
 js_code	fixtures.enums.flat.unbox_Theme	tw:unbox	Theme
 js_code	fixtures.enums.flat.box_Theme	tw:box	Theme
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureWatch	tw:future	watch
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

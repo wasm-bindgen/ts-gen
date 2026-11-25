@@ -15,6 +15,7 @@ js_code	fixtures.construct_values.flat.Options_new_opts_f64	tw:js/global	Options
 js_code	fixtures.construct_values.flat.get_Num	tw:js/global	get:Num()
 js_code	fixtures.construct_values.flat.Count_count	remote	Count#count()
 js_code	fixtures.construct_values.flat.Count_new_f64	remote	Count.new(f64)
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureWatch	tw:future	watch
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

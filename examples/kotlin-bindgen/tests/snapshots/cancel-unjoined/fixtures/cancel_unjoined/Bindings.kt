@@ -60,27 +60,27 @@ fun RequestInit(): RequestInit {
 
 fun fetch(input: String): tsgen.runtime.Future<String> {
     val r0 = fixtures.cancel_unjoined.flat.fetch_str(input.toJsString())
-    return tsgen.runtime.Future<String>(r0!!, { f -> val r1 = fixtures.cancel_unjoined.flat.take_str(f); r1!!.unsafeCast<JsString>().toString() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<String>(r0!!, { f -> val r1 = try { fixtures.cancel_unjoined.flat.get_str(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.cancel_unjoined.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2!!.unsafeCast<JsString>().toString()) }, { f -> futureErrorErr(f) })
 }
 
 fun fetch(input: String, init: RequestInit): tsgen.runtime.Future<String> {
     val r0 = fixtures.cancel_unjoined.flat.fetch_str_RequestInit(input.toJsString(), init)
-    return tsgen.runtime.Future<String>(r0!!, { f -> val r1 = fixtures.cancel_unjoined.flat.take_str(f); r1!!.unsafeCast<JsString>().toString() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<String>(r0!!, { f -> val r1 = try { fixtures.cancel_unjoined.flat.get_str(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.cancel_unjoined.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2!!.unsafeCast<JsString>().toString()) }, { f -> futureErrorErr(f) })
 }
 
 fun send(body: String): tsgen.runtime.Future<Unit> {
     val r0 = fixtures.cancel_unjoined.flat.send_str(body.toJsString())
-    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.cancel_unjoined.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> val r1 = try { fixtures.cancel_unjoined.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r1 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
 }
 
 fun send(body: String, init: RequestInit): tsgen.runtime.Future<Unit> {
     val r0 = fixtures.cancel_unjoined.flat.send_str_RequestInit(body.toJsString(), init)
-    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.cancel_unjoined.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> val r1 = try { fixtures.cancel_unjoined.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r1 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
 }
 
 fun ping(): tsgen.runtime.Future<Unit> {
     val r0 = fixtures.cancel_unjoined.flat.ping()
-    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.cancel_unjoined.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> val r1 = try { fixtures.cancel_unjoined.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r1 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
 }
 
 sealed interface Err {
@@ -121,8 +121,8 @@ fun raiseErr(e: kotlin.js.JsException): ErrException {
 }
 
 fun futureErrorErr(f: JsAny): ErrException {
-    val r2 = fixtures.cancel_unjoined.flat.error_err(f)
-    val s3 = fixtures.cancel_unjoined.flat.ret_externref()
-    return ErrException(decodeErr(r2, s3)!!)
+    val r3 = fixtures.cancel_unjoined.flat.error_err(f)
+    val s4 = fixtures.cancel_unjoined.flat.ret_externref()
+    return ErrException(decodeErr(r3, s4)!!)
 }
 

@@ -7,18 +7,18 @@ external interface KV : JsAny
 
 fun KV.getText(key: String): tsgen.runtime.Future<String?> {
     val r0 = fixtures.overloads.flat.KV_getText_str(this, key.toJsString())
-    return tsgen.runtime.Future<String?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_str(f); r1?.unsafeCast<JsString>()?.toString() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<String?>(r0!!, { f -> val r3 = try { fixtures.overloads.flat.get_str(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s4 = fixtures.overloads.flat.ret_externref(); if (r3 == 0) null else tsgen.runtime.Fulfilled(s4?.unsafeCast<JsString>()?.toString()) }, { f -> futureErrorErr(f) })
 }
 
 fun KV.getJson(key: String): tsgen.runtime.Future<JsAny?> {
     val r0 = fixtures.overloads.flat.KV_getJson_str(this, key.toJsString())
-    return tsgen.runtime.Future<JsAny?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_Any(f); r1 }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<JsAny?>(r0!!, { f -> val r1 = try { fixtures.overloads.flat.get_Any(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.overloads.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2) }, { f -> futureErrorErr(f) })
 }
 
 fun KV.put(key: String, value: KVValueKind): tsgen.runtime.Future<Unit> {
     val w0 = encodeKVValueKind(value)
     val r1 = fixtures.overloads.flat.KV_put_str_KVValueKind(this, key.toJsString(), w0.arm, w0.s0)
-    return tsgen.runtime.Future<Unit>(r1!!, { f -> fixtures.overloads.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Unit>(r1!!, { f -> val r2 = try { fixtures.overloads.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r2 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
 }
 
 fun KV.put(key: String, value: String): tsgen.runtime.Future<Unit> = put(key, KVValueKind.Str(value))
@@ -27,7 +27,7 @@ fun KV.put(key: String, value: ArrayBuffer): tsgen.runtime.Future<Unit> = put(ke
 fun KV.put(key: String, value: KVValueKind, options: PutOptions): tsgen.runtime.Future<Unit> {
     val w0 = encodeKVValueKind(value)
     val r1 = fixtures.overloads.flat.KV_put_str_KVValueKind_PutOptions(this, key.toJsString(), w0.arm, w0.s0, options)
-    return tsgen.runtime.Future<Unit>(r1!!, { f -> fixtures.overloads.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Unit>(r1!!, { f -> val r2 = try { fixtures.overloads.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r2 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
 }
 
 fun KV.put(key: String, value: String, options: PutOptions): tsgen.runtime.Future<Unit> = put(key, KVValueKind.Str(value), options)
@@ -116,27 +116,27 @@ external interface Store : JsAny
 
 fun Store.read(key: String): tsgen.runtime.Future<String?> {
     val r0 = fixtures.overloads.flat.Store_read_str(this, key.toJsString())
-    return tsgen.runtime.Future<String?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_str(f); r1?.unsafeCast<JsString>()?.toString() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<String?>(r0!!, { f -> val r1 = try { fixtures.overloads.flat.get_str(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.overloads.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2?.unsafeCast<JsString>()?.toString()) }, { f -> futureErrorErr(f) })
 }
 
 fun Store.read(key: String, options: PartialGetOptionsUndefined): tsgen.runtime.Future<String?> {
     val r0 = fixtures.overloads.flat.Store_read_str_PartialGetOptionsUndefined(this, key.toJsString(), options)
-    return tsgen.runtime.Future<String?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_str(f); r1?.unsafeCast<JsString>()?.toString() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<String?>(r0!!, { f -> val r1 = try { fixtures.overloads.flat.get_str(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.overloads.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2?.unsafeCast<JsString>()?.toString()) }, { f -> futureErrorErr(f) })
 }
 
 fun Store.readText(key: String, options: GetOptions<*>?): tsgen.runtime.Future<String?> {
     val r0 = fixtures.overloads.flat.Store_readText_str_GetOptions_Any(this, key.toJsString(), options)
-    return tsgen.runtime.Future<String?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_str(f); r1?.unsafeCast<JsString>()?.toString() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<String?>(r0!!, { f -> val r1 = try { fixtures.overloads.flat.get_str(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.overloads.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2?.unsafeCast<JsString>()?.toString()) }, { f -> futureErrorErr(f) })
 }
 
 fun <T : JsAny?> Store.readJson(key: String, options: GetOptions<*>?): tsgen.runtime.Future<T?> {
     val r0 = fixtures.overloads.flat.Store_readJson_str_GetOptions_Any(this, key.toJsString(), options)
-    return tsgen.runtime.Future<T?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_Any(f); (r1 as T?) }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<T?>(r0!!, { f -> val r1 = try { fixtures.overloads.flat.get_Any(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.overloads.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled((s2 as T?)) }, { f -> futureErrorErr(f) })
 }
 
 fun Store.readArrayBuffer(key: String, options: GetOptions<*>?): tsgen.runtime.Future<ArrayBuffer?> {
     val r0 = fixtures.overloads.flat.Store_readArrayBuffer_str_GetOptions_Any(this, key.toJsString(), options)
-    return tsgen.runtime.Future<ArrayBuffer?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_ArrayBuffer(f); r1?.unsafeCast<ArrayBuffer>() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<ArrayBuffer?>(r0!!, { f -> val r1 = try { fixtures.overloads.flat.get_ArrayBuffer(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.overloads.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2?.unsafeCast<ArrayBuffer>()) }, { f -> futureErrorErr(f) })
 }
 
 fun Store.tail(options: GetOptions<*>?): String {
@@ -151,17 +151,17 @@ fun Store.open(reader: StoreReader?): String {
 
 fun Store.write(key: String, value: String): tsgen.runtime.Future<Boolean?> {
     val r0 = fixtures.overloads.flat.Store_write_str_str(this, key.toJsString(), value.toJsString())
-    return tsgen.runtime.Future<Boolean?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_bool(f); r1.let { if (it == 2) null else (it != 0) } }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Boolean?>(r0!!, { f -> val r1 = try { fixtures.overloads.flat.get_bool(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.overloads.flat.ret_i32(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2.let { if (it == 2) null else (it != 0) }) }, { f -> futureErrorErr(f) })
 }
 
 fun Store.write(key: String, value: String, options: StoreOptions): tsgen.runtime.Future<Boolean?> {
     val r0 = fixtures.overloads.flat.Store_write_str_str_StoreOptions(this, key.toJsString(), value.toJsString(), options)
-    return tsgen.runtime.Future<Boolean?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_bool(f); r1.let { if (it == 2) null else (it != 0) } }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Boolean?>(r0!!, { f -> val r1 = try { fixtures.overloads.flat.get_bool(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.overloads.flat.ret_i32(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2.let { if (it == 2) null else (it != 0) }) }, { f -> futureErrorErr(f) })
 }
 
 fun Store.write(key: String, value: String, options: StoreWriteOptions): tsgen.runtime.Future<Boolean> {
     val r0 = fixtures.overloads.flat.Store_write_str_str_StoreWriteOptions(this, key.toJsString(), value.toJsString(), options)
-    return tsgen.runtime.Future<Boolean>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_bool_2(f); (r1 != 0) }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Boolean>(r0!!, { f -> val r1 = try { fixtures.overloads.flat.get_bool_2(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.overloads.flat.ret_i32(); if (r1 == 0) null else tsgen.runtime.Fulfilled((s2 != 0)) }, { f -> futureErrorErr(f) })
 }
 
 fun Store.getReader(): String {
@@ -471,15 +471,15 @@ private fun errMessage(error: Err): String = when (error) {
 /** `e` as `err`: its own error, or the fallback arm with its message. */
 fun toErr(e: kotlin.Throwable): Err = if (e is ErrException) e.error else Err.Error((e.message ?: e.toString()).toJsString())
 
-fun futureErrorErr(f: JsAny): ErrException {
-    val r2 = fixtures.overloads.flat.error_err(f)
-    val s3 = fixtures.overloads.flat.ret_externref()
-    return ErrException(decodeErr(r2, s3)!!)
-}
-
 fun raiseErr(e: kotlin.js.JsException): ErrException {
     val r1 = fixtures.overloads.flat.err_err(e.thrownValue)
     val s2 = fixtures.overloads.flat.ret_externref()
     return ErrException(decodeErr(r1, s2)!!)
+}
+
+fun futureErrorErr(f: JsAny): ErrException {
+    val r5 = fixtures.overloads.flat.error_err(f)
+    val s6 = fixtures.overloads.flat.ret_externref()
+    return ErrException(decodeErr(r5, s6)!!)
 }
 

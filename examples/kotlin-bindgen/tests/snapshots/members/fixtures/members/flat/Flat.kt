@@ -83,9 +83,9 @@ external fun Counter_increment_f64(p0: JsAny?, p1: Double): Double
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun Counter_reset(p0: JsAny?)
 
-/** tw:future take<unit> */
+/** tw:future get<unit> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_unit(p0: JsAny?)
+external fun get_unit(p0: JsAny?): Int
 
 /** tw:future error<err> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")

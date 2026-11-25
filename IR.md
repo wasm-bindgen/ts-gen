@@ -837,9 +837,9 @@ module: workers-types declares `DurableObjectNamespace` as a class, but
 workerd has no such global. The bridge resolves each class path once, at
 instantiate time, and for a class with no value:
 
-* a value check (a plain result or argument, a future's resolution, a
-  host array's element) degrades to the interface test (a non-null
-  object);
+* a value check (a plain result or argument, a future's value where it's
+  read, a host array's element) degrades to the interface test (a
+  non-null object);
 * its arm test never matches, so discrimination falls through to later
   arms;
 * `("tw:instanceof", ...)` returns 0.
@@ -1367,7 +1367,7 @@ generator. The IR is unchanged by it.
 | exported-class finalizers | on \| off |
 | `results` | `multi` (default) \| `single` |
 | `throws` | `tag` (default) \| `js` (§15) |
-| `jspi` | off (default) \| on: the language may suspend in `tw:future suspend` and `suspend_race` (§16) |
+| `jspi` | off (default) \| on: the language may suspend in `tw:future suspend` and `tw:future-list suspend` (§16) |
 | protocol names | defaults (§19), each overridable |
 
 Presets:
@@ -1418,8 +1418,8 @@ scratch return area. It applies to every core function between the
 language and the bridge whose flattened results are more than one value,
 in both directions: IR imports
 and exports, callback trampolines and calls, and the `tw` protocol
-operations (`tw:future` `new` and `take<T>`, `tw:unbox`, `tw:arr get<T>`,
-`tw:err`). Multi-value parameters are unaffected.
+operations (`tw:future` `new` and `get<T>`, `tw:future-list` `states`,
+`tw:unbox`, `tw:arr get<T>`, `tw:err`). Multi-value parameters are unaffected.
 
 * The language declares slot 0 as the only result. Slots `1..n` go through
   the **spill**.
@@ -1636,7 +1636,7 @@ enumerates them.
     as-is. A language handle goes through `tw:box` and `tw:unbox` (above).
 * The cost is one bridge call per box/unbox, on erased paths only.
   Converting to a JS value has to happen anyway.
-* A future of an erased `T` takes and resolves on its erasure, `Any`
+* A future of an erased `T` is read and resolved on its erasure, `Any`
   ([§16](#16-async)).
 
 ### Bounds
@@ -2099,18 +2099,15 @@ future settles. Under `jspi = on` the bridge provides two
 `WebAssembly.Suspending` imports, which return at once when they can:
 
 * `("tw:future", "suspend")(f) -> i32` suspends until `f` settles, and
-  returns 1 resolved or 2 rejected. It doesn't consume `f`: the language
-  takes it, reads its error or drops it as usual.
-* `("tw:future", "suspend_race")(fs: arr<Any>) -> i32` suspends until one
+  returns its state, 1 fulfilled or 2 rejected. It reads nothing: the
+  language reads the value with `get`, or the rejection with `error`, as
+  usual.
+* `("tw:future-list", "suspend")(fs: arr<Any>) -> i32` suspends until one
   of the futures in `fs` settles, and returns its index: the lowest one
   already settled, or else the first to settle. The others are left as
   they are. An empty list is a `TypeError`.
 * Several suspensions, in one call or in several, can be parked on one
-  future, and each resumes once it settles. Dropping a future while a
-  suspension is parked on it resumes that suspension with 0 (`suspend`)
-  or -1 (`suspend_race`); the future is gone, so the language must not
-  take it.
-* Suspending on a dropped future is a `TypeError`, like polling one.
+  future, beside the wakers watching it, and each resumes once it settles.
 
 Promising calls:
 
@@ -2144,7 +2141,8 @@ What the language must do:
   while this one is parked.
 * **A suspension outside a promising call throws** a `SuspendError`
   (`WebAssembly.SuspendError`): a synchronous export, a finalizer, a tick
-  or a wake has no suspendable stack.
+  or a wake has no suspendable stack. The language may catch it and go on:
+  the bridge's scratch is as it was before the call.
 * **A synchronous callback reached through JS can't suspend**, even within
   a promising call: the JS frame between them can't be suspended. Only a
   callback returning a `future` is called through `WebAssembly.promising`,
@@ -2157,31 +2155,92 @@ language runs nothing more, not even its exception handlers.
 
 ### Future operations (bridge imports, group `tw:future`)
 
+A future is a host object: its state, and the raw JS value it settled
+with. The language reads the state whenever it likes, and a value crosses
+into the language only where it's read.
+
 | name | signature | meaning |
 |---|---|---|
-| `poll` | `(externref f, i32 waker) -> i32` | 0 pending, 1 resolved, 2 rejected; polling again replaces the waker |
-| `take<T>` | `(externref f) -> T wire` | the resolved value; consumes the future, once |
-| `error<E>` | `(externref f) -> E wire` | the rejection, mapped through `E` as in §15 |
-| `drop` | `(externref f)` | drops the future, which **cancels** it |
-| `suspend` | `(externref f) -> i32` | `jspi = on`: suspends until `f` settles; 1 resolved, 2 rejected, 0 dropped while parked |
-| `suspend_race` | `(W(arr<Any>)) -> i32` | `jspi = on`: suspends until one settles; its index, -1 if one is dropped while parked |
+| `state` | `(externref f) -> i32` | 0 pending, 1 fulfilled, 2 rejected |
+| `get<T, E>` | `(externref f) -> (i32 present, T wire)` | the value's option: `present` is 1, with the value, once the future is fulfilled |
+| `error<E>` | `(externref f) -> E wire` | the rejection of a rejected future, mapped through `E` as in §15 |
+| `cancel` | `(externref f)` | asks the call to stop (below) |
+| `watch` | `(externref f, i32 waker)` | parks a waker on a pending future |
+| `suspend` | `(externref f) -> i32` | `jspi = on`: suspends until `f` settles; 1 fulfilled, 2 rejected |
 | `new` | `() -> (externref future, externref resolver)` | a language-created future; JS sees a Promise |
 | `resolve<T>` | `(externref resolver, T wire)` | |
 | `reject<E>` | `(externref resolver, E wire)` | the JS rejection value is the outgoing mapping of `E` |
 
+* `state` only reads: nothing is registered, and it can't miss a
+  settlement, since a promise settles in a microtask, never inside a call
+  from the language.
+* **`get` is the one read**, and an await's fast path: a fulfilled future
+  is read in that one call. With no value, `state` says whether the future
+  is pending or rejected.
+* **`watch` is how an await waits.** The bridge calls
+  `tw:future/wake(waker)` once, when the future settles. It does nothing
+  on a future that has settled: the language reads `get` or `state`
+  first, and nothing can settle between the two.
+* **A wake is a hint.** It says that something the waker watched has
+  settled, and the language reads the state to learn what. There's no
+  unwatching, so a waker may be woken for a future its task has stopped
+  waiting on.
+* A future holds a waker once. Watching it again with the same waker,
+  alone or among others, replaces that waker's earlier watch on it.
+* **The option is its own flag**, not `T?`: its none is "no value yet", not
+  a JS value, so it wraps a `T` that has nones of its own (`T?`, `T??`)
+  without merging with them. It's laid out as the nullable tuple of the
+  value alone (§11), so the value's slots are zero when `present` is 0,
+  and a `unit` future's option is the flag alone.
+* **A value is validated where it's read, and nowhere else.** `get` lowers
+  it exactly as an import with `throws E` lowers its result (§15): a value
+  that isn't a `T` is a `TypeError`, thrown to `E`'s tag, or left for
+  `("tw:err", E)` under `throws = js`. So state 1 says the promise
+  fulfilled, not that its value is a `T`.
+* `E` is the future's rejection enum, and `get<T>` is `get<T, err>`, as
+  `future<T>` is `future<T, err>`. In a name the two are written with no
+  space (`get<Response,FetchError>`).
+* Reading consumes nothing. `get` lowers the value afresh each time it's
+  called, and `error` leaves the rejection in place. The future holds its
+  settlement for as long as the language holds the future.
+* `error` on a future that isn't rejected is a `TypeError`, the language's
+  own misuse.
+* A `future<never>` that fulfils is rejected instead, with a `TypeError`
+  (§3): it has no value to read.
+
+### Future lists (bridge imports, group `tw:future-list`)
+
+Several futures are read and watched together as an `arr<Any>` of them,
+the profile's own array ([§11](#11-sequences-and-memory)): a future is an
+`externref` there whatever its `T`.
+
+| name | signature | meaning |
+|---|---|---|
+| `states` | `(arr<Any> wire) -> u8[] wire` | each future's state, by index |
+| `watch` | `(arr<Any> wire, i32 waker)` | parks a waker on the futures together |
+| `suspend` | `(arr<Any> wire) -> i32` | `jspi = on`: suspends until one settles; its index |
+
+* `watch` calls `tw:future/wake(waker)` once, when the first of the
+  futures that were pending settles. Futures settling in the same turn
+  share that one wake, and the rest wake nothing until they're watched
+  again.
+* The bridge keeps nothing of the array past the call, only the waker on
+  each pending future until the wake.
+* An element that isn't a future is a `TypeError`.
+
 A type parameter names nothing outside its member, so an operation on a
 future whose value names one is named by its erasure: each type parameter
-becomes `Any` (`get<T>(): future<T?>` takes through `take<Any?>`,
-`all<T>(): future<D1Result<T>>` through `take<D1Result<Any>>`). Its wire is
+becomes `Any` (`first<T>(): future<T?>` is read through `get<Any?>`,
+`all<T>(): future<D1Result<T>>` through `get<D1Result<Any>>`). Its wire is
 the erasure's, `externref`, in every profile. Under GC handles the erased
 value itself is `anyref` ([§13](#13-boxes-reference-wire-types-and-generics)),
-so the language converts with `any.convert_extern` after `take` and
+so the language converts with `any.convert_extern` after `get` and
 `extern.convert_any` before `resolve`, as it does around `("tw:unbox", T)`.
 
 ### Cancellation (guest only)
 
-Dropping a future cancels it. The JS side of cancellation is explicit call
-shape:
+`cancel` asks a pending future's call to stop. The JS side of cancellation
+is explicit call shape:
 
 ```ts
 @js(
@@ -2192,7 +2251,7 @@ shape:
 fetch(input: Request, init: RequestInit?): future<Response, FetchError>;
 ```
 
-* `let` values live with the future until it settles or is dropped.
+* `let` values live with the future until it settles.
 * A cancel signal joins the caller's and never replaces it: the fill
   passes `AbortSignal.any` of the signal `init` came with, when it has
   one, and the controller's (§7). The caller's signal still aborts the
@@ -2200,9 +2259,13 @@ fetch(input: Request, init: RequestInit?): future<Response, FetchError>;
 * An overload without the dictionary parameter cancels through one the
   bridge makes: `let i = RequestInit.new()`, filled as `i? { signal =
   c.signal }` in the dictionary's position.
-* On `drop`, the bridge calls `cancel` once.
-  * A failing cancel function is swallowed, and doesn't settle the promise.
-  * A later settlement is ignored.
+* On `cancel`, the bridge calls the cancel function, once, if the future
+  is pending. A failing cancel function is swallowed.
+* **Cancelling is a request, not a state.** The future settles as its
+  promise does, usually by rejecting with the host's `AbortError`, which
+  `E` maps like any rejection. A future with no cancel function isn't
+  affected, and may still fulfil. The language that wants nothing more
+  from a future stops reading it.
 * `$result` names the call's JS result, for APIs that return a cancellable
   handle (`cancel = $result.cancel`).
 * JS-side cancellation of language-created futures is out of scope.
@@ -2212,9 +2275,12 @@ Example:
 1. Rust awaits `fetch(req)`. The bridge creates `c`, calls
    `fetch(req, { signal: AbortSignal.any([c.signal]) })`, and returns the
    Promise as an `externref`.
-2. The language polls it with its waker.
-3. The language drops the future: `("tw:future", "drop")` runs `c.abort()`.
-4. The resulting rejection is ignored.
+2. The language gets no value, reads its state, 0, and watches it with
+   its waker.
+3. The language cancels the future: `("tw:future", "cancel")` runs
+   `c.abort()`.
+4. The fetch rejects with an `AbortError`: the bridge wakes the waker,
+   and the future's state is 2.
 
 ## 17. Exports
 
@@ -2430,15 +2496,18 @@ Notation in the tables:
 | `tw:unit` | empty | `() -> externref` | the unit box, `undefined`: a box's none (§13); the table's `const_base` |
 | `tw:true`, `tw:false` | empty | `() -> externref` | the `Bool` boxes (§13); the table's `const_base + 2`, `+ 3` |
 | `tw:tag` | enum path | tag `(W(E))` | §15; `err` for the built-in |
-| `tw:future` | `poll` | `(externref, i32 waker) -> i32` | §16; 0 pending, 1 resolved, 2 rejected |
-| `tw:future` | `take<T>` | `(externref) -> W(T)` | |
+| `tw:future` | `state` | `(externref) -> i32` | §16; 0 pending, 1 fulfilled, 2 rejected |
+| `tw:future` | `get<T,E>` | `(externref) -> (i32 present, W(T))` | `,E` omitted for `err` |
 | `tw:future` | `error<E>` | `(externref) -> W(E)` | |
-| `tw:future` | `drop` | `(externref)` | cancels |
+| `tw:future` | `cancel` | `(externref)` | |
+| `tw:future` | `watch` | `(externref, i32 waker)` | |
 | `tw:future` | `suspend` | `(externref) -> i32` | `jspi = on`; suspending |
-| `tw:future` | `suspend_race` | `(W(arr<Any>)) -> i32` | `jspi = on`; suspending |
 | `tw:future` | `new` | `() -> (externref, externref)` | future, resolver |
 | `tw:future` | `resolve<T>` | `(externref, W(T))` | |
 | `tw:future` | `reject<E>` | `(externref, W(E))` | |
+| `tw:future-list` | `states` | `(W(arr<Any>)) -> W(u8[])` | §16 |
+| `tw:future-list` | `watch` | `(W(arr<Any>), i32 waker)` | |
+| `tw:future-list` | `suspend` | `(W(arr<Any>)) -> i32` | `jspi = on`; suspending |
 | `tw:loop` | `work_available` | `(i32 loop)` | |
 | `tw:loop` | `drop` | `(i32 loop)` | |
 | `tw:ret` | `<vt>` | `() -> vt` | `results = single`: pop the next spilled slot |
@@ -2501,7 +2570,8 @@ Language imports (both profiles, except where noted):
 | `("tw:js/global", "Request#get:url()")` | `(externref) -> (i32, i32)` (linear) / `(ref $str)` (GC, `gc` str) |
 | `("tw:js/global", "Response.new(str)")` | `(i32, i32) -> externref` (linear) / `((ref $str)) -> externref` (GC) |
 | `("tw:js/global", "fetch(Request,RequestInit?)")` | `(externref, externref) -> externref` |
-| `("tw:future", "take<Response>")` | `(externref) -> externref` |
+| `("tw:future", "get<Response,FetchError>")` | `(externref) -> (i32, externref)` |
+| `("tw:future", "state")` | `(externref) -> i32` |
 | `("tw:future", "error<FetchError>")` | `(externref) -> (i32, externref)` |
 
 Language exports: `default.fetch(Request,Env,ExecutionContext)`, of type
@@ -2514,7 +2584,7 @@ At runtime:
 1. JS calls the module's `default.fetch(req, env, ctx)`. The bridge checks
    the termination flag (if enabled) and calls the export.
 2. The language reads `req.url` (copied into its carrier), calls `fetch`,
-   and polls the returned future.
+   and watches the returned future until `get` has its value.
 3. If the request is aborted, `error<FetchError>` yields
    `(1 or 2, message)`: `Aborted` when the rejection is a
    `DOMException` named `AbortError`, `TypeError` for a `TypeError`, and

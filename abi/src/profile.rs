@@ -107,7 +107,7 @@ pub struct Profile {
     pub results: Results,
     pub throws: Throws,
     /// JSPI (§16): the bridge provides `("tw:future", "suspend")` and
-    /// `suspend_race`, which suspend the language, and calls the exports
+    /// `tw:future-list` `suspend`, which suspend the language, and calls the exports
     /// and callbacks returning a future through `WebAssembly.promising`.
     pub jspi: bool,
     /// Protocol name overrides, default name → name.

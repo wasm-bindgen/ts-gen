@@ -59,7 +59,7 @@ fun encodeDurableObjectFetchKind(v: DurableObjectFetchKind?): DurableObjectFetch
 fun decodeDurableObjectFetchKind(arm: Int, s0: JsAny?): DurableObjectFetchKind? = when (arm) {
     0 -> null
     1 -> DurableObjectFetchKind.Response(s0!!.unsafeCast<Response>())
-    2 -> DurableObjectFetchKind.Future(tsgen.runtime.Future<Response>(s0!!, { f -> val r3 = fixtures.export_class.flat.take_Response(f); r3!!.unsafeCast<Response>() }, { f -> futureErrorErr(f) }))
+    2 -> DurableObjectFetchKind.Future(tsgen.runtime.Future<Response>(s0!!, { f -> val r3 = try { fixtures.export_class.flat.get_Response(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s4 = fixtures.export_class.flat.ret_externref(); if (r3 == 0) null else tsgen.runtime.Fulfilled(s4!!.unsafeCast<Response>()) }, { f -> futureErrorErr(f) }))
     else -> throw IllegalStateException("DurableObjectFetchKind: arm $arm")
 }
 
@@ -111,8 +111,8 @@ fun rejectErr(resolver: JsAny?, e: kotlin.Throwable) {
 }
 
 fun futureErrorErr(f: JsAny): ErrException {
-    val r4 = fixtures.export_class.flat.error_err(f)
-    val s5 = fixtures.export_class.flat.ret_externref()
-    return ErrException(decodeErr(r4, s5)!!)
+    val r5 = fixtures.export_class.flat.error_err(f)
+    val s6 = fixtures.export_class.flat.ret_externref()
+    return ErrException(decodeErr(r5, s6)!!)
 }
 

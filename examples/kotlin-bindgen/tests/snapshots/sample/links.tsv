@@ -12,10 +12,10 @@ js_code	fixtures.sample.flat.Response_clone	tw:js/global	Response#clone()
 js_code	fixtures.sample.flat.err_err	tw:err	err
 js_code	fixtures.sample.flat.ret_externref	tw:ret	externref
 js_code	fixtures.sample.flat.Response_text	tw:js/global	Response#text()
-js_code	fixtures.sample.flat.take_str	tw:future	take<str>
+js_code	fixtures.sample.flat.get_str	tw:future	get<str>
 js_code	fixtures.sample.flat.error_err	tw:future	error<err>
 js_code	fixtures.sample.flat.Response_bytes	tw:js/global	Response#bytes()
-js_code	fixtures.sample.flat.take_u8	tw:future	take<u8[]>
+js_code	fixtures.sample.flat.get_u8	tw:future	get<u8[]>
 js_code	fixtures.sample.flat.Headers_new	tw:js/global	Headers.new()
 js_code	fixtures.sample.flat.Headers_get_str	tw:js/global	Headers#get(str)
 js_code	fixtures.sample.flat.Headers_set_str_str	tw:js/global	Headers#set(str,str)
@@ -42,12 +42,13 @@ js_code	fixtures.sample.flat.SliceOptions_new	tw:js/global	SliceOptions.new()
 js_code	fixtures.sample.flat.SliceOptions_get_start	tw:js/global	SliceOptions#get:start()
 js_code	fixtures.sample.flat.SliceOptions_set_start_u32	tw:js/global	SliceOptions#set:start(u32)
 js_code	fixtures.sample.flat.KVNamespace_get_str	tw:js/global	KVNamespace#get(str)
-js_code	fixtures.sample.flat.take_str_2	tw:future	take<str?>
+js_code	fixtures.sample.flat.get_str__KvError	tw:future	get<str?,KvError>
+js_code	fixtures.sample.flat.err_KvError	tw:err	KvError
 js_code	fixtures.sample.flat.error_KvError	tw:future	error<KvError>
 js_code	fixtures.sample.flat.KVNamespace_put_str_str_u53	tw:js/global	KVNamespace#put(str,str,u53?)
-js_code	fixtures.sample.flat.take_unit	tw:future	take<unit>
+js_code	fixtures.sample.flat.get_unit_KvError	tw:future	get<unit,KvError>
 js_code	fixtures.sample.flat.KVNamespace_list_str_u32	tw:js/global	KVNamespace#list(str?,u32?)
-js_code	fixtures.sample.flat.take_arr_Str	tw:future	take<arr<Str>>
+js_code	fixtures.sample.flat.get_arr_Str	tw:future	get<arr<Str>>
 js_code	fixtures.sample.flat.crypto_randomUUID	tw:js/global	crypto.randomUUID()
 js_code	fixtures.sample.flat.crypto_getRandomValues_mut_u8	tw:js/global	crypto.getRandomValues(mut u8[])
 js_code	fixtures.sample.flat.Buffer_byteLength_str	node:buffer	Buffer.byteLength(str)
@@ -80,6 +81,7 @@ js_code	fixtures.sample.flat.box_fn_str_str	tw:box	fn(str,str)
 js_code	fixtures.sample.flat.unbox_fn_str_str	tw:unbox	fn(str,str)
 js_code	fixtures.sample.flat.box_fn	tw:box	fn()
 js_code	fixtures.sample.flat.unbox_fn	tw:unbox	fn()
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureWatch	tw:future	watch
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

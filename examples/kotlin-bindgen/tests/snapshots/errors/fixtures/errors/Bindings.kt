@@ -32,7 +32,7 @@ fun Kv.get(key: String): String {
  */
 fun Kv.put(key: String, value: String): tsgen.runtime.Future<Unit> {
     val r0 = fixtures.errors.flat.Kv_put_str_str(this, key.toJsString(), value.toJsString())
-    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.errors.flat.take_unit(f); Unit }, { f -> futureErrorDOMExceptionOrQuotaExceededErr(f) })
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> val r3 = try { fixtures.errors.flat.get_unit_DOMExceptionOrQuotaExceededErr(f) } catch (e: kotlin.js.JsException) { throw raiseDOMExceptionOrQuotaExceededErr(e) }; if (r3 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorDOMExceptionOrQuotaExceededErr(f) })
 }
 
 /**
@@ -180,12 +180,12 @@ fun RequestInit(): RequestInit {
 
 fun fetch(input: String): tsgen.runtime.Future<String> {
     val r0 = fixtures.errors.flat.fetch_str(input.toJsString())
-    return tsgen.runtime.Future<String>(r0!!, { f -> val r1 = fixtures.errors.flat.take_str(f); r1!!.unsafeCast<JsString>().toString() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<String>(r0!!, { f -> val r1 = try { fixtures.errors.flat.get_str(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.errors.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2!!.unsafeCast<JsString>().toString()) }, { f -> futureErrorErr(f) })
 }
 
 fun fetch(input: String, init: RequestInit?): tsgen.runtime.Future<String> {
     val r0 = fixtures.errors.flat.fetch_str_RequestInit(input.toJsString(), init)
-    return tsgen.runtime.Future<String>(r0!!, { f -> val r1 = fixtures.errors.flat.take_str(f); r1!!.unsafeCast<JsString>().toString() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<String>(r0!!, { f -> val r1 = try { fixtures.errors.flat.get_str(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.errors.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2!!.unsafeCast<JsString>().toString()) }, { f -> futureErrorErr(f) })
 }
 
 /** `DOMExceptionErr` as its box: its arm's JS value. */
@@ -442,9 +442,9 @@ fun raiseErr(e: kotlin.js.JsException): ErrException {
 }
 
 fun futureErrorErr(f: JsAny): ErrException {
-    val r2 = fixtures.errors.flat.error_err(f)
-    val s3 = fixtures.errors.flat.ret_externref()
-    return ErrException(decodeErr(r2, s3)!!)
+    val r3 = fixtures.errors.flat.error_err(f)
+    val s4 = fixtures.errors.flat.ret_externref()
+    return ErrException(decodeErr(r3, s4)!!)
 }
 
 /** `DOMExceptionErr`, thrown across the boundary. */
@@ -478,16 +478,16 @@ private fun dOMExceptionOrQuotaExceededErrMessage(error: DOMExceptionOrQuotaExce
 /** `e` as `DOMExceptionOrQuotaExceededErr`: its own error, or the fallback arm with its message. */
 fun toDOMExceptionOrQuotaExceededErr(e: kotlin.Throwable): DOMExceptionOrQuotaExceededErr = if (e is DOMExceptionOrQuotaExceededErrException) e.error else DOMExceptionOrQuotaExceededErr.Error((e.message ?: e.toString()).toJsString())
 
-fun futureErrorDOMExceptionOrQuotaExceededErr(f: JsAny): DOMExceptionOrQuotaExceededErrException {
-    val r1 = fixtures.errors.flat.error_DOMExceptionOrQuotaExceededErr(f)
+fun raiseDOMExceptionOrQuotaExceededErr(e: kotlin.js.JsException): DOMExceptionOrQuotaExceededErrException {
+    val r1 = fixtures.errors.flat.err_DOMExceptionOrQuotaExceededErr(e.thrownValue)
     val s2 = fixtures.errors.flat.ret_externref()
     return DOMExceptionOrQuotaExceededErrException(decodeDOMExceptionOrQuotaExceededErr(r1, s2)!!)
 }
 
-fun raiseDOMExceptionOrQuotaExceededErr(e: kotlin.js.JsException): DOMExceptionOrQuotaExceededErrException {
-    val r0 = fixtures.errors.flat.err_DOMExceptionOrQuotaExceededErr(e.thrownValue)
-    val s1 = fixtures.errors.flat.ret_externref()
-    return DOMExceptionOrQuotaExceededErrException(decodeDOMExceptionOrQuotaExceededErr(r0, s1)!!)
+fun futureErrorDOMExceptionOrQuotaExceededErr(f: JsAny): DOMExceptionOrQuotaExceededErrException {
+    val r4 = fixtures.errors.flat.error_DOMExceptionOrQuotaExceededErr(f)
+    val s5 = fixtures.errors.flat.ret_externref()
+    return DOMExceptionOrQuotaExceededErrException(decodeDOMExceptionOrQuotaExceededErr(r4, s5)!!)
 }
 
 /** `TypeErr`, thrown across the boundary. */

@@ -1,6 +1,8 @@
 // The probe's exports, called from JS through the bridge by test.mjs.
 package app
 
+import probe.Err
+import probe.ErrException
 import probe.Listener
 import probe.Mode
 import probe.ProbeError
@@ -101,5 +103,35 @@ suspend fun probe_generic(): String {
     return "$word ${n.toInt() + 1} ${probe.ext.size(shelf)}"
 }
 
-/** A future of an erased `T`, resolved by Kotlin and taken back. */
+/** A future of an erased `T`, resolved by Kotlin and read back. */
 suspend fun probe_attempt(): String = probe.ext.attempt { "attempted".toJsString() }.await().toString()
+
+/**
+ * A fulfilled future whose value is no `str`: `get` throws, and `await`
+ * with it, the rejection enum's exception, on its `TypeError` arm.
+ */
+suspend fun probe_mistaken(): String {
+    val plain = try {
+        probe.ext.wrong().await()
+    } catch (e: ErrException) {
+        if (e.error is Err.TypeError) "a TypeError" else "another error"
+    }
+    val typed = try {
+        probe.ext.wrongBusy().await()
+    } catch (e: ProbeErrorException) {
+        if (e.error is ProbeError.TypeError) "a TypeError" else "another error"
+    }
+    return "$plain, $typed"
+}
+
+/** Cancelling is a request: the future stays, and rejects as its call does. */
+suspend fun probe_cancelled(): String {
+    val pending = probe.ext.hang()
+    delay(1.0)
+    pending.cancel()
+    return try {
+        pending.await()
+    } catch (e: ErrException) {
+        "rejected (${e.message})"
+    }
+}

@@ -39,9 +39,9 @@ external fun ret_i32(): Int
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun Pixels_first(p0: JsAny?): Int
 
-/** tw:future take<u32> */
+/** tw:future get<u32> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_u32(p0: JsAny?): Int
+external fun get_u32(p0: JsAny?): Int
 
 /** tw:future error<err> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")

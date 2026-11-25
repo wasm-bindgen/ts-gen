@@ -18,6 +18,15 @@ class Shelf<T> {
   first(): T;
 }
 
+class AbortSignal {
+}
+
+class AbortController {
+  new();
+  get signal(): AbortSignal;
+  abort();
+}
+
 namespace ext {
   shelf(): Shelf<Str>;
   stock<T>(item: T): future<Shelf<T>>;
@@ -36,6 +45,10 @@ namespace ext {
   soon(f: fn());
   listen(l: Listener, x: str): str;
   attempt<T>(f: fn() -> future<T>): future<T>;
+  wrong(): future<str>;
+  wrongBusy(): future<str, ProbeError>;
+  @js(let c = AbortController.new(), args = (c.signal), cancel = c.abort)
+  hang(): future<str>;
 }
 
 export class Counter {
@@ -66,4 +79,6 @@ export namespace probe {
   listen(): str;
   attempt(): future<str>;
   generic(): future<str>;
+  mistaken(): future<str>;
+  cancelled(): future<str>;
 }

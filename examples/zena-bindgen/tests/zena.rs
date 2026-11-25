@@ -414,8 +414,13 @@ fn check_imports(zena: &(PathBuf, PathBuf), name: &str, ir: &Ir, main: Option<&P
         if module == "tw:future" {
             let arg = |p: &str| field.strip_prefix(p)?.strip_suffix('>');
             let cx = Context::default();
-            let sig = if let Some(t) = arg("take<") {
-                layouts.future_take(&ts_gen_abi::text::parse_type(t).unwrap(), &cx)
+            let sig = if let Some(s) = arg("get<") {
+                let (t, e) = ts_gen_abi::protocol::split_future_subject(s);
+                layouts.future_get(
+                    &ts_gen_abi::text::parse_type(t).unwrap(),
+                    &ts_gen_abi::ir::Path::new(vec![e.to_string()]),
+                    &cx,
+                )
             } else if let Some(t) = arg("resolve<") {
                 layouts.future_resolve(&ts_gen_abi::text::parse_type(t).unwrap(), &cx)
             } else if let Some(e) = arg("error<") {
@@ -881,6 +886,38 @@ fn errors_reach_the_caller() {
     assert_eq!(
         run_fixture(&zena, "unwind", &["sync", "before", "typedAfter"]),
         "sync: SyntaxError: boom!\nbefore: SyntaxError: boom!\ntypedAfter: TypeError: typed!\n"
+    );
+}
+
+/// A future fulfilled with a value that isn't its type fails its awaiter
+/// with the future's error, as a rejection does.
+#[test]
+fn mistyped_value_fails_the_await() {
+    let Some(zena) = zena() else {
+        return;
+    };
+    assert_eq!(
+        run_fixture(&zena, "unwind", &["mistypedValue", "mistypedValueAs"]),
+        "mistypedValue: err's TypeError\nmistypedValueAs: TypeErr's TypeError\n"
+    );
+}
+
+/// A `future<T?>` awaits to its none or its value, and fails as any other
+/// on a value that isn't a `T`.
+#[test]
+fn optional_value_awaits() {
+    let Some(zena) = zena() else {
+        return;
+    };
+    assert_eq!(
+        run_fixture(
+            &zena,
+            "unwind",
+            &["optionalValue", "optionalValueAs", "optionalValueOf"]
+        ),
+        "optionalValue: none, two, err's TypeError\n\
+         optionalValueAs: none, two, TypeErr's TypeError\n\
+         optionalValueOf: none, two, text, err's TypeError\n"
     );
 }
 

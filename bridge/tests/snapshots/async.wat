@@ -1,7 +1,9 @@
 (module
   (import "tw:glue" "r18" (func $r18 (param externref) (result i32)))
+  (import "tw:glue" "r19" (func $r19 (param externref) (result i32)))
   (import "tw:glue" "r21" (func $r21 (param externref) (result externref)))
   (import "tw:glue" "r22" (func $r22 (param externref) (result externref)))
+  (import "tw:glue" "r25" (func $r25 (param i32 i32) (result i32)))
   (memory $m (export "memory") 1)
   (table $st (export "table") 0 externref)
   (global (export "hdr") i32 (i32.const 0))
@@ -31,9 +33,16 @@
     (table.fill $st (local.get $tsp) (ref.null extern) (i32.sub (call $tsp) (local.get $tsp)))
     (call $set_tsp (local.get $tsp))
     (call $set_sp (local.get $sp)))
-  (func $f18 (export "f18") (param $p0 externref) (result i32 i32)
+  (func $f18 (export "f18") (param $p0 externref) (result i32 i32 i32)
     (local $l1 i32)
     (local.set $l1 (call $r18 (local.get $p0)))
+    local.get $l1
+    (i32.load offset=8 (i32.const 0))
+    (i32.load offset=16 (i32.const 0))
+  )
+  (func $f19 (export "f19") (param $p0 externref) (result i32 i32)
+    (local $l1 i32)
+    (local.set $l1 (call $r19 (local.get $p0)))
     local.get $l1
     (i32.load offset=8 (i32.const 0))
   )
@@ -48,5 +57,11 @@
     (local.set $l1 (call $r22 (local.get $p0)))
     (i32.load offset=8 (i32.const 0))
     local.get $l1
+  )
+  (func $f25 (export "f25") (param $p0 i32) (param $p1 i32) (result i32 i32)
+    (local $l1 i32)
+    (local.set $l1 (call $r25 (local.get $p0) (local.get $p1)))
+    local.get $l1
+    (i32.load offset=8 (i32.const 0))
   )
 )

@@ -11,6 +11,9 @@ class Probe {
     if (this.thrown) throw this.thrown;
     return this.next;
   }
+  later() {
+    return this.next;
+  }
   on(cb) {
     this.cb = cb;
   }
@@ -66,6 +69,29 @@ idle();
 // `tw:future new` returns the future and its resolver.
 const [f, r] = call("future:new");
 assert.ok(f != null && typeof r.resolve === "function");
+idle();
+
+// A future's value drains the same way, after its option's flag. Under
+// `throws = js`, one that fails validation is the TypeError itself.
+const tick = () => new Promise((r) => setTimeout(r, 0));
+p.next = Promise.resolve([3, "three"]);
+let g = call("Probe#later()", p);
+await tick();
+assert.equal(call("future:state", g), 1);
+assert.deepEqual(call("future:get<(u32,str),KvError>", g), [1, 3, "three"]);
+idle();
+p.next = Promise.resolve(["x", "three"]);
+g = call("Probe#later()", p);
+await tick();
+assert.equal(call("future:state", g), 1);
+let invalid;
+try {
+  call("future:get<(u32,str),KvError>", g);
+} catch (e) {
+  invalid = e;
+}
+assert.ok(invalid instanceof TypeError);
+assert.equal(call("err:KvError", invalid)[0], 1);
 idle();
 
 // Exports: the language pushes slots 1.. and returns slot 0.

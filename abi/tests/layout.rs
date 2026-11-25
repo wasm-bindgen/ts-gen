@@ -699,11 +699,11 @@ export namespace default {
         let l = Layouts::new(&ir, p);
         let cx = Context::default();
         assert_eq!(
-            l.future_take(&Type::named(["Response"]), &cx)
+            l.future_get(&Type::named(["Response"]), &Path::new(["FetchError"]), &cx)
                 .unwrap()
                 .core()
                 .to_string(),
-            "(externref) -> (externref)"
+            "(externref) -> (i32, externref)"
         );
         let e = l.future_error(&Path::new(["FetchError"]), &cx).unwrap();
         assert_eq!(e.core().to_string(), "(externref) -> (i32, externref)");
@@ -744,10 +744,23 @@ fn protocol_operations() {
     assert_eq!(op(&m64, None, "tw:table/alloc"), "(i32) -> (i32)");
     assert_eq!(op(&lin, None, "tw:loop/tick"), "(i32, i32) -> (i32)");
     assert_eq!(op(&lin, None, "tw:loop/next_sleep"), "(i32) -> (i64)");
-    assert_eq!(
-        op(&lin, Some("tw:future"), "poll"),
-        "(externref, i32) -> (i32)"
-    );
+    assert_eq!(op(&lin, Some("tw:future"), "state"), "(externref) -> (i32)");
+    assert_eq!(op(&lin, Some("tw:future"), "cancel"), "(externref)");
+    assert_eq!(op(&lin, Some("tw:future"), "watch"), "(externref, i32)");
+    let host = profile("all-host");
+    for (p, states, watch) in [
+        (&lin, "(i32, i32) -> (i32, i32)", "(i32, i32, i32)"),
+        (
+            &gc,
+            "((ref (array (mut externref)))) -> ((ref (array (mut i8))))",
+            "((ref (array (mut externref))), i32)",
+        ),
+        (&host, "(externref) -> (externref)", "(externref, i32)"),
+    ] {
+        let l = Layouts::new(&ir, p);
+        assert_eq!(l.future_list_states().unwrap().core().to_string(), states);
+        assert_eq!(l.future_list_watch().unwrap().core().to_string(), watch);
+    }
     assert_eq!(
         op(&lin, Some("tw:future"), "new"),
         "() -> (externref, externref)"

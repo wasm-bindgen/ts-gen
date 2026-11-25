@@ -73,7 +73,7 @@ fun Counter.reset() {
 
 fun Counter.done(): tsgen.runtime.Future<Unit> {
     val r0 = fixtures.members.flat.Counter_done(this)
-    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.members.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> val r1 = try { fixtures.members.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r1 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
 }
 
 object CounterStatic {
@@ -259,8 +259,8 @@ fun raiseErr(e: kotlin.js.JsException): ErrException {
 }
 
 fun futureErrorErr(f: JsAny): ErrException {
-    val r1 = fixtures.members.flat.error_err(f)
-    val s2 = fixtures.members.flat.ret_externref()
-    return ErrException(decodeErr(r1, s2)!!)
+    val r2 = fixtures.members.flat.error_err(f)
+    val s3 = fixtures.members.flat.ret_externref()
+    return ErrException(decodeErr(r2, s3)!!)
 }
 

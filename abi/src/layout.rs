@@ -369,7 +369,7 @@ pub enum Host {
     Any,
     /// A box (§13), with the layout its `tw:unbox` produces.
     Box(Box<Repr>),
-    /// `future<T, E>`: the value `take<T>` produces and the rejection enum.
+    /// `future<T, E>`: the value `get<T>` produces and the rejection enum.
     Future {
         value: Box<Repr>,
         error: Rc<EnumLayout>,
@@ -1993,22 +1993,70 @@ impl<'a> Layouts<'a> {
         })
     }
 
-    /// `("tw:future", "take<T>")`: `(externref) -> W(T)` (§16).
-    pub fn future_take(&self, t: &Type, cx: &Context<'_>) -> Result<Signature> {
-        let r = self.lower(t, cx, Flow::ToLang)?;
+    /// `("tw:future", "get<T,E>")`: `(externref) -> (i32 present, W(T))`,
+    /// the value read as an import with `throws E` reads its result (§16).
+    /// The option is the nullable tuple of the value alone, so it wraps a
+    /// `T` that has nones of its own, and a `unit` is the flag alone.
+    pub fn future_get(&self, t: &Type, e: &Path, cx: &Context<'_>) -> Result<Signature> {
+        let value = self.lower(t, cx, Flow::ToLang)?;
+        let ty = format!("({})?", value.ty);
+        let elems = match value.kind {
+            Kind::Unit | Kind::Never => Vec::new(),
+            _ => vec![value],
+        };
+        let r = Repr {
+            ty,
+            kind: Kind::Tuple {
+                elems,
+                nullable: true,
+            },
+            js_null: false,
+        };
         Ok(Signature {
             params: vec![self.extern_pos(Pos::Future, "future")?],
+            results: self.result(&r)?,
+            throws: Some(self.enum_path(e, cx, Flow::ToLang)?),
+        })
+    }
+
+    /// `("tw:future-list", "states")`: `(W(arr<Any>)) -> W(u8[])` (§16).
+    pub fn future_list_states(&self) -> Result<Signature> {
+        let cx = Context::default();
+        let r = self.lower(
+            &Type::Vec(Box::new(Type::Scalar(Scalar::U8))),
+            &cx,
+            Flow::ToLang,
+        )?;
+        Ok(Signature {
+            params: vec![self.future_list(&cx)?],
             results: self.result(&r)?,
             throws: None,
         })
     }
 
-    /// `("tw:future", "suspend_race")`: `(W(arr<Any>)) -> i32` (§16), the
-    /// list's elements the futures as they are.
-    pub fn future_race(&self, cx: &Context<'_>) -> Result<Signature> {
-        let r = self.lower(&Type::Array(Box::new(Type::Any)), cx, Flow::ToJs)?;
+    /// `("tw:future-list", "watch")`: `(W(arr<Any>), i32)` (§16).
+    pub fn future_list_watch(&self) -> Result<Signature> {
+        let cx = Context::default();
+        let waker = self.lower(&Type::Scalar(Scalar::I32), &cx, Flow::ToJs)?;
         Ok(Signature {
-            params: vec![self.position(Pos::Param(0), r)?],
+            params: vec![self.future_list(&cx)?, self.position(Pos::Param(1), waker)?],
+            results: Vec::new(),
+            throws: None,
+        })
+    }
+
+    /// Futures in the profile's own array: a future is an `Any` there,
+    /// whatever its `T`.
+    fn future_list(&self, cx: &Context<'_>) -> Result<Position> {
+        let r = self.lower(&Type::Array(Box::new(Type::Any)), cx, Flow::ToJs)?;
+        self.position(Pos::Param(0), r)
+    }
+
+    /// `("tw:future-list", "suspend")`: `(W(arr<Any>)) -> i32` (§16).
+    pub fn future_list_suspend(&self) -> Result<Signature> {
+        let cx = Context::default();
+        Ok(Signature {
+            params: vec![self.future_list(&cx)?],
             results: vec![self.fixed(Pos::Result, "i32", Kind::Scalar(Scalar::I32))?],
             throws: None,
         })
@@ -2117,8 +2165,8 @@ impl<'a> Layouts<'a> {
     }
 
     /// The `tw` operations with fixed signatures (§19), by default name:
-    /// `tw:instanceof`, `tw:arr` `len`, the untyped `tw:future` and
-    /// `tw:loop` imports, and the language exports. `None` for a name that
+    /// `tw:instanceof`, `tw:arr` `len`, the untyped `tw:future`,
+    /// `tw:future-list` and `tw:loop` imports, and the language exports. `None` for a name that
     /// isn't one, or whose profile requirement (a linear memory) is unmet.
     pub fn fixed_op(&self, module: Option<&str>, name: &str) -> Option<FuncType> {
         use crate::protocol as tw;
@@ -2131,10 +2179,11 @@ impl<'a> Layouts<'a> {
             (Some(tw::ARR), "len") => f(vec![EXTERNREF], vec![I32]),
             (Some(tw::IS_NULLISH | tw::IS_UNDEFINED), "") => f(vec![EXTERNREF], vec![I32]),
             (Some(tw::UNIT | tw::TRUE | tw::FALSE), "") => f(vec![], vec![EXTERNREF]),
-            (Some(tw::FUTURE), "poll") => f(vec![EXTERNREF, I32], vec![I32]),
-            (Some(tw::FUTURE), "drop") => f(vec![EXTERNREF], vec![]),
+            (Some(tw::FUTURE), "state") => f(vec![EXTERNREF], vec![I32]),
+            (Some(tw::FUTURE), "cancel") => f(vec![EXTERNREF], vec![]),
             (Some(tw::FUTURE), "suspend") if self.profile.jspi => f(vec![EXTERNREF], vec![I32]),
             (Some(tw::FUTURE), "new") => f(vec![], vec![EXTERNREF, EXTERNREF]),
+            (Some(tw::FUTURE), "watch") => f(vec![EXTERNREF, I32], vec![]),
             (Some(tw::LOOP), "work_available" | "drop") => f(vec![I32], vec![]),
             (None, tw::REALLOC) => {
                 let p = ptr?;

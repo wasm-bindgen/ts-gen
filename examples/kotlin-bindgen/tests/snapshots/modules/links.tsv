@@ -20,6 +20,7 @@ js_code	fixtures.modules.flat.StepConfigRetries_set_limit_f64	steps	StepConfigRe
 js_code	fixtures.modules.flat.peek	sink	peek()
 js_code	fixtures.modules.flat.unbox_StrOrArrayBufferOrF64	tw:unbox	StrOrArrayBufferOrF64
 js_code	fixtures.modules.flat.box_StrOrArrayBufferOrF64	tw:box	StrOrArrayBufferOrF64
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureWatch	tw:future	watch
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

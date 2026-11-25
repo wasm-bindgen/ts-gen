@@ -98,7 +98,7 @@ js_code	fixtures.generics.flat.Sizes_set_width_f64	tw:js/global	Sizes#set:width(
 js_code	fixtures.generics.flat.Sizes_get_label	tw:js/global	Sizes#get:label()
 js_code	fixtures.generics.flat.Sizes_set_label_str	tw:js/global	Sizes#set:label(str)
 js_code	fixtures.generics.flat.Ai_run_Name_AiModelList_Name_inputs	tw:js/global	Ai#run(Name,AiModelList[Name]["inputs"])
-js_code	fixtures.generics.flat.take_Any	tw:future	take<Any>
+js_code	fixtures.generics.flat.get_Any	tw:future	get<Any>
 js_code	fixtures.generics.flat.error_err	tw:future	error<err>
 js_code	fixtures.generics.flat.Ai_size_K	tw:js/global	Ai#size(K)
 js_code	fixtures.generics.flat.ret_f64	tw:ret	f64
@@ -217,6 +217,7 @@ js_code	fixtures.generics.flat.box_fn_MessageEventOrCloseEvent	tw:box	fn(Message
 js_code	fixtures.generics.flat.unbox_fn_MessageEventOrCloseEvent	tw:unbox	fn(MessageEventOrCloseEvent)
 js_code	fixtures.generics.flat.call_fn_Event	tw:call	fn(Event)
 js_code	fixtures.generics.flat.call_fn_MessageEventOrCloseEvent	tw:call	fn(MessageEventOrCloseEvent)
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureWatch	tw:future	watch
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

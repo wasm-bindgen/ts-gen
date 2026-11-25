@@ -19,9 +19,9 @@ external fun fail_str(p0: JsAny?)
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
 external fun failAnyway()
 
-/** tw:future take<never> */
+/** tw:future get<never> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_never(p0: JsAny?)
+external fun get_never(p0: JsAny?): Int
 
 /** tw:future error<err> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")

@@ -57,7 +57,7 @@ fun failAnyway(): Nothing {
 
 fun rejectLater(): tsgen.runtime.Future<Nothing> {
     val r0 = fixtures.never.flat.rejectLater()
-    return tsgen.runtime.Future<Nothing>(r0!!, { f -> fixtures.never.flat.take_never(f); error("a never future resolved") }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Nothing>(r0!!, { f -> val r1 = try { fixtures.never.flat.get_never(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r1 == 0) null else error("a never future resolved") }, { f -> futureErrorErr(f) })
 }
 
 fun A(): A {
@@ -121,8 +121,8 @@ fun raiseErr(e: kotlin.js.JsException): ErrException {
 }
 
 fun futureErrorErr(f: JsAny): ErrException {
-    val r1 = fixtures.never.flat.error_err(f)
-    val s2 = fixtures.never.flat.ret_externref()
-    return ErrException(decodeErr(r1, s2)!!)
+    val r2 = fixtures.never.flat.error_err(f)
+    val s3 = fixtures.never.flat.ret_externref()
+    return ErrException(decodeErr(r2, s3)!!)
 }
 

@@ -205,7 +205,7 @@ pub fn generate_opts(
             }
             _ => name.clone(),
         };
-        let suspends = matches!(func.op, plan::Op::Suspend | plan::Op::SuspendRace);
+        let suspends = matches!(func.op, plan::Op::Suspend | plan::Op::ListSuspend);
         let value = if gc {
             let export = format!("f{i}");
             w.forwarder(&export, &format!("g{i}"), func, area.as_ref())?;
@@ -288,9 +288,12 @@ pub fn generate_opts(
         });
     }
     // The language exports driving futures and loops (§16).
-    let polls = plan.funcs.iter().any(|f| matches!(f.op, plan::Op::Poll));
+    let watches = plan
+        .funcs
+        .iter()
+        .any(|f| matches!(f.op, plan::Op::FutureWatch | plan::Op::ListWatch));
     let mut driving = Vec::new();
-    if polls {
+    if watches {
         driving.push(protocol::FUTURE_WAKE);
     }
     if g.loops {
@@ -311,7 +314,7 @@ pub fn generate_opts(
         || plan
             .funcs
             .iter()
-            .any(|f| matches!(f.op, plan::Op::Suspend | plan::Op::SuspendRace))
+            .any(|f| matches!(f.op, plan::Op::Suspend | plan::Op::ListSuspend))
     {
         glue_imports.push("wait: new WebAssembly.Suspending($wait)".into());
         glue_imports.push("stash: $stash".into());
@@ -360,7 +363,7 @@ pub fn generate_opts(
     } else {
         ""
     };
-    if polls || g.loops {
+    if watches || g.loops {
         let live = if profile.termination_flag {
             "try {\n    $checkLive();\n    return true;\n  } catch {\n    return false;\n  }"
         } else {
@@ -368,7 +371,7 @@ pub fn generate_opts(
         };
         let _ = writeln!(js, "function $live() {{\n  {live}\n}}");
     }
-    if polls {
+    if watches {
         let wake = prop("$X", profile.name(protocol::FUTURE_WAKE));
         let _ = writeln!(js, "function $wake(w) {{\n  if ($live()) {wake}(w);\n}}");
     }

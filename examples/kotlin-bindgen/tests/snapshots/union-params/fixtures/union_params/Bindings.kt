@@ -288,7 +288,7 @@ fun loadText(): BufferOrStr {
 
 fun join(parts: JsArray<JsAny?>): tsgen.runtime.Future<ByteArray> {
     val r0 = fixtures.union_params.flat.join_arr_buffer(parts)
-    return tsgen.runtime.Future<ByteArray>(r0!!, { f -> val r1 = fixtures.union_params.flat.take_buffer(f); tsgen.runtime.byteArray(r1!!) }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<ByteArray>(r0!!, { f -> val r1 = try { fixtures.union_params.flat.get_buffer(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.union_params.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled(tsgen.runtime.byteArray(s2!!)) }, { f -> futureErrorErr(f) })
 }
 
 fun boxed(): Box<JsAny?> {
@@ -730,9 +730,9 @@ fun raiseErr(e: kotlin.js.JsException): ErrException {
 }
 
 fun futureErrorErr(f: JsAny): ErrException {
-    val r2 = fixtures.union_params.flat.error_err(f)
-    val s3 = fixtures.union_params.flat.ret_externref()
-    return ErrException(decodeErr(r2, s3)!!)
+    val r3 = fixtures.union_params.flat.error_err(f)
+    val s4 = fixtures.union_params.flat.ret_externref()
+    return ErrException(decodeErr(r3, s4)!!)
 }
 
 fun setErr(e: kotlin.Throwable) {

@@ -121,7 +121,7 @@ fun display(style: fixtures.std.NumberFormatOptionsCompactDisplay) {
 
 fun store(s: Store<*>): tsgen.runtime.Future<Nothing> {
     val r0 = fixtures.with_std.flat.store_Store_unit(s)
-    return tsgen.runtime.Future<Nothing>(r0!!, { f -> fixtures.with_std.flat.take_never(f); error("a never future resolved") }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Nothing>(r0!!, { f -> val r1 = try { fixtures.with_std.flat.get_never(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r1 == 0) null else error("a never future resolved") }, { f -> futureErrorErr(f) })
 }
 
 fun describe(s: fixtures.std.Symbol): String {
@@ -252,8 +252,8 @@ fun raiseErr(e: kotlin.js.JsException): ErrException {
 }
 
 fun futureErrorErr(f: JsAny): ErrException {
-    val r1 = fixtures.with_std.flat.error_err(f)
-    val s2 = fixtures.with_std.flat.ret_externref()
-    return ErrException(decodeErr(r1, s2)!!)
+    val r2 = fixtures.with_std.flat.error_err(f)
+    val s3 = fixtures.with_std.flat.ret_externref()
+    return ErrException(decodeErr(r2, s3)!!)
 }
 

@@ -62,7 +62,7 @@ BACKEND.fetch: 200 GET /hello, from the backend
 fetch with an init: 200 POST /post, with "ping", from the backend
 a fetch with AbortSignal.timeout(50) rejected with an Error (The operation was aborted due to timeout)
 the backend saw 1 of its requests abort
-a dropped fetch: the backend saw 1 of its requests abort
+a cancelled fetch: the backend saw 1 of its requests abort
 
 == GET /timers
 scheduler.wait(5) resolved, then setTimeout(5) called back

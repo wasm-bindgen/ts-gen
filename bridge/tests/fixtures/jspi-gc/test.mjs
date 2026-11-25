@@ -7,6 +7,9 @@ class Api {
   later() {
     return new Promise((r) => this.resolvers.push(r));
   }
+  mark() {
+    this.scratch = scratchUse();
+  }
 }
 globalThis.Api = Api;
 
@@ -15,6 +18,12 @@ const fs = await import("node:fs");
 const compile = (f) => new WebAssembly.Module(fs.readFileSync(f));
 instantiate(compile("lang.wasm"), compile("bridge.wasm"));
 const empty = scratchUse();
+
+// A synchronous export has no stack to suspend: the `SuspendError` is the
+// language's to catch, with scratch as it was.
+const stuck = new Api();
+assert.equal(app.stuck(stuck), 7);
+assert.deepEqual(stuck.scratch, empty);
 
 // Two calls parked at once, resumed out of order.
 const a = new Api();
@@ -40,7 +49,7 @@ other.resolvers[0](1);
 other.resolvers[1](1);
 assert.equal(await ran, 2);
 
-// A GC list for `suspend_race`.
+// A GC list for the list's `suspend`.
 const r = new Api();
 const raced = app.race(r);
 r.resolvers[1](9);

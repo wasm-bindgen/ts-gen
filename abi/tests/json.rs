@@ -212,7 +212,7 @@ fn box_nested_warns_under_box_none_null() {
     assert!(!json::lower(&ir, &p).pretty().contains("\"warnings\""));
 }
 
-/// A future of a type parameter takes and resolves through the operations
+/// A future of a type parameter is read and resolved through the operations
 /// on its erasure: a type parameter names nothing in a protocol key.
 #[test]
 fn erased_future_ops() {
@@ -223,21 +223,21 @@ fn erased_future_ops() {
     let out = json::lower(&ir, &Profile::all_linear()).pretty();
     check(&out);
     for name in [
-        "take<Any?>",
+        "get<Any?>",
         "resolve<Any?>",
-        "take<Result<Any>>",
-        "take<arr<Any>>",
-        "take<str>",
+        "get<Result<Any>>",
+        "get<arr<Any>>",
+        "get<str>",
     ] {
         assert!(
             out.contains(&format!("\"name\": \"{name}\"")),
             "{name}:\n{out}"
         );
     }
-    assert!(!out.contains("take<T"), "{out}");
-    assert!(!out.contains("take<arr<V>>"), "{out}");
+    assert!(!out.contains("get<T"), "{out}");
+    assert!(!out.contains("get<arr<V>>"), "{out}");
     // A type parameter shadowing a declaration is erased too.
-    assert!(!out.contains("take<Box?>"), "{out}");
+    assert!(!out.contains("get<Box?>"), "{out}");
     // A function type's and a nested optional's type parameters are
     // erased too.
     let ir2 = text::parse(
@@ -246,7 +246,7 @@ fn erased_future_ops() {
     .unwrap();
     let out2 = json::lower(&ir2, &Profile::all_linear()).pretty();
     check(&out2);
-    for name in ["take<fn(Any)->Any>", "take<Any??>"] {
+    for name in ["get<fn(Any)->Any>", "get<Any??>"] {
         assert!(
             out2.contains(&format!("\"name\": \"{name}\"")),
             "{name}:\n{out2}"
@@ -256,7 +256,7 @@ fn erased_future_ops() {
     // keep the erasure's name and `externref` wire (§16).
     let gc = json::lower(&ir, &Profile::parse("handles = gc").unwrap()).pretty();
     check(&gc);
-    assert!(gc.contains("\"name\": \"take<Any?>\""), "{gc}");
+    assert!(gc.contains("\"name\": \"get<Any?>\""), "{gc}");
     assert!(gc.contains("\"anyref\""), "{gc}");
 }
 

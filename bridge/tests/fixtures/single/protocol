@@ -2,4 +2,6 @@ tw:err KvError
 tw:err set:KvError
 tw:call fn(u32)->(u32,str)
 tw:future new
+tw:future state
+tw:future get<(u32,str),KvError>
 export tw:call:fn(u32)->(u32,str)

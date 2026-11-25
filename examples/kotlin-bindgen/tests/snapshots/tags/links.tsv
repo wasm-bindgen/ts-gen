@@ -8,10 +8,11 @@ js_code	fixtures.tags.flat.Pixels_sizes	tw:js/global	Pixels#sizes()
 js_code	fixtures.tags.flat.Pixels_first	tw:js/global	Pixels#first()
 js_code	fixtures.tags.flat.ret_i32	tw:ret	i32
 js_code	fixtures.tags.flat.Pixels_load	tw:js/global	Pixels#load()
-js_code	fixtures.tags.flat.take_u32	tw:future	take<u32>
+js_code	fixtures.tags.flat.get_u32	tw:future	get<u32>
 js_code	fixtures.tags.flat.error_err	tw:future	error<err>
 js_code	fixtures.tags.flat.Pixels_clear	tw:js/global	Pixels#clear()
 js_code	fixtures.tags.flat.Pixels_fail	tw:js/global	Pixels#fail()
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureWatch	tw:future	watch
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

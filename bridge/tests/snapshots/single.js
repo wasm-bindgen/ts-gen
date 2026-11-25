@@ -342,33 +342,28 @@ function $construct(C, msg, props) {
   return e;
 }
 
-// A future the language holds (IR.md §16): a promise, settled state for
-// synchronous polls, and the waker to call when it settles. `check`
-// validates a resolution, which otherwise rejects with its TypeError.
+// A future the language holds (IR.md §16): a promise, with its state and
+// raw settlement kept for the language's synchronous reads. `check` is a
+// `future<never>`'s rule, which rejects a resolution.
 class $Future {
   constructor(promise, check, cancel) {
     this.promise = promise;
     this.state = 0;
     this.value = undefined;
-    this.waker = -1;
+    this.watchers = null;
     this.cancel = cancel;
-    this.dropped = false;
-    this.taken = false;
-    // The suspensions parked on it (§16).
-    this.parked = null;
     promise.then(
       (v) => {
-        if (this.dropped) return;
-        try {
-          if (check) check(v);
-          this.settle(1, v);
-        } catch (e) {
-          this.settle(2, e);
+        if (check) {
+          try {
+            check(v);
+          } catch (e) {
+            return this.settle(2, e);
+          }
         }
+        this.settle(1, v);
       },
-      (e) => {
-        if (!this.dropped) this.settle(2, e);
-      },
+      (e) => this.settle(2, e),
     );
   }
 
@@ -376,20 +371,31 @@ class $Future {
     this.state = state;
     this.value = value;
     this.cancel = null;
-    const w = this.waker;
-    this.waker = -1;
-    if (w !== -1) $wake(w);
-    $unpark(this, state);
+    const ws = this.watchers;
+    this.watchers = null;
+    if (ws) for (const [w, watch] of ws) watch === true ? $wake(w) : watch.fire(this);
   }
 }
 
-// Dropping cancels: the cancel function runs once, its failure swallowed,
-// and a later settlement is ignored.
-// Resumes the suspensions parked on future `f` with `state`.
-function $unpark(f, state) {
-  const ps = f.parked;
-  f.parked = null;
-  if (ps) for (const w of ps) w(state);
+function $future(v, check, cancel) {
+  return v instanceof $Future ? v : new $Future(Promise.resolve(v), check ?? null, cancel ?? null);
+}
+
+// A synchronous throw folded into a rejected future (§16).
+function $rejected(e) {
+  return new $Future(Promise.reject(e), null, null);
+}
+
+function $isFuture(f) {
+  if (!(f instanceof $Future)) throw new TypeError(`expected a future, got ${$describe(f)}`);
+  return f;
+}
+
+// A future's value as `get` reads it: a tuple of it once the future is
+// fulfilled (empty for a `unit`), and none until then.
+function $option(f, unit) {
+  if (f.state !== 1) return null;
+  return unit ? [] : [f.value];
 }
 
 function $newFuture() {
@@ -505,32 +511,43 @@ function $f12$s(a0, a1) {
   return r[0];
 }
 
+// ("tw:js/global", "Probe#later()")
+function $f13(w0_0) {
+  try {
+    const r = w0_0.later();
+    const t1 = $future(r);
+    return t1;
+  } catch (e) {
+    return $rejected(e);
+  }
+}
+
 // ("tw:js/global", "Probe#on(fn(u32)->(u32,str))")
-function $f13(w0_0, w1_0) {
+function $f14(w0_0, w1_0) {
   const t1 = $h1(w1_0);
   w0_0.on(t1);
 }
 
 // ("tw:err", "KvError")
-function $f14(v) {
+function $f15(v) {
   return $h3(v);
 }
 
-function $f14$s(a0) {
+function $f15$s(a0) {
   $spillCheck();
-  const r = $f14(a0);
+  const r = $f15(a0);
   $B.push_externref(r[1]);
   return r[0];
 }
 
 // ("tw:err", "set:KvError")
-function $f15(arm, m) {
+function $f16(arm, m) {
   $pending = $h4(arm, m);
   $B.pending.value = 1;
 }
 
 // ("tw:call", "fn(u32)->(u32,str)")
-function $f16(w0_0, w1_0) {
+function $f17(w0_0, w1_0) {
   const t1 = (w1_0 >>> 0);
   const r = w0_0(t1);
   $tuple(r, 2, "(u32,str)");
@@ -541,22 +558,59 @@ function $f16(w0_0, w1_0) {
   return [t3, t5];
 }
 
-function $f16$s(a0, a1) {
+function $f17$s(a0, a1) {
   $spillCheck();
-  const r = $f16(a0, a1);
+  const r = $f17(a0, a1);
   $B.push_externref(r[1]);
   return r[0];
 }
 
 // ("tw:future", "new")
-function $f17() {
+function $f18() {
   return $newFuture();
 }
 
-function $f17$s() {
+function $f18$s() {
   $spillCheck();
-  const r = $f17();
+  const r = $f18();
   $B.push_externref(r[1]);
+  return r[0];
+}
+
+// ("tw:future", "state")
+function $f19(f) {
+  return $isFuture(f).state;
+}
+
+// ("tw:future", "get<(u32,str),KvError>")
+function $f20(w0_0) {
+  const f = $isFuture(w0_0);
+  try {
+    const r = $option(f, false);
+    let t1 = 0, t2 = 0, t3 = null;
+    if (r != null) {
+      $tuple(r, 1, "((u32,str))?");
+      const t4 = r[0];
+      $tuple(t4, 2, "(u32,str)");
+      const t5 = t4[0];
+      const t6 = $int(t5, 0, 4294967295, "u32");
+      const t7 = t4[1];
+      const t8 = $str(t7);
+      t1 = 1;
+      t2 = t6;
+      t3 = t8;
+    }
+    return [t1, t2, t3];
+  } catch (e) {
+    throw e;
+  }
+}
+
+function $f20$s(a0) {
+  $spillCheck();
+  const r = $f20(a0);
+  $B.push_i32(r[1]);
+  $B.push_externref(r[2]);
   return r[0];
 }
 
@@ -651,17 +705,20 @@ export function instantiate(language, bridge, imports = {}) {
       "Probe#triple()": $f10$s,
       "Probe#maybe()": $f11$s,
       "Probe#get(str)": $f12$s,
-      "Probe#on(fn(u32)->(u32,str))": $f13,
+      "Probe#later()": $f13,
+      "Probe#on(fn(u32)->(u32,str))": $f14,
     },
     "tw:err": {
-      "KvError": $f14$s,
-      "set:KvError": $f15,
+      "KvError": $f15$s,
+      "set:KvError": $f16,
     },
     "tw:call": {
-      "fn(u32)->(u32,str)": $f16$s,
+      "fn(u32)->(u32,str)": $f17$s,
     },
     "tw:future": {
-      "new": $f17$s,
+      "new": $f18$s,
+      "state": $f19,
+      "get<(u32,str),KvError>": $f20$s,
     },
   });
   $X = instance.exports;

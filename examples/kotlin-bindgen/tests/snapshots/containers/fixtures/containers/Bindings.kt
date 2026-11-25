@@ -66,7 +66,7 @@ fun bytes(): Uint8Array {
 
 fun later(): tsgen.runtime.Future<String> {
     val r0 = fixtures.containers.flat.later()
-    return tsgen.runtime.Future<String>(r0!!, { f -> val r1 = fixtures.containers.flat.take_str(f); r1!!.unsafeCast<JsString>().toString() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<String>(r0!!, { f -> val r1 = try { fixtures.containers.flat.get_str(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.containers.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2!!.unsafeCast<JsString>().toString()) }, { f -> futureErrorErr(f) })
 }
 
 fun any(): Any_ {
@@ -126,8 +126,8 @@ fun raiseErr(e: kotlin.js.JsException): ErrException {
 }
 
 fun futureErrorErr(f: JsAny): ErrException {
-    val r2 = fixtures.containers.flat.error_err(f)
-    val s3 = fixtures.containers.flat.ret_externref()
-    return ErrException(decodeErr(r2, s3)!!)
+    val r3 = fixtures.containers.flat.error_err(f)
+    val s4 = fixtures.containers.flat.ret_externref()
+    return ErrException(decodeErr(r3, s4)!!)
 }
 
