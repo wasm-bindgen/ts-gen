@@ -359,6 +359,7 @@ fn walk_decls<'a>(
                         .set("path", Json::str(key::location(&loc(&n.name))))
                         .set("module", Json::opt_str(cx.module))
                         .set("name", Json::str(&n.name))
+                        .set("jsName", js_name(&n.meta))
                         .set("export", Json::Bool(exported || n.export))
                         .set("doc", doc(&n.meta))
                         .done(),
