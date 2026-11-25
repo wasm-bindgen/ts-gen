@@ -3,7 +3,7 @@
 //!
 //! ```sh
 //! ts-gen-bridge link <in.wasm> <links.tsv>... -o <out.wasm>
-//! ts-gen-bridge generate <file.ir> <language.wasm> -o <dir> [--profile <profile>] [--with <lib.ir>]... [--wat]
+//! ts-gen-bridge generate <file.ir> <language.wasm> -o <dir> [--profile <profile>] [--with <lib.ir>]... [--wat] [--factory]
 //! ```
 //!
 //! `link` renames the imports the links files list ([`ts_gen_bridge::link`]).
@@ -20,7 +20,7 @@ use ts_gen_abi::text;
 use ts_gen_bridge::link;
 
 const USAGE: &str = "usage: ts-gen-bridge link <in.wasm> <links.tsv>... -o <out.wasm>
-       ts-gen-bridge generate <file.ir> <language.wasm> -o <dir> [--profile <profile>] [--with <lib.ir>]... [--wat]";
+       ts-gen-bridge generate <file.ir> <language.wasm> -o <dir> [--profile <profile>] [--with <lib.ir>]... [--wat] [--factory]";
 
 fn read(p: &str) -> Result<Vec<u8>, String> {
     std::fs::read(p).map_err(|e| format!("{p}: {e}"))
@@ -49,6 +49,7 @@ fn run(args: &[String]) -> Result<(), String> {
     let mut profile = Profile::default();
     let mut libs = Vec::new();
     let mut emit_wat = false;
+    let mut opts = ts_gen_bridge::Options::default();
     let mut it = rest.iter();
     while let Some(a) = it.next() {
         match a.as_str() {
@@ -59,6 +60,7 @@ fn run(args: &[String]) -> Result<(), String> {
                 profile = Profile::parse(&src).map_err(|e| format!("{v}: {e}"))?;
             }
             "--wat" if cmd == "generate" => emit_wat = true,
+            "--factory" if cmd == "generate" => opts.factory = true,
             "--with" if cmd == "generate" => {
                 let v = it.next().ok_or(USAGE)?;
                 libs.push(text::parse(&read_str(v)?).map_err(|e| format!("{v}: {e}"))?);
@@ -80,7 +82,7 @@ fn run(args: &[String]) -> Result<(), String> {
         }
         ("generate", [ir, wasm]) => {
             let ir = text::parse(&read_str(ir)?).map_err(|e| format!("{ir}: {e}"))?;
-            let b = ts_gen_bridge::generate_with(&ir, &libs, &profile, &read_module(wasm)?)
+            let b = ts_gen_bridge::generate_opts(&ir, &libs, &profile, &read_module(wasm)?, opts)
                 .map_err(|e| e.to_string())?;
             for w in &b.warnings {
                 eprintln!("warning: {w}");

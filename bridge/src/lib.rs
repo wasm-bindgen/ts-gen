@@ -73,13 +73,26 @@ pub(crate) fn unsupported<T>(m: impl Into<String>) -> Result<T> {
 /// A generated bridge.
 pub struct Bridge {
     /// The ESM glue. It exports `instantiate(language, bridge)`, taking both
-    /// compiled modules and returning the language's instance.
+    /// compiled modules and returning the language's instance, or with
+    /// [`Options::factory`], `createBridge()`.
     pub js: String,
     /// The bridge module, as text and binary.
     pub wat: String,
     pub wasm: Vec<u8>,
     /// Approximations, by the import or export they're in.
     pub warnings: Vec<String>,
+}
+
+/// The shape of the generated JS.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct Options {
+    /// The ESM module holds one bridge, so it instantiates one language
+    /// instance. With `factory` it exports `createBridge()` instead, which
+    /// returns a new bridge each call: an object with `instantiate`,
+    /// `scratchUse` and the exports, over its own state. A host running
+    /// several instances of the language (a pool) makes one per instance.
+    /// An export can't take one of the bridge's own field names.
+    pub factory: bool,
 }
 
 pub fn generate(ir: &Ir, profile: &Profile, language: &[u8]) -> Result<Bridge> {
@@ -90,12 +103,23 @@ pub fn generate(ir: &Ir, profile: &Profile, language: &[u8]) -> Result<Bridge> {
 /// (§5). A lib's declarations are JS values like the IR's own; only the
 /// language's imports add glue.
 pub fn generate_with(ir: &Ir, libs: &[Ir], profile: &Profile, language: &[u8]) -> Result<Bridge> {
+    generate_opts(ir, libs, profile, language, Options::default())
+}
+
+/// [`generate_with`], shaped by `opts`.
+pub fn generate_opts(
+    ir: &Ir,
+    libs: &[Ir],
+    profile: &Profile,
+    language: &[u8],
+    opts: Options,
+) -> Result<Bridge> {
     profile.check().map_err(Error::Profile)?;
-    let opts = ts_gen_abi::validate::Options {
+    let vopts = ts_gen_abi::validate::Options {
         libs,
         ..Default::default()
     };
-    ts_gen_abi::validate::validate_with(ir, opts).map_err(|es| {
+    ts_gen_abi::validate::validate_with(ir, vopts).map_err(|es| {
         Error::Ir(
             es.iter()
                 .map(ToString::to_string)
@@ -217,7 +241,7 @@ pub fn generate_with(ir: &Ir, libs: &[Ir], profile: &Profile, language: &[u8]) -
         let v = g.tag_var(&t.layout);
         imports.push((t.module.clone(), t.name.clone(), v));
     }
-    let exports = g.exports()?;
+    let (exports, esm) = g.exports()?;
     let outgoing = g.outgoing()?;
     for (i, r) in g.convs.iter().enumerate() {
         w.conv(i, r)?;
@@ -350,6 +374,9 @@ pub fn generate_with(ir: &Ir, libs: &[Ir], profile: &Profile, language: &[u8]) -
         let _ = writeln!(js, "\n{outgoing}");
     }
     js.push_str(&exports);
+    if !opts.factory {
+        js.push_str(&entry::export_list(&esm));
+    }
     js.push('\n');
     let lang_table = m.exports(
         profile.name(protocol::TABLE),
@@ -361,6 +388,8 @@ pub fn generate_with(ir: &Ir, libs: &[Ir], profile: &Profile, language: &[u8]) -
             profile.name(protocol::TABLE)
         )));
     }
+    let export = if opts.factory { "" } else { "export " };
+    js.push_str(export);
     js.push_str(&instantiate(
         profile,
         if lang_table {
@@ -376,8 +405,49 @@ pub fn generate_with(ir: &Ir, libs: &[Ir], profile: &Profile, language: &[u8]) -
         &g.classes,
         js_string,
     ));
+    // Diagnostics: the scratch bump pointers, which every call restores.
+    let _ = writeln!(
+        js,
+        "{export}function scratchUse() {{\n  return $S ? $S.mark() : null;\n}}"
+    );
+    if profile.results == Results::Single {
+        let _ = writeln!(
+            js,
+            "{export}function spillEmpty() {{\n  return $B ? $B.spill_empty() === 1 : null;\n}}"
+        );
+    }
     let runtime = runtime::used(&js[runtime_at..]);
     js.insert_str(runtime_at, &format!("{runtime}\n"));
+    if opts.factory {
+        let mut fields = vec!["instantiate".to_string(), "scratchUse".to_string()];
+        if profile.results == Results::Single {
+            fields.push("spillEmpty".into());
+        }
+        for (name, v) in &esm {
+            if fields.iter().any(|f| f == name) {
+                return Err(Error::Ir(format!(
+                    "`{name}` is a bridge's own field under `--factory`, so it can't be an export"
+                )));
+            }
+            // `__proto__: v` would set the prototype, not a property.
+            let key = if name == "__proto__" {
+                "[\"__proto__\"]".to_string()
+            } else {
+                entry::method_key(name)
+            };
+            fields.push(format!("{key}: {v}"));
+        }
+        let body = js.split_off(runtime_at);
+        js.push_str("export function createBridge() {\n");
+        for line in body.lines() {
+            if !line.is_empty() {
+                js.push_str("  ");
+            }
+            js.push_str(line);
+            js.push('\n');
+        }
+        let _ = writeln!(js, "  return {{ {} }};\n}}", fields.join(", "));
+    }
     Ok(Bridge {
         js,
         wat: wat_src,
@@ -631,7 +701,7 @@ fn instantiate(
     }
     let _ = writeln!(
         s,
-        "export function instantiate(language, bridge, imports = {{}}) {{"
+        "function instantiate(language, bridge, imports = {{}}) {{"
     );
     let _ = writeln!(
         s,
@@ -726,12 +796,5 @@ fn instantiate(
     }
     let _ = writeln!(s, "  return instance;");
     s.push_str("}\n\n");
-    // Diagnostics: the scratch bump pointers, which every call restores.
-    s.push_str("export function scratchUse() {\n  return $S ? $S.mark() : null;\n}\n");
-    if p.results == Results::Single {
-        s.push_str(
-            "export function spillEmpty() {\n  return $B ? $B.spill_empty() === 1 : null;\n}\n",
-        );
-    }
     s
 }
