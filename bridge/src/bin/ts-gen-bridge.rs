@@ -1,14 +1,11 @@
-//! `ts-gen-bridge`: the bridge generator and the link step, for languages
-//! built outside Rust.
+//! `ts-gen-bridge`: the bridge generator, for languages built outside Rust.
 //!
 //! ```sh
-//! ts-gen-bridge link <in.wasm> <links.tsv>... -o <out.wasm>
 //! ts-gen-bridge generate <file.ir> <language.wasm> -o <dir> [--profile <profile>] [--with <lib.ir>]... [--wat] [--factory]
 //! ```
 //!
-//! `link` renames the imports the links files list ([`ts_gen_bridge::link`]).
 //! `generate` writes `<dir>/bridge.js` and `<dir>/bridge.wasm` for the
-//! (linked) language module, and `<dir>/bridge.wat` with `--wat`. The
+//! language module, and `<dir>/bridge.wat` with `--wat`. The
 //! language module may be `.wat` text. `<profile>` is a file holding the
 //! profile text form, or the text itself (`all-host`, `"all-host, results =
 //! single"`).
@@ -17,10 +14,8 @@ use std::process::ExitCode;
 
 use ts_gen_abi::profile::Profile;
 use ts_gen_abi::text;
-use ts_gen_bridge::link;
 
-const USAGE: &str = "usage: ts-gen-bridge link <in.wasm> <links.tsv>... -o <out.wasm>
-       ts-gen-bridge generate <file.ir> <language.wasm> -o <dir> [--profile <profile>] [--with <lib.ir>]... [--wat] [--factory]";
+const USAGE: &str = "usage: ts-gen-bridge generate <file.ir> <language.wasm> -o <dir> [--profile <profile>] [--with <lib.ir>]... [--wat] [--factory]";
 
 fn read(p: &str) -> Result<Vec<u8>, String> {
     std::fs::read(p).map_err(|e| format!("{p}: {e}"))
@@ -70,16 +65,6 @@ fn run(args: &[String]) -> Result<(), String> {
     }
     let out = out.ok_or(USAGE)?;
     match (cmd.as_str(), &pos[..]) {
-        ("link", [wasm, files @ ..]) if !files.is_empty() => {
-            let mut links = link::Links::new();
-            for f in files {
-                let more = link::read_links(&read_str(f)?).map_err(|e| format!("{f}: {e}"))?;
-                links.extend(more);
-            }
-            let linked =
-                link::link(&read_module(wasm)?, &links).map_err(|e| format!("{wasm}: {e}"))?;
-            write(out.as_ref(), &linked)
-        }
         ("generate", [ir, wasm]) => {
             let ir = text::parse(&read_str(ir)?).map_err(|e| format!("{ir}: {e}"))?;
             let b = ts_gen_bridge::generate_opts(&ir, &libs, &profile, &read_module(wasm)?, opts)

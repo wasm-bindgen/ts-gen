@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Builds the Kotlin worker end to end into out/:
 #   ts-gen --ir -> ts-gen-abi lower -> kotlin-bindgen -> Kotlin/Wasm
-#   -> ts-gen-bridge link -> ts-gen-bridge generate.
+#   -> kotlin-bindgen link -> ts-gen-bridge generate.
 # `./run.sh serve` then serves it in workerd and curls every route;
 # `./run.sh node` runs the routes node can serve.
 #
@@ -43,7 +43,7 @@ mkdir -p "$B"
 #    keys; the bridge is generated for the linked module.
 rm -rf "$OUT"
 mkdir -p "$OUT"
-"$BIN/ts-gen-bridge" link "$KOUT/worker.wasm" "$B/std/links.tsv" "$B/bindings/links.tsv" -o "$OUT/worker.wasm"
+"$KOTLIN" link "$KOUT/worker.wasm" "$B/std/links.tsv" "$B/bindings/links.tsv" -o "$OUT/worker.wasm"
 "$BIN/ts-gen-bridge" generate "$B/worker.ir" "$OUT/worker.wasm" --with "$STD" --profile "$PROFILE" -o "$OUT"
 cp "$EX/loader.js" "$EX/backend.js" "$EX/config.capnp" "$EX/node.mjs" "$KOUT/worker.import-object.mjs" "$KOUT/worker.js-builtins.mjs" "$OUT/"
 echo "built $OUT"

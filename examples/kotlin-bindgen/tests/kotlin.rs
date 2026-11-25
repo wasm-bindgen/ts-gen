@@ -750,6 +750,126 @@ fn kotlin_runtime() {
     );
 }
 
+/// `kotlin-bindgen link`: the imports the links files list are renamed,
+/// whatever kinds of import sit between them, and nothing else changes.
+#[test]
+fn kotlin_link() {
+    if skipped(false) {
+        return;
+    }
+    let generator = generator();
+    let dir = work().join("link");
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir).unwrap();
+    let p = |f: &str| dir.join(f);
+    let link = |args: &[&Path]| {
+        let out = Command::new(&generator)
+            .arg("link")
+            .args(args)
+            .output()
+            .unwrap();
+        match out.status.success() {
+            true => Ok(()),
+            false => Err(String::from_utf8_lossy(&out.stderr).into_owned()),
+        }
+    };
+    let imports = |wasm: &[u8]| {
+        let mut out = Vec::new();
+        for payload in wasmparser::Parser::new(0).parse_all(wasm) {
+            if let wasmparser::Payload::ImportSection(r) = payload.unwrap() {
+                for i in r.into_imports() {
+                    let i = i.unwrap();
+                    out.push((i.module.to_string(), i.name.to_string()));
+                }
+            }
+        }
+        out
+    };
+
+    let wasm = wat::parse_str(
+        r#"(module
+  (type $s (struct))
+  (import "js_code" "kotlin.println" (func (param externref)))
+  (import "env" "table" (table 1 2 funcref))
+  (import "env" "refs" (table 0 (ref null $s)))
+  (import "env" "memory" (memory 1))
+  (import "env" "big" (memory i64 1 2))
+  (import "env" "count" (global (mut i32)))
+  (import "env" "any" (global (ref null any)))
+  (import "env" "tag" (tag (param i32)))
+  (import "js_code" "app.flat.Request_get_url" (func $url (param externref) (result externref)))
+  (import "js_code" "app.flat.dropped" (func (param i32)))
+  (func (export "f") (param externref) (result externref) (call $url (local.get 0)))
+  (@custom "name-ish" "kept")
+)"#,
+    )
+    .unwrap();
+    std::fs::write(p("in.wasm"), &wasm).unwrap();
+    // A key long enough for a two-byte length.
+    let long = "k".repeat(200);
+    std::fs::write(
+        p("a.tsv"),
+        "js_code\tapp.flat.Request_get_url\ttw:js/global\tRequest#get:url()\n\njs_code\tapp.flat.gone\ttw:js/global\tgone()\n",
+    )
+    .unwrap();
+    std::fs::write(
+        p("b.tsv"),
+        format!("js_code\tapp.flat.dropped\ttw:js/global\t{long}\n"),
+    )
+    .unwrap();
+    link(&[
+        &p("in.wasm"),
+        &p("a.tsv"),
+        &p("b.tsv"),
+        Path::new("-o"),
+        &p("out.wasm"),
+    ])
+    .unwrap();
+    let out = std::fs::read(p("out.wasm")).unwrap();
+    wasmparser::Validator::new_with_features(wasmparser::WasmFeatures::all())
+        .validate_all(&out)
+        .unwrap();
+    let mut want = imports(&wasm);
+    want[8] = ("tw:js/global".into(), "Request#get:url()".into());
+    want[9] = ("tw:js/global".into(), long.clone());
+    assert_eq!(imports(&out), want);
+
+    // Everything but the import names is unchanged.
+    std::fs::write(
+        p("back.tsv"),
+        format!(
+            "tw:js/global\tRequest#get:url()\tjs_code\tapp.flat.Request_get_url\n\
+             tw:js/global\t{long}\tjs_code\tapp.flat.dropped\n"
+        ),
+    )
+    .unwrap();
+    link(&[
+        &p("out.wasm"),
+        &p("back.tsv"),
+        Path::new("-o"),
+        &p("back.wasm"),
+    ])
+    .unwrap();
+    assert_eq!(std::fs::read(p("back.wasm")).unwrap(), wasm);
+
+    let links = |name: &str, text: &str| {
+        std::fs::write(p(name), text).unwrap();
+        link(&[&p("in.wasm"), &p(name), Path::new("-o"), &p("bad.wasm")])
+    };
+    let e = links("two.tsv", "js_code\tonly-two\n").unwrap_err();
+    assert!(
+        e.contains("line 1: expected 4 tab-separated fields, got 2"),
+        "{e}"
+    );
+    let e = links("both.tsv", "js_code\ta\tm\tx\njs_code\ta\tm\ty\n").unwrap_err();
+    assert!(e.contains("line 2"), "{e}");
+    links("same.tsv", "js_code\ta\tm\tx\njs_code\ta\tm\tx\n").unwrap();
+    let e = link(&[&p("a.tsv"), &p("a.tsv"), Path::new("-o"), &p("bad.wasm")]).unwrap_err();
+    assert!(e.contains("not a Wasm module"), "{e}");
+    let e = link(&[&p("in.wasm"), &p("a.tsv")]).unwrap_err();
+    assert!(e.contains("usage:"), "{e}");
+}
+
 /// A build-and-run script's stdout, with the generator built.
 fn run_script(script: &Path, args: &[&str]) -> String {
     generator();

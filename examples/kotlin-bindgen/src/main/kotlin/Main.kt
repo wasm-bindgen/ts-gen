@@ -4,6 +4,7 @@ import java.io.File
 import kotlin.system.exitProcess
 
 const val USAGE = """usage: kotlin-bindgen <lowered.json> <out-dir> [--package <pkg>] [--app-package <pkg>] [--lib <name>=<pkg>]... [--runtime] [--scaffold <file>]
+       kotlin-bindgen link <in.wasm> <links.tsv>... -o <out.wasm>
 
 Writes Kotlin/Wasm bindings for a lowered IR (`ts-gen-abi lower --profile
 "all-host, results = single, throws = js"`):
@@ -11,13 +12,16 @@ Writes Kotlin/Wasm bindings for a lowered IR (`ts-gen-abi lower --profile
   <out-dir>/<pkg>/Bindings.kt   the typed API (default package: workers)
   <out-dir>/<pkg>/Tuples.kt     the tuples other than pairs and triples
   <out-dir>/<pkg>/Exports.kt    exports calling <app-package> (default: app)
-  <out-dir>/links.tsv           js_code imports to rename to their keys
+  <out-dir>/links.tsv           js_code imports for `link` to rename to their keys
   <out-dir>/tsgen/runtime/Runtime.kt  with --runtime: futures and the loop,
                                 once per program
 <out-dir> is replaced. --lib names the package a lib's bindings were
 generated into, for each lib the IR resolves against. --scaffold writes
 the declarations the exports call, with TODO() bodies, to <file> if it
-does not exist."""
+does not exist.
+
+`link` renames the compiled module's js_code imports to the keys its
+links.tsv files give them, for the bridge to read."""
 
 /**
  * Kotlin/Wasm interop can name no GC type, so every category is `host`;
@@ -43,7 +47,31 @@ val RUNTIME_LINKS = listOf(
     "tsgen.runtime.loopWorkAvailable" to Import("tw:loop", "work_available"),
 )
 
+/** `link <in.wasm> <links.tsv>... -o <out.wasm>`. */
+private fun linkCommand(args: List<String>) {
+    val pos = mutableListOf<String>()
+    var out: String? = null
+    var i = 0
+    while (i < args.size) {
+        if (args[i] == "-o" && i + 1 < args.size) out = args[++i] else pos += args[i]
+        i++
+    }
+    if (out == null || pos.size < 2) { System.err.println(USAGE); exitProcess(2) }
+    val links: Links = HashMap()
+    var at = pos[0]
+    try {
+        for (f in pos.drop(1)) { at = f; readLinks(File(f).readText(), links) }
+        at = pos[0]
+        File(out).writeBytes(link(File(at).readBytes(), links))
+    } catch (e: LinkError) {
+        System.err.println("error: $at: ${e.message}"); exitProcess(1)
+    } catch (e: java.io.IOException) {
+        System.err.println("error: ${e.message}"); exitProcess(1)
+    }
+}
+
 fun main(args: Array<String>) {
+    if (args.firstOrNull() == "link") return linkCommand(args.drop(1))
     val pos = mutableListOf<String>()
     var pkg = "workers"
     var appPkg = "app"
