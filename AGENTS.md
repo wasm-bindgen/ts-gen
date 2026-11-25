@@ -110,7 +110,8 @@ older toolchain via `rust-toolchain.toml`. CI uses the same.
 
 Three layers:
 
-1. **Unit tests** (`cargo test --lib`) — focused, white-box checks of
+1. **Unit tests** (`cargo test --lib -p ts-gen -p ts-gen-wasm-bindgen`) —
+   focused, white-box checks of
    internal helpers (parse logic, naming, subtyping LUB, signature
    expansion). New behaviour should ship with unit tests in the
    relevant module's `#[cfg(test)] mod tests`.
@@ -120,7 +121,7 @@ Three layers:
    configuration in `wasm-bindgen/tests/snapshot.rs` (`default`, and `mono` for
    `--experimental-generic-mono --fallible`) into `tests/snapshots/<name>/`.
    Re-bless
-   with `BLESS=1 cargo test`. Snapshot
+   with `just test-overwrite` (`BLESS=1 cargo test -p ts-gen-wasm-bindgen`). Snapshot
    diffs in PRs should match documented convention changes — silently
    diff-only PRs are a smell.
 3. **Integration tests** (`integration-tests/`) — actual wasm-bindgen

@@ -155,14 +155,14 @@ takes the same flags without the `--`.
 #### Library
 
 ```sh
-cargo add ts-gen-wasm-bindgen
+cargo add ts-gen-wasm-bindgen --no-default-features
 cargo add ts-gen --no-default-features
 ```
 
 `ts-gen` holds the parser and `ts-gen-wasm-bindgen` the Rust generator. The
-`cli` feature of `ts-gen` (enabled by default) pulls in `clap` and the
-bridge generator for the binary. Disable it if you only need the library
-API.
+`cli` feature of each (enabled by default) pulls in `clap`, and for `ts-gen`
+the bridge generator, for its binary. Disable it if you only need the
+library API.
 
 ### Usage
 

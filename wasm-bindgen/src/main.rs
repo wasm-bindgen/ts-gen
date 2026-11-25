@@ -165,6 +165,46 @@ struct Cli {
     /// `undefined` for it. Every target reads the IR this produces.
     #[arg(long = "strict-nullable")]
     strict_nullable: bool,
+
+    #[command(flatten)]
+    ir: IrOptions,
+}
+
+/// The options of the IR outputs. `ts-gen` passes a generator every
+/// `.d.ts` option it was given, so these are read in order to say that
+/// they don't apply here.
+#[derive(clap::Args, Debug)]
+struct IrOptions {
+    #[arg(long, hide = true)]
+    provides: Option<String>,
+    #[arg(long, hide = true, num_args = 1..)]
+    once: Vec<String>,
+    #[arg(long = "no-cancel", hide = true)]
+    no_cancel: bool,
+    #[arg(long, hide = true, num_args = 1..)]
+    bound: Vec<String>,
+    #[arg(long = "with", hide = true, num_args = 1..)]
+    with: Vec<String>,
+    #[arg(long = "emit-lib", hide = true)]
+    emit_lib: Option<String>,
+    #[arg(long, hide = true, num_args = 1..)]
+    root: Vec<String>,
+}
+
+impl IrOptions {
+    fn given(&self) -> Option<&'static str> {
+        [
+            ("--provides", self.provides.is_some()),
+            ("--once", !self.once.is_empty()),
+            ("--no-cancel", self.no_cancel),
+            ("--bound", !self.bound.is_empty()),
+            ("--with", !self.with.is_empty()),
+            ("--emit-lib", self.emit_lib.is_some()),
+            ("--root", !self.root.is_empty()),
+        ]
+        .into_iter()
+        .find_map(|(flag, given)| given.then_some(flag))
+    }
 }
 
 #[derive(Clone, Copy, Debug, clap::ValueEnum)]
@@ -196,6 +236,10 @@ fn main() -> Result<()> {
             "ts-gen-wasm-bindgen reads .d.ts files, not the IR ({})",
             ir.display()
         );
+    }
+
+    if let Some(flag) = cli.ir.given() {
+        bail!("{flag} shapes the IR (--ir, --json, --bridge) and doesn't apply to Rust bindings");
     }
 
     // Resolve input files

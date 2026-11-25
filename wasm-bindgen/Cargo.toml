@@ -8,16 +8,21 @@ name = "ts-gen-wasm-bindgen"
 repository = "https://github.com/wasm-bindgen/ts-gen"
 version = "0.1.0"
 
+[features]
+cli = ["dep:clap"]
+default = ["cli"]
+
 [[bin]]
 name = "ts-gen-wasm-bindgen"
 path = "src/main.rs"
+required-features = ["cli"]
 
 [lib]
 path = "src/lib.rs"
 
 [dependencies]
 anyhow = "1"
-clap = { version = "4", features = ["derive"] }
+clap = { version = "4", features = ["derive"], optional = true }
 indexmap = "2"
 prettyplease = "0.2"
 proc-macro2 = "1"

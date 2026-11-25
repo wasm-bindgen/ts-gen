@@ -13,7 +13,7 @@ resolver = "2"
 
 [workspace.dependencies]
 ts-gen = { path = ".", version = "0.1.0", default-features = false }
-ts-gen-wasm-bindgen = { path = "wasm-bindgen", version = "0.1.0" }
+ts-gen-wasm-bindgen = { path = "wasm-bindgen", version = "0.1.0", default-features = false }
 
 # wasm-bindgen ecosystem — used by integration-tests.
 # Companion crates version independently but in lockstep with wasm-bindgen:
