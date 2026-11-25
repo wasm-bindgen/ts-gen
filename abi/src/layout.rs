@@ -1961,6 +1961,17 @@ impl<'a> Layouts<'a> {
         })
     }
 
+    /// `("tw:future", "suspend_race")`: `(W(arr<Any>)) -> i32` (§16), the
+    /// list's elements the futures as they are.
+    pub fn future_race(&self, cx: &Context<'_>) -> Result<Signature> {
+        let r = self.lower(&Type::Array(Box::new(Type::Any)), cx, Flow::ToJs)?;
+        Ok(Signature {
+            params: vec![self.position(Pos::Param(0), r)?],
+            results: vec![self.fixed(Pos::Result, "i32", Kind::Scalar(Scalar::I32))?],
+            throws: None,
+        })
+    }
+
     /// `("tw:future", "resolve<T>")`: `(externref, W(T))` (§16).
     pub fn future_resolve(&self, t: &Type, cx: &Context<'_>) -> Result<Signature> {
         let r = self.lower(t, cx, Flow::ToJs)?;
@@ -2080,6 +2091,7 @@ impl<'a> Layouts<'a> {
             (Some(tw::UNIT | tw::TRUE | tw::FALSE), "") => f(vec![], vec![EXTERNREF]),
             (Some(tw::FUTURE), "poll") => f(vec![EXTERNREF, I32], vec![I32]),
             (Some(tw::FUTURE), "drop") => f(vec![EXTERNREF], vec![]),
+            (Some(tw::FUTURE), "suspend") if self.profile.jspi => f(vec![EXTERNREF], vec![I32]),
             (Some(tw::FUTURE), "new") => f(vec![], vec![EXTERNREF, EXTERNREF]),
             (Some(tw::LOOP), "work_available" | "drop") => f(vec![I32], vec![]),
             (None, tw::REALLOC) => {

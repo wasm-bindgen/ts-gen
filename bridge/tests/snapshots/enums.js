@@ -434,6 +434,8 @@ class $Future {
     this.cancel = cancel;
     this.dropped = false;
     this.taken = false;
+    // The suspensions parked on it (§16).
+    this.parked = null;
     promise.then(
       (v) => {
         if (this.dropped) return;
@@ -457,11 +459,21 @@ class $Future {
     const w = this.waker;
     this.waker = -1;
     if (w !== -1) $wake(w);
+    $unpark(this, state);
   }
 }
 
 function $future(v, check, cancel) {
   return v instanceof $Future ? v : new $Future(Promise.resolve(v), check, cancel ?? null);
+}
+
+// Dropping cancels: the cancel function runs once, its failure swallowed,
+// and a later settlement is ignored.
+// Resumes the suspensions parked on future `f` with `state`.
+function $unpark(f, state) {
+  const ps = f.parked;
+  f.parked = null;
+  if (ps) for (const w of ps) w(state);
 }
 
 

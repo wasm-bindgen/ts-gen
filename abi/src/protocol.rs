@@ -183,6 +183,17 @@ pub fn future_drop() -> Import {
     Import::new(FUTURE, "drop")
 }
 
+/// `(externref f) -> i32`, under `jspi = on`: suspends until `f` settles.
+pub fn future_suspend() -> Import {
+    Import::new(FUTURE, "suspend")
+}
+
+/// `(W(arr<Any>)) -> i32`, under `jspi = on`: suspends until one of the
+/// futures settles.
+pub fn future_suspend_race() -> Import {
+    Import::new(FUTURE, "suspend_race")
+}
+
 pub fn future_new() -> Import {
     Import::new(FUTURE, "new")
 }

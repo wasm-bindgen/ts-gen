@@ -39,6 +39,21 @@ pub struct ExportClass<'a> {
     pub class: &'a Class,
 }
 
+/// Whether the bridge calls an entry through `WebAssembly.promising`:
+/// under JSPI, one returning a future (§16).
+pub(crate) fn promising(l: &ts_gen_abi::layout::Layouts<'_>, sig: &Signature) -> bool {
+    l.profile.jspi
+        && sig.results.first().is_some_and(|r| {
+            matches!(
+                r.repr.kind,
+                Kind::Host {
+                    of: Host::Future { .. },
+                    ..
+                }
+            )
+        })
+}
+
 impl<'a, 'b> Glue<'a, 'b> {
     /// The language export `key` reached through `$E[i]`.
     pub(crate) fn entry(&mut self, key: &str, sig: &Signature) -> usize {

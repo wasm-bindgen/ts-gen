@@ -59,6 +59,10 @@ fn settings_override_the_preset() {
     assert_eq!(p.eh, Eh::Legacy);
     assert!(!p.validation && p.termination_flag && !p.finalizers);
     assert_eq!(p.name("tw:terminated"), "__instance_terminated");
+    assert!(!p.jspi);
+    let p = Profile::parse("all-linear, jspi = on").unwrap();
+    assert!(p.jspi);
+    assert_eq!(Profile::parse(&p.to_string()).unwrap(), p);
 }
 
 #[test]

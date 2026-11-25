@@ -728,6 +728,9 @@ fixtures! {
     erased_futures => "erased-futures",
     erased_futures_gc => "erased-futures-gc",
     factory => "factory",
+    jspi => "jspi",
+    jspi_gc => "jspi-gc",
+    jspi_terminated => "jspi-terminated",
     rest_callbacks => "rest-callbacks",
     never => "never",
     constructor_values => "constructor-values",
@@ -768,6 +771,31 @@ fn termination_flag_needs_its_global() {
         &lang("(global (export \"tw:terminated\") (mut i32) (i32.const 0))"),
     );
     assert!(r.is_ok(), "{:?}", r.err().map(|e| e.to_string()));
+}
+
+#[test]
+fn suspend_needs_jspi() {
+    let ir = text::parse("ir 1;\nclass C { f(): u32; }").unwrap();
+    let err = |name: &str, ty: &str, p: &str| {
+        let lang = wat::parse_str(format!(
+            "(module (import \"tw:future\" \"{name}\" (func {ty})) (memory (export \"memory\") 1) (table (export \"tw:table\") 132 externref) (global (export \"tw:table/stack_base\") i32 (i32.const 1)) (global (export \"tw:table/const_base\") i32 (i32.const 128)) (global (export \"tw:table/heap_base\") i32 (i32.const 132)) (func (export \"tw:table/alloc\") (param i32) (result i32) unreachable) (func (export \"tw:table/free\") (param i32 i32)))"
+        ))
+        .unwrap();
+        match ts_gen_bridge::generate(&ir, &Profile::parse(p).unwrap(), &lang) {
+            Ok(_) => String::new(),
+            Err(e) => e.to_string(),
+        }
+    };
+    let suspend = "(param externref) (result i32)";
+    let race = "(param i32 i32) (result i32)";
+    assert!(
+        err("suspend", suspend, "all-linear").contains("`suspend` needs `jspi = on`"),
+        "{}",
+        err("suspend", suspend, "all-linear")
+    );
+    assert!(err("suspend_race", race, "all-linear").contains("`suspend_race` needs `jspi = on`"));
+    assert_eq!(err("suspend", suspend, "jspi = on"), "");
+    assert_eq!(err("suspend_race", race, "jspi = on"), "");
 }
 
 #[test]

@@ -35,6 +35,10 @@ pub struct Wat<'a, 'b> {
     /// The function types of the language exports reached through the
     /// `entries` table, by slot.
     entries: Vec<String>,
+    /// Whether it has JSPI roots or suspending wrappers (§16).
+    jspi: bool,
+    /// The promising roots, `p{k}`.
+    roots: usize,
 }
 
 /// A function under construction.
@@ -142,6 +146,8 @@ impl<'a, 'b> Wat<'a, 'b> {
             js_string: false,
             entries: Vec::new(),
             allocn: false,
+            jspi: false,
+            roots: 0,
         }
     }
 
@@ -1083,21 +1089,8 @@ impl<'a, 'b> Wat<'a, 'b> {
     /// results into scratch. JS resets scratch after reading them. Returns
     /// the table slot.
     pub fn entry(&mut self, sig: &Signature) -> Result<usize> {
-        let slot = self.entries.len();
-        let full = sig.core();
-        let lang = self.l.lang_core(&full)?;
-        let core = &lang.ty;
-        let mut ft = String::from("(func");
-        if !core.params.is_empty() {
-            let ps: Vec<String> = core.params.iter().map(|v| self.ty(v)).collect();
-            let _ = write!(ft, " (param {})", ps.join(" "));
-        }
-        if !core.results.is_empty() {
-            let rs: Vec<String> = core.results.iter().map(|v| self.ty(v)).collect();
-            let _ = write!(ft, " (result {})", rs.join(" "));
-        }
-        ft.push(')');
-        self.entries.push(ft);
+        let lang = self.l.lang_core(&sig.core())?;
+        let slot = self.entry_slot(&lang.ty);
         let mut fb = Fb::new();
         let mut args = Vec::new();
         for p in &sig.params {
@@ -1131,7 +1124,7 @@ impl<'a, 'b> Wat<'a, 'b> {
                         t => format!("({t}.const 0)"),
                     })
                     .collect();
-                let s0 = self.ty(&core.results[0]);
+                let s0 = self.ty(&lang.ty.results[0]);
                 let s0 = fb.local(s0);
                 fb.op(format!("local.set {s0}"));
                 fb.op(format!(
@@ -1173,6 +1166,173 @@ impl<'a, 'b> Wat<'a, 'b> {
         self.funcs
             .push(fb.finish(&format!("$e{slot} (export \"e{slot}\")")));
         Ok(slot)
+    }
+
+    /// A slot in the `entries` table for a language export of type `core`.
+    pub fn entry_slot(&mut self, core: &FuncType) -> usize {
+        let mut ft = String::from("(func");
+        if !core.params.is_empty() {
+            let ps: Vec<String> = core.params.iter().map(|v| self.ty(v)).collect();
+            let _ = write!(ft, " (param {})", ps.join(" "));
+        }
+        if !core.results.is_empty() {
+            let rs: Vec<String> = core.results.iter().map(|v| self.ty(v)).collect();
+            let _ = write!(ft, " (result {})", rs.join(" "));
+        }
+        ft.push(')');
+        self.entries.push(ft);
+        self.entries.len() - 1
+    }
+
+    fn use_jspi(&mut self) {
+        if self.jspi {
+            return;
+        }
+        self.jspi = true;
+        self.imports.push(format!(
+            "  (import \"{GLUE}\" \"wait\" (func $wait (result i32)))"
+        ));
+        self.imports.push(format!(
+            "  (import \"{GLUE}\" \"stash\" (func $stash (param i32 i32 i32 i32) (result externref)))"
+        ));
+        self.imports.push(format!(
+            "  (import \"{GLUE}\" \"unstash\" (func $unstash (param externref)))"
+        ));
+    }
+
+    /// The suspending `tw:future` import `export` (§16): `prep`, of type
+    /// `ty`, returns the result, or `PARKED` once it has parked the
+    /// suspension, and then the wrapper suspends in `$parked`. `prep` is a
+    /// glue import, or with `local` a bridge function already.
+    pub fn suspender(&mut self, export: &str, prep: &str, local: bool, ty: &FuncType) {
+        self.use_jspi();
+        let ps: Vec<String> = ty.params.iter().map(|v| self.ty(v)).collect();
+        if !local {
+            let mut imp = format!("  (import \"{GLUE}\" \"{prep}\" (func ${prep}");
+            if !ps.is_empty() {
+                let _ = write!(imp, " (param {})", ps.join(" "));
+            }
+            imp.push_str(" (result i32)))");
+            self.imports.push(imp);
+        }
+        let mut fb = Fb::new();
+        let args: String = ps
+            .into_iter()
+            .map(|t| format!(" (local.get {})", fb.param(t)))
+            .collect();
+        fb.results = vec!["i32".into()];
+        let r = fb.local("i32");
+        fb.op(format!("(local.set {r} (call ${prep}{args}))"));
+        fb.op(format!(
+            "(if (i32.eq (local.get {r}) (i32.const {PARKED})) (then (local.set {r} (call $parked))))"
+        ));
+        fb.op(format!("local.get {r}"));
+        self.funcs
+            .push(fb.finish(&format!("${export} (export \"{export}\")")));
+    }
+
+    /// The root of a call through `WebAssembly.promising` (§16), `p{k}`:
+    /// it records the scratch base the stack's suspensions keep, drains the
+    /// spill and a pending `throws = js` error itself, since the JS call
+    /// returns at the first suspension, and empties scratch on the way out
+    /// of a stack that suspended, which then runs alone from the event
+    /// loop. It calls the GC entry `e{gc}`, or else the language export in
+    /// `entries` slot `slot` directly. Returns `k`.
+    pub fn root(&mut self, sig: &Signature, gc: Option<usize>, slot: usize) -> Result<usize> {
+        self.use_jspi();
+        let k = self.roots;
+        self.roots += 1;
+        let mut fb = Fb::new();
+        let (ins, outs): (Vec<String>, Vec<String>) = if gc.is_some() {
+            let mut ins = Vec::new();
+            for p in &sig.params {
+                ins.extend(self.f.jsw(&p.repr)?.iter().map(|j| j.wat().to_string()));
+            }
+            let mut outs = Vec::new();
+            for r in &sig.results {
+                outs.extend(self.f.jsw(&r.repr)?.iter().map(|j| j.wat().to_string()));
+            }
+            (ins, outs)
+        } else {
+            let core = self.l.lang_core(&sig.core())?.ty;
+            (
+                core.params.iter().map(|v| self.ty(v)).collect(),
+                core.results.iter().map(|v| self.ty(v)).collect(),
+            )
+        };
+        let args: String = ins
+            .into_iter()
+            .map(|t| format!(" (local.get {})", fb.param(t)))
+            .collect();
+        let call = match gc {
+            Some(n) => format!("(call $e{n}{args})"),
+            None => format!("(call_indirect $entries (type $ft{slot}){args} (i32.const {slot}))"),
+        };
+        let rs: Vec<String> = outs.iter().map(|t| fb.local(t.clone())).collect();
+        fb.results = outs;
+        let single = self.l.profile.results == Results::Single;
+        let pending = self.l.profile.throws == Throws::Js && sig.throws.is_some();
+        fb.op("(global.set $base (call $sp))");
+        fb.op("(global.set $tbase (call $tsp))");
+        fb.op("(global.set $suspended (i32.const 0))");
+        if single {
+            fb.op("(call $spill_check)");
+        }
+        if pending {
+            fb.op("(global.set $pending (i32.const 0))");
+        }
+        let mut body = vec![call];
+        for r in rs.iter().rev() {
+            body.push(format!("local.set {r}"));
+        }
+        let leave = if single {
+            "(call $leave) (call $spill_reset)"
+        } else {
+            "(call $leave)"
+        };
+        match self.l.profile.eh {
+            Eh::Modern => {
+                let exn = fb.local("exnref");
+                fb.op("(block $done");
+                fb.op(format!(
+                    "(local.set {exn} (block $catch (result exnref) (try_table (catch_all_ref $catch)"
+                ));
+                fb.code.extend(body.into_iter().map(|c| format!("  {c}")));
+                fb.op(") (br $done)))");
+                fb.op(leave);
+                fb.op(format!("(throw_ref (local.get {exn})))"));
+            }
+            Eh::Legacy => {
+                fb.op("try");
+                fb.code.extend(body.into_iter().map(|c| format!("  {c}")));
+                fb.op("catch_all");
+                fb.op(format!("  {leave}"));
+                fb.op("  rethrow 0");
+                fb.op("end");
+            }
+        }
+        fb.op("(call $leave)");
+        if pending {
+            if !self.memo.contains_key("throw_pending") {
+                self.memo.insert("throw_pending".into(), String::new());
+                self.imports.push(format!(
+                    "  (import \"{GLUE}\" \"throw_pending\" (func $throw_pending))"
+                ));
+            }
+            let reset = if single { " (call $spill_reset)" } else { "" };
+            fb.op(format!(
+                "(if (global.get $pending) (then (global.set $pending (i32.const 0)){reset} (call $throw_pending)))"
+            ));
+        }
+        if single {
+            fb.op("(call $spill_check)");
+        }
+        for r in rs {
+            fb.op(format!("local.get {r}"));
+        }
+        self.funcs
+            .push(fb.finish(&format!("$p{k} (export \"p{k}\")")));
+        Ok(k)
     }
 
     /// The conversions of a GC value held externalized in the language's
@@ -1355,6 +1515,9 @@ impl<'a, 'b> Wat<'a, 'b> {
         if self.allocn {
             s.push_str(ALLOCN);
         }
+        if self.jspi {
+            s.push_str(&JSPI.replace("{SP}", &(hdr + 8 + RET_AREA).to_string()));
+        }
         if !self.entries.is_empty() {
             let _ = writeln!(
                 s,
@@ -1444,6 +1607,42 @@ const RUNTIME: &str = r#"  (memory $m (export "memory") 1)
     (table.fill $st (local.get $tsp) (ref.null extern) (i32.sub (call $tsp) (local.get $tsp)))
     (call $set_tsp (local.get $tsp))
     (call $set_sp (local.get $sp)))
+"#;
+
+/// A `tw:future` suspension's result while it's parked (§16).
+pub(crate) const PARKED: i32 = i32::MIN;
+
+/// JSPI (§16). `base` and `tbase` are the scratch the running promising
+/// call found at its root: a suspension stashes what's live above them in
+/// JS, empties scratch to them, and puts it all back once resumed, since
+/// other calls run on scratch while it's parked. `suspended` makes a root
+/// whose stack suspended empty scratch on its way out. JS restores all
+/// three around a promising call, which returns at its first suspension
+/// to whatever was running.
+const JSPI: &str = r#"  (global $base (export "base") (mut i32) (i32.const 0))
+  (global $tbase (export "tbase") (mut i32) (i32.const 0))
+  (global $suspended (export "suspended") (mut i32) (i32.const 0))
+  (func $parked (result i32)
+    (local $b i32) (local $tb i32) (local $sp i32) (local $tsp i32) (local $k externref) (local $r i32)
+    (local.set $b (global.get $base))
+    (local.set $tb (global.get $tbase))
+    (local.set $sp (call $sp))
+    (local.set $tsp (call $tsp))
+    (if (i32.or (i32.ne (local.get $sp) (local.get $b)) (i32.ne (local.get $tsp) (local.get $tb)))
+      (then
+        (local.set $k (call $stash (local.get $b) (local.get $sp) (local.get $tb) (local.get $tsp)))
+        (call $restore (local.get $b) (local.get $tb))))
+    (local.set $r (call $wait))
+    (if (i32.eqz (ref.is_null (local.get $k))) (then (call $unstash (local.get $k))))
+    (call $set_sp (local.get $sp))
+    (call $set_tsp (local.get $tsp))
+    (global.set $base (local.get $b))
+    (global.set $tbase (local.get $tb))
+    (global.set $suspended (i32.const 1))
+    (local.get $r))
+  (func $leave
+    (if (global.get $suspended)
+      (then (call $restore (i32.const {SP}) (i32.const 0)) (global.set $suspended (i32.const 0)))))
 "#;
 
 /// `allocn(q, n)`: `n` language allocations in one call, from the sizes

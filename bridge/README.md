@@ -94,7 +94,8 @@ Two diagnostics are exported for tests:
 The glue targets the current Wasm platform: WasmGC, exception handling with
 `exnref` (or the legacy instructions under `eh = legacy`), JS string
 builtins (`wasm:js-string`), memory64 for 64-bit profiles, and
-`FinalizationRegistry`. Node 26 has all of them, as does workerd.
+`FinalizationRegistry`, plus JSPI under `jspi = on`. Node 26 has all of
+them, as does workerd.
 
 ## Testing
 

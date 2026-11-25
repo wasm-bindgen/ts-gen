@@ -2067,6 +2067,14 @@ impl<'a, 'b> Glue<'a, 'b> {
                 b.line("return $poll(f, w);");
                 return Ok(b.finish(&format!("function {name}(f, w)")));
             }
+            Op::Suspend => {
+                b.line("return $suspend(f);");
+                return Ok(b.finish(&format!("function {name}(f)")));
+            }
+            Op::SuspendRace => {
+                let v = self.lift(&func.sig.params[0].repr, &wires[0])?;
+                b.line(format!("return $suspendRace({v});"));
+            }
             Op::FutureDrop => {
                 b.line("$dropFuture(f);");
                 return Ok(b.finish(&format!("function {name}(f)")));
