@@ -33,3 +33,11 @@ interface NoErasure {
 
 /** The awaited value is a top-level return: the enum is synthesised. */
 declare function fetchValue(): Promise<32 | "foo">;
+
+interface Lookup {
+  /** A result admitting `null` keeps the enum, inside its carrier. */
+  find(name: string): (string | ArrayBuffer) | null;
+}
+
+/** As does an awaited one. */
+declare function fetchMaybe(): Promise<32 | "foo" | undefined>;

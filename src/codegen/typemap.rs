@@ -3574,7 +3574,7 @@ fn return_value(
         return tokens;
     }
     let read = resolve_union_aliases(ty, ctx, scope);
-    maybe_synthesise_return_union(&read, ctx, scope, from_module, anchor)
+    synthesised_read(&read, ctx, scope, from_module, anchor)
         .unwrap_or_else(|| to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module))
 }
 
@@ -3943,19 +3943,25 @@ pub fn to_getter_return_type(
         return tokens;
     }
     let read = resolve_union_aliases(ty, ctx, scope);
-    if let Some(tokens) = maybe_synthesise_return_union(&read, ctx, scope, from_module, anchor) {
-        return tokens;
+    synthesised_read(&read, ctx, scope, from_module, anchor)
+        .unwrap_or_else(|| to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module))
+}
+
+/// The enum a read union synthesises. One admitting empties synthesises it
+/// for its other members, wrapped in its carrier.
+fn synthesised_read(
+    read: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+    anchor: ReturnAnchor<'_>,
+) -> Option<TokenStream> {
+    if let Some(tokens) = maybe_synthesise_return_union(read, ctx, scope, from_module, anchor) {
+        return Some(tokens);
     }
-    // A union admitting empties still synthesises the enum for its other
-    // members, wrapped in its carrier.
-    if let Some((core, n)) = read.split_empties() {
-        if let Some(inner_tokens) =
-            maybe_synthesise_return_union(&core, ctx, scope, from_module, anchor)
-        {
-            return read_carrier(inner_tokens, n);
-        }
-    }
-    to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module)
+    let (core, n) = read.split_empties()?;
+    let inner = maybe_synthesise_return_union(&core, ctx, scope, from_module, anchor)?;
+    Some(read_carrier(inner, n))
 }
 
 /// Whether `ty` is `any` or `unknown`, through aliases.
