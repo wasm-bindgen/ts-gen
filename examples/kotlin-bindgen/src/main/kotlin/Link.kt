@@ -54,7 +54,7 @@ private class Reader(val b: ByteArray) {
 
     fun name(): String {
         val n = u32()
-        if (at + n > b.size) throw LinkError("the module ends early")
+        if (n > b.size - at) throw LinkError("the module ends early")
         return String(b, at, n, Charsets.UTF_8).also { at += n }
     }
 
@@ -120,8 +120,8 @@ fun link(wasm: ByteArray, links: Map<Pair<String, String>, Pair<String, String>>
         val start = r.at
         val id = r.byte()
         val size = r.u32()
+        if (size > wasm.size - r.at) throw LinkError("the module ends early")
         val end = r.at + size
-        if (end > wasm.size) throw LinkError("the module ends early")
         if (id != 2) {
             out.write(wasm, start, end - start)
             r.at = end

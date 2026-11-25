@@ -868,6 +868,17 @@ fn kotlin_link() {
     assert!(e.contains("not a Wasm module"), "{e}");
     let e = link(&[&p("in.wasm"), &p("a.tsv")]).unwrap_err();
     assert!(e.contains("usage:"), "{e}");
+    // A section size and a name length that overflow past the end of the module.
+    for body in [
+        &[0, 0xff, 0xff, 0xff, 0xff, 0x07][..],
+        &[2, 6, 1, 0xff, 0xff, 0xff, 0xff, 0x07],
+    ] {
+        let mut cut = b"\0asm\x01\0\0\0".to_vec();
+        cut.extend_from_slice(body);
+        std::fs::write(p("cut.wasm"), cut).unwrap();
+        let e = link(&[&p("cut.wasm"), &p("a.tsv"), Path::new("-o"), &p("bad.wasm")]).unwrap_err();
+        assert!(e.contains("the module ends early"), "{e}");
+    }
 }
 
 /// A build-and-run script's stdout, with the generator built.
