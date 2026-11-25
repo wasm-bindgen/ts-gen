@@ -47,6 +47,12 @@ function $isInstance(v, C) {
   return typeof C === "function" && v instanceof C;
 }
 
+// Whether `v` is a valid value of class `C`: an instance, or any object
+// when the class has no value (§8).
+function $isValue(v, C) {
+  return C === null ? $isObject(v) : v instanceof C;
+}
+
 function $isObject(v) {
   return (typeof v === "object" && v !== null) || typeof v === "function";
 }
@@ -212,6 +218,11 @@ function $table(table, stack, constant, heap) {
   table.set(constant + 2, true);
   table.set(constant + 3, false);
   return { table, stack, constant, heap };
+}
+
+function $fn(v, what) {
+  if (typeof v !== "function") $fail(what, v);
+  return v;
 }
 
 // The cleanup stack (IR.md §15): `kind, ptr, size, align` records of the
@@ -397,10 +408,35 @@ function $h1(v) {
 }
 
 function $h2(v) {
-  if (!($isInstance(v, $cls0))) $fail("Box<T>", v);
+  if (!($isValue(v, $cls0))) $fail("Box<T>", v);
 }
 
-function $h3(e) {
+function $h3(v) {
+  if (!(typeof v === "function")) $fail("fn(T)->T", v);
+}
+
+function $h5(v) {
+  if (v === undefined) return true;
+  if (true) return true;
+  return false;
+}
+
+function $h4(v) {
+  if (!($h5(v))) $fail("T??", v);
+}
+
+function $h6(v, cx) {
+  if (v === undefined) {
+    return [1, null];
+  }
+  if (true) {
+    const t1 = (v == null ? null : $some(v, "Any?"));
+    return [2, t1];
+  }
+  $fail("Any??", v);
+}
+
+function $h7(e) {
   if ((($isInstance(e, globalThis.TypeError)) || ($isInstance(e, globalThis.RangeError)))) return [1, $message(e)];
   return [-1, $message(e)];
 }
@@ -428,13 +464,35 @@ function $f1(w0_0) {
   }
 }
 
+// ("tw:js/global", "Kv#mapper()")
+function $f2(w0_0) {
+  try {
+    const r = w0_0.mapper();
+    const t1 = $future(r, $h3);
+    return t1;
+  } catch (e) {
+    return $rejected(e);
+  }
+}
+
+// ("tw:js/global", "Kv#nested()")
+function $f3(w0_0) {
+  try {
+    const r = w0_0.nested();
+    const t1 = $future(r, $h4);
+    return t1;
+  } catch (e) {
+    return $rejected(e);
+  }
+}
+
 // ("tw:future", "poll")
-function $f2(f, w) {
+function $f4(f, w) {
   return $poll(f, w);
 }
 
 // ("tw:future", "take<Any?>")
-function $f3(w0_0) {
+function $f5(w0_0) {
   const v = $settled(w0_0, 1);
   const cx = $cx;
   const cxm = cx.n;
@@ -450,7 +508,7 @@ function $f3(w0_0) {
 }
 
 // ("tw:future", "take<Box<Any>>")
-function $f4(w0_0) {
+function $f6(w0_0) {
   const v = $settled(w0_0, 1);
   const cx = $cx;
   const cxm = cx.n;
@@ -465,20 +523,56 @@ function $f4(w0_0) {
   }
 }
 
-// ("tw:future", "error<err>")
-function $f5(w0_0) {
-  return $h3($settled(w0_0, 2));
+// ("tw:future", "take<fn(Any)->Any>")
+function $f7(w0_0) {
+  const v = $settled(w0_0, 1);
+  const cx = $cx;
+  const cxm = cx.n;
+  try {
+    const t1 = $fn(v, "fn(Any)->Any");
+    return t1;
+  } catch (e) {
+    $release(cx, cxm);
+    throw e;
+  } finally {
+    cx.n = cxm;
+  }
 }
 
-function $f5$r(a0) {
-  const r = $f5(a0);
+// ("tw:future", "take<Any??>")
+function $f8(w0_0) {
+  const v = $settled(w0_0, 1);
+  const cx = $cx;
+  const cxm = cx.n;
+  try {
+    const t1 = $h6(v, null);
+    const t2 = t1[0];
+    const t3 = t1[1];
+    const ra = $ret();
+    ra.i32[0] = t2;
+    return t3;
+  } catch (e) {
+    $release(cx, cxm);
+    throw e;
+  } finally {
+    cx.n = cxm;
+  }
+}
+
+// ("tw:future", "error<err>")
+function $f9(w0_0) {
+  return $h7($settled(w0_0, 2));
+}
+
+function $f9$r(a0) {
+  const r = $f9(a0);
   const ra = $ret();
   ra.i32[0] = r[0];
   return r[1];
 }
 
 // ("tw:future", "drop")
-function $f6(f) {
+function $f10(f) {
   $dropFuture(f);
 }
 
@@ -486,7 +580,7 @@ export function instantiate(language, bridge, imports = {}) {
   if ($B) throw new Error("this bridge is already instantiated");
   $cls0 = $class(globalThis.Box);
   $B = new WebAssembly.Instance(bridge, {
-    "tw:glue": { r5: $f5$r },
+    "tw:glue": { r8: $f8, r9: $f9$r },
   }).exports;
   $S = new $Scratch($B);
   const instance = new WebAssembly.Instance(language, {
@@ -494,13 +588,17 @@ export function instantiate(language, bridge, imports = {}) {
     "tw:js/global": {
       "Kv#get(str)": $f0,
       "Kv#boxed()": $f1,
+      "Kv#mapper()": $f2,
+      "Kv#nested()": $f3,
     },
     "tw:future": {
-      "poll": $f2,
-      "take<Any?>": $f3,
-      "take<Box<Any>>": $f4,
-      "error<err>": $B.f5,
-      "drop": $f6,
+      "poll": $f4,
+      "take<Any?>": $f5,
+      "take<Box<Any>>": $f6,
+      "take<fn(Any)->Any>": $f7,
+      "take<Any??>": $B.f8,
+      "error<err>": $B.f9,
+      "drop": $f10,
     },
   });
   $X = instance.exports;

@@ -7,4 +7,6 @@ class Box<T> {}
 class Kv {
   get<T>(key: str): future<T?>;
   boxed<T>(): future<Box<T>>;
+  mapper<T>(): future<fn(T) -> T>;
+  nested<T>(): future<T??>;
 }

@@ -238,6 +238,20 @@ fn erased_future_ops() {
     assert!(!out.contains("take<arr<V>>"), "{out}");
     // A type parameter shadowing a declaration is erased too.
     assert!(!out.contains("take<Box?>"), "{out}");
+    // A function type's and a nested optional's type parameters are
+    // erased too.
+    let ir2 = text::parse(
+        "ir 1;\n\nclass Kv {\n  call<T>(): future<fn(T) -> T>;\n  nested<T>(): future<T??>;\n}\n",
+    )
+    .unwrap();
+    let out2 = json::lower(&ir2, &Profile::all_linear()).pretty();
+    check(&out2);
+    for name in ["take<fn(Any)->Any>", "take<Any??>"] {
+        assert!(
+            out2.contains(&format!("\"name\": \"{name}\"")),
+            "{name}:\n{out2}"
+        );
+    }
     // Under GC handles the erased value is `anyref`, and its operations
     // keep the erasure's name and `externref` wire (§16).
     let gc = json::lower(&ir, &Profile::parse("handles = gc").unwrap()).pretty();

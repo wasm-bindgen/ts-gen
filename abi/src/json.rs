@@ -844,6 +844,16 @@ fn type_params(r: &Repr, out: &mut Vec<String>) {
         Kind::Erased { .. } => out.push(r.ty.trim_end_matches('?').into()),
         Kind::Array { elem, .. } => type_params(elem, out),
         Kind::Tuple { elems, .. } => elems.iter().for_each(|e| type_params(e, out)),
+        Kind::Fn { sig, .. } => {
+            sig.params.iter().for_each(|p| type_params(p, out));
+            type_params(&sig.result, out);
+        }
+        // A `T??` is spelled by its value. A declared enum is its path.
+        Kind::Enum { layout, .. } if layout.origin == Origin::Nested => layout
+            .arms
+            .iter()
+            .flat_map(|a| &a.payload)
+            .for_each(|p| type_params(p, out)),
         Kind::Host { of, .. } => match of {
             Host::Class { args, .. } => args.iter().for_each(|a| arg_params(a, out)),
             Host::Box(inner) => type_params(inner, out),
