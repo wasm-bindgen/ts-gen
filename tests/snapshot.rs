@@ -551,7 +551,7 @@ fn ir_and_output_report_a_warning_once() {
         .arg("--input")
         .arg(&fixture)
         .arg("--ir")
-        .arg(out_dir.0.join("bindings.ir"))
+        .arg(out_dir.0.join("bindings.tw"))
         .arg("--output")
         .arg(out_dir.0.join("bindings.rs"))
         .output()

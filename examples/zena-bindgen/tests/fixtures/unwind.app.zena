@@ -1,4 +1,4 @@
-// The app behind tests/fixtures/unwind.ir's exports: where a JS
+// The app behind tests/fixtures/unwind.tw's exports: where a JS
 // exception meets Zena.
 import { Future } from 'zena:async';
 import { boom, later, typed } from './unwind.zena';

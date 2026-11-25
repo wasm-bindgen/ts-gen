@@ -1,4 +1,4 @@
-//! `ts-gen-abi lower <file.ir> [--profile <profile>] [--with <lib.ir>]...`:
+//! `ts-gen-abi lower <file.tw> [--profile <profile>] [--with <lib.tw>]...`:
 //! the lowered IR as JSON on stdout ([`ts_gen_abi::json`]). `<profile>` is a
 //! file holding the profile text form, or the text itself (`all-host`).
 //! `--with` supplies the lib IRs its `with` names (§5).
@@ -9,7 +9,7 @@ use ts_gen_abi::profile::Profile;
 use ts_gen_abi::{json, resolve, text, validate};
 
 const USAGE: &str =
-    "usage: ts-gen-abi lower <file.ir> [--profile <file or text>] [--with <lib.ir>]...";
+    "usage: ts-gen-abi lower <file.tw> [--profile <file or text>] [--with <lib.tw>]...";
 
 fn run(args: &[String]) -> Result<String, String> {
     let (cmd, rest) = args.split_first().ok_or(USAGE)?;

@@ -14,7 +14,7 @@ B="$EX/build"
 OUT="$EX/out"
 KOUT="$B/compileSync/wasmJs/main/productionExecutable/kotlin"
 BIN="$ROOT/target/debug"
-STD="$ROOT/std/std.ir"
+STD="$ROOT/std/std.tw"
 PROFILE="all-host, results = single, throws = js"
 KOTLIN="$ROOT/examples/kotlin-bindgen/build/install/kotlin-bindgen/bin/kotlin-bindgen"
 
@@ -24,15 +24,15 @@ mkdir -p "$B"
 
 # 1. The IR: workers-types and the bindings of env.d.ts, with the ABI
 #    choices of annotate.d.ts, the JS standard library resolved against
-#    std.ir, and what the module provides (provides.d.ts).
+#    std.tw, and what the module provides (provides.d.ts).
 "$BIN/ts-gen" -i "$ROOT/tests/fixtures/workers-types.d.ts" -i "$EX/env.d.ts" \
   --annotate "$EX/annotate.d.ts" --with "$STD" \
-  --provides "$EX/provides.d.ts" --ir "$B/worker.ir" 2>/dev/null
+  --provides "$EX/provides.d.ts" --ir "$B/worker.tw" 2>/dev/null
 
 # 2. The bindings: std's (with the runtime: futures and the loop), then
 #    the worker's over them.
 "$BIN/ts-gen-abi" lower "$STD" --profile "$PROFILE" > "$B/std.json"
-"$BIN/ts-gen-abi" lower "$B/worker.ir" --with "$STD" --profile "$PROFILE" > "$B/worker.json"
+"$BIN/ts-gen-abi" lower "$B/worker.tw" --with "$STD" --profile "$PROFILE" > "$B/worker.json"
 "$KOTLIN" "$B/std.json" "$B/std" --package std --runtime
 "$KOTLIN" "$B/worker.json" "$B/bindings" --package workers --app-package app --lib std=std
 
@@ -44,7 +44,7 @@ mkdir -p "$B"
 rm -rf "$OUT"
 mkdir -p "$OUT"
 "$KOTLIN" link "$KOUT/worker.wasm" "$B/std/links.tsv" "$B/bindings/links.tsv" -o "$OUT/worker.wasm"
-"$BIN/ts-gen-bridge" generate "$B/worker.ir" "$OUT/worker.wasm" --with "$STD" --profile "$PROFILE" -o "$OUT"
+"$BIN/ts-gen-bridge" generate "$B/worker.tw" "$OUT/worker.wasm" --with "$STD" --profile "$PROFILE" -o "$OUT"
 cp "$EX/loader.js" "$EX/backend.js" "$EX/config.capnp" "$EX/node.mjs" "$KOUT/worker.import-object.mjs" "$KOUT/worker.js-builtins.mjs" "$OUT/"
 echo "built $OUT"
 

@@ -1,7 +1,7 @@
 //! Producer tests: `.d.ts` → IR.
 //!
 //! Every `.d.ts` in `tests/lower/` is lowered and compared against the
-//! IR snapshot beside it (`<name>.ir`), headed by the lowering diagnostics
+//! IR snapshot beside it (`<name>.tw`), headed by the lowering diagnostics
 //! as `//` comments. Every produced IR, including one per fixture of the
 //! Rust snapshot suite, must print, read back equal, and pass strict
 //! validation.
@@ -160,7 +160,7 @@ fn snapshots() {
             .unwrap()
             .to_string_lossy()
             .replace(".d.ts", "");
-        let snapshot = fixture.with_file_name(format!("{name}.ir"));
+        let snapshot = fixture.with_file_name(format!("{name}.tw"));
         let actual = match produce(&fixture) {
             Ok(text) => text,
             Err(e) => {

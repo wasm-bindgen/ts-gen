@@ -26,7 +26,7 @@ fn run(c: &mut Command) -> Result<(), String> {
 #[test]
 fn generates() {
     let d = scratch("cli");
-    std::fs::write(d.join("api.ir"), "ir 1;\nclass C { f(): (u32, str); }\n").unwrap();
+    std::fs::write(d.join("api.tw"), "ir 1;\nclass C { f(): (u32, str); }\n").unwrap();
     std::fs::write(
         d.join("lang.wat"),
         r#"(module
@@ -37,7 +37,7 @@ fn generates() {
     let p = |f: &str| d.join(f).to_str().unwrap().to_string();
     run(bin().args([
         "generate",
-        &p("api.ir"),
+        &p("api.tw"),
         &p("lang.wat"),
         "-o",
         &p("out"),
@@ -55,7 +55,7 @@ fn generates() {
     // A profile mismatch is reported with the import.
     let e = run(bin().args([
         "generate",
-        &p("api.ir"),
+        &p("api.tw"),
         &p("lang.wat"),
         "-o",
         &p("bad"),
@@ -67,6 +67,6 @@ fn generates() {
         e.contains("(\"tw:js/global\", \"C#f()\"): the language declares (i32)"),
         "{e}"
     );
-    let e = run(bin().args(["generate", &p("api.ir")])).unwrap_err();
+    let e = run(bin().args(["generate", &p("api.tw")])).unwrap_err();
     assert!(e.contains("usage:"), "{e}");
 }

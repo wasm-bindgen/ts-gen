@@ -1,7 +1,7 @@
 //! `ts-gen-bridge`: the bridge generator, for languages built outside Rust.
 //!
 //! ```sh
-//! ts-gen-bridge generate <file.ir> <language.wasm> -o <dir> [--profile <profile>] [--with <lib.ir>]... [--wat] [--factory]
+//! ts-gen-bridge generate <file.tw> <language.wasm> -o <dir> [--profile <profile>] [--with <lib.tw>]... [--wat] [--factory]
 //! ```
 //!
 //! `generate` writes `<dir>/bridge.js` and `<dir>/bridge.wasm` for the
@@ -15,7 +15,7 @@ use std::process::ExitCode;
 use ts_gen_abi::profile::Profile;
 use ts_gen_abi::text;
 
-const USAGE: &str = "usage: ts-gen-bridge generate <file.ir> <language.wasm> -o <dir> [--profile <profile>] [--with <lib.ir>]... [--wat] [--factory]";
+const USAGE: &str = "usage: ts-gen-bridge generate <file.tw> <language.wasm> -o <dir> [--profile <profile>] [--with <lib.tw>]... [--wat] [--factory]";
 
 fn read(p: &str) -> Result<Vec<u8>, String> {
     std::fs::read(p).map_err(|e| format!("{p}: {e}"))

@@ -1,4 +1,4 @@
-// Runs tests/fixtures/unwind.ir's exports, printing how each ends. An
+// Runs tests/fixtures/unwind.tw's exports, printing how each ends. An
 // export still pending after its wait prints `pending`.
 import { readFile } from 'node:fs/promises';
 

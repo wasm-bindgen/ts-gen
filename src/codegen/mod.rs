@@ -375,11 +375,11 @@ fn rustfmt(code: &str) -> anyhow::Result<String> {
     }
 }
 
-/// `std/std.ir`, the JS standard library as a lib IR.
+/// `std/std.tw`, the JS standard library as a lib IR.
 fn std_ir() -> &'static ts_gen_abi::ir::Ir {
     static STD: std::sync::OnceLock<ts_gen_abi::ir::Ir> = std::sync::OnceLock::new();
     STD.get_or_init(|| {
-        ts_gen_abi::text::parse(include_str!("../../std/std.ir")).expect("std/std.ir parses")
+        ts_gen_abi::text::parse(include_str!("../../std/std.tw")).expect("std/std.tw parses")
     })
 }
 

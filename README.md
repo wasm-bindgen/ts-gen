@@ -13,8 +13,8 @@ language can bind against.
 
 ```text
 .d.ts -ts-gen-------> Rust (#[wasm_bindgen])
-.d.ts -ts-gen --ir--> app.ir -ts-gen-abi lower-> JSON -> Kotlin / Zena bindings -> app.wasm
-                      app.ir + app.wasm -ts-gen-bridge-> bridge.js + bridge.wasm
+.d.ts -ts-gen --ir--> app.tw -ts-gen-abi lower-> JSON -> Kotlin / Zena bindings -> app.wasm
+                      app.tw + app.wasm -ts-gen-bridge-> bridge.js + bridge.wasm
 ```
 
 ## The ts-gen IR
@@ -33,8 +33,8 @@ the profile and layout rules, and the `tw` protocol names. It lowers an IR
 to per-member wire layouts for generators that don't link it:
 
 ```sh
-ts-gen --input worker.d.ts --provides ExportedHandler.fetch --ir worker.ir
-ts-gen-abi lower worker.ir --profile "all-host, results = single, throws = js" > worker.json
+ts-gen --input worker.d.ts --provides ExportedHandler.fetch --ir worker.tw
+ts-gen-abi lower worker.tw --profile "all-host, results = single, throws = js" > worker.json
 ```
 
 `--ir` takes the producer options: `--provides`, `--once`, `--no-cancel`,
@@ -70,7 +70,7 @@ link` renames the compiled module's imports to their keys. Build the generator w
 `examples/kotlin-bindgen` (JDK 21). [examples/kotlin-bindgen/example](examples/kotlin-bindgen/example)
 runs a Worker end to end.
 
-**Zena**: `zena-bindgen <input.ir> [-o <out.zena>]` writes `@external`
+**Zena**: `zena-bindgen <input.tw> [-o <out.zena>]` writes `@external`
 declarations. They need the Zena compiler fork with the `tw` option on
 `@external`.
 

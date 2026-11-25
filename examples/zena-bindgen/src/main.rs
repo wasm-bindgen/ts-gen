@@ -23,12 +23,12 @@ fn main() -> anyhow::Result<()> {
             }
             "--with" => {
                 let (Some(ir), Some(module)) = (args.next(), args.next()) else {
-                    bail!("--with takes <lib.ir> <bindings specifier>");
+                    bail!("--with takes <lib.tw> <bindings specifier>");
                 };
                 libs.push((PathBuf::from(ir), module));
             }
             "-h" | "--help" => {
-                println!("usage: zena-bindgen <input.ir> [-o <out.zena>] [--probe] [--entry <entry.zena> <bindings> <app>] [--with <lib.ir> <lib bindings>]");
+                println!("usage: zena-bindgen <input.tw> [-o <out.zena>] [--probe] [--entry <entry.zena> <bindings> <app>] [--with <lib.tw> <lib bindings>]");
                 return Ok(());
             }
             _ if input.is_none() => input = Some(PathBuf::from(a)),
@@ -36,7 +36,7 @@ fn main() -> anyhow::Result<()> {
         }
     }
     let Some(input) = input else {
-        bail!("usage: zena-bindgen <input.ir> [-o <out.zena>] [--probe] [--entry <entry.zena> <bindings> <app>] [--with <lib.ir> <lib bindings>]");
+        bail!("usage: zena-bindgen <input.tw> [-o <out.zena>] [--probe] [--entry <entry.zena> <bindings> <app>] [--with <lib.tw> <lib bindings>]");
     };
     let src = std::fs::read_to_string(&input).with_context(|| input.display().to_string())?;
     let ir =

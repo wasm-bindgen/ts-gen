@@ -1,4 +1,4 @@
-// The app behind tests/lower/export-class.ir's exports.
+// The app behind tests/lower/export-class.tw's exports.
 import { Future } from 'zena:async';
 import { DurableObjectState, Env, Request, Response, newCounter } from './export-class.zena';
 

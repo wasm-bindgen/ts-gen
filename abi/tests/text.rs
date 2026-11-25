@@ -4,7 +4,7 @@ use ts_gen_abi::ir::*;
 use ts_gen_abi::text;
 
 fn sample() -> String {
-    let path = FsPath::new(env!("CARGO_MANIFEST_DIR")).join("testdata/sample.ir");
+    let path = FsPath::new(env!("CARGO_MANIFEST_DIR")).join("testdata/sample.tw");
     std::fs::read_to_string(path).unwrap()
 }
 

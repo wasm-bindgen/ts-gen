@@ -44,7 +44,7 @@ interface QueueResult {
   readonly outcome: string;
 }
 
-// The JSON global, which neither workers-types nor std.ir declares.
+// The JSON global, which neither workers-types nor std.tw declares.
 declare namespace JSON {
   /** @throws {SyntaxError} if the text is not JSON */
   function parse(text: string): any;

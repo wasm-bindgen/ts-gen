@@ -1,4 +1,4 @@
-// ABI choices for std.ir, layered onto TypeScript's lib declarations by
+// ABI choices for std.tw, layered onto TypeScript's lib declarations by
 // tests/std.rs. Lengths, sizes and offsets are `u32`, as in js-sys;
 // positions that may count from the end (`at`, `slice`, `fill`) are `i32`;
 // typed array elements are their element type. `Date` stays `f64`, since an

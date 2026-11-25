@@ -65,7 +65,7 @@ The declarations beside workers-types:
 
 `run.sh`:
 
-1. `ts-gen --provides provides.d.ts --with std.ir --ir`: the IR, against
+1. `ts-gen --provides provides.d.ts --with std.tw --ir`: the IR, against
    the JS standard library's.
 2. `zena-bindgen --entry`: the bindings (`build/bindings.zena`, and
    `build/std.zena` for the library, whose `ErrException` and tw loop
