@@ -94,7 +94,8 @@ Two diagnostics are exported for tests:
 The glue targets the current Wasm platform: WasmGC, exception handling with
 `exnref` (or the legacy instructions under `eh = legacy`), JS string
 builtins (`wasm:js-string`), memory64 for 64-bit profiles, and
-`FinalizationRegistry`. Node 26 has all of them, as does workerd.
+`FinalizationRegistry`, plus JSPI under `jspi = on`. Node 26 has all of
+them, as does workerd.
 
 ## Testing
 
@@ -115,6 +116,7 @@ Each directory in `tests/fixtures/` holds the following:
   * a generated pass-through module, which imports each member, exports a
     `call:<key>` forwarder for it, and adds the trampolines and exports
     that `protocol` lists;
+* optional extra Node flags in `node`;
 * a `test.mjs`.
 
 The generated `bridge.js` and `bridge.wat` are snapshotted in

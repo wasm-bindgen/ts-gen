@@ -1,6 +1,7 @@
 //! Bridge fixtures: each `tests/fixtures/<name>/` has an `ir.ts`, an
 //! optional `profile`, an optional empty `factory` (generating with
-//! `Options::factory`), and a `test.mjs`. The language module is the
+//! `Options::factory`), optional extra Node flags in `node`, and a
+//! `test.mjs`. The language module is the
 //! fixture's `lang.wat` (with `{RUNTIME}` standing for the runtime below), or by default a pass-through module that imports
 //! every IR member (and each `protocol` line) and re-exports it as
 //! `call:<key>` (`call:<group>:<name>` for protocol imports), over the counting runtime in `tests/runtime.wat`.
@@ -663,8 +664,10 @@ fn fixture(name: &str) {
     std::fs::write(out.join("bridge.js"), &bridge.js).unwrap();
     std::fs::write(out.join("bridge.wasm"), &bridge.wasm).unwrap();
     std::fs::write(out.join("lang.wasm"), &lang).unwrap();
+    let flags = read("node").unwrap_or_default();
     let run = Command::new(&node)
         .arg("--expose-gc")
+        .args(flags.split_whitespace())
         .arg("test.mjs")
         .current_dir(&out)
         .output()
@@ -728,6 +731,9 @@ fixtures! {
     erased_futures => "erased-futures",
     erased_futures_gc => "erased-futures-gc",
     factory => "factory",
+    jspi => "jspi",
+    jspi_gc => "jspi-gc",
+    jspi_terminated => "jspi-terminated",
     rest_callbacks => "rest-callbacks",
     never => "never",
     constructor_values => "constructor-values",
@@ -768,6 +774,31 @@ fn termination_flag_needs_its_global() {
         &lang("(global (export \"tw:terminated\") (mut i32) (i32.const 0))"),
     );
     assert!(r.is_ok(), "{:?}", r.err().map(|e| e.to_string()));
+}
+
+#[test]
+fn suspend_needs_jspi() {
+    let ir = text::parse("ir 1;\nclass C { f(): u32; }").unwrap();
+    let err = |name: &str, ty: &str, p: &str| {
+        let lang = wat::parse_str(format!(
+            "(module (import \"tw:future\" \"{name}\" (func {ty})) (memory (export \"memory\") 1) (table (export \"tw:table\") 132 externref) (global (export \"tw:table/stack_base\") i32 (i32.const 1)) (global (export \"tw:table/const_base\") i32 (i32.const 128)) (global (export \"tw:table/heap_base\") i32 (i32.const 132)) (func (export \"tw:table/alloc\") (param i32) (result i32) unreachable) (func (export \"tw:table/free\") (param i32 i32)))"
+        ))
+        .unwrap();
+        match ts_gen_bridge::generate(&ir, &Profile::parse(p).unwrap(), &lang) {
+            Ok(_) => String::new(),
+            Err(e) => e.to_string(),
+        }
+    };
+    let suspend = "(param externref) (result i32)";
+    let race = "(param i32 i32) (result i32)";
+    assert!(
+        err("suspend", suspend, "all-linear").contains("`suspend` needs `jspi = on`"),
+        "{}",
+        err("suspend", suspend, "all-linear")
+    );
+    assert!(err("suspend_race", race, "all-linear").contains("`suspend_race` needs `jspi = on`"));
+    assert_eq!(err("suspend", suspend, "jspi = on"), "");
+    assert_eq!(err("suspend_race", race, "jspi = on"), "");
 }
 
 #[test]

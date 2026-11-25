@@ -43,6 +43,10 @@ pub enum Op<'a> {
     CallFn,
     /// `("tw:future", ...)` (§16).
     Poll,
+    /// `suspend` and `suspend_race`, under `jspi = on`: the bridge
+    /// module's suspending wrappers over these.
+    Suspend,
+    SuspendRace,
     Take(Option<Repr>),
     FutureError(Rc<EnumLayout>),
     FutureDrop,
@@ -72,6 +76,7 @@ impl Op<'_> {
                 | Op::IsUndefined
                 | Op::Constant(_)
                 | Op::Poll
+                | Op::Suspend
                 | Op::FutureDrop
                 | Op::FutureNew
                 | Op::WorkAvailable
@@ -302,6 +307,15 @@ impl<'a> Plan<'a> {
                 };
                 match i.name.as_str() {
                     "poll" => (Op::Poll, empty),
+                    "suspend" | "suspend_race" if !p.jspi => {
+                        return Err(Error::Import(format!(
+                            "{}: `{}` needs `jspi = on`",
+                            what(),
+                            i.name
+                        )));
+                    }
+                    "suspend" => (Op::Suspend, empty),
+                    "suspend_race" => (Op::SuspendRace, l.future_race(&cx)?),
                     "drop" => (Op::FutureDrop, empty),
                     "new" => (Op::FutureNew, empty),
                     _ => {

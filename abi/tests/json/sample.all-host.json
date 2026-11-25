@@ -14,7 +14,8 @@
     "termination": "off",
     "finalizers": "off",
     "results": "multi",
-    "throws": "tag"
+    "throws": "tag",
+    "jspi": "off"
   },
   "lib": null,
   "with": [],

@@ -564,6 +564,18 @@ function $release(cx, m) {
   cx.n = m;
 }
 
+// Moves a suspended entry's argument records, those above `m`, off the
+// stack, and releases them once its future `f` settles: under JSPI the call
+// returns its future at its first suspension, and the language may read its
+// arguments after it resumes (IR.md §16).
+function $hold(cx, m, f) {
+  if (cx.n === m) return;
+  const held = { a: cx.a.slice(m, cx.n), n: cx.n - m };
+  cx.n = m;
+  const done = () => $release(held, 0);
+  f.promise.then(done, done);
+}
+
 // The bridge's return area, the first bytes of its scratch memory, where a
 // JS import writes its results past the first.
 let $ra = null;
@@ -851,6 +863,8 @@ class $Future {
     this.cancel = cancel;
     this.dropped = false;
     this.taken = false;
+    // The suspensions parked on it (§16).
+    this.parked = null;
     promise.then(
       (v) => {
         if (this.dropped) return;
@@ -874,6 +888,7 @@ class $Future {
     const w = this.waker;
     this.waker = -1;
     if (w !== -1) $wake(w);
+    $unpark(this, state);
   }
 }
 
@@ -884,6 +899,121 @@ function $future(v, check, cancel) {
 // A synchronous throw folded into a rejected future (§16).
 function $rejected(e) {
   return new $Future(Promise.reject(e), null, null);
+}
+
+// The promise the next JSPI suspension waits on (§16): a `tw:future`
+// suspend parks one, and the bridge module's `wait` takes it.
+let $parked = null;
+
+function $wait() {
+  const p = $parked;
+  $parked = null;
+  return p;
+}
+
+// `tw:future suspend`: 1 resolved, 2 rejected, or once parked, 0 if the
+// future is dropped first.
+function $suspend(f) {
+  $isFuture(f);
+  if (f.state !== 0) return f.state;
+  $parked = new Promise((r) => $parkOn([f], (i, s) => $resume(r, s)));
+  return -0x80000000;
+}
+
+// `tw:future suspend_race`: the index of a settled future, the lowest if
+// several are, or once parked the first to settle, or -1 if one is
+// dropped first. The others are left as they are.
+function $suspendRace(fs) {
+  if (fs.length === 0) throw new TypeError("`suspend_race` on an empty list");
+  for (const f of fs) $isFuture(f);
+  const i = fs.findIndex((f) => f.state !== 0);
+  if (i !== -1) return i;
+  $parked = new Promise((r) => $parkOn(fs, (i, s) => $resume(r, s === 0 ? -1 : i)));
+  return -0x80000000;
+}
+
+// Parks a suspension on futures `fs`: `done(i, state)` runs once, when
+// `fs[i]` settles or is dropped first (state 0), and the others forget it.
+function $parkOn(fs, done) {
+  const ws = fs.map((f, i) => {
+    const w = (s) => {
+      fs.forEach((g, j) => g.parked?.delete(ws[j]));
+      done(i, s);
+    };
+    (f.parked ??= new Set()).add(w);
+    return w;
+  });
+}
+
+// The scratch above a suspending stack's base, `[b, sp)` and the table's
+// `[tb, tsp)`, kept in JS while it's parked.
+function $stash(b, sp, tb, tsp) {
+  const refs = [];
+  for (let i = tb; i < tsp; i++) refs.push($S.table.get(i));
+  return { b, bytes: $S.u8().slice(b, sp), tb, refs };
+}
+
+function $unstash(k) {
+  $S.u8().set(k.bytes, k.b);
+  for (let i = 0; i < k.refs.length; i++) $S.table.set(k.tb + i, k.refs[i]);
+}
+
+function $throwPending() {
+  const e = $pending;
+  $pending = null;
+  throw e;
+}
+
+// The rejections of the promising calls in flight.
+const $calls = new Set();
+
+// Rejects every promising call in flight with the termination error `e`,
+// leaving their stacks parked (§15, §16).
+function $terminate(e) {
+  for (const reject of $calls) reject(e);
+  $calls.clear();
+}
+
+// An export or callback returning a future, called through JSPI (§16):
+// its future settles as the call's promise does. A first suspension
+// returns to whatever was running, so the scratch base it was running on
+// comes back.
+function $promising(f) {
+  const g = WebAssembly.promising(f);
+  return (...a) => {
+    const b = $B.base.value;
+    const tb = $B.tbase.value;
+    const s = $B.suspended.value;
+    let p;
+    try {
+      p = g(...a);
+    } finally {
+      $B.base.value = b;
+      $B.tbase.value = tb;
+      $B.suspended.value = s;
+    }
+    const call = new Promise((resolve, reject) => {
+      $calls.add(reject);
+      p.then(
+        (v) => {
+          $calls.delete(reject);
+          resolve($promise(v));
+        },
+        (e) => {
+          $calls.delete(reject);
+          reject($outgoing(e));
+        },
+      );
+    });
+    return new $Future(call, null, null);
+  };
+}
+
+// Keeps `vs` reachable until future `f` settles, so their finalizers don't
+// drop the handles a suspended call still uses (§16).
+function $keep(f, vs) {
+  const keep = () => vs;
+  f.promise.then(keep, keep);
 }
 
 function $promise(v) {
@@ -915,10 +1045,18 @@ function $settled(f, state) {
 
 // Dropping cancels: the cancel function runs once, its failure swallowed,
 // and a later settlement is ignored.
+// Resumes the suspensions parked on future `f` with `state`.
+function $unpark(f, state) {
+  const ps = f.parked;
+  f.parked = null;
+  if (ps) for (const w of ps) w(state);
+}
+
 function $dropFuture(f) {
   if (!(f instanceof $Future) || f.dropped) return;
   f.dropped = true;
   f.waker = -1;
+  $unpark(f, 0);
   f.value = undefined;
   const c = f.state === 0 ? f.cancel : null;
   f.cancel = null;

@@ -37,7 +37,7 @@
     (memory.fill (local.get $p) (i32.const 0xee) (local.get $size))
     (global.set $live (i32.sub (global.get $live) (i32.const 1)))
     (global.set $bytes ({P}.sub (global.get $bytes) (local.get $size))))
-  (func (export "tw:table/alloc") (param $n i32) (result i32)
+  (func $talloc (export "tw:table/alloc") (param $n i32) (result i32)
     (local $b i32)
     (local.set $b (global.get $tbump))
     (global.set $tbump (i32.add (local.get $b) (local.get $n)))

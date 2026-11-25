@@ -106,6 +106,10 @@ pub struct Profile {
     pub finalizers: bool,
     pub results: Results,
     pub throws: Throws,
+    /// JSPI (§16): the bridge provides `("tw:future", "suspend")` and
+    /// `suspend_race`, which suspend the language, and calls the exports
+    /// and callbacks returning a future through `WebAssembly.promising`.
+    pub jspi: bool,
     /// Protocol name overrides, default name → name.
     pub renames: BTreeMap<String, String>,
 }
@@ -150,6 +154,7 @@ impl Profile {
             finalizers: true,
             results: Results::Multi,
             throws: Throws::Tag,
+            jspi: false,
             renames: BTreeMap::new(),
         }
     }
@@ -280,6 +285,7 @@ impl Profile {
                 }
                 "termination" => p.termination_flag = switch(value).ok_or_else(bad)?,
                 "finalizers" => p.finalizers = switch(value).ok_or_else(bad)?,
+                "jspi" => p.jspi = switch(value).ok_or_else(bad)?,
                 "results" => {
                     p.results = match value {
                         "multi" => Results::Multi,
@@ -357,6 +363,7 @@ impl fmt::Display for Profile {
             Throws::Js => "js",
         };
         writeln!(f, "throws = {throws}")?;
+        writeln!(f, "jspi = {}", on(self.jspi))?;
         for (from, to) in &self.renames {
             writeln!(f, "rename.{from} = {to}")?;
         }

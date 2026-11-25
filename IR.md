@@ -1299,6 +1299,7 @@ generator. The IR is unchanged by it.
 | exported-class finalizers | on \| off |
 | `results` | `multi` (default) \| `single` |
 | `throws` | `tag` (default) \| `js` (§15) |
+| `jspi` | off (default) \| on: the language may suspend in `tw:future suspend` and `suspend_race` (§16) |
 | protocol names | defaults (§19), each overridable |
 
 Presets:
@@ -1918,8 +1919,8 @@ class Kv {
   rejection enum. `future<T>` is `future<T, err>`. `future<never>` only
   rejects (§3).
 * A future is an `externref` (a JS Promise).
-* There's no async syntax and no JSPI. Languages treat functions that
-  return a `future` as async on their own.
+* There's no async syntax. Languages treat functions that return a
+  `future` as async on their own, or block on futures under JSPI (below).
 * **Folding:** without `throws`, every synchronous exception (validation or
   host) becomes the future's rejection (WebIDL's rule). With `throws`,
   synchronous throws go to the tag.
@@ -1960,6 +1961,70 @@ interleaving of macrotasks.
 * Multiple bridges and loops coexist in one JS event loop: all state is per
   instance, with no globals.
 
+### JSPI (`jspi = on`)
+
+A language with no async of its own (one whose coroutines run on a
+synchronous executor) blocks instead: it suspends its whole stack until a
+future settles. Under `jspi = on` the bridge provides two
+`WebAssembly.Suspending` imports, which return at once when they can:
+
+* `("tw:future", "suspend")(f) -> i32` suspends until `f` settles, and
+  returns 1 resolved or 2 rejected. It doesn't consume `f`: the language
+  takes it, reads its error or drops it as usual.
+* `("tw:future", "suspend_race")(fs: arr<Any>) -> i32` suspends until one
+  of the futures in `fs` settles, and returns its index: the lowest one
+  already settled, or else the first to settle. The others are left as
+  they are. An empty list is a `TypeError`.
+* Several suspensions, in one call or in several, can be parked on one
+  future, and each resumes once it settles. Dropping a future while a
+  suspension is parked on it resumes that suspension with 0 (`suspend`)
+  or -1 (`suspend_race`); the future is gone, so the language must not
+  take it.
+* Suspending on a dropped future is a `TypeError`, like polling one.
+
+Promising calls:
+
+* The bridge calls an export or callback returning a `future` through
+  `WebAssembly.promising`. The JS result is the promise of the call's own
+  future, and an error escaping the call rejects it.
+* Such a call returns to JS at its first suspension, but its arguments
+  stay borrowed until its future settles: the bridge frees them then, not
+  when the call first returns (§11). It also keeps the call's receiver and
+  JS arguments reachable until then, so a finalizer doesn't drop a handle
+  the call still uses (`await new Foo().run()`).
+* It enters the language through a root in the bridge module, which
+  records the scratch base: a suspension moves what's live above it out of
+  scratch while it's parked, and puts it back once resumed. The root also
+  drains the spill (`results = single`) and a pending `throws = js` error
+  itself, since the call has returned to JS by the time the language
+  finishes.
+
+What the language must do:
+
+* **Several calls can be parked at once**, each on its own stack, and they
+  resume in the order their futures settle, not the order they were made.
+* **The bridge still enters the instance while calls are parked:** other
+  exports, other promising calls, `tw:future/wake`, `tw:loop/tick`,
+  finalizers (`tw:drop:*`) and `tw:free` all run between a suspension and
+  its resumption. The language's state must be consistent at every
+  suspension, as at a return.
+* **The language saves and restores its own shadow stack** (a linear
+  memory stack pointer, the externref table's stack range) around a
+  suspension, as wasm-bindgen does under JSPI: another call runs on it
+  while this one is parked.
+* **A suspension outside a promising call throws** a `SuspendError`
+  (`WebAssembly.SuspendError`): a synchronous export, a finalizer, a tick
+  or a wake has no suspendable stack.
+* **A synchronous callback reached through JS can't suspend**, even within
+  a promising call: the JS frame between them can't be suspended. Only a
+  callback returning a `future` is called through `WebAssembly.promising`,
+  and suspends on its own stack.
+
+Termination (§15): once the language has terminated, a settlement doesn't
+resume a parked stack. Every promising call in flight rejects with the
+termination error from JS instead, and the stacks stay parked, so the
+language runs nothing more, not even its exception handlers.
+
 ### Future operations (bridge imports, group `tw:future`)
 
 | name | signature | meaning |
@@ -1968,6 +2033,8 @@ interleaving of macrotasks.
 | `take<T>` | `(externref f) -> T wire` | the resolved value; consumes the future, once |
 | `error<E>` | `(externref f) -> E wire` | the rejection, mapped through `E` as in §15 |
 | `drop` | `(externref f)` | drops the future, which **cancels** it |
+| `suspend` | `(externref f) -> i32` | `jspi = on`: suspends until `f` settles; 1 resolved, 2 rejected, 0 dropped while parked |
+| `suspend_race` | `(W(arr<Any>)) -> i32` | `jspi = on`: suspends until one settles; its index, -1 if one is dropped while parked |
 | `new` | `() -> (externref future, externref resolver)` | a language-created future; JS sees a Promise |
 | `resolve<T>` | `(externref resolver, T wire)` | |
 | `reject<E>` | `(externref resolver, E wire)` | the JS rejection value is the outgoing mapping of `E` |
@@ -2237,6 +2304,8 @@ Notation in the tables:
 | `tw:future` | `take<T>` | `(externref) -> W(T)` | |
 | `tw:future` | `error<E>` | `(externref) -> W(E)` | |
 | `tw:future` | `drop` | `(externref)` | cancels |
+| `tw:future` | `suspend` | `(externref) -> i32` | `jspi = on`; suspending |
+| `tw:future` | `suspend_race` | `(W(arr<Any>)) -> i32` | `jspi = on`; suspending |
 | `tw:future` | `new` | `() -> (externref, externref)` | future, resolver |
 | `tw:future` | `resolve<T>` | `(externref, W(T))` | |
 | `tw:future` | `reject<E>` | `(externref, W(E))` | |
@@ -2414,7 +2483,6 @@ Deferred, and not part of this version:
 * multiple memories, and table64;
 * tagged unions (`@js(when)`);
 * JS-side cancellation of language-created futures;
-* JSPI;
 * custom descriptors for exported classes;
 * language-built GC scalar boxes as an optional fast path (`tw:unbox` would
   accept them);

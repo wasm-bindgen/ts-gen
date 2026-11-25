@@ -206,11 +206,21 @@ pub fn generate_opts(
             }
             _ => name.clone(),
         };
+        let suspends = matches!(func.op, plan::Op::Suspend | plan::Op::SuspendRace);
         let value = if gc {
             let export = format!("f{i}");
             w.forwarder(&export, &format!("g{i}"), func, area.as_ref())?;
             glue_imports.push(format!("g{i}: {glue}"));
-            format!("$B.{export}")
+            if suspends {
+                w.suspender(&format!("s{i}"), &export, true, &func.core.ty);
+                format!("$B.s{i}")
+            } else {
+                format!("$B.{export}")
+            }
+        } else if suspends {
+            w.suspender(&format!("s{i}"), &format!("g{i}"), false, &func.core.ty);
+            glue_imports.push(format!("g{i}: {glue}"));
+            format!("$B.s{i}")
         } else if let Some(a) = &area {
             let export = format!("f{i}");
             w.ret_shim(&export, &format!("r{i}"), &func.core.ty, a);
@@ -255,17 +265,27 @@ pub fn generate_opts(
             .iter()
             .chain(&sig.results)
             .any(|p| f.has_gc(&p.repr));
-        let slot = if gc { Some(w.entry(sig)?) } else { None };
-        let spill = l.lang_core(&sig.core())?.spill;
-        spill_fits(&spill, &|| format!("the export `{key}`"))?;
+        let lang = l.lang_core(&sig.core())?;
+        let mut slot = if gc { Some(w.entry(sig)?) } else { None };
+        spill_fits(&lang.spill, &|| format!("the export `{key}`"))?;
         let pending = profile.throws == Throws::Js && sig.throws.is_some();
         // A GC entry drains the spill in the bridge module.
-        let takes = if gc { Vec::new() } else { spill };
+        let takes = if gc { Vec::new() } else { lang.spill };
+        // Under JSPI an entry returning a future may suspend, through a
+        // root in the bridge module (§16).
+        let root = if entry::promising(&l, sig) {
+            let n = *slot.get_or_insert_with(|| w.entry_slot(&lang.ty));
+            Some(w.root(sig, gc.then_some(n), n)?)
+        } else {
+            None
+        };
         entries.push(Entry {
             key: key.clone(),
             slot,
+            gc,
             takes,
             pending,
+            root,
         });
     }
     // The language exports driving futures and loops (§16).
@@ -287,6 +307,19 @@ pub fn generate_opts(
     check_entries(&l, &g, &driving, &m)?;
     if profile.results == Results::Single {
         glue_imports.push("spill_fault: $spillFault".into());
+    }
+    if entries.iter().any(|e| e.root.is_some())
+        || plan
+            .funcs
+            .iter()
+            .any(|f| matches!(f.op, plan::Op::Suspend | plan::Op::SuspendRace))
+    {
+        glue_imports.push("wait: new WebAssembly.Suspending($wait)".into());
+        glue_imports.push("stash: $stash".into());
+        glue_imports.push("unstash: $unstash".into());
+        if entries.iter().any(|e| e.root.is_some() && e.pending) {
+            glue_imports.push("throw_pending: $throwPending".into());
+        }
     }
     check_exports(&l, &f, &plan, &g, &m)?;
 
@@ -339,6 +372,19 @@ pub fn generate_opts(
     if polls {
         let wake = prop("$X", profile.name(protocol::FUTURE_WAKE));
         let _ = writeln!(js, "function $wake(w) {{\n  if ($live()) {wake}(w);\n}}");
+    }
+    if profile.jspi {
+        // Once the language has terminated (§15), a parked stack stays
+        // parked, and the calls parked reject instead.
+        let check = if profile.termination_flag {
+            "  try {\n    $checkLive();\n  } catch (e) {\n    $terminate(e);\n    return;\n  }\n"
+        } else {
+            ""
+        };
+        let _ = writeln!(
+            js,
+            "// Resumes a parked suspension with `v` (§16).\nfunction $resume(r, v) {{\n{check}  r(v);\n}}"
+        );
     }
     if g.loops {
         let _ = writeln!(
@@ -632,12 +678,16 @@ fn check_entries(
 /// A language export the glue calls through `$E[i]`.
 struct Entry {
     key: String,
-    /// The bridge module's entry slot, for GC positions.
+    /// The bridge module's `entries` slot, for GC positions or a root.
     slot: Option<usize>,
+    /// Whether the bridge module's `e{slot}` translates its GC positions.
+    gc: bool,
     /// The spilled result slots JS drains after the call (§12).
     takes: Vec<ts_gen_abi::layout::ValType>,
     /// Whether a pending `throws = js` error replaces the results (§15).
     pending: bool,
+    /// Its root in the bridge module, `p{k}`, called through JSPI (§16).
+    root: Option<usize>,
 }
 
 /// The return area's wrapper for a glue function returning an array.
@@ -747,15 +797,18 @@ fn instantiate(
     }
     for (i, e) in entries.iter().enumerate() {
         let f = prop("$X", &e.key);
-        let f = match e.slot {
-            Some(n) => {
-                let _ = writeln!(s, "  $B.entries.set({n}, {f});");
-                format!("$B.e{n}")
-            }
-            None => f,
+        if let Some(n) = e.slot {
+            let _ = writeln!(s, "  $B.entries.set({n}, {f});");
+        }
+        let f = match (e.root, e.slot) {
+            (Some(k), _) => format!("$B.p{k}"),
+            (None, Some(n)) if e.gc => format!("$B.e{n}"),
+            _ => f,
         };
-        let single = p.results == Results::Single && (e.slot.is_some() || !e.takes.is_empty());
-        if single || e.pending {
+        let single = p.results == Results::Single && (e.gc || !e.takes.is_empty());
+        if e.root.is_some() {
+            let _ = writeln!(s, "  $E[{i}] = $promising({f});");
+        } else if single || e.pending {
             let takes: Vec<String> = e
                 .takes
                 .iter()

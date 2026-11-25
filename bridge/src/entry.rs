@@ -39,6 +39,21 @@ pub struct ExportClass<'a> {
     pub class: &'a Class,
 }
 
+/// Whether the bridge calls an entry through `WebAssembly.promising`:
+/// under JSPI, one returning a future (§16).
+pub(crate) fn promising(l: &ts_gen_abi::layout::Layouts<'_>, sig: &Signature) -> bool {
+    l.profile.jspi
+        && sig.results.first().is_some_and(|r| {
+            matches!(
+                r.repr.kind,
+                Kind::Host {
+                    of: Host::Future { .. },
+                    ..
+                }
+            )
+        })
+}
+
 impl<'a, 'b> Glue<'a, 'b> {
     /// The language export `key` reached through `$E[i]`.
     pub(crate) fn entry(&mut self, key: &str, sig: &Signature) -> usize {
@@ -85,11 +100,20 @@ impl<'a, 'b> Glue<'a, 'b> {
         }
         b.open("try {");
         let mut wire = Vec::new();
+        let mut keep = Vec::new();
         for (p, a) in sig.params.iter().zip(args) {
             match a {
-                Arg::Raw(e) => wire.push(e.clone()),
+                Arg::Raw(e) => {
+                    if matches!(p.role, Pos::This | Pos::Handle)
+                        && !keep.iter().any(|k| k == "this")
+                    {
+                        keep.push("this".to_string());
+                    }
+                    wire.push(e.clone());
+                }
                 Arg::Js(v) => {
                     let v = b.bind(v.clone());
+                    keep.push(v.clone());
                     let m = self.mode();
                     wire.extend(self.lower(b, &p.repr, &v, m)?);
                 }
@@ -100,6 +124,18 @@ impl<'a, 'b> Glue<'a, 'b> {
             None => b.line(format!("{call};")),
             Some(r) => {
                 b.line(format!("const r = {call};"));
+                // A promising call returns at its first suspension, while
+                // the language may still use its arguments and receiver
+                // (§16): they stay borrowed, and reachable, until its
+                // future settles.
+                if promising(self.l, sig) {
+                    if alloc {
+                        b.line("$hold(cx, cxm, r);");
+                    }
+                    if !keep.is_empty() {
+                        b.line(format!("$keep(r, [{}]);", keep.join(", ")));
+                    }
+                }
                 let n = self.f.jsw(&r.repr)?.len();
                 let ws: Vec<String> = if n == 1 {
                     vec!["r".into()]
