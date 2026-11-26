@@ -1198,6 +1198,8 @@ impl<'a, 'b> Wat<'a, 'b> {
         self.imports.push(format!(
             "  (import \"{GLUE}\" \"unstash\" (func $unstash (param externref)))"
         ));
+        self.imports
+            .push(format!("  (import \"{GLUE}\" \"abandon\" (func $abandon))"));
     }
 
     /// The suspending `tw:future` import `export` (§16): `prep`, of type
@@ -1517,10 +1519,11 @@ impl<'a, 'b> Wat<'a, 'b> {
         }
         if self.jspi {
             // A suspension that can't suspend throws (a `SuspendError`
-            // outside a promising call), and scratch is put back first.
+            // outside a promising call): its park comes off, and scratch
+            // is put back, first.
             let (locals, wait) = match self.l.profile.eh {
-                Eh::Modern => (" (local $e exnref)", "(block $ok\n      (local.set $e (block $thrown (result exnref)\n        (try_table (catch_all_ref $thrown) (local.set $r (call $wait)))\n        (br $ok)))\n      (call $unpark (local.get $k) (local.get $sp) (local.get $tsp))\n      (throw_ref (local.get $e)))"),
-                Eh::Legacy => ("", "try\n      (local.set $r (call $wait))\n    catch_all\n      (call $unpark (local.get $k) (local.get $sp) (local.get $tsp))\n      rethrow 0\n    end"),
+                Eh::Modern => (" (local $e exnref)", "(block $ok\n      (local.set $e (block $thrown (result exnref)\n        (try_table (catch_all_ref $thrown) (local.set $r (call $wait)))\n        (br $ok)))\n      (call $abandon)\n      (call $unpark (local.get $k) (local.get $sp) (local.get $tsp))\n      (throw_ref (local.get $e)))"),
+                Eh::Legacy => ("", "try\n      (local.set $r (call $wait))\n    catch_all\n      (call $abandon)\n      (call $unpark (local.get $k) (local.get $sp) (local.get $tsp))\n      rethrow 0\n    end"),
             };
             s.push_str(
                 &JSPI

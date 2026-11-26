@@ -319,6 +319,7 @@ pub fn generate_opts(
         glue_imports.push("wait: new WebAssembly.Suspending($wait)".into());
         glue_imports.push("stash: $stash".into());
         glue_imports.push("unstash: $unstash".into());
+        glue_imports.push("abandon: $abandon".into());
         if entries.iter().any(|e| e.root.is_some() && e.pending) {
             glue_imports.push("throw_pending: $throwPending".into());
         }

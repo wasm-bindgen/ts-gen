@@ -941,9 +941,20 @@ class $Park {
   }
 }
 
+// The suspension that parked last: its wait is the next thing to run.
+let $parking = null;
+
 function $park(fs, done) {
   const p = new $Park(fs, done);
   for (const f of fs) (f.listeners ??= new Map()).set(p, p);
+  $parking = p;
+}
+
+// A wait that threw never suspended: its park comes off its futures.
+function $abandon() {
+  const p = $parking;
+  $parking = null;
+  if (p) for (const f of p.futures) f.listeners?.delete(p);
 }
 
 // The scratch above a suspending stack's base, `[b, sp)` and the table's

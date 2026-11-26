@@ -290,9 +290,20 @@ class $Park {
   }
 }
 
+// The suspension that parked last: its wait is the next thing to run.
+let $parking = null;
+
 function $park(fs, done) {
   const p = new $Park(fs, done);
   for (const f of fs) (f.listeners ??= new Map()).set(p, p);
+  $parking = p;
+}
+
+// A wait that threw never suspended: its park comes off its futures.
+function $abandon() {
+  const p = $parking;
+  $parking = null;
+  if (p) for (const f of p.futures) f.listeners?.delete(p);
 }
 
 // The scratch above a suspending stack's base, `[b, sp)` and the table's
@@ -595,7 +606,7 @@ export function instantiate(language, bridge, imports = {}) {
   if ($B) throw new Error("this bridge is already instantiated");
   $cls0 = $class(globalThis.Api);
   $B = new WebAssembly.Instance(bridge, {
-    "tw:glue": { g1: $f1, g2: $f2, spill_fault: $spillFault, wait: new WebAssembly.Suspending($wait), stash: $stash, unstash: $unstash, throw_pending: $throwPending },
+    "tw:glue": { g1: $f1, g2: $f2, spill_fault: $spillFault, wait: new WebAssembly.Suspending($wait), stash: $stash, unstash: $unstash, abandon: $abandon, throw_pending: $throwPending },
     "wasm:js-string": {
       length: (s) => s.length,
       fromCharCodeArray: (a, start, end) => {

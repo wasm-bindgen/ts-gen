@@ -2168,7 +2168,8 @@ What the language must do:
 * **A suspension outside a promising call throws** a `SuspendError`
   (`WebAssembly.SuspendError`): a synchronous export, a finalizer, a tick
   or a wake has no suspendable stack. The language may catch it and go on:
-  the bridge's scratch is as it was before the call.
+  the bridge's scratch is as it was before the call, and the suspension
+  leaves nothing on its futures.
 * **A synchronous callback reached through JS can't suspend**, even within
   a promising call: the JS frame between them can't be suspended. Only a
   callback returning a `future` is called through `WebAssembly.promising`,

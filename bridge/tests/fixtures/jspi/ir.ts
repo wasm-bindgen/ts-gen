@@ -12,6 +12,8 @@ export namespace app {
   echo(api: Api, s: str): future<u32>;
   share(api: Api): u32;
   peek(): future<u32>;
+  listen(w: u32);
+  stuck(): u32;
   race(api: Api): future<u32>;
   lowest(api: Api): future<u32>;
   empty(): future<u32>;

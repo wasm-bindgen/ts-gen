@@ -586,9 +586,20 @@ class $Park {
   }
 }
 
+// The suspension that parked last: its wait is the next thing to run.
+let $parking = null;
+
 function $park(fs, done) {
   const p = new $Park(fs, done);
   for (const f of fs) (f.listeners ??= new Map()).set(p, p);
+  $parking = p;
+}
+
+// A wait that threw never suspended: its park comes off its futures.
+function $abandon() {
+  const p = $parking;
+  $parking = null;
+  if (p) for (const f of p.futures) f.listeners?.delete(p);
 }
 
 // The scratch above a suspending stack's base, `[b, sp)` and the table's
@@ -658,6 +669,28 @@ function $option(f, unit) {
   return unit ? [] : [f.value];
 }
 
+// A pending future's listeners (IR.md §16), by waker: `true` for one
+// the language added to it alone, woken when it settles, or the `$Race`
+// it shares with other futures. The latest add replaces a waker's entry.
+// A parked suspension (`$Park`) is among them under itself.
+function $addListener(f, w) {
+  if ($isFuture(f).state === 0) (f.listeners ??= new Map()).set(w, true);
+}
+
+// One waker listening to several futures, spent by the first to settle.
+class $Race {
+  constructor(waker, futures) {
+    this.waker = waker;
+    this.futures = futures;
+  }
+
+  fire() {
+    const w = this.waker;
+    for (const f of this.futures) if (f.listeners?.get(w) === this) f.listeners.delete(w);
+    $wake(w);
+  }
+}
+
 function $newFuture() {
   let resolve, reject;
   const p = new Promise((a, b) => {
@@ -681,6 +714,9 @@ let $T = null;
 const $E = [];
 function $live() {
   return true;
+}
+function $wake(w) {
+  if ($live()) $X["tw:future/wake"](w);
 }
 // Resumes a parked suspension with `v` (§16).
 function $resume(r, v) {
@@ -717,7 +753,7 @@ function $h4(f, h, a0) {
     const env = f[$flagged] === undefined ? h : $H1.call(f);
     try {
       const t1 = $instance(a0, $cls0, "Api");
-      const r = $E[12](env, t1);
+      const r = $E[14](env, t1);
       return $promise(r);
     } catch (e) {
       throw $outgoing(e);
@@ -769,8 +805,13 @@ function $f3(w0_0, w0_1) {
   return $suspendList($h1(w0_0, w0_1));
 }
 
+// ("tw:future", "add_listener")
+function $f4(f, w) {
+  $addListener(f, w);
+}
+
 // ("tw:future", "get<u32>")
-function $f4(w0_0) {
+function $f5(w0_0) {
   const f = $isFuture(w0_0);
   try {
     const r = $option(f, false);
@@ -792,12 +833,12 @@ function $f4(w0_0) {
 }
 
 // ("tw:future", "new")
-function $f5() {
+function $f6() {
   return $newFuture();
 }
 
 // ("tw:future", "resolve<u32>")
-function $f6(w0_0, w1_0) {
+function $f7(w0_0, w1_0) {
   $resolver(w0_0).resolve((w1_0 >>> 0));
 }
 
@@ -937,13 +978,34 @@ const $N0 = {
       return Promise.reject(e);
     }
   },
+  listen(...a) {
+    if (a.length >= 1) {
+      try {
+        const t1 = a[0];
+        const t2 = $int(t1, 0, 4294967295, "u32");
+        $E[8](t2);
+      } catch (e) {
+        throw $outgoing(e);
+      }
+      return;
+    }
+    throw new TypeError("`listen` doesn't match its arguments");
+  },
+  stuck(...a) {
+    try {
+      const r = $E[9]();
+      return (r >>> 0);
+    } catch (e) {
+      throw $outgoing(e);
+    }
+  },
   race(...a) {
     try {
       if (a.length >= 1) {
         try {
           const t1 = a[0];
           const t2 = $instance(t1, $cls0, "Api");
-          const r = $E[8](t2);
+          const r = $E[10](t2);
           return $promise(r);
         } catch (e) {
           throw $outgoing(e);
@@ -960,7 +1022,7 @@ const $N0 = {
         try {
           const t1 = a[0];
           const t2 = $instance(t1, $cls0, "Api");
-          const r = $E[9](t2);
+          const r = $E[11](t2);
           return $promise(r);
         } catch (e) {
           throw $outgoing(e);
@@ -974,7 +1036,7 @@ const $N0 = {
   empty(...a) {
     try {
       try {
-        const r = $E[10]();
+        const r = $E[12]();
         return $promise(r);
       } catch (e) {
         throw $outgoing(e);
@@ -988,7 +1050,7 @@ const $N0 = {
       try {
         const t1 = a[0];
         const t2 = $int(t1, 0, 4294967295, "u32");
-        const r = $E[11](t2);
+        const r = $E[13](t2);
         return $h3(r);
       } catch (e) {
         throw $outgoing(e);
@@ -1004,7 +1066,7 @@ export function instantiate(language, bridge, imports = {}) {
   if ($B) throw new Error("this bridge is already instantiated");
   $cls0 = $class(globalThis.Api);
   $B = new WebAssembly.Instance(bridge, {
-    "tw:glue": { g2: $f2, g3: $f3, r4: $f4, wait: new WebAssembly.Suspending($wait), stash: $stash, unstash: $unstash },
+    "tw:glue": { g2: $f2, g3: $f3, r5: $f5, wait: new WebAssembly.Suspending($wait), stash: $stash, unstash: $unstash, abandon: $abandon },
   }).exports;
   $S = new $Scratch($B);
   const instance = new WebAssembly.Instance(language, {
@@ -1016,9 +1078,10 @@ export function instantiate(language, bridge, imports = {}) {
     "tw:future": {
       "suspend": $B.s2,
       "suspend_list": $B.s3,
-      "get<u32>": $B.f4,
-      "new": $f5,
-      "resolve<u32>": $f6,
+      "add_listener": $f4,
+      "get<u32>": $B.f5,
+      "new": $f6,
+      "resolve<u32>": $f7,
     },
   });
   $X = instance.exports;
@@ -1036,15 +1099,17 @@ export function instantiate(language, bridge, imports = {}) {
   $E[6] = $X["app.share(Api)"];
   $B.entries.set(4, $X["app.peek()"]);
   $E[7] = $promising($B.p4);
+  $E[8] = $X["app.listen(u32)"];
+  $E[9] = $X["app.stuck()"];
   $B.entries.set(5, $X["app.race(Api)"]);
-  $E[8] = $promising($B.p5);
+  $E[10] = $promising($B.p5);
   $B.entries.set(6, $X["app.lowest(Api)"]);
-  $E[9] = $promising($B.p6);
+  $E[11] = $promising($B.p6);
   $B.entries.set(7, $X["app.empty()"]);
-  $E[10] = $promising($B.p7);
-  $E[11] = $X["app.plus(u32)"];
+  $E[12] = $promising($B.p7);
+  $E[13] = $X["app.plus(u32)"];
   $B.entries.set(8, $X["tw:call:fn(Api)->future<u32>"]);
-  $E[12] = $promising($B.p8);
+  $E[14] = $promising($B.p8);
   $L = new $Lang(instance.exports, { memory: "memory", table: "tw:table", realloc: "tw:realloc", free: "tw:free", talloc: "tw:table/alloc", tfree: "tw:table/free" }, false);
   return instance;
 }

@@ -6,6 +6,7 @@
   (import "tw:js/global" "Api#see(Job,Any)" (func $see (param externref i32 externref)))
   (import "tw:future" "suspend" (func $suspend (param externref) (result i32)))
   (import "tw:future" "suspend_list" (func $race (param i32 i32) (result i32)))
+  (import "tw:future" "add_listener" (func $listen (param externref i32)))
   (import "tw:future" "get<u32>" (func $get (param externref) (result i32 i32)))
   (import "tw:future" "new" (func $new (result externref externref)))
   (import "tw:future" "resolve<u32>" (func $resolve (param externref i32)))
@@ -53,6 +54,25 @@
     (i32.const 0))
   (func (export "app.peek()") (result externref)
     (call $ready (call $suspend (global.get $shared))))
+
+  ;; Wakers on the shared future, beside the calls parked on it: the sum of
+  ;; those woken. Waker 2 traps.
+  (global $woken (mut i32) (i32.const 0))
+  (func (export "test:woken") (result i32) (global.get $woken))
+  (func (export "test:shared") (result externref) (global.get $shared))
+  (func (export "app.listen(u32)") (param $w i32)
+    (call $listen (global.get $shared) (local.get $w)))
+  (func (export "tw:future/wake") (param $w i32)
+    (global.set $woken (i32.add (global.get $woken) (local.get $w)))
+    (if (i32.eq (local.get $w) (i32.const 2)) (then unreachable)))
+
+  ;; A suspension with no stack to suspend throws, here into a handler.
+  (func (export "app.stuck()") (result i32)
+    (block $caught
+      (try_table (catch_all $caught)
+        (drop (call $suspend (global.get $shared)))
+        unreachable))
+    (i32.const 7))
 
   ;; Three futures in table slots 1 to 3, the list the suspension takes.
   (func $three (param $api externref)

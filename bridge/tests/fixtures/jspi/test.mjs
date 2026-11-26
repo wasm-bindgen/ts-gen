@@ -125,5 +125,34 @@ j.seen = null;
 await collect();
 assert.deepEqual([drops(), freed()], [3, 3]);
 
+// A waker and a parked call are both a future's listeners, each run when
+// it settles: a wake that traps doesn't leave the call parked.
+const m = new Api();
+app.share(m);
+app.listen(1);
+app.listen(2);
+const woke = app.peek();
+app.listen(4);
+let trap;
+process.once("unhandledRejection", (e) => (trap = e));
+m.resolvers[0](7);
+assert.equal(await woke, 1);
+await new Promise((r) => setTimeout(r, 0));
+assert.equal(instance.exports["test:woken"](), 7);
+assert.ok(trap instanceof WebAssembly.RuntimeError);
+
+// A suspension that can't suspend leaves nothing behind: scratch is as it
+// was, and its future has no listener of it, however often it's tried.
+const n = new Api();
+app.share(n);
+const shared = instance.exports["test:shared"]();
+const use = scratchUse();
+for (let i = 0; i < 3; i++) assert.equal(app.stuck(), 7);
+assert.equal(shared.listeners?.size ?? 0, 0);
+assert.deepEqual(scratchUse(), use);
+const still = app.peek();
+n.resolvers[0](0);
+assert.equal(await still, 1);
+
 assert.deepEqual(scratchUse(), empty);
 console.log("ok");
