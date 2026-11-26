@@ -120,6 +120,8 @@ for (let i = 0; i < 2; i++) {
 L.throwsType(() => L.call("future:get<str,FetchError>", {}), /a future/);
 L.throwsType(() => listen({}, 1), /a future/);
 L.throwsType(() => L.call("future:remove_listener", {}, 1), /a future/);
+L.throwsType(() => L.call("future:cancel", {}), /a future/);
+L.throwsType(() => state({}), /a future/);
 
 // Rejections map through `E`, read as often as asked.
 api.next = Promise.reject(new DOMException("gone", "AbortError"));

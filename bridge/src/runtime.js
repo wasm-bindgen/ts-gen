@@ -1045,8 +1045,7 @@ function $rejection(f) {
 // Cancelling is a request: the cancel function runs once, its failure
 // swallowed, and the future settles as its promise does.
 function $cancelFuture(f) {
-  if (!(f instanceof $Future)) return;
-  const c = f.cancel;
+  const c = $isFuture(f).cancel;
   f.cancel = null;
   if (c) {
     try {

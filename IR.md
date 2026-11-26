@@ -2200,6 +2200,7 @@ into the language only where it's read.
 | `resolve<T>` | `(externref resolver, T wire)` | |
 | `reject<E>` | `(externref resolver, E wire)` | the JS rejection value is the outgoing mapping of `E` |
 
+* Each takes a future: any other value is a `TypeError`.
 * `state` only reads: nothing is registered, and it can't miss a
   settlement, since a promise settles in a microtask, never inside a call
   from the language.
