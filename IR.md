@@ -2031,6 +2031,11 @@ validation failures.
   * Ownership of a result passes to the language only on success, and of
     an export's arguments only once every one has converted and the call
     is entered.
+  * A call that fails before the language runs (the stack exhausted at
+    the call itself, or memory in the bridge module's GC entry) can't be
+    told from one that failed inside it. Its arguments are already the
+    language's, so they leak: the bridge never frees what the language
+    may have freed.
 * User JS can run during a conversion (getters, Proxy traps), and may
   reenter the language. That's ordinary reentrancy: partially built values
   are never visible to the language.
