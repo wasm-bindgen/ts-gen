@@ -494,7 +494,6 @@ class Gen(
             }
             "str" -> if (n) "$w?.unsafeCast<JsString>()?.toString()" else "$w!!.unsafeCast<JsString>().toString()"
             "vec" -> {
-                if (r.m["writeback"] == true) unsupported("a `mut T[]` received")
                 val read = "tsgen.runtime.${vecKt(r.vecElem).replaceFirstChar { it.lowercase() }}"
                 if (n) "$w?.let { $read(it) }" else "$read($w!!)"
             }

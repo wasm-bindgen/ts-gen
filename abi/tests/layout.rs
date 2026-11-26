@@ -755,7 +755,7 @@ fn protocol_operations() {
         "(externref, i32)"
     );
     let host = profile("all-host");
-    for (p, states, watch) in [
+    for (p, states, listen) in [
         (&lin, "(i32, i32) -> (i32, i32)", "(i32, i32, i32)"),
         (
             &gc,
@@ -766,7 +766,7 @@ fn protocol_operations() {
     ] {
         let l = Layouts::new(&ir, p);
         assert_eq!(l.future_states().unwrap().core().to_string(), states);
-        assert_eq!(l.future_listener_list().unwrap().core().to_string(), watch);
+        assert_eq!(l.future_listener_list().unwrap().core().to_string(), listen);
     }
     assert_eq!(
         op(&lin, Some("tw:future"), "new"),

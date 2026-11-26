@@ -2624,6 +2624,7 @@ Language imports (both profiles, except where noted):
 | `("tw:js/global", "fetch(Request,RequestInit?)")` | `(externref, externref) -> externref` |
 | `("tw:future", "get<Response,FetchError>")` | `(externref) -> (i32, externref)` |
 | `("tw:future", "state")` | `(externref) -> i32` |
+| `("tw:future", "add_listener")` | `(externref, i32)` |
 | `("tw:future", "error<FetchError>")` | `(externref) -> (i32, externref)` |
 
 Language exports: `default.fetch(Request,Env,ExecutionContext)`, of type
