@@ -1367,7 +1367,7 @@ generator. The IR is unchanged by it.
 | exported-class finalizers | on \| off |
 | `results` | `multi` (default) \| `single` |
 | `throws` | `tag` (default) \| `js` (§15) |
-| `jspi` | off (default) \| on: the language may suspend in `tw:future suspend` and `suspend_all` (§16) |
+| `jspi` | off (default) \| on: the language may suspend in `tw:future suspend` and `suspend_list` (§16) |
 | protocol names | defaults (§19), each overridable |
 
 Presets:
@@ -2102,7 +2102,7 @@ future settles. Under `jspi = on` the bridge provides two
   returns its state, 1 fulfilled or 2 rejected. It reads nothing: the
   language reads the value with `get`, or the rejection with `error`, as
   usual.
-* `("tw:future", "suspend_all")(fs: arr<Any>) -> i32` suspends until one
+* `("tw:future", "suspend_list")(fs: arr<Any>) -> i32` suspends until one
   of the futures in `fs` settles, and returns its index: the lowest one
   already settled, or else the first to settle. The others are left as
   they are. An empty list is a `TypeError`.
@@ -2184,10 +2184,11 @@ into the language only where it's read.
   `tw:future/wake(waker)` once, when the future settles. `add_listener`
   does nothing on a future that has settled: the language reads `get` or
   `state` first, and nothing can settle between the two.
-* A future holds a waker once, however often it's added, and lets it go
-  when it settles. `remove_listener` takes it off sooner, for an await
-  that's abandoned: without it the waker stays for as long as the future
-  is pending. Removing one that isn't there does nothing.
+* A future holds a waker once: adding it again, alone or in a list,
+  replaces its earlier listener there. It lets it go when it settles.
+  `remove_listener` takes it off sooner, for an await that's abandoned:
+  without it the waker stays for as long as the future is pending.
+  Removing one that isn't there does nothing.
 * A wake says only that a future the waker listened to has settled. The
   language reads the state to learn which, and how.
 * **The option is its own flag**, not `T?`: its none is "no value yet", not
@@ -2221,14 +2222,18 @@ too.
 | name | signature | meaning |
 |---|---|---|
 | `states` | `(arr<Any> wire) -> u8[] wire` | each future's state, by index |
-| `add_listener_all` | `(arr<Any> wire, i32 waker)` | `add_listener` on each |
-| `remove_listener_all` | `(arr<Any> wire, i32 waker)` | `remove_listener` on each |
-| `suspend_all` | `(arr<Any> wire) -> i32` | `jspi = on`: suspends until one settles; its index |
+| `add_listener_list` | `(arr<Any> wire, i32 waker)` | adds a waker to the futures as a race |
+| `remove_listener_list` | `(arr<Any> wire, i32 waker)` | removes it from each |
+| `suspend_list` | `(arr<Any> wire) -> i32` | `jspi = on`: suspends until one settles; its index |
 
-* The waker is woken as each of the futures settles, not once for them
-  all: a language waiting for the first removes it from the rest when
-  it's woken.
-* The bridge keeps nothing of the array past the call.
+* `add_listener_list` is a race: the bridge calls `tw:future/wake(waker)`
+  once, when the first of the futures that were pending settles, and the
+  waker is off the rest. Futures settling in the same turn share that
+  one wake.
+* `remove_listener_list` takes the waker off each of the futures, for a
+  wait that's abandoned before any settles.
+* The bridge keeps nothing of the array past the call, only the waker on
+  each pending future.
 * An element that isn't a future is a `TypeError`, and nothing is added
   or removed.
 
@@ -2511,9 +2516,9 @@ Notation in the tables:
 | `tw:future` | `resolve<T>` | `(externref, W(T))` | |
 | `tw:future` | `reject<E>` | `(externref, W(E))` | |
 | `tw:future` | `states` | `(W(arr<Any>)) -> W(u8[])` | futures as `arr<Any>` |
-| `tw:future` | `add_listener_all` | `(W(arr<Any>), i32 waker)` | |
-| `tw:future` | `remove_listener_all` | `(W(arr<Any>), i32 waker)` | |
-| `tw:future` | `suspend_all` | `(W(arr<Any>)) -> i32` | `jspi = on`; suspending |
+| `tw:future` | `add_listener_list` | `(W(arr<Any>), i32 waker)` | |
+| `tw:future` | `remove_listener_list` | `(W(arr<Any>), i32 waker)` | |
+| `tw:future` | `suspend_list` | `(W(arr<Any>)) -> i32` | `jspi = on`; suspending |
 | `tw:loop` | `work_available` | `(i32 loop)` | |
 | `tw:loop` | `drop` | `(i32 loop)` | |
 | `tw:ret` | `<vt>` | `() -> vt` | `results = single`: pop the next spilled slot |

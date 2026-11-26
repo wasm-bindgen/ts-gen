@@ -766,7 +766,7 @@ fn protocol_operations() {
     ] {
         let l = Layouts::new(&ir, p);
         assert_eq!(l.future_states().unwrap().core().to_string(), states);
-        assert_eq!(l.future_listener_all().unwrap().core().to_string(), watch);
+        assert_eq!(l.future_listener_list().unwrap().core().to_string(), watch);
     }
     assert_eq!(
         op(&lin, Some("tw:future"), "new"),

@@ -49,7 +49,7 @@ other.resolvers[0](1);
 other.resolvers[1](1);
 assert.equal(await ran, 2);
 
-// A GC list for `suspend_all`.
+// A GC list for `suspend_list`.
 const r = new Api();
 const raced = app.race(r);
 r.resolvers[1](9);

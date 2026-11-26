@@ -290,7 +290,7 @@ class $Future {
     this.cancel = null;
     const ls = this.listeners;
     this.listeners = null;
-    if (ls) for (const l of ls) typeof l === "number" ? $wake(l) : l.fire(this);
+    if (ls) for (const [w, l] of ls) l === true ? $wake(w) : l.fire(this);
   }
 }
 

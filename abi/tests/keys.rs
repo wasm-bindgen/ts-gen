@@ -350,12 +350,12 @@ fn protocol_names() {
     );
     assert_eq!(protocol::future_states(), i("tw:future", "states"));
     assert_eq!(
-        protocol::future_add_listener_all(),
-        i("tw:future", "add_listener_all")
+        protocol::future_add_listener_list(),
+        i("tw:future", "add_listener_list")
     );
     assert_eq!(
-        protocol::future_remove_listener_all(),
-        i("tw:future", "remove_listener_all")
+        protocol::future_remove_listener_list(),
+        i("tw:future", "remove_listener_list")
     );
     assert_eq!(protocol::future_new(), i("tw:future", "new"));
     assert_eq!(

@@ -885,7 +885,7 @@ class $Future {
     this.cancel = null;
     const ls = this.listeners;
     this.listeners = null;
-    if (ls) for (const l of ls) typeof l === "number" ? $wake(l) : l.fire(this);
+    if (ls) for (const [w, l] of ls) l === true ? $wake(w) : l.fire(this);
   }
 }
 
@@ -916,11 +916,11 @@ function $suspend(f) {
   return -0x80000000;
 }
 
-// `tw:future suspend_all`: the index of a settled future, the lowest if
+// `tw:future suspend_list`: the index of a settled future, the lowest if
 // several are, or once parked the first to settle. The others are left as
 // they are.
-function $suspendAll(fs) {
-  if (fs.length === 0) throw new TypeError("`suspend_all` on an empty list");
+function $suspendList(fs) {
+  if (fs.length === 0) throw new TypeError("`suspend_list` on an empty list");
   for (const f of fs) $isFuture(f);
   const i = fs.findIndex((f) => f.state !== 0);
   if (i !== -1) return i;
@@ -944,7 +944,7 @@ class $Park {
 
 function $park(fs, done) {
   const p = new $Park(fs, done);
-  for (const f of fs) (f.listeners ??= new Set()).add(p);
+  for (const f of fs) (f.listeners ??= new Map()).set(p, p);
 }
 
 // The scratch above a suspending stack's base, `[b, sp)` and the table's
@@ -1052,20 +1052,42 @@ function $cancelFuture(f) {
   }
 }
 
-// A pending future's listeners (IR.md §16): the wakers the language adds,
-// each woken when it settles, and the suspensions parked on it.
+// A pending future's listeners (IR.md §16), by waker: `true` for one
+// the language added to it alone, woken when it settles, or the `$Race`
+// it shares with other futures. The latest add replaces a waker's entry.
+// A parked suspension (`$Park`) is among them under itself.
 function $addListener(f, w) {
-  if ($isFuture(f).state === 0) (f.listeners ??= new Set()).add(w);
+  if ($isFuture(f).state === 0) (f.listeners ??= new Map()).set(w, true);
 }
 
 function $removeListener(f, w) {
   $isFuture(f).listeners?.delete(w);
 }
 
-// `each(f, w)` for every future of `fs`, or for none if one isn't a future.
-function $each(fs, each, w) {
+// One waker listening to several futures, spent by the first to settle.
+class $Race {
+  constructor(waker, futures) {
+    this.waker = waker;
+    this.futures = futures;
+  }
+
+  fire() {
+    const w = this.waker;
+    for (const f of this.futures) if (f.listeners?.get(w) === this) f.listeners.delete(w);
+    $wake(w);
+  }
+}
+
+function $addListenerList(fs, w) {
+  const pending = [];
+  for (const f of fs) if ($isFuture(f).state === 0) pending.push(f);
+  const race = new $Race(w, pending);
+  for (const f of pending) (f.listeners ??= new Map()).set(w, race);
+}
+
+function $removeListenerList(fs, w) {
   for (const f of fs) $isFuture(f);
-  for (const f of fs) each(f, w);
+  for (const f of fs) f.listeners?.delete(w);
 }
 
 function $states(fs) {

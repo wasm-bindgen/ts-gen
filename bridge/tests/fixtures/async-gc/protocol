@@ -2,7 +2,7 @@ tw:future state
 tw:future get<str>
 tw:future add_listener
 tw:future states
-tw:future add_listener_all
+tw:future add_listener_list
 tw:future new
 tw:future resolve<str>
 export tw:future/wake

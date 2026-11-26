@@ -80,8 +80,8 @@ const refs = (fs) => {
 };
 const states = (fs) => [...L.take(...L.call("future:states", ...refs(fs)))];
 const listen = (f, w) => L.call("future:add_listener", f, w);
-const listenAll = (fs, w) => L.call("future:add_listener_all", ...refs(fs), w);
-const unlistenAll = (fs, w) => L.call("future:remove_listener_all", ...refs(fs), w);
+const listenList = (fs, w) => L.call("future:add_listener_list", ...refs(fs), w);
+const unlistenList = (fs, w) => L.call("future:remove_listener_list", ...refs(fs), w);
 const err = L.ex["tag:err"];
 const fetchError = L.ex["tag:FetchError"];
 // A read's failure, thrown to the future's `E` with its message.
@@ -193,47 +193,59 @@ assert.match(L.call("future:error<err>", f)[1], /aborted/);
 L.call("future:cancel", f);
 assert.equal(state(f), 2);
 
-// A listener is added to, and removed from, several futures at once
-// through the language's own array: it's woken as each of them settles.
+// A listener on several futures, through the language's own array, is a
+// race: one wake for the first of them to settle, and it's off the rest.
 {
   const rs = [];
-  const fs = [0, 1, 2].map(() => {
-    api.next = new Promise((r) => rs.push(r));
-    return L.call("Api#number()", api);
-  });
+  const pending = (n) =>
+    Array.from({ length: n }, () => {
+      api.next = new Promise((r) => rs.push(r));
+      return L.call("Api#number()", api);
+    });
+  const fs = pending(3);
   assert.deepEqual(states(fs), [0, 0, 0]);
   wakes.length = 0;
-  listenAll(fs, 20);
-  // A future holds a listener once, however it was added.
-  listenAll([fs[1]], 20);
-  listen(fs[1], 20);
+  listenList(fs, 20);
+  // A future holds a waker once: the latest add replaces it.
   listen(fs[1], 21);
+  listenList([fs[1]], 21);
   rs[1](1);
-  await tick();
-  assert.deepEqual(wakes, [20, 21], "one wake a listener for a future");
-  assert.deepEqual(states(fs), [0, 1, 0], "a state says nothing of the value");
-  // The rest still hold it, until it's removed from them.
   rs[2]("x");
   await tick();
-  assert.deepEqual(wakes, [20, 21, 20]);
-  unlistenAll(fs, 20);
+  assert.deepEqual(wakes, [20, 21], "one wake a race");
+  assert.deepEqual(states(fs), [0, 1, 1], "a state says nothing of the value");
   rs[0](0);
   await tick();
-  assert.deepEqual(wakes, [20, 21, 20]);
-  assert.deepEqual(states(fs), [1, 1, 1]);
-  // Settled futures wake nothing.
-  listenAll(fs, 22);
-  await tick();
-  assert.deepEqual(wakes, [20, 21, 20]);
-  L.throwsType(() => states([fs[0], {}]), /a future/);
-  // An element that isn't a future fails the whole call.
-  api.next = new Promise((r) => rs.push(r));
-  const g = L.call("Api#number()", api);
-  L.throwsType(() => listenAll([g, {}], 23), /a future/);
-  L.throwsType(() => unlistenAll([g, {}], 23), /a future/);
+  assert.deepEqual(wakes, [20, 21], "a spent race wakes nothing");
+  // Added again and again, it's still one race.
+  const gs = pending(2);
+  for (let i = 0; i < 3; i++) listenList(gs, 30);
   rs[3](0);
   await tick();
-  assert.deepEqual(wakes, [20, 21, 20]);
+  assert.deepEqual(wakes, [20, 21, 30]);
+  rs[4](0);
+  await tick();
+  assert.deepEqual(wakes, [20, 21, 30]);
+  // Removed, it wakes nothing.
+  const hs = pending(2);
+  listenList(hs, 40);
+  unlistenList(hs, 40);
+  rs[5](0);
+  rs[6](0);
+  await tick();
+  assert.deepEqual(wakes, [20, 21, 30]);
+  // Settled futures wake nothing.
+  listenList(fs, 22);
+  await tick();
+  assert.deepEqual(wakes, [20, 21, 30]);
+  L.throwsType(() => states([fs[0], {}]), /a future/);
+  // An element that isn't a future fails the whole call.
+  const [g] = pending(1);
+  L.throwsType(() => listenList([g, {}], 23), /a future/);
+  L.throwsType(() => unlistenList([g, {}], 23), /a future/);
+  rs[7](0);
+  await tick();
+  assert.deepEqual(wakes, [20, 21, 30]);
 }
 
 // A cancel signal joins the caller's: the caller's own aborts the call,

@@ -527,7 +527,7 @@ class $Future {
     this.cancel = null;
     const ls = this.listeners;
     this.listeners = null;
-    if (ls) for (const l of ls) typeof l === "number" ? $wake(l) : l.fire(this);
+    if (ls) for (const [w, l] of ls) l === true ? $wake(w) : l.fire(this);
   }
 }
 
@@ -558,11 +558,11 @@ function $suspend(f) {
   return -0x80000000;
 }
 
-// `tw:future suspend_all`: the index of a settled future, the lowest if
+// `tw:future suspend_list`: the index of a settled future, the lowest if
 // several are, or once parked the first to settle. The others are left as
 // they are.
-function $suspendAll(fs) {
-  if (fs.length === 0) throw new TypeError("`suspend_all` on an empty list");
+function $suspendList(fs) {
+  if (fs.length === 0) throw new TypeError("`suspend_list` on an empty list");
   for (const f of fs) $isFuture(f);
   const i = fs.findIndex((f) => f.state !== 0);
   if (i !== -1) return i;
@@ -586,7 +586,7 @@ class $Park {
 
 function $park(fs, done) {
   const p = new $Park(fs, done);
-  for (const f of fs) (f.listeners ??= new Set()).add(p);
+  for (const f of fs) (f.listeners ??= new Map()).set(p, p);
 }
 
 // The scratch above a suspending stack's base, `[b, sp)` and the table's
@@ -764,9 +764,9 @@ function $f1(f) {
   return $suspend(f);
 }
 
-// ("tw:future", "suspend_all")
+// ("tw:future", "suspend_list")
 function $f2(w0_0, w0_1) {
-  return $suspendAll($h1(w0_0, w0_1));
+  return $suspendList($h1(w0_0, w0_1));
 }
 
 // ("tw:future", "get<u32>")
@@ -987,7 +987,7 @@ export function instantiate(language, bridge, imports = {}) {
     },
     "tw:future": {
       "suspend": $B.s1,
-      "suspend_all": $B.s2,
+      "suspend_list": $B.s2,
       "get<u32>": $B.f3,
       "new": $f4,
       "resolve<u32>": $f5,

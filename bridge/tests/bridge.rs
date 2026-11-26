@@ -393,8 +393,8 @@ fn passthrough(ir: &Ir, libs: &[Ir], profile: &Profile, protocol: &str) -> Strin
                     f
                 } else if name == "states" {
                     l.future_states().unwrap().core()
-                } else if name == "add_listener_all" || name == "remove_listener_all" {
-                    l.future_listener_all().unwrap().core()
+                } else if name == "add_listener_list" || name == "remove_listener_list" {
+                    l.future_listener_list().unwrap().core()
                 } else if let Some(s) = arg("get<") {
                     let (t, e) = protocol::split_future_subject(s);
                     l.future_get(&ty(t), &path(e), &cx).unwrap().core()
@@ -831,9 +831,9 @@ fn suspend_needs_jspi() {
         "{}",
         err("suspend", suspend, "all-linear")
     );
-    assert!(err("suspend_all", race, "all-linear").contains("`suspend_all` needs `jspi = on`"));
+    assert!(err("suspend_list", race, "all-linear").contains("`suspend_list` needs `jspi = on`"));
     assert_eq!(err("suspend", suspend, "jspi = on"), "");
-    assert_eq!(err("suspend_all", race, "jspi = on"), "");
+    assert_eq!(err("suspend_list", race, "jspi = on"), "");
 }
 
 #[test]

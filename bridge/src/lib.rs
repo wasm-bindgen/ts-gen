@@ -205,7 +205,7 @@ pub fn generate_opts(
             }
             _ => name.clone(),
         };
-        let suspends = matches!(func.op, plan::Op::Suspend | plan::Op::SuspendAll);
+        let suspends = matches!(func.op, plan::Op::Suspend | plan::Op::SuspendList);
         let value = if gc {
             let export = format!("f{i}");
             w.forwarder(&export, &format!("g{i}"), func, area.as_ref())?;
@@ -291,7 +291,7 @@ pub fn generate_opts(
     let listens = plan
         .funcs
         .iter()
-        .any(|f| matches!(f.op, plan::Op::AddListener | plan::Op::AddListenerAll));
+        .any(|f| matches!(f.op, plan::Op::AddListener | plan::Op::AddListenerList));
     let mut driving = Vec::new();
     if listens {
         driving.push(protocol::FUTURE_WAKE);
@@ -314,7 +314,7 @@ pub fn generate_opts(
         || plan
             .funcs
             .iter()
-            .any(|f| matches!(f.op, plan::Op::Suspend | plan::Op::SuspendAll))
+            .any(|f| matches!(f.op, plan::Op::Suspend | plan::Op::SuspendList))
     {
         glue_imports.push("wait: new WebAssembly.Suspending($wait)".into());
         glue_imports.push("stash: $stash".into());

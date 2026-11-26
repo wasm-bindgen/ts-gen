@@ -562,7 +562,7 @@ class $Future {
     this.cancel = null;
     const ls = this.listeners;
     this.listeners = null;
-    if (ls) for (const l of ls) typeof l === "number" ? $wake(l) : l.fire(this);
+    if (ls) for (const [w, l] of ls) l === true ? $wake(w) : l.fire(this);
   }
 }
 
@@ -573,6 +573,20 @@ function $future(v, check, cancel) {
 // A synchronous throw folded into a rejected future (§16).
 function $rejected(e) {
   return new $Future(Promise.reject(e), null, null);
+}
+
+// A suspension parked on futures, among their listeners:
+// `done(i)` runs once, when the first of them, `futures[i]`, settles.
+class $Park {
+  constructor(futures, done) {
+    this.futures = futures;
+    this.done = done;
+  }
+
+  fire(f) {
+    for (const g of this.futures) g.listeners?.delete(this);
+    this.done(this.futures.indexOf(f));
+  }
 }
 
 function $promise(v) {
@@ -609,20 +623,42 @@ function $cancelFuture(f) {
   }
 }
 
-// A pending future's listeners (IR.md §16): the wakers the language adds,
-// each woken when it settles, and the suspensions parked on it.
+// A pending future's listeners (IR.md §16), by waker: `true` for one
+// the language added to it alone, woken when it settles, or the `$Race`
+// it shares with other futures. The latest add replaces a waker's entry.
+// A parked suspension (`$Park`) is among them under itself.
 function $addListener(f, w) {
-  if ($isFuture(f).state === 0) (f.listeners ??= new Set()).add(w);
+  if ($isFuture(f).state === 0) (f.listeners ??= new Map()).set(w, true);
 }
 
 function $removeListener(f, w) {
   $isFuture(f).listeners?.delete(w);
 }
 
-// `each(f, w)` for every future of `fs`, or for none if one isn't a future.
-function $each(fs, each, w) {
+// One waker listening to several futures, spent by the first to settle.
+class $Race {
+  constructor(waker, futures) {
+    this.waker = waker;
+    this.futures = futures;
+  }
+
+  fire() {
+    const w = this.waker;
+    for (const f of this.futures) if (f.listeners?.get(w) === this) f.listeners.delete(w);
+    $wake(w);
+  }
+}
+
+function $addListenerList(fs, w) {
+  const pending = [];
+  for (const f of fs) if ($isFuture(f).state === 0) pending.push(f);
+  const race = new $Race(w, pending);
+  for (const f of pending) (f.listeners ??= new Map()).set(w, race);
+}
+
+function $removeListenerList(fs, w) {
   for (const f of fs) $isFuture(f);
-  for (const f of fs) each(f, w);
+  for (const f of fs) f.listeners?.delete(w);
 }
 
 function $states(fs) {
@@ -1113,14 +1149,14 @@ function $f26(w0_0, w0_1) {
   }
 }
 
-// ("tw:future", "add_listener_all")
+// ("tw:future", "add_listener_list")
 function $f27(w0_0, w0_1, w1_0) {
-  $each($h6(w0_0, w0_1), $addListener, w1_0);
+  $addListenerList($h6(w0_0, w0_1), w1_0);
 }
 
-// ("tw:future", "remove_listener_all")
+// ("tw:future", "remove_listener_list")
 function $f28(w0_0, w0_1, w1_0) {
-  $each($h6(w0_0, w0_1), $removeListener, w1_0);
+  $removeListenerList($h6(w0_0, w0_1), w1_0);
 }
 
 // ("tw:future", "new")
@@ -1229,8 +1265,8 @@ export function instantiate(language, bridge, imports = {}) {
       "add_listener": $f24,
       "remove_listener": $f25,
       "states": $B.f26,
-      "add_listener_all": $f27,
-      "remove_listener_all": $f28,
+      "add_listener_list": $f27,
+      "remove_listener_list": $f28,
       "new": $f29,
       "resolve<u32>": $f30,
       "reject<err>": $f31,

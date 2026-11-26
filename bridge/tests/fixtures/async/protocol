@@ -10,8 +10,8 @@ tw:future cancel
 tw:future add_listener
 tw:future remove_listener
 tw:future states
-tw:future add_listener_all
-tw:future remove_listener_all
+tw:future add_listener_list
+tw:future remove_listener_list
 tw:future new
 tw:future resolve<u32>
 tw:future reject<err>

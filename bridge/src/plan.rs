@@ -51,12 +51,12 @@ pub enum Op<'a> {
     FutureNew,
     /// Several futures together, as the profile's `arr<Any>`.
     States,
-    AddListenerAll,
-    RemoveListenerAll,
-    /// `suspend` and `suspend_all`, under `jspi = on`: the bridge
+    AddListenerList,
+    RemoveListenerList,
+    /// `suspend` and `suspend_list`, under `jspi = on`: the bridge
     /// module's suspending wrappers over these.
     Suspend,
-    SuspendAll,
+    SuspendList,
     Resolve(Option<Repr>),
     Reject(Rc<EnumLayout>),
     /// `("tw:ret", vt)` and `("tw:ret", "push:vt")` (§12): served by the
@@ -319,9 +319,9 @@ impl<'a> Plan<'a> {
                     "add_listener" => (Op::AddListener, empty),
                     "remove_listener" => (Op::RemoveListener, empty),
                     "states" => (Op::States, l.future_states()?),
-                    "add_listener_all" => (Op::AddListenerAll, l.future_listener_all()?),
-                    "remove_listener_all" => (Op::RemoveListenerAll, l.future_listener_all()?),
-                    "suspend" | "suspend_all" if !p.jspi => {
+                    "add_listener_list" => (Op::AddListenerList, l.future_listener_list()?),
+                    "remove_listener_list" => (Op::RemoveListenerList, l.future_listener_list()?),
+                    "suspend" | "suspend_list" if !p.jspi => {
                         return Err(Error::Import(format!(
                             "{}: `{}` needs `jspi = on`",
                             what(),
@@ -329,7 +329,7 @@ impl<'a> Plan<'a> {
                         )));
                     }
                     "suspend" => (Op::Suspend, empty),
-                    "suspend_all" => (Op::SuspendAll, l.future_suspend_all()?),
+                    "suspend_list" => (Op::SuspendList, l.future_suspend_list()?),
                     "new" => (Op::FutureNew, empty),
                     _ => {
                         if let Some(s) = arg("get<") {

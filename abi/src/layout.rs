@@ -2034,9 +2034,9 @@ impl<'a> Layouts<'a> {
         })
     }
 
-    /// `("tw:future", "add_listener_all")` and `remove_listener_all`:
+    /// `("tw:future", "add_listener_list")` and `remove_listener_list`:
     /// `(W(arr<Any>), i32)` (§16).
-    pub fn future_listener_all(&self) -> Result<Signature> {
+    pub fn future_listener_list(&self) -> Result<Signature> {
         let cx = Context::default();
         let waker = self.lower(&Type::Scalar(Scalar::I32), &cx, Flow::ToJs)?;
         Ok(Signature {
@@ -2053,8 +2053,8 @@ impl<'a> Layouts<'a> {
         self.position(Pos::Param(0), r)
     }
 
-    /// `("tw:future", "suspend_all")`: `(W(arr<Any>)) -> i32` (§16).
-    pub fn future_suspend_all(&self) -> Result<Signature> {
+    /// `("tw:future", "suspend_list")`: `(W(arr<Any>)) -> i32` (§16).
+    pub fn future_suspend_list(&self) -> Result<Signature> {
         let cx = Context::default();
         Ok(Signature {
             params: vec![self.futures(&cx)?],

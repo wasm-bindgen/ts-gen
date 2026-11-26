@@ -1,10 +1,10 @@
 ;; A hand-written language with no async of its own, which blocks on
 ;; futures under JSPI: it suspends in `tw:future suspend` and
-;; `suspend_all`, and returns futures of its own.
+;; `suspend_list`, and returns futures of its own.
 (module
   (import "tw:js/global" "Api#later()" (func $later (param externref) (result externref)))
   (import "tw:future" "suspend" (func $suspend (param externref) (result i32)))
-  (import "tw:future" "suspend_all" (func $race (param i32 i32) (result i32)))
+  (import "tw:future" "suspend_list" (func $race (param i32 i32) (result i32)))
   (import "tw:future" "get<u32>" (func $get (param externref) (result i32 i32)))
   (import "tw:future" "new" (func $new (result externref externref)))
   (import "tw:future" "resolve<u32>" (func $resolve (param externref i32)))

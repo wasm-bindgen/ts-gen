@@ -416,7 +416,7 @@ class $Future {
     this.cancel = null;
     const ls = this.listeners;
     this.listeners = null;
-    if (ls) for (const l of ls) typeof l === "number" ? $wake(l) : l.fire(this);
+    if (ls) for (const [w, l] of ls) l === true ? $wake(w) : l.fire(this);
   }
 }
 
@@ -463,7 +463,7 @@ class $Park {
 
 function $park(fs, done) {
   const p = new $Park(fs, done);
-  for (const f of fs) (f.listeners ??= new Set()).add(p);
+  for (const f of fs) (f.listeners ??= new Map()).set(p, p);
 }
 
 // The scratch above a suspending stack's base, `[b, sp)` and the table's

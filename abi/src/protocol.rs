@@ -239,18 +239,18 @@ pub fn future_states() -> Import {
     Import::new(FUTURE, "states")
 }
 
-pub fn future_add_listener_all() -> Import {
-    Import::new(FUTURE, "add_listener_all")
+pub fn future_add_listener_list() -> Import {
+    Import::new(FUTURE, "add_listener_list")
 }
 
-pub fn future_remove_listener_all() -> Import {
-    Import::new(FUTURE, "remove_listener_all")
+pub fn future_remove_listener_list() -> Import {
+    Import::new(FUTURE, "remove_listener_list")
 }
 
 /// `(W(arr<Any>)) -> i32`, under `jspi = on`: suspends until one of the
 /// futures settles.
-pub fn future_suspend_all() -> Import {
-    Import::new(FUTURE, "suspend_all")
+pub fn future_suspend_list() -> Import {
+    Import::new(FUTURE, "suspend_list")
 }
 
 pub fn loop_work_available() -> Import {

@@ -2084,9 +2084,9 @@ impl<'a, 'b> Glue<'a, 'b> {
                 b.line("return $suspend(f);");
                 return Ok(b.finish(&format!("function {name}(f)")));
             }
-            Op::SuspendAll => {
+            Op::SuspendList => {
                 let fs = self.lift(&func.sig.params[0].repr, &wires[0])?;
-                b.line(format!("return $suspendAll({fs});"));
+                b.line(format!("return $suspendList({fs});"));
             }
             Op::FutureState => {
                 b.line("return $isFuture(f).state;");
@@ -2148,13 +2148,13 @@ impl<'a, 'b> Glue<'a, 'b> {
                 let call = format!("$states({fs})");
                 self.complete(&mut b, &call, func.sig.results.first(), None, false, &[])?;
             }
-            Op::AddListenerAll | Op::RemoveListenerAll => {
+            Op::AddListenerList | Op::RemoveListenerList => {
                 let fs = self.lift(&func.sig.params[0].repr, &wires[0])?;
-                let each = match func.op {
-                    Op::AddListenerAll => "$addListener",
-                    _ => "$removeListener",
+                let list = match func.op {
+                    Op::AddListenerList => "$addListenerList",
+                    _ => "$removeListenerList",
                 };
-                b.line(format!("$each({fs}, {each}, {});", wires[1][0]));
+                b.line(format!("{list}({fs}, {});", wires[1][0]));
             }
             Op::FutureError(e) => {
                 let map = self.error_map(e)?;
