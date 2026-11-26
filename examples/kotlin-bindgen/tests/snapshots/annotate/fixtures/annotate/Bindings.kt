@@ -17,6 +17,24 @@ val Response.ok: Boolean
         return (r0 != 0)
     }
 
+val Response.url: String
+    get() {
+        val r0 = fixtures.annotate.flat.Response_get_url(this)
+        return r0!!.unsafeCast<JsString>().toString()
+    }
+
+val Response.type: String
+    get() {
+        val r0 = fixtures.annotate.flat.Response_get_type(this)
+        return r0!!.unsafeCast<JsString>().toString()
+    }
+
+val Response.body: ReadableStream<Uint8Array>?
+    get() {
+        val r0 = fixtures.annotate.flat.Response_get_body(this)
+        return r0?.unsafeCast<ReadableStream<Uint8Array>>()
+    }
+
 /**
  * Creates a clone of the response.
  *
@@ -50,6 +68,14 @@ val ResponseInit.statusText: String?
 fun ResponseInit.setStatusText(value: String) {
     fixtures.annotate.flat.ResponseInit_set_statusText_str(this, value.toJsString())
 }
+
+external interface ReadableStream<R : JsAny?> : JsAny
+
+val <R : JsAny?> ReadableStream<R>.locked: Boolean
+    get() {
+        val r0 = fixtures.annotate.flat.ReadableStream_get_locked(this)
+        return (r0 != 0)
+    }
 
 external interface Cache : JsAny
 
@@ -89,6 +115,23 @@ external interface Console : JsAny
 
 fun Console.log(vararg data: JsAny?) {
     fixtures.annotate.flat.Console_log_arr_Any(this, data.toList().toJsArray())
+}
+
+external interface Bucket : JsAny
+
+fun Bucket.put(key: String, bodyBytes: Uint8Array): tsgen.runtime.Future<Unit> {
+    val r0 = fixtures.annotate.flat.Bucket_put_str_Uint8Array(this, key.toJsString(), bodyBytes)
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.annotate.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+}
+
+fun Bucket.put(key: String, bodyBytes: ByteArray): tsgen.runtime.Future<Unit> {
+    val r0 = fixtures.annotate.flat.Bucket_put_str_u8(this, key.toJsString(), tsgen.runtime.typedArray("Uint8Array", bodyBytes))
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.annotate.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+}
+
+fun Bucket.upload(key: String, data: ByteArray): tsgen.runtime.Future<Unit> {
+    val r0 = fixtures.annotate.flat.Bucket_upload_str_buffer(this, key.toJsString(), tsgen.runtime.typedArray("Uint8Array", data))
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.annotate.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
 }
 
 external interface Incoming : JsAny
@@ -133,9 +176,20 @@ fun Lookup.find(key: String): String? {
     return r0?.unsafeCast<JsString>()?.toString()
 }
 
+external interface Uint8Array : JsAny
+
+external interface ArrayBuffer : JsAny
+
+external interface ArrayBufferView : JsAny
+
 fun ResponseInit(): ResponseInit {
     val r0 = fixtures.annotate.flat.ResponseInit_new()
     return r0!!.unsafeCast<ResponseInit>()
+}
+
+fun <R : JsAny?> ReadableStream(): ReadableStream<R> {
+    val r0 = fixtures.annotate.flat.ReadableStream_new()
+    return r0!!.unsafeCast<ReadableStream<R>>()
 }
 
 val console: Console

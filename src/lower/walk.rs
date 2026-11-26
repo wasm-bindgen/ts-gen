@@ -87,6 +87,7 @@ fn tparams(ps: &mut [abi::TypeParam], f: &mut impl FnMut(&mut abi::TypeRef)) {
         match &mut p.bound {
             Some(abi::Bound::Subtype(t)) => ty(t, f),
             Some(abi::Bound::In(ts)) => ts.iter_mut().for_each(|t| ty(t, f)),
+            Some(abi::Bound::KeyOf(t)) => ty(t, f),
             None => {}
         }
     }
@@ -114,10 +115,16 @@ fn ty(t: &mut abi::Type, f: &mut impl FnMut(&mut abi::TypeRef)) {
             ty(&mut fun.result, f);
         }
         T::Named(r) => type_ref(r, f),
-        T::Unit
+        T::Index(m, k) => {
+            ty(m, f);
+            ty(k, f);
+        }
+        T::Lit(_)
+        | T::Unit
         | T::Never
         | T::Scalar(_)
         | T::Str
+        | T::Buffer
         | T::Any
         | T::ScalarBox(_)
         | T::StrBox

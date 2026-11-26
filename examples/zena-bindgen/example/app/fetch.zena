@@ -1,7 +1,7 @@
 // Subrequests: a service binding, the global fetch, a timeout, and cancellation.
 import { Future, TaskGroup } from 'zena:async';
 import {
-  AbortController, AbortSignal, BodyInitStr, Env, Event, EventListenerOrEventListenerObjectEventListener,
+  AbortController, AbortSignal, BodyInitStr, Env, Event,
   NoStoreOrNoCache, RequestInfoStr, RequestInit, RequestInitCfProperties, Response, fetch as jsFetch, fetchWithInit,
   scheduler
 } from '../bindings.zena';
@@ -61,9 +61,9 @@ export async function fetchRoute(env: Env): Future<Response> {
   // An AbortController made here: JS calls the listener on `abort()`.
   let controller = new AbortController();
   var heard = "nothing";
-  let listener = new EventListenerOrEventListenerObjectEventListener((event: Event): void => {
+  let listener = (event: Event): void => {
     heard = `an "${event.type_}" event`;
-  });
+  };
   controller.signal.addEventListener("abort", listener);
   controller.abort();
   return ok(`service binding: ${bound}global fetch: ${global}` +

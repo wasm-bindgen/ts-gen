@@ -41,6 +41,12 @@ pub(crate) struct Tcx {
     /// In a union of `bigint` with other values (a comparator's
     /// `number | bigint`), where `bigint` is no typed array element.
     pub mixed: bool,
+    /// A type argument, which holds no `buffer`: its two classes stay an
+    /// enum there.
+    pub arg: bool,
+    /// A `{@slice view}` parameter, whose `buffer` is written by arm
+    /// beside its view.
+    pub view: bool,
 }
 
 /// What a use is of the declaration holding it.
@@ -75,6 +81,16 @@ impl Tcx {
             owner: None,
             export: false,
             mixed: false,
+            arg: false,
+            view: false,
+        }
+    }
+
+    /// A type argument of the use.
+    pub fn arg(&self) -> Tcx {
+        Tcx {
+            arg: true,
+            ..self.clone()
         }
     }
 
@@ -171,6 +187,9 @@ pub(crate) struct Leaves {
     /// The value types and string literals in source order, which a name
     /// spelled from them follows.
     pub order: Vec<Leaf>,
+    /// The `ArrayBuffer` and `ArrayBufferView` a `buffer` among `values`
+    /// stands for.
+    pub handles: Vec<abi::Type>,
 }
 
 impl Leaves {
@@ -220,7 +239,62 @@ impl Leaves {
                 l.values.push(abi::Type::Scalar(abi::Scalar::Bool));
             }
         }
+        l.fold_buffer();
         l
+    }
+
+    /// `ArrayBuffer` and `ArrayBufferView` together are a `buffer`,
+    /// whatever else the union holds (IR.md §3).
+    fn fold_buffer(&mut self) {
+        let class = |name: &str| {
+            self.values.iter().position(|v| {
+                matches!(v, abi::Type::Named(r)
+                    if r.path.segments.last().is_some_and(|n| n == name))
+            })
+        };
+        let (Some(a), Some(b)) = (class("ArrayBuffer"), class("ArrayBufferView")) else {
+            return;
+        };
+        self.handles = vec![self.values[a].clone(), self.values[b].clone()];
+        self.values[a.min(b)] = abi::Type::Buffer;
+        self.values.remove(a.max(b));
+        let mut folded = false;
+        let handles = &self.handles;
+        self.order.retain_mut(|leaf| match leaf {
+            Leaf::Ty(t) if handles.contains(t) => {
+                *t = abi::Type::Buffer;
+                !std::mem::replace(&mut folded, true)
+            }
+            _ => true,
+        });
+    }
+
+    /// Whether the union is a `buffer` and nothing else.
+    fn buffer_only(&self) -> bool {
+        self.values == [abi::Type::Buffer]
+            && self.strs.is_empty()
+            && self.nums.is_empty()
+            && self.bools.is_empty()
+            && !self.open
+    }
+
+    /// The `buffer` as the two classes it folded.
+    fn unfold_buffer(&mut self) {
+        let handles = std::mem::take(&mut self.handles);
+        self.values = std::mem::take(&mut self.values)
+            .into_iter()
+            .flat_map(|t| match t {
+                abi::Type::Buffer => handles.clone(),
+                t => vec![t],
+            })
+            .collect();
+        self.order = std::mem::take(&mut self.order)
+            .into_iter()
+            .flat_map(|leaf| match leaf {
+                Leaf::Ty(abi::Type::Buffer) => handles.iter().cloned().map(Leaf::Ty).collect(),
+                leaf => vec![leaf],
+            })
+            .collect();
     }
 }
 
@@ -322,6 +396,14 @@ impl Lowerer<'_> {
                 generic_args,
             } => self.reference(segments, generic_args, cx),
             TypeRef::Unresolved(s) if s == "this" => cx.this.clone().unwrap_or(T::Any),
+            TypeRef::IndexedAccess(o, i) if self.key_index(o, i) => {
+                let m = self.ty(o, cx);
+                let k = match &**i {
+                    TypeRef::StringLiteral(s) => T::Lit(abi::Literal::Str(s.clone())),
+                    i => self.ty(i, cx),
+                };
+                T::Index(Box::new(m), Box::new(k))
+            }
             other => {
                 self.warn(format!(
                     "{}: `{}` has no IR type and reads as `Any`",
@@ -684,6 +766,9 @@ impl Lowerer<'_> {
         use abi::Type as T;
         if l.top {
             return (T::Nullable(Box::new(T::Any), false), false);
+        }
+        if cx.arg && l.buffer_only() {
+            l.unfold_buffer();
         }
         if !l.nums.is_empty() {
             let only = l.values.is_empty() && l.strs.is_empty() && l.bools.is_empty();
@@ -1605,6 +1690,106 @@ impl Lowerer<'_> {
         }
     }
 
+    /// Whether `o[i]` is an index the IR states (§13): by a key parameter
+    /// of the signature being lowered, or by a literal into one that is.
+    pub(crate) fn key_index(&self, o: &TypeRef, i: &TypeRef) -> bool {
+        match i {
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } => generic_args.is_empty() && matches!(&segments[..], [k] if self.keyed.contains(k)),
+            TypeRef::StringLiteral(_) => {
+                matches!(o, TypeRef::IndexedAccess(o, i) if self.key_index(o, i))
+            }
+            _ => false,
+        }
+    }
+
+    /// [`Self::plain`], but for the indexes the IR states.
+    pub(crate) fn keyed_plain(&self, t: &TypeRef) -> bool {
+        match t {
+            TypeRef::IndexedAccess(o, i) => {
+                self.key_index(o, i)
+                    && match &**o {
+                        TypeRef::IndexedAccess(..) => self.keyed_plain(o),
+                        o => self.plain(o),
+                    }
+            }
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } => {
+                self.utility(segments).is_none()
+                    && segments.as_slice() != ["this"]
+                    && generic_args.iter().all(|a| self.keyed_plain(a))
+            }
+            TypeRef::Array(t) => self.keyed_plain(t),
+            TypeRef::Tuple(ts) => ts.iter().all(|t| self.keyed_plain(t)),
+            TypeRef::Union(u) => u.members().iter().all(|t| self.keyed_plain(t)),
+            TypeRef::Function(f) => {
+                f.params.iter().all(|p| self.keyed_plain(&p.type_ref))
+                    && self.keyed_plain(&f.return_type)
+            }
+            t => self.plain(t),
+        }
+    }
+
+    /// Whether `m` lowers to a map (§13): a class or an interface, or a
+    /// type parameter bounded by one or by a string-keyed `Record`.
+    pub(crate) fn is_map(&self, m: &TypeRef, cx: &Tcx) -> bool {
+        let TypeRef::Reference {
+            segments,
+            generic_args,
+        } = m
+        else {
+            return false;
+        };
+        if !generic_args.iter().all(|a| self.plain(a)) {
+            return false;
+        }
+        let declared = |segments: &[String]| {
+            self.resolve_id(segments, cx).is_some_and(|id| {
+                matches!(
+                    self.gctx.get_type(id).kind,
+                    TypeKind::Interface(_) | TypeKind::Class(_)
+                )
+            })
+        };
+        if declared(segments) {
+            return true;
+        }
+        let [name] = &segments[..] else { return false };
+        let scopes = &self.gctx.scopes;
+        if !matches!(
+            scopes.resolve_binding(cx.scope, name),
+            Some(Binding::TypeParam)
+        ) || cx.subst.contains_key(name)
+        {
+            return false;
+        }
+        let Some(owner) = scopes.binding_owner(cx.scope, name) else {
+            return false;
+        };
+        let bound = self.gctx.iter_types().find_map(|(_, d)| {
+            let (scope, ps) = match &d.kind {
+                TypeKind::Class(c) => (c.body_scope, &c.type_params),
+                TypeKind::Interface(i) => (i.body_scope, &i.type_params),
+                _ => return None,
+            };
+            (scope == owner).then(|| ps.iter().find(|p| p.name == *name))?
+        });
+        match bound.and_then(|p| p.constraint.as_ref()) {
+            Some(TypeRef::Reference {
+                segments,
+                generic_args,
+            }) => match (segments.as_slice(), generic_args.as_slice()) {
+                ([r], [TypeRef::String, v]) if r == "Record" => self.plain(v),
+                _ => generic_args.iter().all(|a| self.plain(a)) && declared(segments),
+            },
+            _ => false,
+        }
+    }
+
     /// Whether `t` reads the same wherever it's written: nothing a use
     /// evaluates (`keyof`, `T[K]`, mapped and template types, utilities)
     /// or names for itself (object literals, intersections).
@@ -1727,7 +1912,7 @@ impl Lowerer<'_> {
                 return self.literal_enum(&strs, cx, Some(named));
             }
         }
-        self.inner(a, cx)
+        self.inner(a, &cx.arg())
     }
 
     /// `undefined`, `void` or `never` as a type argument: `unit`, the
@@ -1893,6 +2078,9 @@ impl Lowerer<'_> {
                         Some(t) => t.clone(),
                         None => abi::Type::named([name.as_str()]),
                     };
+                }
+                Some(Binding::Erased(_)) if args.is_empty() && self.keyed.contains(name) => {
+                    return abi::Type::named([name.as_str()]);
                 }
                 Some(Binding::Erased(e)) => return self.ty(&e.type_ref(), cx),
                 _ => {}
@@ -2090,7 +2278,12 @@ impl Lowerer<'_> {
             _ => {
                 let args = args
                     .iter()
-                    .map(|a| boxed(self.void_arg(a, cx).unwrap_or_else(|| self.inner(a, cx))))
+                    .map(|a| {
+                        boxed(
+                            self.void_arg(a, cx)
+                                .unwrap_or_else(|| self.inner(a, &cx.arg())),
+                        )
+                    })
                     .collect();
                 // A lib's own interfaces outside its roots stay interfaces.
                 let declared = self.resolve_id(&[name.to_string()], cx);
@@ -2116,7 +2309,7 @@ impl Lowerer<'_> {
             _ => "Record",
         };
         let value = match args.get(1) {
-            Some(v) => self.inner(v, cx),
+            Some(v) => self.inner(v, &cx.arg()),
             None => abi::Type::Nullable(Box::new(abi::Type::Any), false),
         };
         self.taken.insert(name.to_string());
@@ -2245,6 +2438,15 @@ impl Lowerer<'_> {
                 _ if self.is_fn(v, &cx.place) => "function".into(),
                 T::Future(..) => "thenable".into(),
                 T::Vec(e) => format!("vec {}", print_type(e)),
+                // A `buffer` takes any view, so it comes after every other
+                // object arm, as the interface it folded did.
+                T::Buffer => {
+                    if object {
+                        return false;
+                    }
+                    object = true;
+                    continue;
+                }
                 // A nested enum's literals or payloads may be anything.
                 _ if self.is_enum(v, &cx.place) => return false,
                 // An interface takes any object, so it comes after every

@@ -69,6 +69,11 @@ impl FetchOptionsBuilder {
         self.inner
     }
 }
+impl From<FetchOptions> for FetchOptionsBuilder {
+    fn from(inner: FetchOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Response , extends = Object , is_type_of = JsValue :: is_object)]
@@ -76,12 +81,18 @@ extern "C" {
     pub type ResponseExt;
     #[doc = " Parse the body as JSON and return a typed result."]
     #[wasm_bindgen(method, catch, js_name = "jsonExt")]
-    pub async fn json_ext<T>(this: &ResponseExt) -> Result<T, JsValue>
+    pub async fn json_ext(this: &ResponseExt) -> Result<JsValue, JsValue>;
+    #[doc = " Parse the body as JSON and return a typed result."]
+    #[wasm_bindgen(method, js_name = "jsonExt")]
+    pub fn json_ext_promise(this: &ResponseExt) -> Promise;
+    #[doc = " Parse the body as JSON and return a typed result."]
+    #[wasm_bindgen(method, catch, js_name = "jsonExt")]
+    pub async fn json_ext_typed<T>(this: &ResponseExt) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
     #[doc = " Parse the body as JSON and return a typed result."]
     #[wasm_bindgen(method, js_name = "jsonExt")]
-    pub fn json_ext_promise<T>(this: &ResponseExt) -> Promise<T>;
+    pub fn json_ext_typed_promise<T>(this: &ResponseExt) -> Promise<T>;
     #[doc = " Get the response body as a Uint8Array."]
     #[wasm_bindgen(method, catch)]
     pub async fn bytes(this: &ResponseExt) -> Result<ArrayBuffer, JsValue>;

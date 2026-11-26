@@ -508,6 +508,93 @@ class Array<T> {
 }
 
 #[test]
+fn keys_read_erased_and_by_their_literal() {
+    let ir = parse(
+        r#"
+class Event {}
+class MessageEvent extends Event {}
+interface Record<V> {
+  @js(index) at(key: str): V?;
+}
+interface SocketEvents {
+  get message(): MessageEvent;
+  get close(): Event;
+}
+interface Bag {
+  get size(): f64;
+  get label(): str;
+  get inner(): Bag;
+}
+enum BagValue {
+  F64(f64);
+  Str(str);
+  Bag(Bag);
+}
+class Target<M: Record<Event> = Record<Event>> {
+  on<K in keyof M>(type: K, handler: fn(M[K]));
+}
+class Store {
+  read<K in keyof Bag>(key: K): Bag[K];
+  deep<K in keyof Bag>(key: K): Bag[K]["size"];
+  label(): Bag["inner"]["label"];
+}
+"#,
+    );
+    let lin = profile("all-linear");
+    let l = Layouts::new(&ir, &lin);
+    let keys = l.keys.members();
+    let lit = |s: &str| Type::Lit(Literal::Str(s.into()));
+
+    // Erased, a key is a string and an index what every key gives: an
+    // open map's value, a closed one's declared enum, else `Any`.
+    let on = member(&keys, "Target#on(K,fn(M[K]))");
+    let s = l.member(on, &[]).unwrap();
+    assert_eq!(s.params[1].repr.ty, "str");
+    assert_eq!(s.params[2].repr.ty, "fn(Event)");
+    let read = member(&keys, "Store#read(K)");
+    assert_eq!(l.member(read, &[]).unwrap().results[0].repr.ty, "BagValue");
+    let deep = member(&keys, "Store#deep(K)");
+    assert_eq!(l.member(deep, &[]).unwrap().results[0].repr.ty, "Any");
+    let label = member(&keys, "Store#label()");
+    assert_eq!(l.member(label, &[]).unwrap().results[0].repr.ty, "str");
+
+    // A mono variant's key has no wire value and picks its property.
+    let s = l.member(on, &[ty("SocketEvents"), lit("message")]).unwrap();
+    assert_eq!(
+        s.params[1].repr.kind,
+        Kind::Lit(Literal::Str("message".into()))
+    );
+    assert_eq!(s.params[2].repr.ty, "fn(MessageEvent)");
+    assert_eq!(s.core().to_string(), "(externref, i32)");
+    // A key left a value reads as the member does erased.
+    let s = l.member(on, &[ty("SocketEvents"), Type::Str]).unwrap();
+    assert_eq!(s.params[1].repr.ty, "str");
+    assert_eq!(s.params[2].repr.ty, "fn(Event)");
+    let s = l
+        .member(on, &[ty("Record<Event>"), lit("anything")])
+        .unwrap();
+    assert_eq!(s.params[2].repr.ty, "fn(Event)");
+    assert_eq!(
+        l.member(read, &[lit("label")]).unwrap().results[0].repr.ty,
+        "str"
+    );
+    assert_eq!(
+        l.member(deep, &[lit("inner")]).unwrap().results[0].repr.ty,
+        "f64"
+    );
+    assert_eq!(
+        l.keys.member(
+            &["Target"],
+            true,
+            on.member,
+            &[ty("SocketEvents"), lit("message")],
+            &on.cx
+        ),
+        r#"Target#on<SocketEvents,"message">(K,fn(M[K]))"#
+    );
+}
+
+#[test]
 fn associated_types_take_their_row() {
     let ir = parse(
         r#"
@@ -1141,4 +1228,24 @@ fn unboxing_a_handle_or_function_recovers_the_handle() {
             );
         }
     }
+}
+
+#[test]
+fn a_buffer_crosses_as_its_bytes() {
+    let ir = parse("");
+    let p = Profile::all_linear();
+    for flow in [Flow::ToJs, Flow::ToLang] {
+        assert_eq!(
+            wire_of(&ir, &p, "buffer", flow),
+            wire_of(&ir, &p, "u8[]", flow)
+        );
+        assert_eq!(
+            wire_of(&ir, &p, "buffer?", flow),
+            wire_of(&ir, &p, "u8[]?", flow)
+        );
+    }
+    assert_eq!(
+        wire_of(&ir, &p, "*buffer", Flow::ToJs),
+        wire_of(&ir, &p, "*u8[]", Flow::ToJs)
+    );
 }

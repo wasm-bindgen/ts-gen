@@ -1,7 +1,7 @@
 // WebSockets: a pair inside the worker, and a Durable Object that holds one.
 import { Completer, Future } from 'zena:async';
 import {
-  CfPropertiesBox, DurableObjectState, Env, Event, EventListenerOrEventListenerObjectEventListener, Headers,
+  CfPropertiesBox, DurableObjectState, Env, Event, Headers,
   HeadersInitHeaders, MessageEvent, RequestInfoStr, RequestInit, Response, ResponseInit, WebSocket, WebSocketPair
 } from '../bindings.zena';
 import { ArrayBuffer } from '../std.zena';
@@ -10,10 +10,10 @@ import { ObjectReq, ok } from './reply.zena';
 /** The next message a socket receives: JS calls the listener per event. */
 function nextMessage(socket: WebSocket): Future<String> {
   let received = new Completer<String>();
-  socket.addEventListener("message", new EventListenerOrEventListenerObjectEventListener((event: Event): void => {
+  socket.addEventListener("message", (event: Event): void => {
     let data = ((event as externref) as MessageEvent).data;
     received.complete(String.fromHandle(data as externref));
-  }));
+  });
   return received.future;
 }
 
@@ -23,10 +23,10 @@ export async function ws(env: Env): Future<Response> {
   let pair = new WebSocketPair();
   let server = pair._1;
   server.accept();
-  server.addEventListener("message", new EventListenerOrEventListenerObjectEventListener((event: Event): void => {
+  server.addEventListener("message", (event: Event): void => {
     let data = ((event as externref) as MessageEvent).data;
     server.send("echo: " + String.fromHandle(data as externref));
-  }));
+  });
   let client = pair._0;
   client.accept();
   let echoed = nextMessage(client);

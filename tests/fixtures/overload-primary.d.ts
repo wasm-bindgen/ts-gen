@@ -8,12 +8,19 @@
 // A variant is named for what it adds to the bare form: `put_with_options`,
 // `until_with_options` beside `until(other: Store)`, and `with` continues
 // with `_and_` (`with_and_options`).
+//
+// A parameter's only dictionary arm is named by the parameter
+// (`decrypt_with_algorithm`, `listen_with_options` beside
+// `listen_with_bool`); `get`'s two dictionaries keep their type names.
 
 interface GetOptions {
   range?: string;
 }
 interface Conditional {
   etag?: string;
+}
+interface Algorithm {
+  name: string;
 }
 interface Store {
   get(key: string, options: Conditional): Promise<string | null>;
@@ -26,4 +33,6 @@ interface Store {
   find(key: number): Promise<string>;
   until(other: Store | string, options?: GetOptions): number;
   with(fields: Conditional, options?: GetOptions): Store;
+  decrypt(algorithm: string | Algorithm, data: string): Promise<string>;
+  listen(type: string, options?: GetOptions | boolean): void;
 }

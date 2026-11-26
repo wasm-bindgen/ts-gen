@@ -91,14 +91,15 @@ var Point.y: Double
 
 external interface GetOptions<Type : JsAny?> : JsAny
 
-var <Type : JsAny?> GetOptions<Type>.type: Type
+val <Type : JsAny?> GetOptions<Type>.type: Type?
     get() {
         val r0 = fixtures.overloads.flat.GetOptions_get_type(this)
-        return (r0 as Type)
+        return (r0 as Type?)
     }
-    set(value) {
-        fixtures.overloads.flat.GetOptions_set_type_Type(this, value)
-    }
+
+fun <Type : JsAny?> GetOptions<Type>.setType(value: Type) {
+    fixtures.overloads.flat.GetOptions_set_type_Type(this, value)
+}
 
 val <Type : JsAny?> GetOptions<Type>.ttl: Double?
     get() {
@@ -123,19 +124,29 @@ fun Store.read(key: String, options: PartialGetOptionsUndefined): tsgen.runtime.
     return tsgen.runtime.Future<String?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_str(f); r1?.unsafeCast<JsString>()?.toString() }, { f -> futureErrorErr(f) })
 }
 
-fun Store.readText(key: String, options: GetOptions<out JsString>): tsgen.runtime.Future<String?> {
-    val r0 = fixtures.overloads.flat.Store_readText_str_GetOptions_Str(this, key.toJsString(), options)
+fun Store.readText(key: String, options: GetOptions<*>?): tsgen.runtime.Future<String?> {
+    val r0 = fixtures.overloads.flat.Store_readText_str_GetOptions_Any(this, key.toJsString(), options)
     return tsgen.runtime.Future<String?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_str(f); r1?.unsafeCast<JsString>()?.toString() }, { f -> futureErrorErr(f) })
 }
 
-fun <T : JsAny?> Store.readJson(key: String, options: GetOptions<out JsString>): tsgen.runtime.Future<T?> {
-    val r0 = fixtures.overloads.flat.Store_readJson_str_GetOptions_Str(this, key.toJsString(), options)
+fun <T : JsAny?> Store.readJson(key: String, options: GetOptions<*>?): tsgen.runtime.Future<T?> {
+    val r0 = fixtures.overloads.flat.Store_readJson_str_GetOptions_Any(this, key.toJsString(), options)
     return tsgen.runtime.Future<T?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_Any(f); (r1 as T?) }, { f -> futureErrorErr(f) })
 }
 
-fun Store.readArrayBuffer(key: String, options: GetOptions<out JsString>): tsgen.runtime.Future<ArrayBuffer?> {
-    val r0 = fixtures.overloads.flat.Store_readArrayBuffer_str_GetOptions_Str(this, key.toJsString(), options)
+fun Store.readArrayBuffer(key: String, options: GetOptions<*>?): tsgen.runtime.Future<ArrayBuffer?> {
+    val r0 = fixtures.overloads.flat.Store_readArrayBuffer_str_GetOptions_Any(this, key.toJsString(), options)
     return tsgen.runtime.Future<ArrayBuffer?>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_ArrayBuffer(f); r1?.unsafeCast<ArrayBuffer>() }, { f -> futureErrorErr(f) })
+}
+
+fun Store.tail(options: GetOptions<*>?): String {
+    val r0 = try { fixtures.overloads.flat.Store_tail_GetOptions_Any(this, options) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0!!.unsafeCast<JsString>().toString()
+}
+
+fun Store.open(reader: StoreReader?): String {
+    val r0 = try { fixtures.overloads.flat.Store_open_StoreReader(this, reader) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0!!.unsafeCast<JsString>().toString()
 }
 
 fun Store.write(key: String, value: String): tsgen.runtime.Future<Boolean?> {
@@ -151,6 +162,44 @@ fun Store.write(key: String, value: String, options: StoreOptions): tsgen.runtim
 fun Store.write(key: String, value: String, options: StoreWriteOptions): tsgen.runtime.Future<Boolean> {
     val r0 = fixtures.overloads.flat.Store_write_str_str_StoreWriteOptions(this, key.toJsString(), value.toJsString(), options)
     return tsgen.runtime.Future<Boolean>(r0!!, { f -> val r1 = fixtures.overloads.flat.take_bool_2(f); (r1 != 0) }, { f -> futureErrorErr(f) })
+}
+
+fun Store.getReader(): String {
+    val r0 = try { fixtures.overloads.flat.Store_getReader(this) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0!!.unsafeCast<JsString>().toString()
+}
+
+fun Store.getReaderByob(): Double {
+    val r0 = try { fixtures.overloads.flat.Store_getReaderByob(this) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0
+}
+
+fun Store.lock(): String {
+    val r0 = try { fixtures.overloads.flat.Store_lock(this) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0!!.unsafeCast<JsString>().toString()
+}
+
+external interface StoreReader : JsAny
+
+val StoreReader.mode: String
+    get() {
+        val r0 = fixtures.overloads.flat.StoreReader_get_mode(this)
+        return r0!!.unsafeCast<JsString>().toString()
+    }
+
+fun StoreReader.setModeByob() {
+    fixtures.overloads.flat.StoreReader_set_modeByob(this)
+}
+
+val StoreReader.size: Double?
+    get() {
+        val r0 = fixtures.overloads.flat.StoreReader_get_size(this)
+        val s1 = fixtures.overloads.flat.ret_f64()
+        return (if (r0 == 0) null else s1)
+    }
+
+fun StoreReader.setSize(value: Double) {
+    fixtures.overloads.flat.StoreReader_set_size_f64(this, value)
 }
 
 external interface StoreOptions : JsAny
@@ -174,6 +223,30 @@ var StoreWriteOptions.ttl: Double
     set(value) {
         fixtures.overloads.flat.StoreWriteOptions_set_ttl_f64(this, value)
     }
+
+external interface StoreGetReaderOptions : JsAny
+
+val StoreGetReaderOptions.mode: String
+    get() {
+        val r0 = fixtures.overloads.flat.StoreGetReaderOptions_get_mode(this)
+        return r0!!.unsafeCast<JsString>().toString()
+    }
+
+fun StoreGetReaderOptions.setModeByob() {
+    fixtures.overloads.flat.StoreGetReaderOptions_set_modeByob(this)
+}
+
+external interface StoreHow : JsAny
+
+val StoreHow.mode: String
+    get() {
+        val r0 = fixtures.overloads.flat.StoreHow_get_mode(this)
+        return r0!!.unsafeCast<JsString>().toString()
+    }
+
+fun StoreHow.setModeExclusive() {
+    fixtures.overloads.flat.StoreHow_set_modeExclusive(this)
+}
 
 external interface PartialGetOptionsUndefined : JsAny
 
@@ -251,6 +324,11 @@ fun <Type : JsAny?> GetOptions(): GetOptions<Type> {
     return r0!!.unsafeCast<GetOptions<Type>>()
 }
 
+fun StoreReader(): StoreReader {
+    val r0 = fixtures.overloads.flat.StoreReader_new()
+    return r0!!.unsafeCast<StoreReader>()
+}
+
 fun StoreOptions(): StoreOptions {
     val r0 = fixtures.overloads.flat.StoreOptions_new()
     return r0!!.unsafeCast<StoreOptions>()
@@ -259,6 +337,16 @@ fun StoreOptions(): StoreOptions {
 fun StoreWriteOptions(): StoreWriteOptions {
     val r0 = fixtures.overloads.flat.StoreWriteOptions_new()
     return r0!!.unsafeCast<StoreWriteOptions>()
+}
+
+fun StoreGetReaderOptions(): StoreGetReaderOptions {
+    val r0 = fixtures.overloads.flat.StoreGetReaderOptions_new()
+    return r0!!.unsafeCast<StoreGetReaderOptions>()
+}
+
+fun StoreHow(): StoreHow {
+    val r0 = fixtures.overloads.flat.StoreHow_new()
+    return r0!!.unsafeCast<StoreHow>()
 }
 
 fun PartialGetOptionsUndefined(): PartialGetOptionsUndefined {

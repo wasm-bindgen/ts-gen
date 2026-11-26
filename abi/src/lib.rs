@@ -21,6 +21,7 @@ pub mod enums;
 pub mod ir;
 pub mod json;
 pub mod key;
+pub mod keyed;
 pub mod layout;
 pub mod naming;
 pub mod profile;

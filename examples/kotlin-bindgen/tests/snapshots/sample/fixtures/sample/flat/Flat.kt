@@ -139,6 +139,14 @@ external fun Bytes_at_u32(p0: JsAny?, p1: Int): Double
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun Bytes_at_i32(p0: JsAny?, p1: Int): Double
 
+/** tw:js/global Bytes#slice(str) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Bytes_slice_str(p0: JsAny?, p1: JsAny?): JsAny?
+
+/** tw:js/global Bytes#slice(SliceOptions) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Bytes_slice_SliceOptions(p0: JsAny?, p1: JsAny?): JsAny?
+
 /** tw:js/global Bytes#one() */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun Bytes_one(p0: JsAny?): JsAny?
@@ -154,6 +162,18 @@ external fun ret_f64(): Double
 /** tw:js/global Bytes#quad() */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun Bytes_quad(p0: JsAny?): Int
+
+/** tw:js/global SliceOptions.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun SliceOptions_new(): JsAny?
+
+/** tw:js/global SliceOptions#get:start() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun SliceOptions_get_start(p0: JsAny?): Int
+
+/** tw:js/global SliceOptions#set:start(u32) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun SliceOptions_set_start_u32(p0: JsAny?, p1: Int)
 
 /** tw:future take<str?> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")

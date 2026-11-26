@@ -1036,6 +1036,29 @@ fn mono_variants_respect_concrete_bounds() {
     assert!(err("Bag#take<u32>(T)", "i32").contains("no generic IR member"));
 }
 
+#[test]
+fn mono_keys_name_a_property() {
+    let ir = text::parse(
+        "ir 1;\ninterface Sizes { get width(): u32; }\nclass Shape { static read<K in keyof Sizes>(key: K): Sizes[K]; }",
+    )
+    .unwrap();
+    let lang = |key: &str| {
+        let key = key.replace('"', "\\\"");
+        wat::parse_str(format!(
+            "(module (import \"tw:js/global\" \"{key}\" (func (result i32))))"
+        ))
+        .unwrap()
+    };
+    let p = Profile::all_linear();
+    let err = |key: &str| match ts_gen_bridge::generate(&ir, &p, &lang(key)) {
+        Ok(_) => String::new(),
+        Err(e) => e.to_string(),
+    };
+    assert_eq!(err(r#"Shape.read<"width">(K)"#), "");
+    assert!(err(r#"Shape.read<"height">(K)"#).contains(r#"`"height"` isn't a key of `Sizes`"#));
+    assert!(err("Shape.read<u32>(K)").contains("`u32` isn't a key of `Sizes`"));
+}
+
 /// Benchmarks (`just bench`, `BENCH=<name>` to pick one): each
 /// `benches/<name>/` has an `ir.ts`, a `profiles` file of `<name>: <profile>`
 /// lines, an optional `protocol` (plus `protocol.<profile name>` additions),

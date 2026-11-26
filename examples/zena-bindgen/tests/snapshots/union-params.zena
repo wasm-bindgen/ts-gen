@@ -3,6 +3,144 @@
 
 import { Option, Some, None, none, some } from 'zena:core';
 
+import { Future, Completer, drainMicrotasks } from 'zena:async';
+
+@external("tw:future", "poll", "tw")
+declare function __tw_future_poll(future: externref, waker: i32): i32;
+
+@external("tw:future", "take<{T}>", "tw")
+declare function __tw_future_take<T>(future: externref): T;
+
+@external("tw:future", "error<err>", "tw")
+declare function __tw_future_error(future: externref): inline (i32, String);
+
+@external("tw:future", "drop", "tw")
+declare function __tw_future_drop(future: externref): void;
+
+@external("tw:future", "new", "tw")
+declare function __tw_future_new(): inline (externref, externref);
+
+@external("tw:future", "resolve<{T}>", "tw")
+declare function __tw_future_resolve<T>(resolver: externref, value: T): void;
+
+@external("tw:future", "reject<err>", "tw")
+declare function __tw_future_reject(resolver: externref, arm: i32, message: String): void;
+
+@external("tw:loop", "work_available", "tw")
+declare function __tw_work_available(loop: i32): void;
+
+// The bindings run one tw loop, Zena's microtask queue: a JS future
+// settling wakes its awaiter, whose completion asks the bridge for a
+// tick, which drains the queue.
+interface __TwPoll {
+  poll(): void;
+}
+
+let __tw_polls = new HashMap<i32, __TwPoll>();
+var __tw_next_waker = 1;
+
+class __TwAwait<T> implements __TwPoll {
+  future: externref;
+  waker: i32;
+  completer: Completer<T>;
+  fail: (future: externref) => Error;
+
+  new(future: externref, waker: i32, fail: (future: externref) => Error)
+      : future = future, waker = waker, completer = new Completer<T>(), fail = fail {}
+
+  poll(): void {
+    let state = __tw_future_poll(this.future, this.waker);
+    if (state == 0) {
+      __tw_polls[this.waker] = this;
+      return;
+    }
+    if (state == 1) {
+      this.completer.complete(__tw_future_take<T>(this.future));
+    } else {
+      let fail = this.fail;
+      this.completer.fail(fail(this.future));
+    }
+    __tw_work_available(1);
+  }
+}
+
+/** A JS future as a Zena future, `fail` mapping its rejection to the
+ * error it fails with. Cancelling its awaiter drops the JS future, which
+ * cancels it. */
+export async function __tw_await_with<T>(
+    future: externref, fail: (future: externref) => Error): Future<T> {
+  let waker = __tw_next_waker;
+  __tw_next_waker += 1;
+  let a = new __TwAwait<T>(future, waker, fail);
+  a.poll();
+  try {
+    return await a.completer.future;
+  } cancel {
+    __tw_polls.delete(waker);
+    __tw_future_drop(future);
+  }
+}
+
+function __tw_err_fail(future: externref): Error {
+  let (arm, message) = __tw_future_error(future);
+  return new ErrException(arm as ErrArm, message);
+}
+
+export function __tw_await<T>(future: externref): Future<T> {
+  return __tw_await_with<T>(future, __tw_err_fail);
+}
+
+async function __tw_settle<T>(
+    resolver: externref, future: Future<T>,
+    reject: (resolver: externref, e: Error) => void): Future<void> {
+  try {
+    __tw_future_resolve<T>(resolver, await future);
+  } catch (e) {
+    reject(resolver, e);
+  }
+}
+
+function __tw_err_reject(resolver: externref, e: Error): void {
+  if (e is ErrException) {
+    __tw_future_reject(resolver, e.arm as i32, e.message);
+  } else {
+    __tw_future_reject(resolver, -1, e.message);
+  }
+}
+
+/** A Zena future as a JS future, `reject` rejecting it with the error
+ * the Zena future fails with. */
+export function __tw_promise_with<T>(
+    future: Future<T>, reject: (resolver: externref, e: Error) => void): externref {
+  let (promise, resolver) = __tw_future_new();
+  __tw_settle<T>(resolver, future, reject);
+  __tw_work_available(1);
+  return promise;
+}
+
+export function __tw_promise<T>(future: Future<T>): externref {
+  return __tw_promise_with<T>(future, __tw_err_reject);
+}
+
+@export("tw:future/wake")
+export function __tw_wake(waker: i32): void {
+  if (let (true, p) = __tw_polls.get(waker)) {
+    __tw_polls.delete(waker);
+    p.poll();
+  }
+}
+
+@export("tw:loop/tick")
+export function __tw_tick(loop: i32, max: i32): i32 {
+  drainMicrotasks();
+  return 0;
+}
+
+@export("tw:loop/next_sleep")
+export function __tw_next_sleep(loop: i32): i64 {
+  return (-9223372036854775808 as i64);
+}
+
 export sealed class Body {
   case BodyStr(value: String)
   case BodyBlob(value: Blob)
@@ -37,6 +175,27 @@ export sealed class Tagged {
 export sealed class VKind {
   case VKindStr(value: String)
   case VKindF64(value: f64)
+}
+
+export sealed class ValueKind {
+  case ValueKindStr(value: String)
+  case ValueKindBuffer(value: FixedArray<u8>)
+}
+
+export sealed class ValueKind2 {
+  case ValueKind2Blob(value: Blob)
+  case ValueKind2Buffer(value: FixedArray<u8>)
+  case ValueKind2Str(value: String)
+}
+
+export sealed class BufferOrStr {
+  case BufferOrStrBuffer(value: FixedArray<u8>)
+  case BufferOrStrStr(value: String)
+}
+
+export sealed class BufferSource {
+  case BufferSourceArrayBuffer(value: ArrayBuffer)
+  case BufferSourceArrayBufferView(value: ArrayBufferView)
 }
 
 export extension class Blob on externref {
@@ -152,6 +311,72 @@ export extension class Universal on externref {
   new() : super(__Universal_new());
 }
 
+export extension class Box<T> on externref {
+  value: T {
+    get {
+      return __Box_value<T>((this as externref));
+    }
+    set(value) {
+      __Box_value2<T>((this as externref), value);
+    }
+  }
+}
+
+export extension class Frame on externref {
+  payload: FixedArray<u8> {
+    get {
+      return __Frame_payload((this as externref));
+    }
+    set(value) {
+      __Frame_payload2((this as externref), value);
+    }
+  }
+  setPayload(value: ArrayBuffer): void {
+    __Frame_payload3((this as externref), value);
+  }
+  setPayload(value: ArrayBufferView): void {
+    __Frame_payload4((this as externref), value);
+  }
+  tag: BufferOrStr | null {
+    get {
+      let (r0, r1, r2) = __Frame_tag((this as externref));
+      return __BufferOrStr_decode(r0, r1, r2);
+    }
+  }
+  setTag(value: BufferOrStr): void {
+    let (t5, t6, t7) = __BufferOrStr_encode(value);
+    __Frame_tag2((this as externref), t5, t6, t7);
+  }
+  setTag(value: FixedArray<u8>): void {
+    __Frame_tag3((this as externref), value);
+  }
+  setTag(value: ArrayBuffer): void {
+    __Frame_tag4((this as externref), value);
+  }
+  setTag(value: ArrayBufferView): void {
+    __Frame_tag5((this as externref), value);
+  }
+  setTag(value: String): void {
+    __Frame_tag6((this as externref), value);
+  }
+  new() : super(__Frame_new());
+}
+
+export extension class ArrayBuffer on externref {
+}
+
+export extension class ArrayBufferView on externref {
+}
+
+/** The box `BufferSource`: the JS value, which `unbox` converts. */
+@spelling("Any")
+export extension class BufferSourceBox on externref {
+  unbox(): BufferSource {
+    let (r0, r1) = __tw_unbox_BufferSourceBox((this as externref));
+    return (__BufferSource_decode(r0, r1) as BufferSource);
+  }
+}
+
 @external("tw:js/global", "Chunk.new()", "tw")
 declare function __Chunk_new(): externref;
 
@@ -221,6 +446,45 @@ declare function __Universal_cache(p0: externref): i32;
 @external("tw:js/global", "Universal#set:cache(bool)", "tw")
 declare function __Universal_cache2(p0: externref, p1: boolean): void;
 
+@external("tw:js/global", "Box#get:value<{T}>()", "tw")
+declare function __Box_value<T>(p0: externref): T;
+
+@external("tw:js/global", "Box#set:value<{T}>(T)", "tw")
+declare function __Box_value2<T>(p0: externref, p1: T): void;
+
+@external("tw:js/global", "Frame.new()", "tw")
+declare function __Frame_new(): externref;
+
+@external("tw:js/global", "Frame#get:payload()", "tw")
+declare function __Frame_payload(p0: externref): FixedArray<u8>;
+
+@external("tw:js/global", "Frame#set:payload(buffer)", "tw")
+declare function __Frame_payload2(p0: externref, p1: FixedArray<u8>): void;
+
+@external("tw:js/global", "Frame#set:payload(ArrayBuffer)", "tw")
+declare function __Frame_payload3(p0: externref, p1: ArrayBuffer): void;
+
+@external("tw:js/global", "Frame#set:payload(ArrayBufferView)", "tw")
+declare function __Frame_payload4(p0: externref, p1: ArrayBufferView): void;
+
+@external("tw:js/global", "Frame#get:tag()", "tw")
+declare function __Frame_tag(p0: externref): inline (i32, array<var u8> | null, externref | null);
+
+@external("tw:js/global", "Frame#set:tag(BufferOrStr)", "tw")
+declare function __Frame_tag2(p0: externref, p1: i32, p2: array<var u8> | null, p3: externref | null): void;
+
+@external("tw:js/global", "Frame#set:tag(buffer)", "tw")
+declare function __Frame_tag3(p0: externref, p1: FixedArray<u8>): void;
+
+@external("tw:js/global", "Frame#set:tag(ArrayBuffer)", "tw")
+declare function __Frame_tag4(p0: externref, p1: ArrayBuffer): void;
+
+@external("tw:js/global", "Frame#set:tag(ArrayBufferView)", "tw")
+declare function __Frame_tag5(p0: externref, p1: ArrayBufferView): void;
+
+@external("tw:js/global", "Frame#set:tag(str)", "tw")
+declare function __Frame_tag6(p0: externref, p1: String): void;
+
 @external("tw:js/global", "send(Body)", "tw, throws:err")
 declare function __send(p0: i32, p1: externref | null): void;
 
@@ -257,6 +521,36 @@ declare function __scalar(p0: i32, p1: externref | null, p2: f64): void;
 @external("tw:js/global", "configure(Universal)", "tw, throws:err")
 declare function __configure(p0: Universal): void;
 
+@external("tw:js/global", "digest(buffer)", "tw, throws:err")
+declare function __digest(p0: FixedArray<u8>): ArrayBuffer;
+
+@external("tw:js/global", "store(str,ValueKind)", "tw, throws:err")
+declare function __store(p0: String, p1: i32, p2: externref | null, p3: array<var u8> | null): void;
+
+@external("tw:js/global", "storeBlob(ValueKind2)", "tw, throws:err")
+declare function __storeBlob(p0: i32, p1: externref | null, p2: array<var u8> | null): void;
+
+@external("tw:js/global", "load()", "tw, throws:err")
+declare function __load(): FixedArray<u8> | null;
+
+@external("tw:js/global", "loadText()", "tw, throws:err")
+declare function __loadText(): inline (i32, array<var u8> | null, externref | null);
+
+@external("tw:unbox", "BufferSource", "tw")
+declare function __tw_unbox_BufferSourceBox(p0: externref): inline (i32, externref | null);
+
+@external("tw:js/global", "boxed()", "tw, throws:err")
+declare function __boxed(): Box<BufferSourceBox>;
+
+@external("tw:js/global", "hash(buffer)", "tw, throws:err")
+declare function __hash(p0: FixedArray<u8>): void;
+
+@external("tw:js/global", "hashText(str)", "tw, throws:err")
+declare function __hashText(p0: String): void;
+
+@external("tw:js/global", "hashText(buffer)", "tw, throws:err")
+declare function __hashText2(p0: FixedArray<u8>): void;
+
 export function __Body_encode(v: Body | null): inline (i32, externref | null) {
   if (v == null) { return (0, null); }
   if (v is BodyStr) { return (1, (v as BodyStr).value.handle); }
@@ -270,6 +564,19 @@ export function __Piece_encode(v: Piece | null): inline (i32, externref | null) 
   if (v is PieceChunk) { return (1, ((v as PieceChunk).value as externref)); }
   if (v is PiecePart) { return (2, ((v as PiecePart).value as externref)); }
   return (0, null);
+}
+
+export function __BufferOrStr_decode(arm: i32, s0: array<var u8> | null, s1: externref | null): BufferOrStr | null {
+  if (arm == 1) { return new BufferOrStrBuffer((s0 as FixedArray<u8>)); }
+  if (arm == 2) { return new BufferOrStrStr(String.fromHandle(s1 as externref)); }
+  return null;
+}
+
+export function __BufferOrStr_encode(v: BufferOrStr | null): inline (i32, array<var u8> | null, externref | null) {
+  if (v == null) { return (0, null, null); }
+  if (v is BufferOrStrBuffer) { return (1, ((v as BufferOrStrBuffer).value as array<var u8>), null); }
+  if (v is BufferOrStrStr) { return (2, null, (v as BufferOrStrStr).value.handle); }
+  return (0, null, null);
 }
 
 export function __BodyKind_encode(v: BodyKind | null): inline (i32, externref | null) {
@@ -307,6 +614,27 @@ export function __VKind_encode(v: VKind | null): inline (i32, externref | null, 
   return (0, null, 0.0);
 }
 
+export function __ValueKind_encode(v: ValueKind | null): inline (i32, externref | null, array<var u8> | null) {
+  if (v == null) { return (0, null, null); }
+  if (v is ValueKindStr) { return (1, (v as ValueKindStr).value.handle, null); }
+  if (v is ValueKindBuffer) { return (2, null, ((v as ValueKindBuffer).value as array<var u8>)); }
+  return (0, null, null);
+}
+
+export function __ValueKind2_encode(v: ValueKind2 | null): inline (i32, externref | null, array<var u8> | null) {
+  if (v == null) { return (0, null, null); }
+  if (v is ValueKind2Blob) { return (1, ((v as ValueKind2Blob).value as externref), null); }
+  if (v is ValueKind2Buffer) { return (2, null, ((v as ValueKind2Buffer).value as array<var u8>)); }
+  if (v is ValueKind2Str) { return (3, (v as ValueKind2Str).value.handle, null); }
+  return (0, null, null);
+}
+
+export function __BufferSource_decode(arm: i32, s0: externref | null): BufferSource | null {
+  if (arm == 1) { return new BufferSourceArrayBuffer((s0 as ArrayBuffer)); }
+  if (arm == 2) { return new BufferSourceArrayBufferView((s0 as ArrayBufferView)); }
+  return null;
+}
+
 export function __Body_decode(arm: i32, s0: externref | null): Body | null {
   if (arm == 1) { return new BodyStr(String.fromHandle(s0 as externref)); }
   if (arm == 2) { return new BodyBlob((s0 as Blob)); }
@@ -315,8 +643,8 @@ export function __Body_decode(arm: i32, s0: externref | null): Body | null {
 }
 
 export function send(body: Body): void {
-  let (t5, t6) = __Body_encode(body);
-  __send(t5, t6);
+  let (t8, t9) = __Body_encode(body);
+  __send(t8, t9);
 }
 
 export function sendMaybe(): void {
@@ -324,54 +652,105 @@ export function sendMaybe(): void {
 }
 
 export function sendMaybeWithBody(body: Body): void {
-  let (t7, t8) = __Body_encode(body);
-  __sendMaybe2(t7, t8);
+  let (t10, t11) = __Body_encode(body);
+  __sendMaybe2(t10, t11);
 }
 
 export function sendAny(body: BodyKind): void {
-  let (t9, t10) = __BodyKind_encode(body);
-  __sendAny(t9, t10);
+  let (t12, t13) = __BodyKind_encode(body);
+  __sendAny(t12, t13);
 }
 
 export function sendPiece(piece: Piece): void {
-  let (t11, t12) = __Piece_encode(piece);
-  __sendPiece(t11, t12);
+  let (t14, t15) = __Piece_encode(piece);
+  __sendPiece(t14, t15);
 }
 
 export function sendPayload(body: Body): void {
-  let (t13, t14) = __Body_encode(body);
-  __sendPayload(t13, t14);
+  let (t16, t17) = __Body_encode(body);
+  __sendPayload(t16, t17);
 }
 
 export function sendLoose(body: Body): void {
-  let (t15, t16) = __Body_encode(body);
-  __sendLoose(t15, t16);
+  let (t18, t19) = __Body_encode(body);
+  __sendLoose(t18, t19);
 }
 
 export function wrapDefault(w: Wrapped): void {
-  let (t17, t18) = __Wrapped_encode(w);
-  __wrapDefault(t17, t18);
+  let (t20, t21) = __Wrapped_encode(w);
+  __wrapDefault(t20, t21);
 }
 
 export function wrapBlob(w: WrappedBlob): void {
-  let (t19, t20) = __WrappedBlob_encode(w);
-  __wrapBlob(t19, t20);
+  let (t22, t23) = __WrappedBlob_encode(w);
+  __wrapBlob(t22, t23);
 }
 
 export function tagged(t: Tagged): void {
-  let (t21, t22) = __Tagged_encode(t);
-  __tagged(t21, t22);
+  let (t24, t25) = __Tagged_encode(t);
+  __tagged(t24, t25);
 }
 
 export function scalar(v: VKind | null): void {
-  let (t23, t24, t25) = __VKind_encode(v);
-  __scalar(t23, t24, t25);
+  let (t26, t27, t28) = __VKind_encode(v);
+  __scalar(t26, t27, t28);
 }
 
 export function configure(s: Universal): void {
   __configure(s);
 }
 
+export function digest(data: FixedArray<u8>): ArrayBuffer {
+  return __digest(data);
+}
+
+export function store(key: String, value: ValueKind): void {
+  let (t29, t30, t31) = __ValueKind_encode(value);
+  __store(key, t29, t30, t31);
+}
+
+export function storeBlob(value: ValueKind2): void {
+  let (t32, t33, t34) = __ValueKind2_encode(value);
+  __storeBlob(t32, t33, t34);
+}
+
+export function load(): FixedArray<u8> | null {
+  return __load();
+}
+
+export function loadText(): BufferOrStr {
+  let (r0, r1, r2) = __loadText();
+  return (__BufferOrStr_decode(r0, r1, r2) as BufferOrStr);
+}
+
+// skipped join(arr<buffer>): a future of `buffer`, which is converted
+export function boxed(): Box<BufferSourceBox> {
+  return __boxed();
+}
+
+/**
+ * * `data`
+ */
+export function hash(data: FixedArray<u8>): void {
+  __hash(data);
+}
+
+// skipped hash(*buffer): `*buffer` needs a linear memory
+/**
+ * * `data`
+ */
+export function hashText(data: String): void {
+  __hashText(data);
+}
+
+/**
+ * * `data`
+ */
+export function hashTextWithBuffer(data: FixedArray<u8>): void {
+  __hashText2(data);
+}
+
+// skipped hashText(*buffer): `*buffer` needs a linear memory
 // export default.receive(Body): the entry module's __export_receive, over the app's receive
 // export default.take(Chunk): the entry module's __export_take, over the app's take
 // export default.take(Part): the entry module's __export_take2, over the app's take

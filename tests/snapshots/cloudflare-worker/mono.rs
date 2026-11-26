@@ -102,11 +102,15 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &Request) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
-    pub async fn json<T>(this: &Request) -> Result<T, JsValue>
+    pub async fn json(this: &Request) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, js_name = "json")]
+    pub fn json_promise(this: &Request) -> Promise;
+    #[wasm_bindgen(method, catch, js_name = "json")]
+    pub async fn json_typed<T>(this: &Request) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
     #[wasm_bindgen(method, js_name = "json")]
-    pub fn json_promise<T>(this: &Request) -> Promise<T>;
+    pub fn json_typed_promise<T>(this: &Request) -> Promise<T>;
     #[wasm_bindgen(method, catch)]
     pub async fn blob(this: &Request) -> Result<Blob, JsValue>;
     #[wasm_bindgen(method, js_name = "blob")]
@@ -266,6 +270,11 @@ impl RequestInitBuilder {
     }
     pub fn build(self) -> RequestInit {
         self.inner
+    }
+}
+impl From<RequestInit> for RequestInitBuilder {
+    fn from(inner: RequestInit) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -432,11 +441,15 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &Response) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
-    pub async fn json<T>(this: &Response) -> Result<T, JsValue>
+    pub async fn json(this: &Response) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, js_name = "json")]
+    pub fn json_promise(this: &Response) -> Promise;
+    #[wasm_bindgen(method, catch, js_name = "json")]
+    pub async fn json_typed<T>(this: &Response) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
     #[wasm_bindgen(method, js_name = "json")]
-    pub fn json_promise<T>(this: &Response) -> Promise<T>;
+    pub fn json_typed_promise<T>(this: &Response) -> Promise<T>;
     #[wasm_bindgen(method, catch)]
     pub async fn blob(this: &Response) -> Result<Blob, JsValue>;
     #[wasm_bindgen(method, js_name = "blob")]
@@ -513,6 +526,11 @@ impl ResponseInitBuilder {
         self.inner
     }
 }
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -560,18 +578,26 @@ extern "C" {
     );
 }
 impl<E: ::wasm_bindgen::convert::IntoWasmAbi> ExportedHandler<E> {
-    pub fn new() -> ExportedHandler<E> {
-        Self::builder().build()
+    pub fn new_typed() -> ExportedHandler<E> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> ExportedHandlerBuilder<E> {
+    pub fn builder_typed() -> ExportedHandlerBuilder<E> {
         ExportedHandlerBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl ExportedHandler<Env> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> ExportedHandlerBuilder<Env> {
+        Self::builder_typed()
+    }
+}
 impl<E: ::wasm_bindgen::convert::IntoWasmAbi> Default for ExportedHandler<E> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct ExportedHandlerBuilder<E> {
@@ -594,6 +620,13 @@ impl<E: ::wasm_bindgen::convert::IntoWasmAbi> ExportedHandlerBuilder<E> {
     }
     pub fn build(self) -> ExportedHandler<E> {
         self.inner
+    }
+}
+impl<E: ::wasm_bindgen::convert::IntoWasmAbi> From<ExportedHandler<E>>
+    for ExportedHandlerBuilder<E>
+{
+    fn from(inner: ExportedHandler<E>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

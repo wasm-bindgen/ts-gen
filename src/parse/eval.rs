@@ -105,7 +105,7 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
 
     let diag = std::mem::take(&mut gctx.diagnostics);
     let mut type_level_only = HashSet::new();
-    let (rewritten, synths, diag, projections, utilities) = {
+    let (rewritten, synths, diag, projections, utilities, keyed) = {
         let mut eval = Eval {
             gctx,
             params_of,
@@ -122,6 +122,7 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
             diag,
             depth: 0,
             owner: None,
+            keyed: Vec::new(),
         };
         let mut rewritten = Vec::new();
         for id in ids {
@@ -156,8 +157,12 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
             eval.diag,
             eval.projections,
             eval.utilities,
+            eval.keyed,
         )
     };
+    for ((scope, position), ty) in keyed {
+        gctx.scopes.note_keyed(scope, position, ty);
+    }
     gctx.diagnostics = diag;
     gctx.projections.extend(projections);
     gctx.utilities.extend(utilities);
@@ -364,6 +369,9 @@ struct Eval<'g> {
     /// The declaration a shape is reading, whose name prefixes the names
     /// of its inline types, as its own rewrite names them.
     owner: Option<String>,
+    /// The types as written that index by a key parameter
+    /// ([`crate::parse::scope::ScopeArena::keyed`]).
+    keyed: Vec<((ScopeId, usize), TypeRef)>,
 }
 
 const MAX_DEPTH: u32 = 64;
@@ -434,10 +442,12 @@ impl<'g> Eval<'g> {
                 let scope = f.body_scope;
                 self.rewrite_type_params(&mut f.type_params, scope, &name, place);
                 self.rewrite_params(&mut f.params, scope, &name, place);
+                self.note_keyed(&f.return_type, scope, usize::MAX);
                 self.rewrite_type(&mut f.return_type, scope, &format!("{name}Return"), place);
                 for o in &mut f.overloads {
                     let scope = o.body_scope;
                     self.rewrite_params(&mut o.params, scope, &name, place);
+                    self.note_keyed(&o.return_type, scope, usize::MAX);
                     self.rewrite_type(&mut o.return_type, scope, &format!("{name}Return"), place);
                 }
             }
@@ -478,9 +488,16 @@ impl<'g> Eval<'g> {
         parent: &str,
         place: Placement,
     ) {
-        for p in params {
+        for (i, p) in params.iter_mut().enumerate() {
             let hint = format!("{parent}{}", to_pascal_case(&p.name));
+            self.note_keyed(&p.type_ref, scope, i);
             self.rewrite_type(&mut p.type_ref, scope, &hint, place);
+        }
+    }
+
+    fn note_keyed(&mut self, ty: &TypeRef, scope: ScopeId, position: usize) {
+        if self.gctx.scopes.indexes_by_key(scope, ty) {
+            self.keyed.push(((scope, position), ty.clone()));
         }
     }
 
@@ -508,6 +525,7 @@ impl<'g> Eval<'g> {
                     let scope = m.body_scope;
                     self.rewrite_type_params(&mut m.type_params, scope, &name, place);
                     self.rewrite_params(&mut m.params, scope, &name, place);
+                    self.note_keyed(&m.return_type, scope, usize::MAX);
                     self.rewrite_type(&mut m.return_type, scope, &format!("{name}Return"), place);
                 }
                 Member::StaticMethod(m) => {
@@ -515,6 +533,7 @@ impl<'g> Eval<'g> {
                     let scope = m.body_scope;
                     self.rewrite_type_params(&mut m.type_params, scope, &name, place);
                     self.rewrite_params(&mut m.params, scope, &name, place);
+                    self.note_keyed(&m.return_type, scope, usize::MAX);
                     self.rewrite_type(&mut m.return_type, scope, &format!("{name}Return"), place);
                 }
                 Member::Constructor(c) => {

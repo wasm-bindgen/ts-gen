@@ -66,3 +66,74 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetailsBuilder<T> {
         self.inner
     }
 }
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<EvaluationDetails<T>>
+    for EvaluationDetailsBuilder<T>
+{
+    fn from(inner: EvaluationDetails<T>) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type FetchOptions<Cf = JsString>;
+    #[wasm_bindgen(method, getter)]
+    pub fn method<Cf>(this: &FetchOptions<Cf>) -> Option<String>;
+    #[wasm_bindgen(method, getter, js_name = "method")]
+    pub fn method_js_string<Cf>(this: &FetchOptions<Cf>) -> Option<JsString>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_method<Cf>(this: &FetchOptions<Cf>, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, getter)]
+    pub fn cf<Cf>(this: &FetchOptions<Cf>) -> Option<Cf>
+    where
+        Option<Cf>: ::wasm_bindgen::convert::FromWasmAbi;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_cf<Cf>(this: &FetchOptions<Cf>, val: Cf)
+    where
+        Cf: ::wasm_bindgen::convert::IntoWasmAbi;
+}
+impl<Cf: ::wasm_bindgen::convert::IntoWasmAbi> FetchOptions<Cf> {
+    pub fn new_typed() -> FetchOptions<Cf> {
+        Self::builder_typed().build()
+    }
+    pub fn builder_typed() -> FetchOptionsBuilder<Cf> {
+        FetchOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl FetchOptions<JsString> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> FetchOptionsBuilder<JsString> {
+        Self::builder_typed()
+    }
+}
+impl<Cf: ::wasm_bindgen::convert::IntoWasmAbi> Default for FetchOptions<Cf> {
+    fn default() -> Self {
+        Self::new_typed()
+    }
+}
+pub struct FetchOptionsBuilder<Cf> {
+    inner: FetchOptions<Cf>,
+}
+impl<Cf: ::wasm_bindgen::convert::IntoWasmAbi> FetchOptionsBuilder<Cf> {
+    pub fn method(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_method(val);
+        self
+    }
+    pub fn cf(self, val: Cf) -> Self {
+        self.inner.set_cf(val);
+        self
+    }
+    pub fn build(self) -> FetchOptions<Cf> {
+        self.inner
+    }
+}
+impl<Cf: ::wasm_bindgen::convert::IntoWasmAbi> From<FetchOptions<Cf>> for FetchOptionsBuilder<Cf> {
+    fn from(inner: FetchOptions<Cf>) -> Self {
+        Self { inner }
+    }
+}

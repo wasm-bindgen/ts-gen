@@ -26,3 +26,23 @@ declare class Cursor {
   // Class-method synthesis path with a generic parameter.
   walk<T>(): Iterable<T>;
 }
+
+// A declared `[Symbol.iterator]()` binds as `iterator()` and makes a
+// reference to the type iterable: a tuple item as a Rust tuple, any
+// other as itself.
+declare class Pairs {
+  constructor();
+  set(key: string, value: number): void;
+  [Symbol.iterator](): IterableIterator<[key: string, value: number]>;
+}
+
+declare class Rows<T> {
+  constructor(first: T, second: T);
+  [Symbol.iterator](): IterableIterator<T>;
+}
+
+interface Lines {
+  [Symbol.iterator](): Iterator<string>;
+}
+
+declare function lines(): Lines;

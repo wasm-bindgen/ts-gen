@@ -69,7 +69,7 @@ pub fn print_path(p: &Path) -> String {
     print::path(p)
 }
 
-pub(crate) fn is_ident(s: &str) -> bool {
+pub fn is_ident(s: &str) -> bool {
     let mut chars = s.chars();
     chars
         .next()

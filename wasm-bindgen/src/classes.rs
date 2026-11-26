@@ -76,6 +76,9 @@ pub(crate) struct ClassConfig<'a> {
     /// Scope for type reference resolution. For class-like configs
     /// this is the type's body scope (holds its `<T, …>`).
     scope: ScopeId,
+    /// The methods of `members` with a `_typed` twin, as the twin reads
+    /// them.
+    typed: Vec<Member>,
 }
 
 /// Whether instantiation `r` passes `param` on as its first argument.
@@ -354,6 +357,44 @@ impl ClassConfig<'_> {
     }
 }
 
+const ITERATOR: &str = "[Symbol.iterator]";
+
+/// The `[Symbol.iterator]()` methods of the blocks declaring the type whose
+/// body scope is `body`, which the parser keeps out of its members.
+fn iterator_members(
+    js_name: &str,
+    body: ScopeId,
+    cgctx: Option<&CodegenContext<'_>>,
+) -> Vec<Member> {
+    let Some(c) = cgctx else {
+        return Vec::new();
+    };
+    let scopes = &c.gctx.scopes;
+    let Some(id) = scopes
+        .get(body)
+        .parent
+        .and_then(|declared| c.gctx.resolve_path(declared, js_name))
+    else {
+        return Vec::new();
+    };
+    let mut found: Vec<(ScopeId, ts_gen::ir::MethodMember)> = scopes
+        .symbol_members(js_name)
+        .filter(|(s, _)| c.gctx.resolve_path(*s, js_name) == Some(id))
+        .filter_map(|(s, m)| match m {
+            Member::Method(m) if m.js_name == ITERATOR => Some((s, m.clone())),
+            _ => None,
+        })
+        .collect();
+    found.sort_by_key(|(s, _)| *s);
+    found
+        .into_iter()
+        .map(|(_, mut m)| {
+            m.name = "iterator".to_string();
+            Member::Method(m)
+        })
+        .collect()
+}
+
 impl<'a> ClassConfig<'a> {
     fn from_class(
         decl: &ClassDecl,
@@ -372,7 +413,8 @@ impl<'a> ClassConfig<'a> {
         };
 
         let mut members = decl.members.clone();
-        super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
+        members.extend(iterator_members(&decl.js_name, scope, cgctx));
+        let typed = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
@@ -389,6 +431,7 @@ impl<'a> ClassConfig<'a> {
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
+            typed,
         }
     }
 
@@ -408,7 +451,8 @@ impl<'a> ClassConfig<'a> {
 
         let inherited = inherited_members(&decl.extends, cgctx);
         let mut members = inherit_into(inherited.beyond_first, &decl.members);
-        super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
+        members.extend(iterator_members(&decl.js_name, scope, cgctx));
+        let typed = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
@@ -422,6 +466,7 @@ impl<'a> ClassConfig<'a> {
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
+            typed,
         }
     }
 
@@ -445,6 +490,7 @@ impl<'a> ClassConfig<'a> {
             type_params: self.type_params.clone(),
             cgctx: self.cgctx,
             scope: self.scope,
+            typed: self.typed.clone(),
         }
     }
 
@@ -465,7 +511,7 @@ impl<'a> ClassConfig<'a> {
             ModuleContext::Global => None,
         };
         let mut members = decl.members.clone();
-        super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
+        let typed = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
@@ -479,7 +525,82 @@ impl<'a> ClassConfig<'a> {
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
+            typed,
         }
+    }
+
+    /// The method or static method whose type parameters `scope` holds,
+    /// as its `_typed` twin reads it, when it has one.
+    fn typed(&self, scope: ScopeId) -> Option<&Member> {
+        self.typed.iter().find(|m| match m {
+            Member::Method(m) => m.body_scope == scope,
+            Member::StaticMethod(m) => m.body_scope == scope,
+            _ => false,
+        })
+    }
+
+    /// The `_typed` twins of `plain`, the bindings of the method group
+    /// `spec`.
+    fn typed_twins(
+        &self,
+        spec: &CallableSpec<'_>,
+        form: super::ir_callables::Form,
+        plain: &[FunctionSignature],
+        names: &mut LocalScope,
+    ) -> Vec<FunctionSignature> {
+        if !spec
+            .overloads
+            .iter()
+            .any(|o| self.typed(o.body_scope).is_some())
+        {
+            return Vec::new();
+        }
+        let typed: Vec<Overload> = spec
+            .overloads
+            .iter()
+            .map(|o| match self.typed(o.body_scope) {
+                Some(Member::Method(m)) => Overload {
+                    params: &m.params,
+                    return_type: &m.return_type,
+                    ..*o
+                },
+                Some(Member::StaticMethod(m)) => Overload {
+                    params: &m.params,
+                    return_type: &m.return_type,
+                    ..*o
+                },
+                _ => *o,
+            })
+            .collect();
+        let module = self.from_module();
+        super::type_params::typed_twins(
+            &CallableSpec {
+                overloads: &typed,
+                ..spec.clone()
+            },
+            ir_site(self, form),
+            plain,
+            names,
+            self.cgctx,
+            &|sig, anchor| {
+                to_return_type(
+                    &sig.return_type,
+                    sig.catch,
+                    &sig.form,
+                    sig.js_string_return,
+                    sig.error_type.as_ref(),
+                    self.cgctx,
+                    sig.body_scope,
+                    &module,
+                    super::typemap::ReturnAnchor {
+                        base: anchor,
+                        kind: super::typemap::ReturnAnchorKind::Callable,
+                        parent: Some(&self.rust_name),
+                    },
+                )
+                .to_string()
+            },
+        )
     }
 
     /// Where the IR declares this type, when it is the declaration being
@@ -831,10 +952,15 @@ impl<'a> ClassConfig<'a> {
     /// erased path keeps the extern declaration's `JsGeneric` bound. The
     /// per-monomorphization path instead needs `IntoWasmAbi` because helper
     /// bodies call generated setters with values of these types, and
-    /// `VectorRefIntoWasmAbi` for one a setter takes a `&[T]` of.
+    /// `RefIntoWasmAbi` for one a setter takes a `&[T]` of.
     fn helper_generics_decl(&self) -> TokenStream {
+        render_generic_bounds(&self.helper_bounds())
+    }
+
+    /// [`Self::helper_generics_decl`]'s bound for each type parameter.
+    fn helper_bounds(&self) -> Vec<TokenStream> {
         if !CodegenContext::generic_mono(self.cgctx) {
-            return self.type_generics_decl();
+            return self.type_param_bounds();
         }
         let sliced = |name: &str| {
             self.members.iter().any(|m| match m {
@@ -845,14 +971,13 @@ impl<'a> ClassConfig<'a> {
                 _ => false,
             })
         };
-        let bounds = self
-            .type_params
+        self.type_params
             .iter()
             .map(|tp| {
                 let ident = super::typemap::make_ident(&tp.name);
                 let mut bound = quote! { ::wasm_bindgen::convert::IntoWasmAbi };
                 if sliced(&tp.name) {
-                    bound.extend(quote! { + ::wasm_bindgen::convert::VectorRefIntoWasmAbi });
+                    bound.extend(quote! { + ::wasm_bindgen::convert::RefIntoWasmAbi });
                 }
                 if let Some(b) = self.bounded().filter(|b| b.param == tp.name) {
                     let b = super::typemap::make_ident(&b.trait_name);
@@ -860,8 +985,50 @@ impl<'a> ClassConfig<'a> {
                 }
                 quote! { #ident: #bound }
             })
-            .collect::<Vec<_>>();
-        render_generic_bounds(&bounds)
+            .collect()
+    }
+
+    /// The instantiation a factory naming only `mentioned` makes: those
+    /// parameters by name and the rest at their declared defaults. Its
+    /// helper `impl` generics, and its argument list.
+    fn open_instantiation(&self, mentioned: &[String]) -> (TokenStream, TokenStream) {
+        let module = self.from_module();
+        let mut chosen: HashMap<&str, TypeRef> = HashMap::new();
+        let mut bounds = Vec::new();
+        let mut args = Vec::new();
+        for (tp, bound) in self.type_params.iter().zip(self.helper_bounds()) {
+            if mentioned.contains(&tp.name) {
+                chosen.insert(&tp.name, TypeRef::ident(tp.name.clone()));
+                bounds.push(bound);
+                let ident = super::typemap::make_ident(&tp.name);
+                args.push(quote! { #ident });
+                continue;
+            }
+            let default = self.type_param_default_ref(tp, &chosen);
+            args.push(
+                match self
+                    .bounded()
+                    .filter(|b| b.param == tp.name)
+                    .and_then(|b| self.ir_enum(&b.default))
+                {
+                    Some(t) => super::typemap::to_syn_type(
+                        &t,
+                        TypePosition::RETURN,
+                        self.cgctx,
+                        self.scope,
+                        &module,
+                    ),
+                    None => super::typemap::type_param_default_tokens(
+                        tp.default.is_some().then_some(&default),
+                        self.cgctx,
+                        self.scope,
+                        &module,
+                    ),
+                },
+            );
+            chosen.insert(&tp.name, default);
+        }
+        (render_generic_bounds(&bounds), quote! { <#(#args),*> })
     }
 
     /// Tokens for the type's generic-argument list (`<T, …>`) used in
@@ -1111,10 +1278,20 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             false
         }
     });
+    // A factory whose arguments leave a type parameter open makes the
+    // default instantiation, and its `_typed` twin any other.
+    let generic = !config.type_params.is_empty();
+    let typed = |name: String, open: bool| {
+        super::typemap::make_ident(&match open {
+            true => format!("{name}_typed"),
+            false => name,
+        })
+    };
+    let bare_new = typed("new".into(), generic);
     let default_impl = quote! {
         impl #type_decl Default for #rust_type {
             fn default() -> Self {
-                Self::new()
+                Self::#bare_new()
             }
         }
     };
@@ -1124,14 +1301,26 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             .iter()
             .all(|m| !matches!(m, Member::Getter(g) if !g.optional));
         let default_impl = all_optional.then_some(&default_impl);
+        let plain = generic.then(|| {
+            let (decl, args) = config.open_instantiation(&[]);
+            quote! {
+                impl #decl #rust_type_ident #args {
+                    #[allow(clippy::new_without_default)]
+                    pub fn new() -> Self {
+                        Self::#bare_new()
+                    }
+                }
+            }
+        });
         return quote! {
             impl #type_decl #rust_type {
                 #[allow(clippy::new_without_default)]
-                pub fn new() -> #rust_type {
+                pub fn #bare_new() -> #rust_type {
                     #[allow(unused_unsafe)]
                     unsafe { JsValue::from(js_sys::Object::new()).unchecked_into() }
                 }
             }
+            #plain
             #default_impl
         };
     }
@@ -1587,6 +1776,9 @@ pub(crate) fn generate_dictionary_factory_with_passes(
 
     let mut builder_variants: Vec<TokenStream> = Vec::new();
     let mut new_variants: Vec<TokenStream> = Vec::new();
+    // The plain factories of each open instantiation, by the type
+    // parameters its arguments mention.
+    let mut open_variants: Vec<(Vec<String>, Vec<TokenStream>)> = Vec::new();
     // Shared across passes so a discriminator combo emitted by branch A
     // doesn't get re-emitted under the same name by branch B.
     let mut emitted_names: HashSet<String> = HashSet::new();
@@ -1826,7 +2018,6 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             if !emitted_names.insert(full_suffix.clone()) {
                 continue;
             }
-            let new_ident = super::typemap::make_ident(&format!("new{full_suffix}"));
             let (value_params, value_scopes): (Vec<ConcreteParam>, Vec<ScopeId>) = plan
                 .value_params
                 .iter()
@@ -1859,6 +2050,25 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             combo_bounds.extend(config.local_generic_bounds(config.scope, &combo_param_tys));
             combo_bounds.extend(abv_bounds);
             let generics = render_generic_bounds(&combo_bounds);
+            // A parameter can lower to a type naming one its `TypeRef`
+            // doesn't (a family's `Units::PluralizeUnits`).
+            let named = config.mentioned_type_params(config.scope, &combo_param_tys);
+            let mentioned: Vec<String> = config
+                .type_params
+                .iter()
+                .map(|tp| tp.name.clone())
+                .filter(|n| {
+                    named.contains(n)
+                        || super::signatures::mentions_param(
+                            quote! { #params_tokens #helper_where_clause },
+                            &HashSet::from([n.clone()]),
+                        )
+                })
+                .collect();
+            let open = mentioned.len() < config.type_params.len();
+            let new_ident = typed(format!("new{full_suffix}"), open);
+            let builder_ident = typed(format!("builder{full_suffix}"), open);
+            let mut plain: Vec<TokenStream> = Vec::new();
             let init_calls = &plan.init_calls;
             let arg_idents = &plan.arg_idents;
 
@@ -1928,7 +2138,18 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                         #builder_name_ident { inner }
                     }
                 };
-                let builder_ident = super::typemap::make_ident(&format!("builder{full_suffix}"));
+                if open {
+                    let (_, args) = config.open_instantiation(&mentioned);
+                    let plain_ident = typed(format!("builder{full_suffix}"), false);
+                    plain.push(quote! {
+                        #builder_doc
+                        pub fn #plain_ident #generics (#params_tokens) -> #builder_name_ident #args
+                        #helper_where_clause
+                        {
+                            Self::#builder_ident(#(#arg_idents),*)
+                        }
+                    });
+                }
                 builder_variants.push(quote! {
                     #builder_doc
                     pub fn #builder_ident #generics (#params_tokens) -> #builder_name
@@ -1971,6 +2192,24 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                         #body
                     }
                 });
+            }
+            if open {
+                let plain_ident = typed(format!("new{full_suffix}"), false);
+                plain.insert(
+                    0,
+                    quote! {
+                        #new_doc
+                        pub fn #plain_ident #generics (#params_tokens) -> Self
+                        #helper_where_clause
+                        {
+                            Self::#new_ident(#(#arg_idents),*)
+                        }
+                    },
+                );
+                match open_variants.iter_mut().find(|(m, _)| *m == mentioned) {
+                    Some((_, variants)) => variants.extend(plain),
+                    None => open_variants.push((mentioned, plain)),
+                }
             }
         }
     }
@@ -2049,12 +2288,21 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         .iter()
         .all(Vec::is_empty)
         .then_some(default_impl);
+    let open_impls = open_variants.iter().map(|(mentioned, variants)| {
+        let (decl, args) = config.open_instantiation(mentioned);
+        quote! {
+            impl #decl #rust_type_ident #args {
+                #(#variants)*
+            }
+        }
+    });
     if emit_builder || kept_builder {
         quote! {
             impl #type_decl #rust_type {
                 #(#new_variants)*
                 #(#builder_variants)*
             }
+            #(#open_impls)*
             #default_impl
 
             pub struct #builder_name_ident #builder_struct_decl {
@@ -2068,6 +2316,12 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     self.inner
                 }
             }
+
+            impl #type_decl From<#rust_type> for #builder_name {
+                fn from(inner: #rust_type) -> Self {
+                    Self { inner }
+                }
+            }
         }
     } else {
         // All-required dictionary: the builder would be empty, so we
@@ -2076,6 +2330,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             impl #type_decl #rust_type {
                 #(#new_variants)*
             }
+            #(#open_impls)*
             #default_impl
         }
     }
@@ -2162,22 +2417,10 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 }
                 expanded_constructors = true;
 
-                // Without per-mono the constructor names the bare class and
+                // The constructor names the bare class and
                 // `generate_expanded_constructor` instantiates only the
                 // parameters its arguments mention; the rest default.
-                let per_mono = CodegenContext::generic_mono(config.cgctx);
-                let return_type = if per_mono && !config.type_params.is_empty() {
-                    TypeRef::generic(
-                        config.rust_name.clone(),
-                        config
-                            .type_params
-                            .iter()
-                            .map(|tp| TypeRef::ident(tp.name.clone()))
-                            .collect(),
-                    )
-                } else {
-                    TypeRef::ident(config.rust_name.clone())
-                };
+                let return_type = TypeRef::ident(config.rust_name.clone());
                 // Each constructor resolves in the body of the declaration
                 // it is written in, or in its construct signature's own
                 // scope when that declares `<T>` (`new <T>(…): Foo<T>`).
@@ -2205,7 +2448,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     config.cgctx,
                 );
                 for sig in &sigs {
-                    items.push(generate_expanded_constructor(config, sig));
+                    items.push(generate_expanded_constructor(config, sig, &mut names));
                 }
             }
             Member::Method(m) => {
@@ -2228,23 +2471,34 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     .collect();
                 let base = config.member_base(MemberKind::Method, &m.js_name);
                 unreserve_base(&mut names, &base);
+                let spec = CallableSpec {
+                    js_name: &m.js_name,
+                    rust_name: Some(&base),
+                    kind: SignatureKind::Method,
+                    overloads: &overloads,
+                    module: &module,
+                };
+                let form = super::ir_callables::Form::Method;
                 let mut sigs = super::ir_callables::build(
-                    &CallableSpec {
-                        js_name: &m.js_name,
-                        rust_name: Some(&base),
-                        kind: SignatureKind::Method,
-                        overloads: &overloads,
-                        module: &module,
-                    },
-                    ir_site(config, super::ir_callables::Form::Method),
+                    &spec,
+                    ir_site(config, form),
                     &mut names,
                     config.cgctx,
                 );
+                let twins = config.typed_twins(&spec, form, &sigs, &mut names);
                 if let Some(display) = display_to_string(config, &mut sigs, &mut names) {
                     items.extend(display.binding);
                     impls.push(display.impl_);
                 }
-                for sig in &sigs {
+                if let Some(iterable) = into_iterator(config, &sigs, &mut names) {
+                    items.extend(iterable.binding);
+                    impls.push(iterable.impl_);
+                }
+                if twins.is_empty() {
+                    let receiver = super::keyed::Receiver::Method;
+                    impls.extend(keyed_twins(config, receiver, &sigs));
+                }
+                for sig in sigs.iter().chain(&twins) {
                     items.push(generate_expanded_method(config, sig));
                 }
             }
@@ -2268,19 +2522,26 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     .collect();
                 let base = config.member_base(MemberKind::StaticMethod, &m.js_name);
                 unreserve_base(&mut names, &base);
+                let spec = CallableSpec {
+                    js_name: &m.js_name,
+                    rust_name: Some(&base),
+                    kind: SignatureKind::StaticMethod,
+                    overloads: &overloads,
+                    module: &module,
+                };
+                let form = super::ir_callables::Form::Static;
                 let sigs = super::ir_callables::build(
-                    &CallableSpec {
-                        js_name: &m.js_name,
-                        rust_name: Some(&base),
-                        kind: SignatureKind::StaticMethod,
-                        overloads: &overloads,
-                        module: &module,
-                    },
-                    ir_site(config, super::ir_callables::Form::Static),
+                    &spec,
+                    ir_site(config, form),
                     &mut names,
                     config.cgctx,
                 );
-                for sig in &sigs {
+                let twins = config.typed_twins(&spec, form, &sigs, &mut names);
+                if twins.is_empty() {
+                    let receiver = super::keyed::Receiver::Static;
+                    impls.extend(keyed_twins(config, receiver, &sigs));
+                }
+                for sig in sigs.iter().chain(&twins) {
                     items.push(generate_expanded_static_method(config, sig));
                 }
             }
@@ -2360,6 +2621,13 @@ struct DisplayToString {
 /// form can't take `to_string` either, so it keeps the `try_` name the
 /// default policy gives it. Under `@throws {never}` there is no catching
 /// form, and `fmt` calls a private `__to_string` extern instead.
+/// The `IntoIterator` impl of a class, with the private binding it calls
+/// when the class has no public one that doesn't catch.
+struct IterableImpl {
+    binding: Option<TokenStream>,
+    impl_: TokenStream,
+}
+
 fn display_to_string(
     config: &ClassConfig,
     sigs: &mut Vec<FunctionSignature>,
@@ -2422,6 +2690,188 @@ fn display_to_string(
         }
     };
     Some(DisplayToString { binding, impl_ })
+}
+
+/// A `[Symbol.iterator]()` makes `&Type` iterable (`for (k, v) in &headers`)
+/// over what its bound `iterator()` returns: an `ArrayTuple<(K, V)>` item
+/// as the tuple, any other as itself. A throwing `[Symbol.iterator]()` or
+/// `next()` rethrows, as `for…of` does.
+///
+/// The adapter calls only what js-sys has both with and without
+/// `js_sys_unstable_apis`, where its own iteration of an `Iterator<T>`
+/// differs.
+/// The `_typed` twins of the plain bindings `sigs` of a keyed method
+/// ([`super::keyed`]), each in an `impl` of the class.
+fn keyed_twins(
+    config: &ClassConfig,
+    receiver: super::keyed::Receiver,
+    sigs: &[FunctionSignature],
+) -> Vec<TokenStream> {
+    let form = match receiver {
+        super::keyed::Receiver::Static => super::ir_callables::Form::Static,
+        _ => super::ir_callables::Form::Method,
+    };
+    let (Some(cgctx), Some(site)) = (config.cgctx, ir_site(config, form)) else {
+        return Vec::new();
+    };
+    let (Some(keyed), None, [owner]) = (&cgctx.keyed, site.module, site.path) else {
+        return Vec::new();
+    };
+    let module = config.from_module();
+    let own = |ident: &syn::Ident| config.type_params.iter().any(|tp| ident == &tp.name);
+    let this = super::typemap::make_ident(&config.effective_rust_name());
+    let decl = config.type_generics_decl();
+    let args = config.type_generics_args();
+    let twins: Vec<TokenStream> = sigs
+        .iter()
+        .filter(|sig| sig.literal.is_none())
+        .filter_map(|sig| {
+            let binding = match receiver {
+                super::keyed::Receiver::Static => generate_expanded_static_method(config, sig),
+                _ => generate_expanded_method(config, sig),
+            };
+            let at = super::keyed::At {
+                cgctx,
+                scope: sig.body_scope,
+                module: &module,
+            };
+            keyed.twin(Some(owner), &sig.js_name, receiver, binding, &own, at)
+        })
+        .collect();
+    if twins.is_empty() {
+        return Vec::new();
+    }
+    vec![quote! {
+        impl #decl #this #args {
+            #(#twins)*
+        }
+    }]
+}
+
+fn into_iterator(
+    config: &ClassConfig,
+    sigs: &[FunctionSignature],
+    names: &mut LocalScope,
+) -> Option<IterableImpl> {
+    let sig = sigs
+        .iter()
+        .filter(|sig| {
+            sig.js_name == ITERATOR
+                && sig.params.is_empty()
+                && sig.form == PromiseForm::Value
+                && sig.literal.is_none()
+        })
+        .min_by_key(|sig| sig.catch)?;
+    // `into_iter` has no `Result` to return and a caught error may not
+    // convert back to the thrown value (`--error-type` asks only for
+    // `From<JsValue>`), so a private binding that doesn't catch stands in
+    // where every public one does.
+    let private = sig.catch.then(|| FunctionSignature {
+        rust_name: names.declare("__iterator", Suffix::Snake),
+        catch: false,
+        error_type: None,
+        doc: None,
+        ..sig.clone()
+    });
+    let sig = private.as_ref().unwrap_or(sig);
+    let mut binding: syn::ForeignItemFn =
+        syn::parse2(generate_expanded_method(config, sig)).ok()?;
+    let syn::ReturnType::Type(_, returned) = &binding.sig.output else {
+        return None;
+    };
+    let iter = &**returned;
+    // A bare `Iterator` yields `JsValue`.
+    let any: syn::Type = syn::parse_quote!(JsValue);
+    let elem = type_args(iter, "Iterator")?
+        .first()
+        .copied()
+        .unwrap_or(&any);
+    let tuple = match type_args(elem, "ArrayTuple").as_deref() {
+        Some([syn::Type::Tuple(tuple)]) => Some(tuple),
+        _ => None,
+    };
+
+    // Every generic of the binding has to be the type's own: a method
+    // parameter would be unconstrained on the impl.
+    let own = |ident: &syn::Ident| config.type_params.iter().any(|tp| ident == &tp.name);
+    let mut params = Vec::new();
+    let mut open = HashSet::new();
+    for param in &binding.sig.generics.params {
+        match param {
+            syn::GenericParam::Type(t) if own(&t.ident) => {
+                params.push(quote! { #t });
+                open.insert(t.ident.to_string());
+            }
+            _ => return None,
+        }
+    }
+    let mut predicates: Vec<TokenStream> = binding
+        .sig
+        .generics
+        .where_clause
+        .iter()
+        .flat_map(|w| w.predicates.iter().map(|p| quote! { #p }))
+        .collect();
+    // What js-sys asks of a type it reads out of the iterator, stated for
+    // the ones naming a parameter: `JsGeneric` without
+    // `js_sys_unstable_apis`, `FromWasmAbi` with it.
+    let read = tuple.map_or_else(|| vec![elem], |t| t.elems.iter().collect());
+    predicates.extend(
+        read.into_iter()
+            .filter(|t| super::signatures::mentions_param(quote! { #t }, &open))
+            .map(|t| {
+                quote! { #t: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi }
+            }),
+    );
+    let where_clause = (!predicates.is_empty()).then(|| quote! { where #(#predicates),* });
+
+    let item = tuple.map_or_else(|| quote! { #elem }, |t| quote! { #t });
+    let into_item = tuple.map(|_| quote! { .into_tuple() });
+    let rethrow = quote! { .unwrap_or_else(|e| ::wasm_bindgen::throw_val(e)) };
+    let method = &binding.sig.ident;
+    let rust_type = super::typemap::make_ident(&config.effective_rust_name());
+    let type_args = config.type_generics_args();
+    let impl_ = quote! {
+        impl<'a, #(#params),*> ::core::iter::IntoIterator for &'a #rust_type #type_args #where_clause {
+            type Item = #item;
+            type IntoIter = ::core::iter::Scan<
+                ::core::iter::Repeat<()>,
+                #iter,
+                fn(&mut #iter, ()) -> Option<#item>,
+            >;
+            fn into_iter(self) -> Self::IntoIter {
+                ::core::iter::repeat(()).scan(self.#method(), |iter, ()| {
+                    let next = iter.next() #rethrow;
+                    (!next.done()).then(|| next.value() #into_item)
+                })
+            }
+        }
+    };
+    let binding = private.is_some().then(|| {
+        binding.vis = syn::Visibility::Inherited;
+        quote! { #binding }
+    });
+    Some(IterableImpl { binding, impl_ })
+}
+
+/// The type arguments of `ty` when its head is `head`.
+fn type_args<'t>(ty: &'t syn::Type, head: &str) -> Option<Vec<&'t syn::Type>> {
+    let syn::Type::Path(path) = ty else {
+        return None;
+    };
+    let last = path.path.segments.last().filter(|s| s.ident == head)?;
+    let syn::PathArguments::AngleBracketed(args) = &last.arguments else {
+        return Some(Vec::new());
+    };
+    Some(
+        args.args
+            .iter()
+            .filter_map(|arg| match arg {
+                syn::GenericArgument::Type(t) => Some(t),
+                _ => None,
+            })
+            .collect(),
+    )
 }
 
 /// `Parent<A>` as the `Parent::<A>` an attribute takes.
@@ -2598,23 +3048,30 @@ pub(super) fn widen_async_return_param(
         .collect()
 }
 
-/// Generate a constructor binding from a resolved signature.
-fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
-    let rust_ident = super::typemap::make_ident(&sig.rust_name);
+/// Generate a constructor binding from a resolved signature, and its
+/// `_typed` twin when its arguments leave a class parameter open.
+fn generate_expanded_constructor(
+    config: &ClassConfig,
+    sig: &FunctionSignature,
+    names: &mut LocalScope,
+) -> TokenStream {
     let scope = sig.body_scope;
-    let doc = super::doc_tokens(&sig.doc);
-    let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
-
     // Type parameters the arguments mention — the class's own or the
     // construct signature's. A constructor-level `<T>` of the same
     // name as a class-level one (the `declare var` pattern) binds the
     // class parameter positionally by name.
     let param_tys: Vec<&TypeRef> = sig.params.iter().map(|p| &p.type_ref).collect();
     let mentioned = config.mentioned_type_param_names(scope, &param_tys);
-    let return_type = if CodegenContext::generic_mono(config.cgctx)
-        || config.type_params.is_empty()
-        || mentioned.is_empty()
-    {
+    let class_bounds = config.type_param_bounds();
+    let class_bound = |name: &str| {
+        let at = config.type_params.iter().position(|tp| tp.name == name);
+        at.map(|i| class_bounds[i].clone())
+    };
+    let open = config
+        .type_params
+        .iter()
+        .any(|tp| !mentioned.contains(&tp.name));
+    let return_type = if config.type_params.is_empty() || mentioned.is_empty() {
         sig.return_type.clone()
     } else {
         // An unmentioned parameter's default can name an earlier one
@@ -2633,11 +3090,54 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         }
         TypeRef::generic(config.rust_name.clone(), args)
     };
-    // Constructors always return the constructed type, wrapped in Result
-    // when `catch` (which is always-true here per `SignatureKind::Constructor`).
+    // A constructor only binds the type parameters its own arguments
+    // mention; the rest are instantiated at their defaults in the return
+    // type so `Foo::new()` needs no turbofish.
+    let bounds: Vec<TokenStream> = mentioned
+        .iter()
+        .map(|n| class_bound(n).unwrap_or_else(|| CodegenContext::type_param_decl(config.cgctx, n)))
+        .collect();
+    let plain = constructor_binding(config, sig, &sig.rust_name, &return_type, bounds);
+    if !open || sig.literal.is_some() {
+        return plain;
+    }
+
+    let typed_return = TypeRef::generic(
+        config.rust_name.clone(),
+        config
+            .type_params
+            .iter()
+            .map(|tp| TypeRef::ident(tp.name.clone()))
+            .collect(),
+    );
+    let mut bounds = class_bounds.clone();
+    bounds.extend(config.local_generic_bounds(scope, &param_tys));
+    let name = names.declare(&format!("{}_typed", sig.rust_name), Suffix::Snake);
+    let typed = constructor_binding(config, sig, &name, &typed_return, bounds);
+    quote! {
+        #plain
+        #typed
+    }
+}
+
+/// One binding of the constructor `sig`, returning the class as
+/// `return_type` instantiates it.
+fn constructor_binding(
+    config: &ClassConfig,
+    sig: &FunctionSignature,
+    rust_name: &str,
+    return_type: &TypeRef,
+    mut bounds: Vec<TokenStream>,
+) -> TokenStream {
+    let rust_ident = super::typemap::make_ident(rust_name);
+    let scope = sig.body_scope;
+    let doc = super::doc_tokens(&sig.doc);
+    let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
+    // Constructors return the constructed type, wrapped in `Result` when
+    // `catch` (the default; `@throws {never}` opts out).
     // The class is named from its own body, wherever the params resolve.
     let ret = to_return_type(
-        &return_type,
+        return_type,
         sig.catch,
         &sig.form,
         sig.js_string_return,
@@ -2661,17 +3161,6 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         wb_parts.push(quote! { catch });
     }
 
-    let mut bounds = if CodegenContext::generic_mono(config.cgctx) {
-        generic_bounds_for_method(config, sig)
-    } else {
-        // A constructor only binds the type parameters its own
-        // arguments mention; the rest are instantiated at their
-        // defaults in the return type so `Foo::new()` needs no turbofish.
-        mentioned
-            .iter()
-            .map(|n| CodegenContext::type_param_decl(config.cgctx, n))
-            .collect()
-    };
     let params = generate_callable_params(
         &sig.params,
         config.cgctx,
@@ -2682,9 +3171,11 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     let generics = render_generic_bounds(&bounds);
 
     let literal = super::inline_wrappers::literal_attr(sig);
+    let buffer_read = super::inline_wrappers::buffer_result_attr(sig, config.cgctx);
     quote! {
         #doc
         #literal
+        #buffer_read
         #[wasm_bindgen(#(#wb_parts),*)]
         pub fn #rust_ident #generics (#params) -> #ret;
     }
@@ -2748,9 +3239,11 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     let this_generics = config.type_generics_args();
 
     let literal = super::inline_wrappers::literal_attr(sig);
+    let buffer_read = super::inline_wrappers::buffer_result_attr(sig, config.cgctx);
     quote! {
         #doc
         #literal
+        #buffer_read
         #[wasm_bindgen(#(#wb_parts),*)]
         pub #async_kw fn #rust_ident #method_generics (this: &#this_type #this_generics, #params) #ret;
     }
@@ -2825,9 +3318,11 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     let generics = render_generic_bounds(&bounds);
 
     let literal = super::inline_wrappers::literal_attr(sig);
+    let buffer_read = super::inline_wrappers::buffer_result_attr(sig, config.cgctx);
     quote! {
         #doc
         #literal
+        #buffer_read
         #[wasm_bindgen(#(#wb_parts),*)]
         pub #async_kw fn #rust_ident #generics (#params) #ret;
     }
@@ -2923,8 +3418,11 @@ fn generate_getter(
             },
         );
 
+    let buffer_read =
+        super::inline_wrappers::buffer_read_attr(&lowered_ty, config.cgctx, getter.scope);
     quote! {
         #doc
+        #buffer_read
         #[wasm_bindgen(#(#wb_parts),*)]
         pub fn #rust_ident #fn_generics (this: &#this_type #this_generics) -> #getter_type;
         #js_string_variant
@@ -3208,8 +3706,11 @@ fn generate_static_getter(
         }
     });
 
+    let buffer_read =
+        super::inline_wrappers::buffer_read_attr(&lowered_ty, config.cgctx, getter.scope);
     quote! {
         #doc
+        #buffer_read
         #[wasm_bindgen(#(#wb_parts),*)]
         pub fn #rust_ident #fn_generics () -> #getter_type;
         #js_string_variant

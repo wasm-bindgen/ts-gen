@@ -23,11 +23,71 @@ impl Event {
 }
 #[wasm_bindgen]
 extern "C" {
+    # [wasm_bindgen (extends = Event , extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type MessageEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn data(this: &MessageEvent) -> String;
+}
+impl MessageEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> MessageEvent {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+#[allow(dead_code)]
+pub type EventListener<E = Event> = Function<fn(E) -> Undefined>;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type EventListenerObject<E: ::wasm_bindgen::JsGeneric = Event>;
+    #[wasm_bindgen(method, js_name = "handleEvent")]
+    pub fn handle_event<E: ::wasm_bindgen::JsGeneric>(this: &EventListenerObject<E>, event: &E);
+    #[wasm_bindgen(method, catch, js_name = "handleEvent")]
+    pub fn try_handle_event<E: ::wasm_bindgen::JsGeneric>(
+        this: &EventListenerObject<E>,
+        event: &E,
+    ) -> Result<(), JsValue>;
+}
+#[allow(dead_code)]
+pub type EventListenerOrEventListenerObject = JsValue;
+#[wasm_bindgen]
+extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventTarget<EventMap: ::wasm_bindgen::JsGeneric = Object<Event>>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<EventTarget, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<EventMap: ::wasm_bindgen::JsGeneric>() -> Result<EventTarget<EventMap>, JsValue>;
+    #[wasm_bindgen(method, js_name = "addEventListener")]
+    pub fn add_event_listener<EventMap: ::wasm_bindgen::JsGeneric>(
+        this: &EventTarget<EventMap>,
+        r#type: &str,
+        handler: &Function<fn(Event) -> Undefined>,
+    );
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    pub fn try_add_event_listener<EventMap: ::wasm_bindgen::JsGeneric>(
+        this: &EventTarget<EventMap>,
+        r#type: &str,
+        handler: &Function<fn(Event) -> Undefined>,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "addEventListener")]
+    pub fn add_event_listener_with_event_listener_object<EventMap: ::wasm_bindgen::JsGeneric>(
+        this: &EventTarget<EventMap>,
+        r#type: &str,
+        handler: &EventListenerObject,
+    );
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    pub fn try_add_event_listener_with_event_listener_object<EventMap: ::wasm_bindgen::JsGeneric>(
+        this: &EventTarget<EventMap>,
+        r#type: &str,
+        handler: &EventListenerObject,
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "dispatchEvent")]
     pub fn dispatch_event<EventMap: ::wasm_bindgen::JsGeneric>(
         this: &EventTarget<EventMap>,
@@ -38,6 +98,105 @@ extern "C" {
         this: &EventTarget<EventMap>,
         event: &Event,
     ) -> Result<bool, JsValue>;
+}
+impl<EventMap: ::wasm_bindgen::JsGeneric> EventTarget<EventMap> {
+    pub fn add_event_listener_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+    ) {
+        self.add_event_listener(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    pub fn try_add_event_listener_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    pub fn add_event_listener_with_event_listener_object_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+    ) {
+        self.add_event_listener_with_event_listener_object(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    pub fn try_add_event_listener_with_event_listener_object_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_event_listener_object(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type SocketEventMap;
+    #[wasm_bindgen(method, getter)]
+    pub fn message(this: &SocketEventMap) -> MessageEvent;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_message(this: &SocketEventMap, val: &MessageEvent);
+    #[wasm_bindgen(method, getter)]
+    pub fn close(this: &SocketEventMap) -> Event;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_close(this: &SocketEventMap, val: &Event);
+}
+impl SocketEventMap {
+    pub fn new(message: &MessageEvent, close: &Event) -> SocketEventMap {
+        let inner: SocketEventMap = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_message(message);
+        inner.set_close(close);
+        inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = EventTarget , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Socket;
+    #[wasm_bindgen(method)]
+    pub fn last(this: &Socket, r#type: &str) -> Event;
+    #[wasm_bindgen(method, catch, js_name = "last")]
+    pub fn try_last(this: &Socket, r#type: &str) -> Result<Event, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "addEventListener")]
+    pub fn add_event_listener(r#type: &str, handler: &Function<fn(Event) -> Undefined>);
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "addEventListener")]
+    pub fn try_add_event_listener(
+        r#type: &str,
+        handler: &Function<fn(Event) -> Undefined>,
+    ) -> Result<(), JsValue>;
+}
+pub fn add_event_listener_typed<K: MapKey<SocketEventMap>>(
+    handler: &Function<fn(<K as MapKey<SocketEventMap>>::Value) -> Undefined>,
+) {
+    add_event_listener(
+        <K as MapKey<SocketEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+    )
+}
+pub fn try_add_event_listener_typed<K: MapKey<SocketEventMap>>(
+    handler: &Function<fn(<K as MapKey<SocketEventMap>>::Value) -> Undefined>,
+) -> Result<(), JsValue> {
+    try_add_event_listener(
+        <K as MapKey<SocketEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+    )
 }
 #[wasm_bindgen]
 extern "C" {
@@ -98,18 +257,26 @@ extern "C" {
     );
 }
 impl<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric> Transformer<I, O> {
-    pub fn new() -> Transformer<I, O> {
-        Self::builder().build()
+    pub fn new_typed() -> Transformer<I, O> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> TransformerBuilder<I, O> {
+    pub fn builder_typed() -> TransformerBuilder<I, O> {
         TransformerBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl Transformer<JsValue, JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> TransformerBuilder<JsValue, JsValue> {
+        Self::builder_typed()
+    }
+}
 impl<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric> Default for Transformer<I, O> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct TransformerBuilder<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric> {
@@ -128,6 +295,13 @@ impl<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric> TransformerBuil
         self.inner
     }
 }
+impl<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric> From<Transformer<I, O>>
+    for TransformerBuilder<I, O>
+{
+    fn from(inner: Transformer<I, O>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -138,6 +312,9 @@ extern "C" {
     >;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<TransformStream, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+    ) -> Result<TransformStream<I, O>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_transformer<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
         transformer: &Transformer<I, O>,
@@ -163,10 +340,14 @@ extern "C" {
     # [wasm_bindgen (static_method_of = Labelled , catch , js_name = "of")]
     pub fn try_of<T: ::wasm_bindgen::JsGeneric>(value: &T) -> Result<Labelled<T>, JsValue>;
     # [wasm_bindgen (static_method_of = Labelled , catch)]
-    pub async fn load<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
+    pub async fn load() -> Result<JsValue, JsValue>;
+    # [wasm_bindgen (static_method_of = Labelled , js_name = "load")]
+    pub fn load_promise() -> Promise;
+    # [wasm_bindgen (static_method_of = Labelled , catch , js_name = "load")]
+    pub async fn load_typed<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
     ) -> Result<T, JsValue>;
     # [wasm_bindgen (static_method_of = Labelled , js_name = "load")]
-    pub fn load_promise<T: ::wasm_bindgen::JsGeneric>() -> Promise<T>;
+    pub fn load_typed_promise<T: ::wasm_bindgen::JsGeneric>() -> Promise<T>;
     #[wasm_bindgen(method, getter)]
     pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Labelled<T>) -> T;
 }
@@ -183,6 +364,14 @@ extern "C" {
     pub fn new<C: ::wasm_bindgen::JsGeneric>(
         c: &C,
     ) -> Result<Chained<JsString, JsString, C>, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<
+        A: ::wasm_bindgen::JsGeneric,
+        B: ::wasm_bindgen::JsGeneric,
+        C: ::wasm_bindgen::JsGeneric,
+    >(
+        c: &C,
+    ) -> Result<Chained<A, B, C>, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -190,14 +379,24 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Storage<Props: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn get<Props: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
+    pub async fn get<Props: ::wasm_bindgen::JsGeneric>(
+        this: &Storage<Props>,
+        key: &str,
+    ) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_promise<Props: ::wasm_bindgen::JsGeneric>(
+        this: &Storage<Props>,
+        key: &str,
+    ) -> Promise;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_typed<Props: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
         this: &Storage<Props>,
         key: &str,
     ) -> Result<Option<T>, JsValue>
     where
         Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_promise<Props: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
+    pub fn get_typed_promise<Props: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
         this: &Storage<Props>,
         key: &str,
     ) -> Promise<JsOption<T>>;
@@ -224,11 +423,83 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "loadValue")]
-    pub async fn load_value<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
-    ) -> Result<T, JsValue>;
+    pub async fn load_value() -> Result<JsValue, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "loadValue")]
-    pub fn load_value_promise<T: ::wasm_bindgen::JsGeneric>() -> Promise<T>;
+    pub fn load_value_promise() -> Promise;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "loadValue")]
+    pub async fn load_value_typed<
+        T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi,
+    >() -> Result<T, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "loadValue")]
+    pub fn load_value_typed_promise<T: ::wasm_bindgen::JsGeneric>() -> Promise<T>;
+}
+#[doc = r" A key of the map `M`: the property it names, and the type"]
+#[doc = r" of that property's value."]
+pub trait MapKey<M: ?Sized> {
+    type Value: ::wasm_bindgen::JsGeneric;
+    const KEY: &'static str;
+}
+#[doc = "The keys of [`SocketEventMap`]."]
+pub mod socket_event_map {
+    #[allow(unused_imports)]
+    use super::*;
+    #[doc = "`message` of [`SocketEventMap`]."]
+    pub struct Message;
+    impl MapKey<SocketEventMap> for Message {
+        type Value = MessageEvent;
+        const KEY: &'static str = "message";
+    }
+    #[doc = "`close` of [`SocketEventMap`]."]
+    pub struct Close;
+    impl MapKey<SocketEventMap> for Close {
+        type Value = Event;
+        const KEY: &'static str = "close";
+    }
+}
+impl Socket {
+    pub fn add_event_listener_typed<K: MapKey<SocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<SocketEventMap>>::Value) -> Undefined>,
+    ) {
+        self.add_event_listener(
+            <K as MapKey<SocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    pub fn try_add_event_listener_typed<K: MapKey<SocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<SocketEventMap>>::Value) -> Undefined>,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener(
+            <K as MapKey<SocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    pub fn add_event_listener_with_event_listener_object_typed<K: MapKey<SocketEventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<SocketEventMap>>::Value>,
+    ) {
+        self.add_event_listener_with_event_listener_object(
+            <K as MapKey<SocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    pub fn try_add_event_listener_with_event_listener_object_typed<K: MapKey<SocketEventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<SocketEventMap>>::Value>,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_with_event_listener_object(
+            <K as MapKey<SocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
 }

@@ -11,7 +11,7 @@ use ts_gen_integration_tests::generic_hoisting_mono::{post, post_async, relay, C
 #[wasm_bindgen_test]
 fn free_functions_take_any_instantiation() {
     let plain: Envelope = Envelope::new("plain").unwrap();
-    let typed: Envelope<String, f64> = Envelope::new("typed").unwrap();
+    let typed: Envelope<String, f64> = Envelope::new_typed("typed").unwrap();
     assert_eq!(post(&plain), "post:plain");
     assert_eq!(post(&typed), "post:typed");
     assert_eq!(relay(&typed, 1.5), "relay:typed:1.5");
@@ -20,7 +20,7 @@ fn free_functions_take_any_instantiation() {
 #[wasm_bindgen_test]
 async fn async_functions_take_any_instantiation() {
     let plain: Envelope = Envelope::new("plain").unwrap();
-    let typed: Envelope<JsString, bool> = Envelope::new("typed").unwrap();
+    let typed: Envelope<JsString, bool> = Envelope::new_typed("typed").unwrap();
     assert_eq!(post_async(&plain).await.unwrap(), "post-async:plain");
     assert_eq!(post_async(&typed).await.unwrap(), "post-async:typed");
 }
@@ -28,7 +28,7 @@ async fn async_functions_take_any_instantiation() {
 #[wasm_bindgen_test]
 async fn methods_take_any_instantiation() {
     let plain: Envelope = Envelope::new("plain").unwrap();
-    let typed: Envelope<String, f64> = Envelope::new("typed").unwrap();
+    let typed: Envelope<String, f64> = Envelope::new_typed("typed").unwrap();
     let courier = Courier::new(&typed).unwrap();
     assert_eq!(
         Courier::new(&plain).unwrap().send(&typed),

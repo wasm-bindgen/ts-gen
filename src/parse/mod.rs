@@ -74,6 +74,7 @@ pub fn parse_dts_files(
     erased_args::drop_erased_args(&mut gctx);
     classify::optional_methods_as_properties(&mut gctx);
     eval::evaluate_types(&mut gctx, &mut module);
+    classify::literal_fields_optional(&mut gctx);
 
     Ok((module, gctx))
 }
@@ -94,6 +95,7 @@ pub fn parse_single_source(
     erased_args::drop_erased_args(&mut gctx);
     classify::optional_methods_as_properties(&mut gctx);
     eval::evaluate_types(&mut gctx, &mut module);
+    classify::literal_fields_optional(&mut gctx);
     Ok((module, gctx))
 }
 

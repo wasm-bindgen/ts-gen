@@ -266,6 +266,11 @@ impl SettingsBuilder {
         self.inner
     }
 }
+impl From<Settings> for SettingsBuilder {
+    fn from(inner: Settings) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -1575,14 +1580,24 @@ extern "C" {
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchGeneric")]
-    pub async fn fetch_generic<T: ::wasm_bindgen::JsGeneric>() -> Result<Option<T>, JsValue>
+    pub async fn fetch_generic() -> Result<JsValue, JsValue>;
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetchGeneric")]
+    pub fn fetch_generic_promise() -> Promise;
+}
+#[wasm_bindgen(module = "nullability")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "fetchGeneric")]
+    pub async fn fetch_generic_typed<T: ::wasm_bindgen::JsGeneric>() -> Result<Option<T>, JsValue>
     where
         Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(js_name = "fetchGeneric")]
-    pub fn fetch_generic_promise<T: ::wasm_bindgen::JsGeneric>() -> Promise<JsNullable<T>>;
+    pub fn fetch_generic_typed_promise<T: ::wasm_bindgen::JsGeneric>() -> Promise<JsNullable<T>>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
@@ -1850,6 +1865,11 @@ impl AttachmentBuilder {
         self.inner
     }
 }
+impl From<Attachment> for AttachmentBuilder {
+    fn from(inner: Attachment) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     pub fn send(attachment: &Attachment);
@@ -1925,6 +1945,11 @@ impl UploadBuilder {
         self.inner
     }
 }
+impl From<Upload> for UploadBuilder {
+    fn from(inner: Upload) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     pub fn upload(upload: &Upload);
@@ -1989,6 +2014,11 @@ impl CoverBuilder {
     }
     pub fn build(self) -> Cover {
         self.inner
+    }
+}
+impl From<Cover> for CoverBuilder {
+    fn from(inner: Cover) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "nullability")]

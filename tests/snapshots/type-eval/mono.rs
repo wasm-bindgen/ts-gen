@@ -104,6 +104,11 @@ impl SizedBuilder {
         self.inner
     }
 }
+impl From<Sized_> for SizedBuilder {
+    fn from(inner: Sized_) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Minute {
@@ -200,6 +205,11 @@ impl MixedBuilder {
         self.inner
     }
 }
+impl From<Mixed> for MixedBuilder {
+    fn from(inner: Mixed) -> Self {
+        Self { inner }
+    }
+}
 #[allow(dead_code)]
 pub type Patch = JsValue;
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
@@ -260,18 +270,26 @@ extern "C" {
         U::LargestUnit: ::wasm_bindgen::convert::IntoWasmAbi;
 }
 impl<U: ::wasm_bindgen::convert::IntoWasmAbi + RoundingU> Rounding<U> {
-    pub fn new() -> Rounding<U> {
-        Self::builder().build()
+    pub fn new_typed() -> Rounding<U> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> RoundingBuilder<U> {
+    pub fn builder_typed() -> RoundingBuilder<U> {
         RoundingBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl Rounding<Unit> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> RoundingBuilder<Unit> {
+        Self::builder_typed()
+    }
+}
 impl<U: ::wasm_bindgen::convert::IntoWasmAbi + RoundingU> Default for Rounding<U> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct RoundingBuilder<U> {
@@ -288,6 +306,11 @@ impl<U: ::wasm_bindgen::convert::IntoWasmAbi + RoundingU> RoundingBuilder<U> {
     }
     pub fn build(self) -> Rounding<U> {
         self.inner
+    }
+}
+impl<U: ::wasm_bindgen::convert::IntoWasmAbi + RoundingU> From<Rounding<U>> for RoundingBuilder<U> {
+    fn from(inner: Rounding<U>) -> Self {
+        Self { inner }
     }
 }
 pub trait RoundingU {
@@ -437,6 +460,11 @@ pub mod scoped {
             self.inner
         }
     }
+    impl From<Settings> for SettingsBuilder {
+        fn from(inner: Settings) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_namespace = "Scoped")]
@@ -485,6 +513,11 @@ pub mod scoped {
         }
         pub fn build(self) -> PartialSettings {
             self.inner
+        }
+    }
+    impl From<PartialSettings> for PartialSettingsBuilder {
+        fn from(inner: PartialSettings) -> Self {
+            Self { inner }
         }
     }
 }
@@ -655,6 +688,11 @@ impl PickOptionsNameOrSizeBuilder {
         self.inner
     }
 }
+impl From<PickOptionsNameOrSize> for PickOptionsNameOrSizeBuilder {
+    fn from(inner: PickOptionsNameOrSize) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -690,6 +728,11 @@ impl PickOptionsSizeBuilder {
     }
     pub fn build(self) -> PickOptionsSize {
         self.inner
+    }
+}
+impl From<PickOptionsSize> for PickOptionsSizeBuilder {
+    fn from(inner: PickOptionsSize) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
@@ -737,6 +780,11 @@ impl PickOptionsExcludeOptionKeyFixedBuilder {
     }
     pub fn build(self) -> PickOptionsExcludeOptionKeyFixed {
         self.inner
+    }
+}
+impl From<PickOptionsExcludeOptionKeyFixed> for PickOptionsExcludeOptionKeyFixedBuilder {
+    fn from(inner: PickOptionsExcludeOptionKeyFixed) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
@@ -887,18 +935,26 @@ extern "C" {
     pub fn set_label<T>(this: &PartialBox<T>, val: impl ::wasm_bindgen::JsStringLike);
 }
 impl<T: ::wasm_bindgen::convert::IntoWasmAbi> PartialBox<T> {
-    pub fn new() -> PartialBox<T> {
-        Self::builder().build()
+    pub fn new_typed() -> PartialBox<T> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> PartialBoxBuilder<T> {
+    pub fn builder_typed() -> PartialBoxBuilder<T> {
         PartialBoxBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl PartialBox<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> PartialBoxBuilder<JsValue> {
+        Self::builder_typed()
+    }
+}
 impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for PartialBox<T> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct PartialBoxBuilder<T> {
@@ -915,6 +971,11 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> PartialBoxBuilder<T> {
     }
     pub fn build(self) -> PartialBox<T> {
         self.inner
+    }
+}
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<PartialBox<T>> for PartialBoxBuilder<T> {
+    fn from(inner: PartialBox<T>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]

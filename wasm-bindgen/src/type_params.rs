@@ -1,63 +1,129 @@
 //! Callable-level type parameters that no argument can infer.
 //!
 //! A method's `<T>` reaches Rust as a generic the caller must name when
-//! the lowered arguments never mention it. That is worth keeping only
-//! where the turbofish is itself the cast: a return of exactly `T`,
-//! `T | undefined` or `T | null` (`storage.get::<JsString>(key)`).
-//! Nested in a container (`Promise<D1Result<T>>`, `Map<string, T>`) the
-//! generic is pure ceremony — the caller can `unchecked_into` the
-//! container just as well — so it erases to a default and leaves the
-//! signature. The default is the one declared by the generic type `T`
-//! instantiates in the return (`D1Result<T = unknown>`), else the
-//! method's own, else `any`.
+//! the lowered arguments never mention it. The plain name therefore reads
+//! it at what TypeScript infers with nothing to go on: the default
+//! declared by the generic type `T` instantiates in the return
+//! (`D1Result<T = unknown>`), else the method's own, else its class or
+//! interface bound, else `any`. The caller's own choice is the `_typed`
+//! twin, which keeps the parameters the return mentions
+//! (`all_typed::<Row>()`).
 
 use std::collections::HashMap;
 
 use ts_gen::ir::{Member, Param, TypeParam, TypeRef};
 use ts_gen::parse::scope::{Binding, ScopeId};
+use ts_gen::util::naming::LocalScope;
 
+use super::ir_callables::Site;
+use super::signatures::{CallableSpec, FunctionSignature};
 use super::typemap::{variadic_spreads_list, CodegenContext};
 
-/// Rewrite the methods of a class-like declaration in place.
+const TYPED: &str = "_typed";
+
+/// The `_typed` twins of `plain`: `typed`, the callable's
+/// [`Reading::Typed`], bound with `_typed` closing each name (`list_typed`,
+/// `list_typed_promise`, `try_list_typed`).
+///
+/// `lowered` is a binding's return as Rust writes it, anchored at the
+/// given name. A twin whose return is its plain binding's is left out: a
+/// parameter the lowering drops anyway types nothing.
+pub(crate) fn typed_twins(
+    typed: &CallableSpec<'_>,
+    site: Option<Site<'_>>,
+    plain: &[FunctionSignature],
+    names: &mut LocalScope,
+    cgctx: Option<&CodegenContext<'_>>,
+    lowered: &dyn Fn(&FunctionSignature, &str) -> String,
+) -> Vec<FunctionSignature> {
+    let mut twins = super::ir_callables::build_postfixed(typed, site, TYPED, names, cgctx);
+    twins.retain(|twin| {
+        let typed = twin.rust_name.rfind(TYPED).is_some_and(|at| {
+            let name = format!(
+                "{}{}",
+                &twin.rust_name[..at],
+                &twin.rust_name[at + TYPED.len()..]
+            );
+            plain
+                .iter()
+                .any(|p| p.rust_name == name && lowered(p, &name) != lowered(twin, &name))
+        });
+        if !typed {
+            names.release(&twin.rust_name);
+            names.release(&format!("__{}", twin.rust_name));
+            for (_, arm) in twin.literal.iter().flat_map(|l| &l.arms) {
+                names.release(arm);
+            }
+            if let Some(l) = &twin.literal {
+                names.release(&l.binding);
+            }
+        }
+        typed
+    });
+    twins
+}
+
+/// Rewrite the methods of a class-like declaration in place, returning
+/// those with a `_typed` twin as the twin reads them.
 pub(crate) fn erase_uninferrable_in_members(
     members: &mut [Member],
     cgctx: Option<&CodegenContext<'_>>,
-) {
+) -> Vec<Member> {
+    let mut twins = Vec::new();
     let Some(cgctx) = cgctx else {
-        return;
+        return twins;
+    };
+    let erase = |member: &mut Member, reading: Reading| match member {
+        Member::Method(m) => erase_uninferrable(
+            &mut m.type_params,
+            &mut m.params,
+            &mut m.return_type,
+            cgctx,
+            m.body_scope,
+            reading,
+        ),
+        Member::StaticMethod(m) => erase_uninferrable(
+            &mut m.type_params,
+            &mut m.params,
+            &mut m.return_type,
+            cgctx,
+            m.body_scope,
+            reading,
+        ),
+        _ => 0,
     };
     for member in members {
-        match member {
-            Member::Method(m) => erase_uninferrable(
-                &mut m.type_params,
-                &mut m.params,
-                &mut m.return_type,
-                cgctx,
-                m.body_scope,
-            ),
-            Member::StaticMethod(m) => erase_uninferrable(
-                &mut m.type_params,
-                &mut m.params,
-                &mut m.return_type,
-                cgctx,
-                m.body_scope,
-            ),
-            _ => {}
+        let mut twin = member.clone();
+        if erase(member, Reading::Plain) > erase(&mut twin, Reading::Typed) {
+            twins.push(twin);
         }
     }
+    twins
+}
+
+/// Which binding of a callable is being read.
+#[derive(Clone, Copy, PartialEq)]
+pub(crate) enum Reading {
+    /// Every parameter no argument infers at its default.
+    Plain,
+    /// The `_typed` twin, which keeps those the return mentions for the
+    /// caller to name.
+    Typed,
 }
 
 /// Apply the rule to one callable. Erased parameters are substituted in
-/// `params` and `return_type` and removed from `type_params`.
+/// `params` and `return_type` and removed from `type_params`; how many
+/// were.
 pub(crate) fn erase_uninferrable(
     type_params: &mut Vec<TypeParam>,
     params: &mut [Param],
     return_type: &mut TypeRef,
     cgctx: &CodegenContext<'_>,
     scope: ScopeId,
-) {
+    reading: Reading,
+) -> usize {
     if type_params.is_empty() {
-        return;
+        return 0;
     }
     let mut inferred = Vec::new();
     for p in params.iter() {
@@ -67,19 +133,23 @@ pub(crate) fn erase_uninferrable(
         }
         surviving_type_params(&p.type_ref, cgctx, scope, &mut inferred);
     }
+    let own = type_params.clone();
     let mut erased: Vec<(String, TypeRef)> = Vec::new();
     type_params.retain(|tp| {
-        if inferred.contains(&tp.name) || is_whole_return(return_type, &tp.name) {
+        let named =
+            reading == Reading::Typed && mentions_any(return_type, std::slice::from_ref(tp));
+        if inferred.contains(&tp.name) || named {
             return true;
         }
         let default = owning_type_default(return_type, &tp.name, cgctx, scope)
             .or_else(|| tp.default.clone())
+            .or_else(|| bound(tp, &own, cgctx, scope))
             .unwrap_or(TypeRef::Any);
         erased.push((tp.name.clone(), default));
         false
     });
     if erased.is_empty() {
-        return;
+        return 0;
     }
     let map: HashMap<&str, TypeRef> = erased
         .iter()
@@ -89,15 +159,27 @@ pub(crate) fn erase_uninferrable(
         p.type_ref = p.type_ref.substitute(&map);
     }
     *return_type = return_type.substitute(&map);
+    erased.len()
 }
 
-/// The (awaited) return is exactly the parameter, optionally nullable.
-fn is_whole_return(return_type: &TypeRef, name: &str) -> bool {
-    let awaited = return_type.as_promise_inner().unwrap_or(return_type);
-    match awaited.split_empties() {
-        Some((core, _)) => core.as_ident() == Some(name),
-        None => awaited.as_ident() == Some(name),
-    }
+/// The class or interface `tp` extends, as the IR bounds it, unless that
+/// names the callable's `own` parameters.
+fn bound(
+    tp: &TypeParam,
+    own: &[TypeParam],
+    cgctx: &CodegenContext<'_>,
+    scope: ScopeId,
+) -> Option<TypeRef> {
+    let c = tp.constraint.as_ref()?;
+    let TypeRef::Reference { segments, .. } = c else {
+        return None;
+    };
+    let id = cgctx.gctx.resolve_path(scope, &segments.join("."))?;
+    let declared = matches!(
+        cgctx.gctx.get_type(id).kind,
+        ts_gen::ir::TypeKind::Interface(_) | ts_gen::ir::TypeKind::Class(_)
+    );
+    (declared && !mentions_any(c, own)).then(|| c.clone())
 }
 
 /// Default declared by the first generic type in the return that takes

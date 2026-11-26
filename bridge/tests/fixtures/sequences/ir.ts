@@ -1,6 +1,8 @@
 ir 1;
 
 class Request {}
+class ArrayBuffer {}
+interface ArrayBufferView {}
 
 class Probe {
   str(v: str): str;
@@ -10,6 +12,9 @@ class Probe {
   bigs(v: i64[]): i64[];
   optBytes(v: u8[]?): u8[]?;
   fill(v: mut u8[]);
+  buf(v: buffer): buffer;
+  optBuf(v: buffer?): buffer?;
+  peek(v: *buffer);
   nums(v: arr<u32>): arr<u32>;
   strs(v: arr<str>): arr<str>;
   optStrs(v: arr<str?>?): arr<str?>?;

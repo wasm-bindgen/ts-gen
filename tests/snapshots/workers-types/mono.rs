@@ -594,6 +594,11 @@ pub mod web_assembly {
             self.inner
         }
     }
+    impl From<GlobalDescriptor> for GlobalDescriptorBuilder {
+        fn from(inner: GlobalDescriptor) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_name = "Global" , js_namespace = "WebAssembly")]
@@ -677,6 +682,11 @@ pub mod web_assembly {
         }
         pub fn build(self) -> MemoryDescriptor {
             self.inner
+        }
+    }
+    impl From<MemoryDescriptor> for MemoryDescriptorBuilder {
+        fn from(inner: MemoryDescriptor) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -823,6 +833,11 @@ pub mod web_assembly {
             self.inner
         }
     }
+    impl From<TableDescriptor> for TableDescriptorBuilder {
+        fn from(inner: TableDescriptor) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
@@ -877,7 +892,9 @@ pub mod web_assembly {
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_namespace = "WebAssembly")]
-        pub fn validate(bytes: impl super::BufferSource) -> Result<bool, JsValue>;
+        pub fn validate(
+            #[wasm_bindgen(slice = "copy")] bytes: impl ::js_sys::BufferSourceLike,
+        ) -> Result<bool, JsValue>;
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -1334,7 +1351,7 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_function_and_event_target_add_event_listener_options(
+    pub fn add_event_listener_with_function_and_options(
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(Event) -> Undefined>,
         options: &EventTargetAddEventListenerOptions,
@@ -1343,7 +1360,7 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_listener_object_and_event_target_add_event_listener_options(
+    pub fn add_event_listener_with_event_listener_object_and_options(
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject,
         options: &EventTargetAddEventListenerOptions,
@@ -1367,6 +1384,66 @@ extern "C" {
         options: bool,
     ) -> Result<(), JsValue>;
 }
+pub fn add_event_listener_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+) -> Result<(), JsValue> {
+    add_event_listener(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+    )
+}
+pub fn add_event_listener_with_event_listener_object_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+) -> Result<(), JsValue> {
+    add_event_listener_with_event_listener_object(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+    )
+}
+pub fn add_event_listener_with_function_and_options_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    options: &EventTargetAddEventListenerOptions,
+) -> Result<(), JsValue> {
+    add_event_listener_with_function_and_options(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn add_event_listener_with_event_listener_object_and_options_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    options: &EventTargetAddEventListenerOptions,
+) -> Result<(), JsValue> {
+    add_event_listener_with_event_listener_object_and_options(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn add_event_listener_with_function_and_bool_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    options: bool,
+) -> Result<(), JsValue> {
+    add_event_listener_with_function_and_bool(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn add_event_listener_with_event_listener_object_and_bool_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    options: bool,
+) -> Result<(), JsValue> {
+    add_event_listener_with_event_listener_object_and_bool(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
@@ -1386,7 +1463,7 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_function_and_event_target_event_listener_options(
+    pub fn remove_event_listener_with_function_and_options(
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(Event) -> Undefined>,
         options: &EventTargetEventListenerOptions,
@@ -1395,7 +1472,7 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_listener_object_and_event_target_event_listener_options(
+    pub fn remove_event_listener_with_event_listener_object_and_options(
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject,
         options: &EventTargetEventListenerOptions,
@@ -1418,6 +1495,70 @@ extern "C" {
         handler: &EventListenerObject,
         options: bool,
     ) -> Result<(), JsValue>;
+}
+pub fn remove_event_listener_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+) -> Result<(), JsValue> {
+    remove_event_listener(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+    )
+}
+pub fn remove_event_listener_with_event_listener_object_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+) -> Result<(), JsValue> {
+    remove_event_listener_with_event_listener_object(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+    )
+}
+pub fn remove_event_listener_with_function_and_options_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    options: &EventTargetEventListenerOptions,
+) -> Result<(), JsValue> {
+    remove_event_listener_with_function_and_options(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn remove_event_listener_with_event_listener_object_and_options_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    options: &EventTargetEventListenerOptions,
+) -> Result<(), JsValue> {
+    remove_event_listener_with_event_listener_object_and_options(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn remove_event_listener_with_function_and_bool_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+    handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    options: bool,
+) -> Result<(), JsValue> {
+    remove_event_listener_with_function_and_bool(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
+}
+pub fn remove_event_listener_with_event_listener_object_and_bool_typed<
+    K: MapKey<WorkerGlobalScopeEventMap>,
+>(
+    handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    options: bool,
+) -> Result<(), JsValue> {
+    remove_event_listener_with_event_listener_object_and_bool(
+        <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+        ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        options,
+    )
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -1993,13 +2134,22 @@ impl<
         Props: ::wasm_bindgen::convert::IntoWasmAbi,
     > ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>
 {
-    pub fn new() -> ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props> {
-        Self::builder().build()
+    pub fn new_typed() -> ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> ExportedHandlerBuilder<Env, QueueHandlerMessage, CfHostMetadata, Props> {
+    pub fn builder_typed() -> ExportedHandlerBuilder<Env, QueueHandlerMessage, CfHostMetadata, Props>
+    {
         ExportedHandlerBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl ExportedHandler<JsValue, JsValue, JsValue, JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> ExportedHandlerBuilder<JsValue, JsValue, JsValue, JsValue> {
+        Self::builder_typed()
     }
 }
 impl<
@@ -2010,7 +2160,7 @@ impl<
     > Default for ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>
 {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct ExportedHandlerBuilder<Env, QueueHandlerMessage, CfHostMetadata, Props> {
@@ -2111,6 +2261,18 @@ impl<
         self.inner
     }
 }
+impl<
+        Env: ::wasm_bindgen::convert::IntoWasmAbi,
+        QueueHandlerMessage: ::wasm_bindgen::convert::IntoWasmAbi,
+        CfHostMetadata: ::wasm_bindgen::convert::IntoWasmAbi,
+        Props: ::wasm_bindgen::convert::IntoWasmAbi,
+    > From<ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>>
+    for ExportedHandlerBuilder<Env, QueueHandlerMessage, CfHostMetadata, Props>
+{
+    fn from(inner: ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -2148,6 +2310,11 @@ impl StructuredSerializeOptionsBuilder {
         self.inner
     }
 }
+impl From<StructuredSerializeOptions> for StructuredSerializeOptionsBuilder {
+    fn from(inner: StructuredSerializeOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -2171,16 +2338,10 @@ extern "C" {
         body: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "sendBeacon")]
-    pub fn send_beacon_with_array_buffer(
+    pub fn send_beacon_with_buffer(
         this: &Navigator,
         url: impl ::wasm_bindgen::JsStringLike,
-        body: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "sendBeacon")]
-    pub fn send_beacon_with_typed_array(
-        this: &Navigator,
-        url: impl ::wasm_bindgen::JsStringLike,
-        body: &Object,
+        #[wasm_bindgen(slice = "copy")] body: impl ::js_sys::BufferSourceLike,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "sendBeacon")]
     pub fn send_beacon_with_blob(
@@ -2433,6 +2594,13 @@ impl DurableObjectNamespaceNewUniqueIdOptionsBuilder {
         self.inner
     }
 }
+impl From<DurableObjectNamespaceNewUniqueIdOptions>
+    for DurableObjectNamespaceNewUniqueIdOptionsBuilder
+{
+    fn from(inner: DurableObjectNamespaceNewUniqueIdOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DurableObjectLocationHint {
@@ -2504,6 +2672,13 @@ impl DurableObjectNamespaceGetDurableObjectOptionsBuilder {
     }
     pub fn build(self) -> DurableObjectNamespaceGetDurableObjectOptions {
         self.inner
+    }
+}
+impl From<DurableObjectNamespaceGetDurableObjectOptions>
+    for DurableObjectNamespaceGetDurableObjectOptionsBuilder
+{
+    fn from(inner: DurableObjectNamespaceGetDurableObjectOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -2623,33 +2798,27 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectTransaction;
     #[wasm_bindgen(method, catch)]
-    pub async fn get<T>(
+    pub async fn get(
         this: &DurableObjectTransaction,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<T>, JsValue>
-    where
-        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
-        T: 'static;
+    ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_promise<T>(
+    pub fn get_promise(
         this: &DurableObjectTransaction,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Option<T>>;
+    ) -> Promise;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_options<T>(
+    pub async fn get_with_options(
         this: &DurableObjectTransaction,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &DurableObjectGetOptions,
-    ) -> Result<Option<T>, JsValue>
-    where
-        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
-        T: 'static;
+    ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_options_promise<T>(
+    pub fn get_with_options_promise(
         this: &DurableObjectTransaction,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &DurableObjectGetOptions,
-    ) -> Promise<Option<T>>;
+    ) -> Promise;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_keys(
         this: &DurableObjectTransaction,
@@ -2672,6 +2841,60 @@ extern "C" {
         keys: &[impl ::wasm_bindgen::JsStringLike],
         options: &DurableObjectGetOptions,
     ) -> Promise<Map<JsString, JsValue>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_typed<T>(
+        this: &DurableObjectTransaction,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Option<T>, JsValue>
+    where
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_typed_promise<T>(
+        this: &DurableObjectTransaction,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<Option<T>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_with_options_typed<T>(
+        this: &DurableObjectTransaction,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &DurableObjectGetOptions,
+    ) -> Result<Option<T>, JsValue>
+    where
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_options_typed_promise<T>(
+        this: &DurableObjectTransaction,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &DurableObjectGetOptions,
+    ) -> Promise<Option<T>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_with_keys_typed<T>(
+        this: &DurableObjectTransaction,
+        keys: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Map<JsString, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_keys_typed_promise<T>(
+        this: &DurableObjectTransaction,
+        keys: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Promise<Map<JsString, T>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_with_keys_and_options_typed<T>(
+        this: &DurableObjectTransaction,
+        keys: &[impl ::wasm_bindgen::JsStringLike],
+        options: &DurableObjectGetOptions,
+    ) -> Result<Map<JsString, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_keys_and_options_typed_promise<T>(
+        this: &DurableObjectTransaction,
+        keys: &[impl ::wasm_bindgen::JsStringLike],
+        options: &DurableObjectGetOptions,
+    ) -> Promise<Map<JsString, T>>;
     #[wasm_bindgen(method, catch)]
     pub async fn list(this: &DurableObjectTransaction) -> Result<Map<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
@@ -2686,6 +2909,26 @@ extern "C" {
         this: &DurableObjectTransaction,
         options: &DurableObjectListOptions,
     ) -> Promise<Map<JsString, JsValue>>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_typed<T>(
+        this: &DurableObjectTransaction,
+    ) -> Result<Map<JsString, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "list")]
+    pub fn list_typed_promise<T>(this: &DurableObjectTransaction) -> Promise<Map<JsString, T>>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_with_options_typed<T>(
+        this: &DurableObjectTransaction,
+        options: &DurableObjectListOptions,
+    ) -> Result<Map<JsString, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "list")]
+    pub fn list_with_options_typed_promise<T>(
+        this: &DurableObjectTransaction,
+        options: &DurableObjectListOptions,
+    ) -> Promise<Map<JsString, T>>;
     #[wasm_bindgen(method, catch)]
     pub async fn put<T>(
         this: &DurableObjectTransaction,
@@ -2867,33 +3110,27 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectStorage;
     #[wasm_bindgen(method, catch)]
-    pub async fn get<T>(
+    pub async fn get(
         this: &DurableObjectStorage,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<T>, JsValue>
-    where
-        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
-        T: 'static;
+    ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_promise<T>(
+    pub fn get_promise(
         this: &DurableObjectStorage,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Option<T>>;
+    ) -> Promise;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_options<T>(
+    pub async fn get_with_options(
         this: &DurableObjectStorage,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &DurableObjectGetOptions,
-    ) -> Result<Option<T>, JsValue>
-    where
-        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
-        T: 'static;
+    ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_options_promise<T>(
+    pub fn get_with_options_promise(
         this: &DurableObjectStorage,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &DurableObjectGetOptions,
-    ) -> Promise<Option<T>>;
+    ) -> Promise;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_keys(
         this: &DurableObjectStorage,
@@ -2916,6 +3153,60 @@ extern "C" {
         keys: &[impl ::wasm_bindgen::JsStringLike],
         options: &DurableObjectGetOptions,
     ) -> Promise<Map<JsString, JsValue>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_typed<T>(
+        this: &DurableObjectStorage,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Option<T>, JsValue>
+    where
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_typed_promise<T>(
+        this: &DurableObjectStorage,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<Option<T>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_with_options_typed<T>(
+        this: &DurableObjectStorage,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &DurableObjectGetOptions,
+    ) -> Result<Option<T>, JsValue>
+    where
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_options_typed_promise<T>(
+        this: &DurableObjectStorage,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &DurableObjectGetOptions,
+    ) -> Promise<Option<T>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_with_keys_typed<T>(
+        this: &DurableObjectStorage,
+        keys: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Map<JsString, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_keys_typed_promise<T>(
+        this: &DurableObjectStorage,
+        keys: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Promise<Map<JsString, T>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_with_keys_and_options_typed<T>(
+        this: &DurableObjectStorage,
+        keys: &[impl ::wasm_bindgen::JsStringLike],
+        options: &DurableObjectGetOptions,
+    ) -> Result<Map<JsString, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_keys_and_options_typed_promise<T>(
+        this: &DurableObjectStorage,
+        keys: &[impl ::wasm_bindgen::JsStringLike],
+        options: &DurableObjectGetOptions,
+    ) -> Promise<Map<JsString, T>>;
     #[wasm_bindgen(method, catch)]
     pub async fn list(this: &DurableObjectStorage) -> Result<Map<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
@@ -2930,6 +3221,24 @@ extern "C" {
         this: &DurableObjectStorage,
         options: &DurableObjectListOptions,
     ) -> Promise<Map<JsString, JsValue>>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_typed<T>(this: &DurableObjectStorage) -> Result<Map<JsString, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "list")]
+    pub fn list_typed_promise<T>(this: &DurableObjectStorage) -> Promise<Map<JsString, T>>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_with_options_typed<T>(
+        this: &DurableObjectStorage,
+        options: &DurableObjectListOptions,
+    ) -> Result<Map<JsString, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "list")]
+    pub fn list_with_options_typed_promise<T>(
+        this: &DurableObjectStorage,
+        options: &DurableObjectListOptions,
+    ) -> Promise<Map<JsString, T>>;
     #[wasm_bindgen(method, catch)]
     pub async fn put<T>(
         this: &DurableObjectStorage,
@@ -3300,6 +3609,11 @@ impl DurableObjectListOptionsBuilder {
         self.inner
     }
 }
+impl From<DurableObjectListOptions> for DurableObjectListOptionsBuilder {
+    fn from(inner: DurableObjectListOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -3345,6 +3659,11 @@ impl DurableObjectGetOptionsBuilder {
         self.inner
     }
 }
+impl From<DurableObjectGetOptions> for DurableObjectGetOptionsBuilder {
+    fn from(inner: DurableObjectGetOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -3380,6 +3699,11 @@ impl DurableObjectGetAlarmOptionsBuilder {
     }
     pub fn build(self) -> DurableObjectGetAlarmOptions {
         self.inner
+    }
+}
+impl From<DurableObjectGetAlarmOptions> for DurableObjectGetAlarmOptionsBuilder {
+    fn from(inner: DurableObjectGetAlarmOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -3435,6 +3759,11 @@ impl DurableObjectPutOptionsBuilder {
         self.inner
     }
 }
+impl From<DurableObjectPutOptions> for DurableObjectPutOptionsBuilder {
+    fn from(inner: DurableObjectPutOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -3480,6 +3809,11 @@ impl DurableObjectSetAlarmOptionsBuilder {
         self.inner
     }
 }
+impl From<DurableObjectSetAlarmOptions> for DurableObjectSetAlarmOptionsBuilder {
+    fn from(inner: DurableObjectSetAlarmOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -3518,9 +3852,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AnalyticsEngineDataPoint;
     #[wasm_bindgen(method, getter)]
-    pub fn indexes(this: &AnalyticsEngineDataPoint) -> Option<Vec<JsValue>>;
+    pub fn indexes(this: &AnalyticsEngineDataPoint) -> Option<Vec<Option<ArrayBufferOrStr>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_indexes(this: &AnalyticsEngineDataPoint, val: &[JsValue]);
+    pub fn set_indexes(this: &AnalyticsEngineDataPoint, val: &[Nullable<ArrayBufferOrStr>]);
     #[wasm_bindgen(method, getter)]
     pub fn doubles(this: &AnalyticsEngineDataPoint) -> Option<Vec<f64>>;
     #[wasm_bindgen(method, setter)]
@@ -3529,9 +3863,9 @@ extern "C" {
         #[wasm_bindgen(slice = "array")] val: &[f64],
     );
     #[wasm_bindgen(method, getter)]
-    pub fn blobs(this: &AnalyticsEngineDataPoint) -> Option<Vec<JsValue>>;
+    pub fn blobs(this: &AnalyticsEngineDataPoint) -> Option<Vec<Option<ArrayBufferOrStr>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_blobs(this: &AnalyticsEngineDataPoint, val: &[JsValue]);
+    pub fn set_blobs(this: &AnalyticsEngineDataPoint, val: &[Nullable<ArrayBufferOrStr>]);
 }
 impl AnalyticsEngineDataPoint {
     pub fn new() -> AnalyticsEngineDataPoint {
@@ -3552,7 +3886,7 @@ pub struct AnalyticsEngineDataPointBuilder {
     inner: AnalyticsEngineDataPoint,
 }
 impl AnalyticsEngineDataPointBuilder {
-    pub fn indexes(self, val: &[JsValue]) -> Self {
+    pub fn indexes(self, val: &[Nullable<ArrayBufferOrStr>]) -> Self {
         self.inner.set_indexes(val);
         self
     }
@@ -3560,12 +3894,17 @@ impl AnalyticsEngineDataPointBuilder {
         self.inner.set_doubles(val);
         self
     }
-    pub fn blobs(self, val: &[JsValue]) -> Self {
+    pub fn blobs(self, val: &[Nullable<ArrayBufferOrStr>]) -> Self {
         self.inner.set_blobs(val);
         self
     }
     pub fn build(self) -> AnalyticsEngineDataPoint {
         self.inner
+    }
+}
+impl From<AnalyticsEngineDataPoint> for AnalyticsEngineDataPointBuilder {
+    fn from(inner: AnalyticsEngineDataPoint) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -3741,6 +4080,11 @@ impl EventInitBuilder {
         self.inner
     }
 }
+impl From<EventInit> for EventInitBuilder {
+    fn from(inner: EventInit) -> Self {
+        Self { inner }
+    }
+}
 #[allow(dead_code)]
 pub type EventListener<EventType = Event> = Function<fn(EventType) -> Undefined>;
 #[wasm_bindgen(experimental_generic_mono)]
@@ -3764,7 +4108,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventTarget<EventMap = Object<Event>>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<EventMap>() -> Result<EventTarget<EventMap>, JsValue>;
+    pub fn new() -> Result<EventTarget, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<EventMap>() -> Result<EventTarget<EventMap>, JsValue>;
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
@@ -3787,7 +4133,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_function_and_event_target_add_event_listener_options<EventMap>(
+    pub fn add_event_listener_with_function_and_options<EventMap>(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(Event) -> Undefined>,
@@ -3797,9 +4143,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_listener_object_and_event_target_add_event_listener_options<
-        EventMap,
-    >(
+    pub fn add_event_listener_with_event_listener_object_and_options<EventMap>(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject,
@@ -3847,7 +4191,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_function_and_event_target_event_listener_options<EventMap>(
+    pub fn remove_event_listener_with_function_and_options<EventMap>(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &Function<fn(Event) -> Undefined>,
@@ -3857,9 +4201,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_listener_object_and_event_target_event_listener_options<
-        EventMap,
-    >(
+    pub fn remove_event_listener_with_event_listener_object_and_options<EventMap>(
         this: &EventTarget<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerObject,
@@ -3893,6 +4235,172 @@ extern "C" {
         this: &EventTarget<EventMap>,
         event: &Event,
     ) -> Result<bool, JsValue>;
+}
+impl<EventMap> EventTarget<EventMap> {
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener_with_event_listener_object(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_function_and_options_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener_with_function_and_options(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_and_options_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_function_and_bool_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener_with_function_and_bool(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_and_bool_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+}
+impl<EventMap> EventTarget<EventMap> {
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener_with_event_listener_object(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_function_and_options_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener_with_function_and_options(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_and_options_typed<
+        K: MapKey<EventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_function_and_bool_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<EventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener_with_function_and_bool(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_and_bool_typed<K: MapKey<EventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<EventMap>>::Value>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<EventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -3929,6 +4437,11 @@ impl EventTargetEventListenerOptionsBuilder {
     }
     pub fn build(self) -> EventTargetEventListenerOptions {
         self.inner
+    }
+}
+impl From<EventTargetEventListenerOptions> for EventTargetEventListenerOptionsBuilder {
+    fn from(inner: EventTargetEventListenerOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -3990,6 +4503,11 @@ impl EventTargetAddEventListenerOptionsBuilder {
     }
     pub fn build(self) -> EventTargetAddEventListenerOptions {
         self.inner
+    }
+}
+impl From<EventTargetAddEventListenerOptions> for EventTargetAddEventListenerOptionsBuilder {
+    fn from(inner: EventTargetAddEventListenerOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -4136,6 +4654,11 @@ impl SchedulerWaitOptionsBuilder {
         self.inner
     }
 }
+impl From<SchedulerWaitOptions> for SchedulerWaitOptionsBuilder {
+    fn from(inner: SchedulerWaitOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Event , extends = Object)]
@@ -4153,9 +4676,18 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CustomEvent<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<T>(r#type: impl ::wasm_bindgen::JsStringLike) -> Result<CustomEvent<T>, JsValue>;
+    pub fn new(r#type: impl ::wasm_bindgen::JsStringLike) -> Result<CustomEvent, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_init<T>(
+    pub fn new_typed<T>(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<CustomEvent<T>, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_init(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        init: &CustomEventCustomEventInit,
+    ) -> Result<CustomEvent, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_init_typed<T>(
         r#type: impl ::wasm_bindgen::JsStringLike,
         init: &CustomEventCustomEventInit,
     ) -> Result<CustomEvent<T>, JsValue>;
@@ -4228,6 +4760,11 @@ impl CustomEventCustomEventInitBuilder {
         self.inner
     }
 }
+impl From<CustomEventCustomEventInit> for CustomEventCustomEventInitBuilder {
+    fn from(inner: CustomEventCustomEventInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -4236,10 +4773,10 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Blob, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_type(r#type: &[JsValue]) -> Result<Blob, JsValue>;
+    pub fn new_with_type(r#type: &[BufferOrStrOrBlob]) -> Result<Blob, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_type_and_options(
-        r#type: Option<&[JsValue]>,
+        r#type: Option<&[BufferOrStrOrBlob]>,
         options: &BlobOptions,
     ) -> Result<Blob, JsValue>;
     #[doc = " The **`size`** read-only property of the Blob interface returns the size of the Blob or File in bytes."]
@@ -4366,6 +4903,11 @@ impl BlobOptionsBuilder {
         self.inner
     }
 }
+impl From<BlobOptions> for BlobOptionsBuilder {
+    fn from(inner: BlobOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Blob , extends = Object)]
@@ -4373,12 +4915,12 @@ extern "C" {
     pub type File;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(
-        bits: Option<&[JsValue]>,
+        bits: Option<&[BufferOrStrOrBlob]>,
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<File, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_options(
-        bits: Option<&[JsValue]>,
+        bits: Option<&[BufferOrStrOrBlob]>,
         name: impl ::wasm_bindgen::JsStringLike,
         options: &FileOptions,
     ) -> Result<File, JsValue>;
@@ -4443,6 +4985,11 @@ impl FileOptionsBuilder {
     }
     pub fn build(self) -> FileOptions {
         self.inner
+    }
+}
+impl From<FileOptions> for FileOptionsBuilder {
+    fn from(inner: FileOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -4668,6 +5215,11 @@ impl CacheQueryOptionsBuilder {
         self.inner
     }
 }
+impl From<CacheQueryOptions> for CacheQueryOptionsBuilder {
+    fn from(inner: CacheQueryOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -4716,7 +5268,7 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
-        plain_text: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] plain_text: impl ::js_sys::BufferSourceLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
     #[doc = ""]
@@ -4726,67 +5278,27 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
-        plain_text: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] plain_text: impl ::js_sys::BufferSourceLike,
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
     #[wasm_bindgen(method, catch, js_name = "encrypt")]
-    pub async fn encrypt_with_subtle_crypto_encrypt_algorithm(
+    pub async fn encrypt_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
-        plain_text: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] plain_text: impl ::js_sys::BufferSourceLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
     #[wasm_bindgen(method, js_name = "encrypt")]
-    pub fn encrypt_with_subtle_crypto_encrypt_algorithm_promise(
+    pub fn encrypt_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
-        plain_text: &ArrayBuffer,
-    ) -> Promise<ArrayBuffer>;
-    #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
-    #[wasm_bindgen(method, catch, js_name = "encrypt")]
-    pub async fn encrypt_with_typed_array(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        plain_text: &Object,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
-    #[wasm_bindgen(method, js_name = "encrypt")]
-    pub fn encrypt_with_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        plain_text: &Object,
-    ) -> Promise<ArrayBuffer>;
-    #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
-    #[wasm_bindgen(method, catch, js_name = "encrypt")]
-    pub async fn encrypt_with_subtle_crypto_encrypt_algorithm_and_typed_array(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoEncryptAlgorithm,
-        key: &CryptoKey,
-        plain_text: &Object,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
-    #[wasm_bindgen(method, js_name = "encrypt")]
-    pub fn encrypt_with_subtle_crypto_encrypt_algorithm_and_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoEncryptAlgorithm,
-        key: &CryptoKey,
-        plain_text: &Object,
+        #[wasm_bindgen(slice = "copy")] plain_text: impl ::js_sys::BufferSourceLike,
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
     #[doc = ""]
@@ -4796,7 +5308,7 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
-        cipher_text: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] cipher_text: impl ::js_sys::BufferSourceLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
     #[doc = ""]
@@ -4806,67 +5318,27 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
-        cipher_text: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] cipher_text: impl ::js_sys::BufferSourceLike,
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
     #[wasm_bindgen(method, catch, js_name = "decrypt")]
-    pub async fn decrypt_with_subtle_crypto_encrypt_algorithm(
+    pub async fn decrypt_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
-        cipher_text: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] cipher_text: impl ::js_sys::BufferSourceLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
     #[wasm_bindgen(method, js_name = "decrypt")]
-    pub fn decrypt_with_subtle_crypto_encrypt_algorithm_promise(
+    pub fn decrypt_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
-        cipher_text: &ArrayBuffer,
-    ) -> Promise<ArrayBuffer>;
-    #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
-    #[wasm_bindgen(method, catch, js_name = "decrypt")]
-    pub async fn decrypt_with_typed_array(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        cipher_text: &Object,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
-    #[wasm_bindgen(method, js_name = "decrypt")]
-    pub fn decrypt_with_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        cipher_text: &Object,
-    ) -> Promise<ArrayBuffer>;
-    #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
-    #[wasm_bindgen(method, catch, js_name = "decrypt")]
-    pub async fn decrypt_with_subtle_crypto_encrypt_algorithm_and_typed_array(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoEncryptAlgorithm,
-        key: &CryptoKey,
-        cipher_text: &Object,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
-    #[wasm_bindgen(method, js_name = "decrypt")]
-    pub fn decrypt_with_subtle_crypto_encrypt_algorithm_and_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoEncryptAlgorithm,
-        key: &CryptoKey,
-        cipher_text: &Object,
+        #[wasm_bindgen(slice = "copy")] cipher_text: impl ::js_sys::BufferSourceLike,
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
     #[doc = ""]
@@ -4876,7 +5348,7 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
-        data: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
     #[doc = ""]
@@ -4886,67 +5358,27 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
-        data: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
     #[wasm_bindgen(method, catch, js_name = "sign")]
-    pub async fn sign_with_subtle_crypto_sign_algorithm(
+    pub async fn sign_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
-        data: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
     #[wasm_bindgen(method, js_name = "sign")]
-    pub fn sign_with_subtle_crypto_sign_algorithm_promise(
+    pub fn sign_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
-        data: &ArrayBuffer,
-    ) -> Promise<ArrayBuffer>;
-    #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
-    #[wasm_bindgen(method, catch, js_name = "sign")]
-    pub async fn sign_with_typed_array(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        data: &Object,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
-    #[wasm_bindgen(method, js_name = "sign")]
-    pub fn sign_with_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        data: &Object,
-    ) -> Promise<ArrayBuffer>;
-    #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
-    #[wasm_bindgen(method, catch, js_name = "sign")]
-    pub async fn sign_with_subtle_crypto_sign_algorithm_and_typed_array(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoSignAlgorithm,
-        key: &CryptoKey,
-        data: &Object,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
-    #[wasm_bindgen(method, js_name = "sign")]
-    pub fn sign_with_subtle_crypto_sign_algorithm_and_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoSignAlgorithm,
-        key: &CryptoKey,
-        data: &Object,
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
@@ -4956,8 +5388,8 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
-        signature: &ArrayBuffer,
-        data: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] signature: impl ::js_sys::BufferSourceLike,
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
     ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
@@ -4967,162 +5399,30 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
-        signature: &ArrayBuffer,
-        data: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] signature: impl ::js_sys::BufferSourceLike,
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
     ) -> Promise<Boolean>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_subtle_crypto_sign_algorithm(
+    pub async fn verify_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
-        signature: &ArrayBuffer,
-        data: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] signature: impl ::js_sys::BufferSourceLike,
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
     ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_subtle_crypto_sign_algorithm_promise(
+    pub fn verify_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
-        signature: &ArrayBuffer,
-        data: &ArrayBuffer,
-    ) -> Promise<Boolean>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_str_and_typed_array_and_array_buffer(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        signature: &Object,
-        data: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_str_and_typed_array_and_array_buffer_promise(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        signature: &Object,
-        data: &ArrayBuffer,
-    ) -> Promise<Boolean>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_subtle_crypto_sign_algorithm_and_typed_array_and_array_buffer(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoSignAlgorithm,
-        key: &CryptoKey,
-        signature: &Object,
-        data: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_subtle_crypto_sign_algorithm_and_typed_array_and_array_buffer_promise(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoSignAlgorithm,
-        key: &CryptoKey,
-        signature: &Object,
-        data: &ArrayBuffer,
-    ) -> Promise<Boolean>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_str_and_array_buffer_and_typed_array(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        signature: &ArrayBuffer,
-        data: &Object,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_str_and_array_buffer_and_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        signature: &ArrayBuffer,
-        data: &Object,
-    ) -> Promise<Boolean>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_subtle_crypto_sign_algorithm_and_array_buffer_and_typed_array(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoSignAlgorithm,
-        key: &CryptoKey,
-        signature: &ArrayBuffer,
-        data: &Object,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_subtle_crypto_sign_algorithm_and_array_buffer_and_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoSignAlgorithm,
-        key: &CryptoKey,
-        signature: &ArrayBuffer,
-        data: &Object,
-    ) -> Promise<Boolean>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_typed_array_and_typed_array(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        signature: &Object,
-        data: &Object,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_typed_array_and_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        signature: &Object,
-        data: &Object,
-    ) -> Promise<Boolean>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_subtle_crypto_sign_algorithm_and_typed_array_and_typed_array(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoSignAlgorithm,
-        key: &CryptoKey,
-        signature: &Object,
-        data: &Object,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_subtle_crypto_sign_algorithm_and_typed_array_and_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoSignAlgorithm,
-        key: &CryptoKey,
-        signature: &Object,
-        data: &Object,
+        #[wasm_bindgen(slice = "copy")] signature: impl ::js_sys::BufferSourceLike,
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
     ) -> Promise<Boolean>;
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
     #[doc = ""]
@@ -5131,7 +5431,7 @@ extern "C" {
     pub async fn digest(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
-        data: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
     #[doc = ""]
@@ -5140,61 +5440,25 @@ extern "C" {
     pub fn digest_promise(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
-        data: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
     #[wasm_bindgen(method, catch, js_name = "digest")]
-    pub async fn digest_with_subtle_crypto_hash_algorithm(
+    pub async fn digest_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoHashAlgorithm,
-        data: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
     #[wasm_bindgen(method, js_name = "digest")]
-    pub fn digest_with_subtle_crypto_hash_algorithm_promise(
+    pub fn digest_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoHashAlgorithm,
-        data: &ArrayBuffer,
-    ) -> Promise<ArrayBuffer>;
-    #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
-    #[wasm_bindgen(method, catch, js_name = "digest")]
-    pub async fn digest_with_typed_array(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        data: &Object,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
-    #[wasm_bindgen(method, js_name = "digest")]
-    pub fn digest_with_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        data: &Object,
-    ) -> Promise<ArrayBuffer>;
-    #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
-    #[wasm_bindgen(method, catch, js_name = "digest")]
-    pub async fn digest_with_subtle_crypto_hash_algorithm_and_typed_array(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoHashAlgorithm,
-        data: &Object,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
-    #[wasm_bindgen(method, js_name = "digest")]
-    pub fn digest_with_subtle_crypto_hash_algorithm_and_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoHashAlgorithm,
-        data: &Object,
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`generateKey()`** method of the SubtleCrypto interface is used to generate a new key (for symmetric algorithms) or key pair (for public-key algorithms)."]
     #[doc = ""]
@@ -5220,7 +5484,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey)"]
     #[wasm_bindgen(method, catch, js_name = "generateKey")]
-    pub async fn generate_key_with_subtle_crypto_generate_key_algorithm(
+    pub async fn generate_key_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoGenerateKeyAlgorithm,
         extractable: bool,
@@ -5230,7 +5494,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey)"]
     #[wasm_bindgen(method, js_name = "generateKey")]
-    pub fn generate_key_with_subtle_crypto_generate_key_algorithm_promise(
+    pub fn generate_key_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoGenerateKeyAlgorithm,
         extractable: bool,
@@ -5264,7 +5528,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, catch, js_name = "deriveKey")]
-    pub async fn derive_key_with_subtle_crypto_derive_key_algorithm(
+    pub async fn derive_key_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5276,7 +5540,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, js_name = "deriveKey")]
-    pub fn derive_key_with_subtle_crypto_derive_key_algorithm_promise(
+    pub fn derive_key_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5288,7 +5552,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, catch, js_name = "deriveKey")]
-    pub async fn derive_key_with_subtle_crypto_import_key_algorithm(
+    pub async fn derive_key_with_derived_key_algorithm(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         base_key: &CryptoKey,
@@ -5300,7 +5564,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, js_name = "deriveKey")]
-    pub fn derive_key_with_subtle_crypto_import_key_algorithm_promise(
+    pub fn derive_key_with_derived_key_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         base_key: &CryptoKey,
@@ -5312,7 +5576,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, catch, js_name = "deriveKey")]
-    pub async fn derive_key_with_subtle_crypto_derive_key_algorithm_and_subtle_crypto_import_key_algorithm(
+    pub async fn derive_key_with_algorithm_and_derived_key_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5324,7 +5588,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, js_name = "deriveKey")]
-    pub fn derive_key_with_subtle_crypto_derive_key_algorithm_and_subtle_crypto_import_key_algorithm_promise(
+    pub fn derive_key_with_algorithm_and_derived_key_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5354,7 +5618,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, catch, js_name = "deriveBits")]
-    pub async fn derive_bits_with_subtle_crypto_derive_key_algorithm(
+    pub async fn derive_bits_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5363,7 +5627,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, js_name = "deriveBits")]
-    pub fn derive_bits_with_subtle_crypto_derive_key_algorithm_promise(
+    pub fn derive_bits_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5392,7 +5656,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, catch, js_name = "deriveBits")]
-    pub async fn derive_bits_with_subtle_crypto_derive_key_algorithm_and_length(
+    pub async fn derive_bits_with_algorithm_and_length(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5402,7 +5666,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, js_name = "deriveBits")]
-    pub fn derive_bits_with_subtle_crypto_derive_key_algorithm_and_length_promise(
+    pub fn derive_bits_with_algorithm_and_length_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
@@ -5415,7 +5679,7 @@ extern "C" {
     pub async fn import_key(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        key_data: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] key_data: impl ::js_sys::BufferSourceLike,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         extractable: bool,
         key_usages: &[impl ::wasm_bindgen::JsStringLike],
@@ -5427,7 +5691,7 @@ extern "C" {
     pub fn import_key_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        key_data: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] key_data: impl ::js_sys::BufferSourceLike,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         extractable: bool,
         key_usages: &[impl ::wasm_bindgen::JsStringLike],
@@ -5436,31 +5700,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
-    pub async fn import_key_with_typed_array(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        key_data: &Object,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<CryptoKey, JsValue>;
-    #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
-    #[wasm_bindgen(method, js_name = "importKey")]
-    pub fn import_key_with_typed_array_promise(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        key_data: &Object,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Promise<CryptoKey>;
-    #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
-    #[wasm_bindgen(method, catch, js_name = "importKey")]
-    pub async fn import_key_with_json_web_key(
+    pub async fn import_key_with_key_data(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key_data: &JsonWebKey,
@@ -5472,7 +5712,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, js_name = "importKey")]
-    pub fn import_key_with_json_web_key_promise(
+    pub fn import_key_with_key_data_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key_data: &JsonWebKey,
@@ -5484,10 +5724,10 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
-    pub async fn import_key_with_subtle_crypto_import_key_algorithm(
+    pub async fn import_key_with_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        key_data: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] key_data: impl ::js_sys::BufferSourceLike,
         algorithm: &SubtleCryptoImportKeyAlgorithm,
         extractable: bool,
         key_usages: &[impl ::wasm_bindgen::JsStringLike],
@@ -5496,10 +5736,10 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, js_name = "importKey")]
-    pub fn import_key_with_subtle_crypto_import_key_algorithm_promise(
+    pub fn import_key_with_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        key_data: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] key_data: impl ::js_sys::BufferSourceLike,
         algorithm: &SubtleCryptoImportKeyAlgorithm,
         extractable: bool,
         key_usages: &[impl ::wasm_bindgen::JsStringLike],
@@ -5508,31 +5748,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
-    pub async fn import_key_with_typed_array_and_subtle_crypto_import_key_algorithm(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        key_data: &Object,
-        algorithm: &SubtleCryptoImportKeyAlgorithm,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<CryptoKey, JsValue>;
-    #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
-    #[wasm_bindgen(method, js_name = "importKey")]
-    pub fn import_key_with_typed_array_and_subtle_crypto_import_key_algorithm_promise(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        key_data: &Object,
-        algorithm: &SubtleCryptoImportKeyAlgorithm,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Promise<CryptoKey>;
-    #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
-    #[wasm_bindgen(method, catch, js_name = "importKey")]
-    pub async fn import_key_with_json_web_key_and_subtle_crypto_import_key_algorithm(
+    pub async fn import_key_with_key_data_and_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key_data: &JsonWebKey,
@@ -5544,7 +5760,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, js_name = "importKey")]
-    pub fn import_key_with_json_web_key_and_subtle_crypto_import_key_algorithm_promise(
+    pub fn import_key_with_key_data_and_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key_data: &JsonWebKey,
@@ -5596,7 +5812,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/wrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "wrapKey")]
-    pub async fn wrap_key_with_subtle_crypto_encrypt_algorithm(
+    pub async fn wrap_key_with_wrap_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
@@ -5607,7 +5823,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/wrapKey)"]
     #[wasm_bindgen(method, js_name = "wrapKey")]
-    pub fn wrap_key_with_subtle_crypto_encrypt_algorithm_promise(
+    pub fn wrap_key_with_wrap_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
@@ -5621,7 +5837,7 @@ extern "C" {
     pub async fn unwrap_key(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] wrapped_key: impl ::js_sys::BufferSourceLike,
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: impl ::wasm_bindgen::JsStringLike,
         unwrapped_key_algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5635,7 +5851,7 @@ extern "C" {
     pub fn unwrap_key_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] wrapped_key: impl ::js_sys::BufferSourceLike,
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: impl ::wasm_bindgen::JsStringLike,
         unwrapped_key_algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5646,38 +5862,10 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_typed_array(
+    pub async fn unwrap_key_with_unwrap_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &Object,
-        unwrapping_key: &CryptoKey,
-        unwrap_algorithm: impl ::wasm_bindgen::JsStringLike,
-        unwrapped_key_algorithm: impl ::wasm_bindgen::JsStringLike,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<CryptoKey, JsValue>;
-    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_typed_array_promise(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &Object,
-        unwrapping_key: &CryptoKey,
-        unwrap_algorithm: impl ::wasm_bindgen::JsStringLike,
-        unwrapped_key_algorithm: impl ::wasm_bindgen::JsStringLike,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Promise<CryptoKey>;
-    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_subtle_crypto_encrypt_algorithm(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] wrapped_key: impl ::js_sys::BufferSourceLike,
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
         unwrapped_key_algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5688,10 +5876,10 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_subtle_crypto_encrypt_algorithm_promise(
+    pub fn unwrap_key_with_unwrap_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] wrapped_key: impl ::js_sys::BufferSourceLike,
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
         unwrapped_key_algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5702,38 +5890,10 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_typed_array_and_subtle_crypto_encrypt_algorithm(
+    pub async fn unwrap_key_with_unwrapped_key_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &Object,
-        unwrapping_key: &CryptoKey,
-        unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
-        unwrapped_key_algorithm: impl ::wasm_bindgen::JsStringLike,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<CryptoKey, JsValue>;
-    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_typed_array_and_subtle_crypto_encrypt_algorithm_promise(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &Object,
-        unwrapping_key: &CryptoKey,
-        unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
-        unwrapped_key_algorithm: impl ::wasm_bindgen::JsStringLike,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Promise<CryptoKey>;
-    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_subtle_crypto_import_key_algorithm(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] wrapped_key: impl ::js_sys::BufferSourceLike,
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: impl ::wasm_bindgen::JsStringLike,
         unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
@@ -5744,10 +5904,10 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_subtle_crypto_import_key_algorithm_promise(
+    pub fn unwrap_key_with_unwrapped_key_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] wrapped_key: impl ::js_sys::BufferSourceLike,
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: impl ::wasm_bindgen::JsStringLike,
         unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
@@ -5758,38 +5918,10 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_typed_array_and_subtle_crypto_import_key_algorithm(
+    pub async fn unwrap_key_with_unwrap_algorithm_and_unwrapped_key_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &Object,
-        unwrapping_key: &CryptoKey,
-        unwrap_algorithm: impl ::wasm_bindgen::JsStringLike,
-        unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<CryptoKey, JsValue>;
-    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_typed_array_and_subtle_crypto_import_key_algorithm_promise(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &Object,
-        unwrapping_key: &CryptoKey,
-        unwrap_algorithm: impl ::wasm_bindgen::JsStringLike,
-        unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Promise<CryptoKey>;
-    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_subtle_crypto_encrypt_algorithm_and_subtle_crypto_import_key_algorithm(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] wrapped_key: impl ::js_sys::BufferSourceLike,
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
         unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
@@ -5800,38 +5932,10 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_subtle_crypto_encrypt_algorithm_and_subtle_crypto_import_key_algorithm_promise(
+    pub fn unwrap_key_with_unwrap_algorithm_and_unwrapped_key_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &ArrayBuffer,
-        unwrapping_key: &CryptoKey,
-        unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
-        unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Promise<CryptoKey>;
-    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_typed_array_and_subtle_crypto_encrypt_algorithm_and_subtle_crypto_import_key_algorithm(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &Object,
-        unwrapping_key: &CryptoKey,
-        unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
-        unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<CryptoKey, JsValue>;
-    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_typed_array_and_subtle_crypto_encrypt_algorithm_and_subtle_crypto_import_key_algorithm_promise(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &Object,
+        #[wasm_bindgen(slice = "copy")] wrapped_key: impl ::js_sys::BufferSourceLike,
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
         unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
@@ -5841,26 +5945,8 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "timingSafeEqual")]
     pub fn timing_safe_equal(
         this: &SubtleCrypto,
-        a: &ArrayBuffer,
-        b: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "timingSafeEqual")]
-    pub fn timing_safe_equal_with_typed_array_and_array_buffer(
-        this: &SubtleCrypto,
-        a: &Object,
-        b: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "timingSafeEqual")]
-    pub fn timing_safe_equal_with_array_buffer_and_typed_array(
-        this: &SubtleCrypto,
-        a: &ArrayBuffer,
-        b: &Object,
-    ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "timingSafeEqual")]
-    pub fn timing_safe_equal_with_typed_array_and_typed_array(
-        this: &SubtleCrypto,
-        a: &Object,
-        b: &Object,
+        #[wasm_bindgen(slice = "copy")] a: impl ::js_sys::BufferSourceLike,
+        #[wasm_bindgen(slice = "copy")] b: impl ::js_sys::BufferSourceLike,
     ) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -6117,6 +6203,11 @@ impl JsonWebKeyBuilder {
         self.inner
     }
 }
+impl From<JsonWebKey> for JsonWebKeyBuilder {
+    fn from(inner: JsonWebKey) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -6176,6 +6267,11 @@ impl RsaOtherPrimesInfoBuilder {
         self.inner
     }
 }
+impl From<RsaOtherPrimesInfo> for RsaOtherPrimesInfoBuilder {
+    fn from(inner: RsaOtherPrimesInfo) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -6187,16 +6283,17 @@ extern "C" {
     pub fn name_js_string(this: &SubtleCryptoDeriveKeyAlgorithm) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_name(this: &SubtleCryptoDeriveKeyAlgorithm, val: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, getter)]
-    pub fn salt(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<ArrayBufferOrArrayBufferView>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_salt(this: &SubtleCryptoDeriveKeyAlgorithm, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "salt")]
-    pub fn set_salt_with_typed_array<T: ::js_sys::TypedArray>(
+    #[wasm_bindgen(method, getter, js_name = "salt")]
+    pub fn salt_js_buffer(
         this: &SubtleCryptoDeriveKeyAlgorithm,
-        val: &T,
-    ) where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "salt")]
+    fn __salt(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_salt(
+        this: &SubtleCryptoDeriveKeyAlgorithm,
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, getter)]
     pub fn iterations(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
@@ -6214,16 +6311,27 @@ extern "C" {
     pub fn public(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<CryptoKey>;
     #[wasm_bindgen(method, setter, js_name = "$public")]
     pub fn set_public(this: &SubtleCryptoDeriveKeyAlgorithm, val: &CryptoKey);
-    #[wasm_bindgen(method, getter)]
-    pub fn info(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<ArrayBufferOrArrayBufferView>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_info(this: &SubtleCryptoDeriveKeyAlgorithm, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "info")]
-    pub fn set_info_with_typed_array<T: ::js_sys::TypedArray>(
+    #[wasm_bindgen(method, getter, js_name = "info")]
+    pub fn info_js_buffer(
         this: &SubtleCryptoDeriveKeyAlgorithm,
-        val: &T,
-    ) where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "info")]
+    fn __info(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_info(
+        this: &SubtleCryptoDeriveKeyAlgorithm,
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
+}
+impl SubtleCryptoDeriveKeyAlgorithm {
+    pub fn salt(&self) -> Option<Vec<u8>> {
+        let v = self.__salt();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
+    pub fn info(&self) -> Option<Vec<u8>> {
+        let v = self.__info();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
 }
 impl SubtleCryptoDeriveKeyAlgorithm {
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> SubtleCryptoDeriveKeyAlgorithm {
@@ -6241,15 +6349,8 @@ pub struct SubtleCryptoDeriveKeyAlgorithmBuilder {
     inner: SubtleCryptoDeriveKeyAlgorithm,
 }
 impl SubtleCryptoDeriveKeyAlgorithmBuilder {
-    pub fn salt(self, val: &ArrayBuffer) -> Self {
+    pub fn salt(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_salt(val);
-        self
-    }
-    pub fn salt_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_salt_with_typed_array(val);
         self
     }
     pub fn iterations(self, val: f64) -> Self {
@@ -6268,19 +6369,17 @@ impl SubtleCryptoDeriveKeyAlgorithmBuilder {
         self.inner.set_public(val);
         self
     }
-    pub fn info(self, val: &ArrayBuffer) -> Self {
+    pub fn info(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_info(val);
-        self
-    }
-    pub fn info_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_info_with_typed_array(val);
         self
     }
     pub fn build(self) -> SubtleCryptoDeriveKeyAlgorithm {
         self.inner
+    }
+}
+impl From<SubtleCryptoDeriveKeyAlgorithm> for SubtleCryptoDeriveKeyAlgorithmBuilder {
+    fn from(inner: SubtleCryptoDeriveKeyAlgorithm) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -6294,56 +6393,76 @@ extern "C" {
     pub fn name_js_string(this: &SubtleCryptoEncryptAlgorithm) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_name(this: &SubtleCryptoEncryptAlgorithm, val: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, getter)]
-    pub fn iv(this: &SubtleCryptoEncryptAlgorithm) -> Option<ArrayBufferOrArrayBufferView>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_iv(this: &SubtleCryptoEncryptAlgorithm, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "iv")]
-    pub fn set_iv_with_typed_array<T: ::js_sys::TypedArray>(
-        this: &SubtleCryptoEncryptAlgorithm,
-        val: &T,
-    ) where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
-    #[wasm_bindgen(method, getter, js_name = "additionalData")]
-    pub fn additional_data(
+    #[wasm_bindgen(method, getter, js_name = "iv")]
+    pub fn iv_js_buffer(
         this: &SubtleCryptoEncryptAlgorithm,
     ) -> Option<ArrayBufferOrArrayBufferView>;
-    #[wasm_bindgen(method, setter, js_name = "additionalData")]
-    pub fn set_additional_data(this: &SubtleCryptoEncryptAlgorithm, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "additionalData")]
-    pub fn set_additional_data_with_typed_array<T: ::js_sys::TypedArray>(
+    #[wasm_bindgen(method, getter, js_name = "iv")]
+    fn __iv(this: &SubtleCryptoEncryptAlgorithm) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_iv(
         this: &SubtleCryptoEncryptAlgorithm,
-        val: &T,
-    ) where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
+    #[wasm_bindgen(method, getter, js_name = "additionalData")]
+    pub fn additional_data_js_buffer(
+        this: &SubtleCryptoEncryptAlgorithm,
+    ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "additionalData")]
+    fn __additional_data(this: &SubtleCryptoEncryptAlgorithm) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter, js_name = "additionalData")]
+    pub fn set_additional_data(
+        this: &SubtleCryptoEncryptAlgorithm,
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, getter, js_name = "tagLength")]
     pub fn tag_length(this: &SubtleCryptoEncryptAlgorithm) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "tagLength")]
     pub fn set_tag_length(this: &SubtleCryptoEncryptAlgorithm, val: f64);
-    #[wasm_bindgen(method, getter)]
-    pub fn counter(this: &SubtleCryptoEncryptAlgorithm) -> Option<ArrayBufferOrArrayBufferView>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_counter(this: &SubtleCryptoEncryptAlgorithm, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "counter")]
-    pub fn set_counter_with_typed_array<T: ::js_sys::TypedArray>(
+    #[wasm_bindgen(method, getter, js_name = "counter")]
+    pub fn counter_js_buffer(
         this: &SubtleCryptoEncryptAlgorithm,
-        val: &T,
-    ) where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "counter")]
+    fn __counter(this: &SubtleCryptoEncryptAlgorithm) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_counter(
+        this: &SubtleCryptoEncryptAlgorithm,
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, getter)]
     pub fn length(this: &SubtleCryptoEncryptAlgorithm) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_length(this: &SubtleCryptoEncryptAlgorithm, val: f64);
-    #[wasm_bindgen(method, getter)]
-    pub fn label(this: &SubtleCryptoEncryptAlgorithm) -> Option<ArrayBufferOrArrayBufferView>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_label(this: &SubtleCryptoEncryptAlgorithm, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "label")]
-    pub fn set_label_with_typed_array<T: ::js_sys::TypedArray>(
+    #[wasm_bindgen(method, getter, js_name = "label")]
+    pub fn label_js_buffer(
         this: &SubtleCryptoEncryptAlgorithm,
-        val: &T,
-    ) where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "label")]
+    fn __label(this: &SubtleCryptoEncryptAlgorithm) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_label(
+        this: &SubtleCryptoEncryptAlgorithm,
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
+}
+impl SubtleCryptoEncryptAlgorithm {
+    pub fn iv(&self) -> Option<Vec<u8>> {
+        let v = self.__iv();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
+    pub fn additional_data(&self) -> Option<Vec<u8>> {
+        let v = self.__additional_data();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
+    pub fn counter(&self) -> Option<Vec<u8>> {
+        let v = self.__counter();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
+    pub fn label(&self) -> Option<Vec<u8>> {
+        let v = self.__label();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
 }
 impl SubtleCryptoEncryptAlgorithm {
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> SubtleCryptoEncryptAlgorithm {
@@ -6359,60 +6478,37 @@ pub struct SubtleCryptoEncryptAlgorithmBuilder {
     inner: SubtleCryptoEncryptAlgorithm,
 }
 impl SubtleCryptoEncryptAlgorithmBuilder {
-    pub fn iv(self, val: &ArrayBuffer) -> Self {
+    pub fn iv(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_iv(val);
         self
     }
-    pub fn iv_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_iv_with_typed_array(val);
-        self
-    }
-    pub fn additional_data(self, val: &ArrayBuffer) -> Self {
+    pub fn additional_data(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_additional_data(val);
-        self
-    }
-    pub fn additional_data_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_additional_data_with_typed_array(val);
         self
     }
     pub fn tag_length(self, val: f64) -> Self {
         self.inner.set_tag_length(val);
         self
     }
-    pub fn counter(self, val: &ArrayBuffer) -> Self {
+    pub fn counter(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_counter(val);
-        self
-    }
-    pub fn counter_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_counter_with_typed_array(val);
         self
     }
     pub fn length(self, val: f64) -> Self {
         self.inner.set_length(val);
         self
     }
-    pub fn label(self, val: &ArrayBuffer) -> Self {
+    pub fn label(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_label(val);
-        self
-    }
-    pub fn label_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_label_with_typed_array(val);
         self
     }
     pub fn build(self) -> SubtleCryptoEncryptAlgorithm {
         self.inner
+    }
+}
+impl From<SubtleCryptoEncryptAlgorithm> for SubtleCryptoEncryptAlgorithmBuilder {
+    fn from(inner: SubtleCryptoEncryptAlgorithm) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -6446,17 +6542,16 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "modulusLength")]
     pub fn set_modulus_length(this: &SubtleCryptoGenerateKeyAlgorithm, val: f64);
     #[wasm_bindgen(method, getter, js_name = "publicExponent")]
-    pub fn public_exponent(
+    pub fn public_exponent_js_buffer(
         this: &SubtleCryptoGenerateKeyAlgorithm,
     ) -> Option<ArrayBufferOrArrayBufferView>;
+    #[wasm_bindgen(method, getter, js_name = "publicExponent")]
+    fn __public_exponent(this: &SubtleCryptoGenerateKeyAlgorithm) -> Option<JsValue>;
     #[wasm_bindgen(method, setter, js_name = "publicExponent")]
-    pub fn set_public_exponent(this: &SubtleCryptoGenerateKeyAlgorithm, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "publicExponent")]
-    pub fn set_public_exponent_with_typed_array<T: ::js_sys::TypedArray>(
+    pub fn set_public_exponent(
         this: &SubtleCryptoGenerateKeyAlgorithm,
-        val: &T,
-    ) where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, getter)]
     pub fn length(this: &SubtleCryptoGenerateKeyAlgorithm) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
@@ -6470,6 +6565,12 @@ extern "C" {
         this: &SubtleCryptoGenerateKeyAlgorithm,
         val: impl ::wasm_bindgen::JsStringLike,
     );
+}
+impl SubtleCryptoGenerateKeyAlgorithm {
+    pub fn public_exponent(&self) -> Option<Vec<u8>> {
+        let v = self.__public_exponent();
+        v.map(|v| __ts_gen_buffer_bytes(&v))
+    }
 }
 impl SubtleCryptoGenerateKeyAlgorithm {
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> SubtleCryptoGenerateKeyAlgorithm {
@@ -6499,15 +6600,8 @@ impl SubtleCryptoGenerateKeyAlgorithmBuilder {
         self.inner.set_modulus_length(val);
         self
     }
-    pub fn public_exponent(self, val: &ArrayBuffer) -> Self {
+    pub fn public_exponent(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_public_exponent(val);
-        self
-    }
-    pub fn public_exponent_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_public_exponent_with_typed_array(val);
         self
     }
     pub fn length(self, val: f64) -> Self {
@@ -6520,6 +6614,11 @@ impl SubtleCryptoGenerateKeyAlgorithmBuilder {
     }
     pub fn build(self) -> SubtleCryptoGenerateKeyAlgorithm {
         self.inner
+    }
+}
+impl From<SubtleCryptoGenerateKeyAlgorithm> for SubtleCryptoGenerateKeyAlgorithmBuilder {
+    fn from(inner: SubtleCryptoGenerateKeyAlgorithm) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -6619,6 +6718,11 @@ impl SubtleCryptoImportKeyAlgorithmBuilder {
         self.inner
     }
 }
+impl From<SubtleCryptoImportKeyAlgorithm> for SubtleCryptoImportKeyAlgorithmBuilder {
+    fn from(inner: SubtleCryptoImportKeyAlgorithm) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -6680,6 +6784,11 @@ impl SubtleCryptoSignAlgorithmBuilder {
     }
     pub fn build(self) -> SubtleCryptoSignAlgorithm {
         self.inner
+    }
+}
+impl From<SubtleCryptoSignAlgorithm> for SubtleCryptoSignAlgorithmBuilder {
+    fn from(inner: SubtleCryptoSignAlgorithm) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -6774,61 +6883,44 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "modulusLength")]
     pub fn set_modulus_length(this: &CryptoKeyRsaKeyAlgorithm, val: f64);
     #[wasm_bindgen(method, getter, js_name = "publicExponent")]
-    pub fn public_exponent(this: &CryptoKeyRsaKeyAlgorithm) -> ArrayBufferOrArrayBufferView;
-    #[wasm_bindgen(method, setter, js_name = "publicExponent")]
-    pub fn set_public_exponent(this: &CryptoKeyRsaKeyAlgorithm, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "publicExponent")]
-    pub fn set_public_exponent_with_typed_array<T: ::js_sys::TypedArray>(
+    pub fn public_exponent_js_buffer(
         this: &CryptoKeyRsaKeyAlgorithm,
-        val: &T,
-    ) where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    ) -> ArrayBufferOrArrayBufferView;
+    #[wasm_bindgen(method, getter, js_name = "publicExponent")]
+    fn __public_exponent(this: &CryptoKeyRsaKeyAlgorithm) -> JsValue;
+    #[wasm_bindgen(method, setter, js_name = "publicExponent")]
+    pub fn set_public_exponent(
+        this: &CryptoKeyRsaKeyAlgorithm,
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, getter)]
     pub fn hash(this: &CryptoKeyRsaKeyAlgorithm) -> Option<CryptoKeyKeyAlgorithm>;
     #[wasm_bindgen(method, setter)]
     pub fn set_hash(this: &CryptoKeyRsaKeyAlgorithm, val: &CryptoKeyKeyAlgorithm);
 }
 impl CryptoKeyRsaKeyAlgorithm {
+    pub fn public_exponent(&self) -> Vec<u8> {
+        let v = self.__public_exponent();
+        __ts_gen_buffer_bytes(&v)
+    }
+}
+impl CryptoKeyRsaKeyAlgorithm {
     pub fn new(
         name: impl ::wasm_bindgen::JsStringLike,
         modulus_length: f64,
-        public_exponent: &ArrayBuffer,
+        public_exponent: impl ::js_sys::BufferSourceLike,
     ) -> CryptoKeyRsaKeyAlgorithm {
         Self::builder(name, modulus_length, public_exponent).build()
-    }
-    pub fn new_with_typed_array<T: ::js_sys::TypedArray>(
-        name: impl ::wasm_bindgen::JsStringLike,
-        modulus_length: f64,
-        public_exponent: &T,
-    ) -> CryptoKeyRsaKeyAlgorithm
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        Self::builder_with_typed_array(name, modulus_length, public_exponent).build()
     }
     pub fn builder(
         name: impl ::wasm_bindgen::JsStringLike,
         modulus_length: f64,
-        public_exponent: &ArrayBuffer,
+        public_exponent: impl ::js_sys::BufferSourceLike,
     ) -> CryptoKeyRsaKeyAlgorithmBuilder {
         let inner: CryptoKeyRsaKeyAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_modulus_length(modulus_length);
         inner.set_public_exponent(public_exponent);
-        CryptoKeyRsaKeyAlgorithmBuilder { inner }
-    }
-    pub fn builder_with_typed_array<T: ::js_sys::TypedArray>(
-        name: impl ::wasm_bindgen::JsStringLike,
-        modulus_length: f64,
-        public_exponent: &T,
-    ) -> CryptoKeyRsaKeyAlgorithmBuilder
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        let inner: CryptoKeyRsaKeyAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_name(name);
-        inner.set_modulus_length(modulus_length);
-        inner.set_public_exponent_with_typed_array(public_exponent);
         CryptoKeyRsaKeyAlgorithmBuilder { inner }
     }
 }
@@ -6842,6 +6934,11 @@ impl CryptoKeyRsaKeyAlgorithmBuilder {
     }
     pub fn build(self) -> CryptoKeyRsaKeyAlgorithm {
         self.inner
+    }
+}
+impl From<CryptoKeyRsaKeyAlgorithm> for CryptoKeyRsaKeyAlgorithmBuilder {
+    fn from(inner: CryptoKeyRsaKeyAlgorithm) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -6937,6 +7034,11 @@ impl CryptoKeyArbitraryKeyAlgorithmBuilder {
         self.inner
     }
 }
+impl From<CryptoKeyArbitraryKeyAlgorithm> for CryptoKeyArbitraryKeyAlgorithmBuilder {
+    fn from(inner: CryptoKeyArbitraryKeyAlgorithm) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = WritableStream , extends = Object)]
@@ -6945,7 +7047,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new(algorithm: impl ::wasm_bindgen::JsStringLike) -> Result<DigestStream, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_subtle_crypto_hash_algorithm(
+    pub fn new_with_algorithm(
         algorithm: &SubtleCryptoHashAlgorithm,
     ) -> Result<DigestStream, JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -6982,65 +7084,34 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn decode_with_array_buffer(
+    pub fn decode_with_input(
         this: &TextDecoder,
-        input: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] input: impl ::js_sys::BufferSourceLike,
     ) -> Result<String, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn decode_with_array_buffer_js_string(
+    pub fn decode_with_input_js_string(
         this: &TextDecoder,
-        input: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] input: impl ::js_sys::BufferSourceLike,
     ) -> Result<JsString, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn decode_with_typed_array(this: &TextDecoder, input: &Object) -> Result<String, JsValue>;
-    #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
-    #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn decode_with_typed_array_js_string(
+    pub fn decode_with_input_and_options(
         this: &TextDecoder,
-        input: &Object,
-    ) -> Result<JsString, JsValue>;
-    #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
-    #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn decode_with_array_buffer_and_options(
-        this: &TextDecoder,
-        input: Option<&ArrayBuffer>,
+        #[wasm_bindgen(slice = "copy")] input: Option<impl ::js_sys::BufferSourceLike>,
         options: &TextDecoderDecodeOptions,
     ) -> Result<String, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn decode_with_array_buffer_and_options_js_string(
+    pub fn decode_with_input_and_options_js_string(
         this: &TextDecoder,
-        input: Option<&ArrayBuffer>,
-        options: &TextDecoderDecodeOptions,
-    ) -> Result<JsString, JsValue>;
-    #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
-    #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn decode_with_typed_array_and_options(
-        this: &TextDecoder,
-        input: &Object,
-        options: &TextDecoderDecodeOptions,
-    ) -> Result<String, JsValue>;
-    #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
-    #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn decode_with_typed_array_and_options_js_string(
-        this: &TextDecoder,
-        input: &Object,
+        #[wasm_bindgen(slice = "copy")] input: Option<impl ::js_sys::BufferSourceLike>,
         options: &TextDecoderDecodeOptions,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -7268,6 +7339,11 @@ impl ErrorEventErrorEventInitBuilder {
         self.inner
     }
 }
+impl From<ErrorEventErrorEventInit> for ErrorEventErrorEventInitBuilder {
+    fn from(inner: ErrorEventErrorEventInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Event , extends = Object)]
@@ -7409,7 +7485,7 @@ extern "C" {
     pub fn get_all(
         this: &FormData,
         name: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Vec<JsValue>, JsValue>;
+    ) -> Result<Vec<FileOrStr>, JsValue>;
     #[doc = " The **`has()`** method of the FormData interface returns whether a `FormData` object contains a certain key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/has)"]
@@ -7462,6 +7538,24 @@ extern "C" {
     ) -> Result<(), JsValue>
     where
         This: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    fn __iterator(this: &FormData) -> Iterator<ArrayTuple<(JsString, JsValue)>>;
+    #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
+    pub fn iterator(this: &FormData) -> Result<Iterator<ArrayTuple<(JsString, JsValue)>>, JsValue>;
+}
+impl<'a> ::core::iter::IntoIterator for &'a FormData {
+    type Item = (JsString, JsValue);
+    type IntoIter = ::core::iter::Scan<
+        ::core::iter::Repeat<()>,
+        Iterator<ArrayTuple<(JsString, JsValue)>>,
+        fn(&mut Iterator<ArrayTuple<(JsString, JsValue)>>, ()) -> Option<(JsString, JsValue)>,
+    >;
+    fn into_iter(self) -> Self::IntoIter {
+        ::core::iter::repeat(()).scan(self.__iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value().into_tuple())
+        })
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -7498,6 +7592,11 @@ impl ContentOptionsBuilder {
     }
     pub fn build(self) -> ContentOptions {
         self.inner
+    }
+}
+impl From<ContentOptions> for ContentOptionsBuilder {
+    fn from(inner: ContentOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -7589,6 +7688,11 @@ impl HTMLRewriterElementContentHandlersBuilder {
         self.inner
     }
 }
+impl From<HTMLRewriterElementContentHandlers> for HTMLRewriterElementContentHandlersBuilder {
+    fn from(inner: HTMLRewriterElementContentHandlers) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -7668,6 +7772,11 @@ impl HTMLRewriterDocumentContentHandlersBuilder {
     }
     pub fn build(self) -> HTMLRewriterDocumentContentHandlers {
         self.inner
+    }
+}
+impl From<HTMLRewriterDocumentContentHandlers> for HTMLRewriterDocumentContentHandlersBuilder {
+    fn from(inner: HTMLRewriterDocumentContentHandlers) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -8298,6 +8407,24 @@ extern "C" {
     pub fn keys(this: &Headers) -> Result<Iterator<JsString>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn values(this: &Headers) -> Result<Iterator<JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    fn __iterator(this: &Headers) -> Iterator<ArrayTuple<(JsString, JsString)>>;
+    #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
+    pub fn iterator(this: &Headers) -> Result<Iterator<ArrayTuple<(JsString, JsString)>>, JsValue>;
+}
+impl<'a> ::core::iter::IntoIterator for &'a Headers {
+    type Item = (JsString, JsString);
+    type IntoIter = ::core::iter::Scan<
+        ::core::iter::Repeat<()>,
+        Iterator<ArrayTuple<(JsString, JsString)>>,
+        fn(&mut Iterator<ArrayTuple<(JsString, JsString)>>, ()) -> Option<(JsString, JsString)>,
+    >;
+    fn into_iter(self) -> Self::IntoIter {
+        ::core::iter::repeat(()).scan(self.__iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value().into_tuple())
+        })
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -8323,11 +8450,15 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &Body) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
-    pub async fn json<T>(this: &Body) -> Result<T, JsValue>
+    pub async fn json(this: &Body) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, js_name = "json")]
+    pub fn json_promise(this: &Body) -> Promise;
+    #[wasm_bindgen(method, catch, js_name = "json")]
+    pub async fn json_typed<T>(this: &Body) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
     #[wasm_bindgen(method, js_name = "json")]
-    pub fn json_promise<T>(this: &Body) -> Promise<T>;
+    pub fn json_typed_promise<T>(this: &Body) -> Promise<T>;
     #[wasm_bindgen(method, catch, js_name = "formData")]
     pub async fn form_data(this: &Body) -> Result<FormData, JsValue>;
     #[wasm_bindgen(method, js_name = "formData")]
@@ -8350,9 +8481,9 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str(body: impl ::wasm_bindgen::JsStringLike) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_array_buffer(body: &ArrayBuffer) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_typed_array(body: &Object) -> Result<Response, JsValue>;
+    pub fn new_with_buffer(
+        #[wasm_bindgen(slice = "copy")] body: impl ::js_sys::BufferSourceLike,
+    ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_blob(body: &Blob) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -8372,13 +8503,8 @@ extern "C" {
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_array_buffer_and_init(
-        body: &ArrayBuffer,
-        init: &ResponseInit,
-    ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_typed_array_and_init(
-        body: &Object,
+    pub fn new_with_buffer_and_init(
+        #[wasm_bindgen(slice = "copy")] body: impl ::js_sys::BufferSourceLike,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -8410,7 +8536,7 @@ extern "C" {
     # [wasm_bindgen (static_method_of = Response , catch)]
     pub fn json(any: &JsValue) -> Result<Response, JsValue>;
     # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
-    pub fn json_with_response_init(
+    pub fn json_with_maybe_init(
         any: &JsValue,
         maybe_init: &ResponseInit,
     ) -> Result<Response, JsValue>;
@@ -8598,6 +8724,11 @@ impl ResponseInitBuilder {
         self.inner
     }
 }
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self {
+        Self { inner }
+    }
+}
 #[allow(dead_code)]
 pub type RequestInfo = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
@@ -8606,29 +8737,51 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Request<CfHostMetadata = JsValue, Cf = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<CfHostMetadata, Cf, CfHostMetadata2, Cf2>(
+    pub fn new<CfHostMetadata, Cf>(input: &Request<CfHostMetadata, Cf>)
+        -> Result<Request, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<CfHostMetadata, Cf, CfHostMetadata2, Cf2>(
         input: &Request<CfHostMetadata2, Cf2>,
     ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_str<CfHostMetadata, Cf>(
+    pub fn new_with_str(input: impl ::wasm_bindgen::JsStringLike) -> Result<Request, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_str_typed<CfHostMetadata, Cf>(
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_url<CfHostMetadata, Cf>(
+    pub fn new_with_url(input: &URL) -> Result<Request, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_url_typed<CfHostMetadata, Cf>(
         input: &URL,
     ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_init<CfHostMetadata, Cf, CfHostMetadata2, Cf2>(
+    pub fn new_with_init<Cf, CfHostMetadata, Cf2>(
+        input: &Request<CfHostMetadata, Cf2>,
+        init: &RequestInit<Cf>,
+    ) -> Result<Request<JsValue, Cf>, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_init_typed<CfHostMetadata, Cf, CfHostMetadata2, Cf2>(
         input: &Request<CfHostMetadata2, Cf2>,
         init: &RequestInit<Cf>,
     ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_str_and_init<CfHostMetadata, Cf>(
+    pub fn new_with_str_and_init<Cf>(
+        input: impl ::wasm_bindgen::JsStringLike,
+        init: &RequestInit<Cf>,
+    ) -> Result<Request<JsValue, Cf>, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_str_and_init_typed<CfHostMetadata, Cf>(
         input: impl ::wasm_bindgen::JsStringLike,
         init: &RequestInit<Cf>,
     ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_url_and_init<CfHostMetadata, Cf>(
+    pub fn new_with_url_and_init<Cf>(
+        input: &URL,
+        init: &RequestInit<Cf>,
+    ) -> Result<Request<JsValue, Cf>, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_url_and_init_typed<CfHostMetadata, Cf>(
         input: &URL,
         init: &RequestInit<Cf>,
     ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
@@ -8776,11 +8929,10 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "body")]
     pub fn set_body_with_str<Cf>(this: &RequestInit<Cf>, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_array_buffer<Cf>(this: &RequestInit<Cf>, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_typed_array<Cf, T: ::js_sys::TypedArray>(this: &RequestInit<Cf>, val: &T)
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_body_with_buffer<Cf>(
+        this: &RequestInit<Cf>,
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, setter, js_name = "body")]
     pub fn set_body_with_blob<Cf>(this: &RequestInit<Cf>, val: &Blob);
     #[wasm_bindgen(method, setter, js_name = "body")]
@@ -8846,18 +8998,26 @@ impl<Cf> RequestInit<Cf> {
     }
 }
 impl<Cf: ::wasm_bindgen::convert::IntoWasmAbi> RequestInit<Cf> {
-    pub fn new() -> RequestInit<Cf> {
-        Self::builder().build()
+    pub fn new_typed() -> RequestInit<Cf> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> RequestInitBuilder<Cf> {
+    pub fn builder_typed() -> RequestInitBuilder<Cf> {
         RequestInitBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl RequestInit<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> RequestInitBuilder<JsValue> {
+        Self::builder_typed()
+    }
+}
 impl<Cf: ::wasm_bindgen::convert::IntoWasmAbi> Default for RequestInit<Cf> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct RequestInitBuilder<Cf> {
@@ -8888,15 +9048,8 @@ impl<Cf: ::wasm_bindgen::convert::IntoWasmAbi> RequestInitBuilder<Cf> {
         self.inner.set_body_with_str(val);
         self
     }
-    pub fn body_with_array_buffer(self, val: &ArrayBuffer) -> Self {
-        self.inner.set_body_with_array_buffer(val);
-        self
-    }
-    pub fn body_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_body_with_typed_array(val);
+    pub fn body_with_buffer(self, val: impl ::js_sys::BufferSourceLike) -> Self {
+        self.inner.set_body_with_buffer(val);
         self
     }
     pub fn body_with_blob(self, val: &Blob) -> Self {
@@ -8957,6 +9110,11 @@ impl<Cf: ::wasm_bindgen::convert::IntoWasmAbi> RequestInitBuilder<Cf> {
     }
     pub fn build(self) -> RequestInit<Cf> {
         self.inner
+    }
+}
+impl<Cf: ::wasm_bindgen::convert::IntoWasmAbi> From<RequestInit<Cf>> for RequestInitBuilder<Cf> {
+    fn from(inner: RequestInit<Cf>) -> Self {
+        Self { inner }
     }
 }
 #[allow(dead_code)]
@@ -9074,13 +9232,23 @@ extern "C" {
         Metadata: ::wasm_bindgen::convert::IntoWasmAbi;
 }
 impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceListKey<Metadata> {
-    pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> KVNamespaceListKey<Metadata> {
-        Self::builder(name).build()
+    pub fn new_typed(name: impl ::wasm_bindgen::JsStringLike) -> KVNamespaceListKey<Metadata> {
+        Self::builder_typed(name).build()
     }
-    pub fn builder(name: impl ::wasm_bindgen::JsStringLike) -> KVNamespaceListKeyBuilder<Metadata> {
+    pub fn builder_typed(
+        name: impl ::wasm_bindgen::JsStringLike,
+    ) -> KVNamespaceListKeyBuilder<Metadata> {
         let inner: KVNamespaceListKey<Metadata> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         KVNamespaceListKeyBuilder { inner }
+    }
+}
+impl KVNamespaceListKey<JsValue> {
+    pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> Self {
+        Self::new_typed(name)
+    }
+    pub fn builder(name: impl ::wasm_bindgen::JsStringLike) -> KVNamespaceListKeyBuilder<JsValue> {
+        Self::builder_typed(name)
     }
 }
 pub struct KVNamespaceListKeyBuilder<Metadata> {
@@ -9097,6 +9265,13 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceListKeyBuilder<M
     }
     pub fn build(self) -> KVNamespaceListKey<Metadata> {
         self.inner
+    }
+}
+impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> From<KVNamespaceListKey<Metadata>>
+    for KVNamespaceListKeyBuilder<Metadata>
+{
+    fn from(inner: KVNamespaceListKey<Metadata>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -9119,7 +9294,7 @@ extern "C" {
         this: &KVNamespaceListResult<Metadata>,
         val: &[KVNamespaceListKey<Metadata>],
     ) where
-        KVNamespaceListKey<Metadata>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        KVNamespaceListKey<Metadata>: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, getter)]
     pub fn cursor<Metadata>(this: &KVNamespaceListResult<Metadata>) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "cursor")]
@@ -9224,6 +9399,13 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceListResultBuilde
         self.inner
     }
 }
+impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> From<KVNamespaceListResult<Metadata>>
+    for KVNamespaceListResultBuilder<Metadata>
+{
+    fn from(inner: KVNamespaceListResult<Metadata>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -9245,19 +9427,19 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_str_and_partial_kv_namespace_get_options_undefined(
+    pub async fn get_with_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_str_and_partial_kv_namespace_get_options_undefined_js_string(
+    pub async fn get_with_options_js_string(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<Option<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_str_and_partial_kv_namespace_get_options_undefined_promise(
+    pub fn get_with_options_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
@@ -9281,20 +9463,17 @@ extern "C" {
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    async fn __get_json<ExpectedValue>(
+    async fn __get_json(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<ExpectedValue>, JsValue>
-    where
-        Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
-        ExpectedValue: 'static;
+    ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    fn __get_json_promise<ExpectedValue>(
+    fn __get_json_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Option<ExpectedValue>>;
+    ) -> Promise;
     #[wasm_bindgen(method, catch, js_name = "get")]
     async fn __get_array_buffer(
         this: &KVNamespace,
@@ -9320,23 +9499,59 @@ extern "C" {
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<ReadableStream>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_str_and_kv_namespace_get_options(
+    async fn __get_text_with_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        options: &KVNamespaceGetOptions<String>,
+        options: &KVNamespaceGetOptions,
     ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_str_and_kv_namespace_get_options_js_string(
+    async fn __get_text_with_options_js_string(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        options: &KVNamespaceGetOptions<String>,
+        options: &KVNamespaceGetOptions,
     ) -> Result<Option<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_str_and_kv_namespace_get_options_promise(
+    fn __get_text_with_options_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        options: &KVNamespaceGetOptions<String>,
+        options: &KVNamespaceGetOptions,
     ) -> Promise<Option<JsString>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_json_with_options(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_json_with_options_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_array_buffer_with_options(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Option<ArrayBuffer>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_array_buffer_with_options_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Option<ArrayBuffer>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_stream_with_options(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Option<ReadableStream>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_stream_with_options_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Option<ReadableStream>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     async fn __get_text_with_slice(
         this: &KVNamespace,
@@ -9372,29 +9587,99 @@ extern "C" {
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<JsString, JsNullable<JsString>>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_slice_and_partial_kv_namespace_get_options_undefined(
+    pub async fn get_with_slice_and_options(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_slice_and_partial_kv_namespace_get_options_undefined_promise(
+    pub fn get_with_slice_and_options_promise(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Promise<Map<JsString, JsNullable<JsString>>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_slice_and_kv_namespace_get_options(
+    async fn __get_text_with_slice_and_options(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
-        options: &KVNamespaceGetOptions<String>,
+        options: &KVNamespaceGetOptions,
     ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_slice_and_kv_namespace_get_options_promise(
+    fn __get_text_with_slice_and_options_promise(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
-        options: &KVNamespaceGetOptions<String>,
+        options: &KVNamespaceGetOptions,
     ) -> Promise<Map<JsString, JsNullable<JsString>>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_json_with_slice_and_options(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Map<JsString, JsValue>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_json_with_slice_and_options_promise(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Map<JsString, JsValue>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_json_typed<ExpectedValue>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Option<ExpectedValue>, JsValue>
+    where
+        Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
+        ExpectedValue: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_json_typed_promise<ExpectedValue>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<Option<ExpectedValue>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_json_with_options_typed<ExpectedValue>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Option<ExpectedValue>, JsValue>
+    where
+        Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
+        ExpectedValue: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_json_with_options_typed_promise<ExpectedValue>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Option<ExpectedValue>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_json_with_slice_typed<ExpectedValue>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Map<JsString, JsNullable<ExpectedValue>>, JsValue>
+    where
+        ExpectedValue: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_json_with_slice_typed_promise<ExpectedValue>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<Map<JsString, JsNullable<ExpectedValue>>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_json_with_slice_and_options_typed<ExpectedValue>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Map<JsString, JsNullable<ExpectedValue>>, JsValue>
+    where
+        ExpectedValue: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_json_with_slice_and_options_typed_promise<ExpectedValue>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Map<JsString, JsNullable<ExpectedValue>>>;
     #[wasm_bindgen(method, catch)]
     pub async fn list(this: &KVNamespace) -> Result<KVNamespaceListResult, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
@@ -9409,6 +9694,28 @@ extern "C" {
         this: &KVNamespace,
         options: &KVNamespaceListOptions,
     ) -> Promise<KVNamespaceListResult>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_typed<Metadata>(
+        this: &KVNamespace,
+    ) -> Result<KVNamespaceListResult<Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "list")]
+    pub fn list_typed_promise<Metadata>(
+        this: &KVNamespace,
+    ) -> Promise<KVNamespaceListResult<Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_with_options_typed<Metadata>(
+        this: &KVNamespace,
+        options: &KVNamespaceListOptions,
+    ) -> Result<KVNamespaceListResult<Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "list")]
+    pub fn list_with_options_typed_promise<Metadata>(
+        this: &KVNamespace,
+        options: &KVNamespaceListOptions,
+    ) -> Promise<KVNamespaceListResult<Metadata>>;
     #[wasm_bindgen(method, catch)]
     pub async fn put(
         this: &KVNamespace,
@@ -9422,28 +9729,16 @@ extern "C" {
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_array_buffer(
+    pub async fn put_with_buffer(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_array_buffer_promise(
+    pub fn put_with_buffer_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
-    ) -> Promise<Undefined>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_typed_array(
-        this: &KVNamespace,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
-    ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_typed_array_promise(
-        this: &KVNamespace,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
+        #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_readable_stream<R>(
@@ -9472,31 +9767,17 @@ extern "C" {
         options: &KVNamespacePutOptions,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_array_buffer_and_options(
+    pub async fn put_with_buffer_and_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike,
         options: &KVNamespacePutOptions,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_array_buffer_and_options_promise(
+    pub fn put_with_buffer_and_options_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
-        options: &KVNamespacePutOptions,
-    ) -> Promise<Undefined>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_typed_array_and_options(
-        this: &KVNamespace,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
-        options: &KVNamespacePutOptions,
-    ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_typed_array_and_options_promise(
-        this: &KVNamespace,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
+        #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike,
         options: &KVNamespacePutOptions,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
@@ -9529,19 +9810,19 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_str_and_partial_kv_namespace_get_options_undefined(
+    pub async fn get_with_metadata_with_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<KVNamespaceGetWithMetadataResult<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_str_and_partial_kv_namespace_get_options_undefined_js_string(
+    pub async fn get_with_metadata_with_options_js_string(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_str_and_partial_kv_namespace_get_options_undefined_promise(
+    pub fn get_with_metadata_with_options_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
@@ -9601,23 +9882,59 @@ extern "C" {
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_str_and_kv_namespace_get_options(
+    async fn __get_with_metadata_text_with_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        options: &KVNamespaceGetOptions<String>,
+        options: &KVNamespaceGetOptions,
     ) -> Result<KVNamespaceGetWithMetadataResult<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_str_and_kv_namespace_get_options_js_string(
+    async fn __get_with_metadata_text_with_options_js_string(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        options: &KVNamespaceGetOptions<String>,
+        options: &KVNamespaceGetOptions,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_str_and_kv_namespace_get_options_promise(
+    fn __get_with_metadata_text_with_options_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        options: &KVNamespaceGetOptions<String>,
+        options: &KVNamespaceGetOptions,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_json_with_options(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult, JsValue>;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_json_with_options_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<KVNamespaceGetWithMetadataResult>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_array_buffer_with_options(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ArrayBuffer>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_array_buffer_with_options_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_stream_with_options(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ReadableStream>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_stream_with_options_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     async fn __get_with_metadata_text_with_slice(
         this: &KVNamespace,
@@ -9653,29 +9970,296 @@ extern "C" {
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String>>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_slice_and_partial_kv_namespace_get_options_undefined(
+    pub async fn get_with_metadata_with_slice_and_options(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String>>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_slice_and_partial_kv_namespace_get_options_undefined_promise(
+    pub fn get_with_metadata_with_slice_and_options_promise(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String>>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_slice_and_kv_namespace_get_options(
+    async fn __get_with_metadata_text_with_slice_and_options(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
-        options: &KVNamespaceGetOptions<String>,
+        options: &KVNamespaceGetOptions,
     ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String>>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_slice_and_kv_namespace_get_options_promise(
+    fn __get_with_metadata_text_with_slice_and_options_promise(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
-        options: &KVNamespaceGetOptions<String>,
+        options: &KVNamespaceGetOptions,
     ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String>>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_json_with_slice_and_options(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_json_with_slice_and_options_promise(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_typed<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_typed_js_string<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    pub fn get_with_metadata_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_with_options_typed<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &PartialKvNamespaceGetOptionsUndefined,
+    ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_with_options_typed_js_string<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &PartialKvNamespaceGetOptionsUndefined,
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    pub fn get_with_metadata_with_options_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &PartialKvNamespaceGetOptionsUndefined,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_text_typed<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_text_typed_js_string<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_text_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_json_typed<ExpectedValue, Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>, JsValue>
+    where
+        ExpectedValue: 'static,
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_json_typed_promise<ExpectedValue, Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_array_buffer_typed<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_array_buffer_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_stream_typed<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_stream_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_text_with_options_typed<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_text_with_options_typed_js_string<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_text_with_options_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_json_with_options_typed<ExpectedValue, Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>, JsValue>
+    where
+        ExpectedValue: 'static,
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_json_with_options_typed_promise<ExpectedValue, Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_array_buffer_with_options_typed<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_array_buffer_with_options_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_stream_with_options_typed<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_stream_with_options_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_text_with_slice_typed<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_text_with_slice_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_json_with_slice_typed<ExpectedValue, Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>, JsValue>
+    where
+        ExpectedValue: 'static,
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_json_with_slice_typed_promise<ExpectedValue, Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_with_slice_typed<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    pub fn get_with_metadata_with_slice_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_with_slice_and_options_typed<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &PartialKvNamespaceGetOptionsUndefined,
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    pub fn get_with_metadata_with_slice_and_options_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &PartialKvNamespaceGetOptionsUndefined,
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_text_with_slice_and_options_typed<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_text_with_slice_and_options_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_json_with_slice_and_options_typed<ExpectedValue, Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>, JsValue>
+    where
+        ExpectedValue: 'static,
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_json_with_slice_and_options_typed_promise<ExpectedValue, Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>>;
     #[wasm_bindgen(method, catch)]
     pub async fn delete(
         this: &KVNamespace,
@@ -9706,20 +10290,13 @@ impl KVNamespace {
     ) -> Promise<Option<JsString>> {
         self.__get_text_promise(key, "text")
     }
-    pub async fn get_json<ExpectedValue>(
+    pub async fn get_json(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<ExpectedValue>, JsValue>
-    where
-        Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
-        ExpectedValue: 'static,
-    {
+    ) -> Result<JsValue, JsValue> {
         self.__get_json(key, "json").await
     }
-    pub fn get_json_promise<ExpectedValue>(
-        &self,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Option<ExpectedValue>> {
+    pub fn get_json_promise(&self, key: impl ::wasm_bindgen::JsStringLike) -> Promise {
         self.__get_json_promise(key, "json")
     }
     pub async fn get_array_buffer(
@@ -9746,6 +10323,158 @@ impl KVNamespace {
     ) -> Promise<Option<ReadableStream>> {
         self.__get_stream_promise(key, "stream")
     }
+    pub async fn get_text_with_options(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Option<String>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__get_text_with_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+            .await
+    }
+    pub async fn get_text_with_options_js_string(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Option<JsString>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__get_text_with_options_js_string(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+            .await
+    }
+    pub fn get_text_with_options_promise(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Option<JsString>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__get_text_with_options_promise(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+    }
+    pub async fn get_json_with_options(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<JsValue, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__get_json_with_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+            .await
+    }
+    pub fn get_json_with_options_promise(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__get_json_with_options_promise(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+    }
+    pub async fn get_array_buffer_with_options(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Option<ArrayBuffer>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
+        );
+        self.__get_array_buffer_with_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+            .await
+    }
+    pub fn get_array_buffer_with_options_promise(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Option<ArrayBuffer>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
+        );
+        self.__get_array_buffer_with_options_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_stream_with_options(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Option<ReadableStream>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("stream"),
+        );
+        self.__get_stream_with_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+            .await
+    }
+    pub fn get_stream_with_options_promise(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Option<ReadableStream>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("stream"),
+        );
+        self.__get_stream_with_options_promise(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+    }
     pub async fn get_text_with_slice(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
@@ -9769,6 +10498,191 @@ impl KVNamespace {
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<JsString, JsValue>> {
         self.__get_json_with_slice_promise(key, "json")
+    }
+    pub async fn get_text_with_slice_and_options(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__get_text_with_slice_and_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+            .await
+    }
+    pub fn get_text_with_slice_and_options_promise(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Map<JsString, JsNullable<JsString>>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__get_text_with_slice_and_options_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_json_with_slice_and_options(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Map<JsString, JsValue>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__get_json_with_slice_and_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+            .await
+    }
+    pub fn get_json_with_slice_and_options_promise(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Map<JsString, JsValue>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__get_json_with_slice_and_options_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_json_typed<ExpectedValue>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Option<ExpectedValue>, JsValue>
+    where
+        Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
+        ExpectedValue: 'static,
+    {
+        self.__get_json_typed(key, "json").await
+    }
+    pub fn get_json_typed_promise<ExpectedValue>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<Option<ExpectedValue>> {
+        self.__get_json_typed_promise(key, "json")
+    }
+    pub async fn get_json_with_options_typed<ExpectedValue>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Option<ExpectedValue>, JsValue>
+    where
+        Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
+        ExpectedValue: 'static,
+    {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__get_json_with_options_typed(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+            .await
+    }
+    pub fn get_json_with_options_typed_promise<ExpectedValue>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Option<ExpectedValue>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__get_json_with_options_typed_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_json_with_slice_typed<ExpectedValue>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Map<JsString, JsNullable<ExpectedValue>>, JsValue>
+    where
+        ExpectedValue: 'static,
+    {
+        self.__get_json_with_slice_typed(key, "json").await
+    }
+    pub fn get_json_with_slice_typed_promise<ExpectedValue>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Promise<Map<JsString, JsNullable<ExpectedValue>>> {
+        self.__get_json_with_slice_typed_promise(key, "json")
+    }
+    pub async fn get_json_with_slice_and_options_typed<ExpectedValue>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Map<JsString, JsNullable<ExpectedValue>>, JsValue>
+    where
+        ExpectedValue: 'static,
+    {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__get_json_with_slice_and_options_typed(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_json_with_slice_and_options_typed_promise<ExpectedValue>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Map<JsString, JsNullable<ExpectedValue>>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__get_json_with_slice_and_options_typed_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
     }
     pub async fn get_with_metadata_text(
         &self,
@@ -9825,6 +10739,182 @@ impl KVNamespace {
     ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream>> {
         self.__get_with_metadata_stream_promise(key, "stream")
     }
+    pub async fn get_with_metadata_text_with_options(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult<String>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__get_with_metadata_text_with_options(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub async fn get_with_metadata_text_with_options_js_string(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__get_with_metadata_text_with_options_js_string(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_with_metadata_text_with_options_promise(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<String>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__get_with_metadata_text_with_options_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_with_metadata_json_with_options(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__get_with_metadata_json_with_options(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_with_metadata_json_with_options_promise(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<KVNamespaceGetWithMetadataResult> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__get_with_metadata_json_with_options_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_with_metadata_array_buffer_with_options(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ArrayBuffer>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
+        );
+        self.__get_with_metadata_array_buffer_with_options(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_with_metadata_array_buffer_with_options_promise(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
+        );
+        self.__get_with_metadata_array_buffer_with_options_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_with_metadata_stream_with_options(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ReadableStream>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("stream"),
+        );
+        self.__get_with_metadata_stream_with_options(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_with_metadata_stream_with_options_promise(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("stream"),
+        );
+        self.__get_with_metadata_stream_with_options_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
     pub async fn get_with_metadata_text_with_slice(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
@@ -9848,6 +10938,466 @@ impl KVNamespace {
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult>> {
         self.__get_with_metadata_json_with_slice_promise(key, "json")
+    }
+    pub async fn get_with_metadata_text_with_slice_and_options(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String>>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__get_with_metadata_text_with_slice_and_options(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_with_metadata_text_with_slice_and_options_promise(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String>>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__get_with_metadata_text_with_slice_and_options_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_with_metadata_json_with_slice_and_options(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__get_with_metadata_json_with_slice_and_options(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_with_metadata_json_with_slice_and_options_promise(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__get_with_metadata_json_with_slice_and_options_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_with_metadata_text_typed<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
+    where
+        Metadata: 'static,
+    {
+        self.__get_with_metadata_text_typed(key, "text").await
+    }
+    pub async fn get_with_metadata_text_typed_js_string<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
+    where
+        Metadata: 'static,
+    {
+        self.__get_with_metadata_text_typed_js_string(key, "text")
+            .await
+    }
+    pub fn get_with_metadata_text_typed_promise<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>> {
+        self.__get_with_metadata_text_typed_promise(key, "text")
+    }
+    pub async fn get_with_metadata_json_typed<ExpectedValue, Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>, JsValue>
+    where
+        ExpectedValue: 'static,
+        Metadata: 'static,
+    {
+        self.__get_with_metadata_json_typed(key, "json").await
+    }
+    pub fn get_with_metadata_json_typed_promise<ExpectedValue, Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>> {
+        self.__get_with_metadata_json_typed_promise(key, "json")
+    }
+    pub async fn get_with_metadata_array_buffer_typed<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>, JsValue>
+    where
+        Metadata: 'static,
+    {
+        self.__get_with_metadata_array_buffer_typed(key, "arrayBuffer")
+            .await
+    }
+    pub fn get_with_metadata_array_buffer_typed_promise<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>> {
+        self.__get_with_metadata_array_buffer_typed_promise(key, "arrayBuffer")
+    }
+    pub async fn get_with_metadata_stream_typed<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>, JsValue>
+    where
+        Metadata: 'static,
+    {
+        self.__get_with_metadata_stream_typed(key, "stream").await
+    }
+    pub fn get_with_metadata_stream_typed_promise<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>> {
+        self.__get_with_metadata_stream_typed_promise(key, "stream")
+    }
+    pub async fn get_with_metadata_text_with_options_typed<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
+    where
+        Metadata: 'static,
+    {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__get_with_metadata_text_with_options_typed(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub async fn get_with_metadata_text_with_options_typed_js_string<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
+    where
+        Metadata: 'static,
+    {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__get_with_metadata_text_with_options_typed_js_string(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_with_metadata_text_with_options_typed_promise<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__get_with_metadata_text_with_options_typed_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_with_metadata_json_with_options_typed<ExpectedValue, Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>, JsValue>
+    where
+        ExpectedValue: 'static,
+        Metadata: 'static,
+    {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__get_with_metadata_json_with_options_typed(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_with_metadata_json_with_options_typed_promise<ExpectedValue, Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__get_with_metadata_json_with_options_typed_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_with_metadata_array_buffer_with_options_typed<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>, JsValue>
+    where
+        Metadata: 'static,
+    {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
+        );
+        self.__get_with_metadata_array_buffer_with_options_typed(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_with_metadata_array_buffer_with_options_typed_promise<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
+        );
+        self.__get_with_metadata_array_buffer_with_options_typed_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_with_metadata_stream_with_options_typed<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>, JsValue>
+    where
+        Metadata: 'static,
+    {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("stream"),
+        );
+        self.__get_with_metadata_stream_with_options_typed(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_with_metadata_stream_with_options_typed_promise<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("stream"),
+        );
+        self.__get_with_metadata_stream_with_options_typed_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_with_metadata_text_with_slice_typed<Metadata>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
+    where
+        Metadata: 'static,
+    {
+        self.__get_with_metadata_text_with_slice_typed(key, "text")
+            .await
+    }
+    pub fn get_with_metadata_text_with_slice_typed_promise<Metadata>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>> {
+        self.__get_with_metadata_text_with_slice_typed_promise(key, "text")
+    }
+    pub async fn get_with_metadata_json_with_slice_typed<ExpectedValue, Metadata>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>, JsValue>
+    where
+        ExpectedValue: 'static,
+        Metadata: 'static,
+    {
+        self.__get_with_metadata_json_with_slice_typed(key, "json")
+            .await
+    }
+    pub fn get_with_metadata_json_with_slice_typed_promise<ExpectedValue, Metadata>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>> {
+        self.__get_with_metadata_json_with_slice_typed_promise(key, "json")
+    }
+    pub async fn get_with_metadata_text_with_slice_and_options_typed<Metadata>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
+    where
+        Metadata: 'static,
+    {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__get_with_metadata_text_with_slice_and_options_typed(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_with_metadata_text_with_slice_and_options_typed_promise<Metadata>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.__get_with_metadata_text_with_slice_and_options_typed_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_with_metadata_json_with_slice_and_options_typed<ExpectedValue, Metadata>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>, JsValue>
+    where
+        ExpectedValue: 'static,
+        Metadata: 'static,
+    {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__get_with_metadata_json_with_slice_and_options_typed(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_with_metadata_json_with_slice_and_options_typed_promise<ExpectedValue, Metadata>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions,
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.__get_with_metadata_json_with_slice_and_options_typed_promise(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -9927,15 +11477,20 @@ impl KVNamespaceListOptionsBuilder {
         self.inner
     }
 }
+impl From<KVNamespaceListOptions> for KVNamespaceListOptionsBuilder {
+    fn from(inner: KVNamespaceListOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVNamespaceGetOptions<Type = JsValue>;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_<Type>(this: &KVNamespaceGetOptions<Type>) -> Type
+    pub fn type_<Type>(this: &KVNamespaceGetOptions<Type>) -> Option<Type>
     where
-        Type: ::wasm_bindgen::convert::FromWasmAbi;
+        Option<Type>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
     pub fn set_type<Type>(this: &KVNamespaceGetOptions<Type>, val: Type)
     where
@@ -9946,25 +11501,49 @@ extern "C" {
     pub fn set_cache_ttl<Type>(this: &KVNamespaceGetOptions<Type>, val: f64);
 }
 impl<Type: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceGetOptions<Type> {
-    pub fn new(r#type: Type) -> KVNamespaceGetOptions<Type> {
-        Self::builder(r#type).build()
+    pub fn new_typed() -> KVNamespaceGetOptions<Type> {
+        Self::builder_typed().build()
     }
-    pub fn builder(r#type: Type) -> KVNamespaceGetOptionsBuilder<Type> {
-        let inner: KVNamespaceGetOptions<Type> = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_type(r#type);
-        KVNamespaceGetOptionsBuilder { inner }
+    pub fn builder_typed() -> KVNamespaceGetOptionsBuilder<Type> {
+        KVNamespaceGetOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl KVNamespaceGetOptions<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> KVNamespaceGetOptionsBuilder<JsValue> {
+        Self::builder_typed()
+    }
+}
+impl<Type: ::wasm_bindgen::convert::IntoWasmAbi> Default for KVNamespaceGetOptions<Type> {
+    fn default() -> Self {
+        Self::new_typed()
     }
 }
 pub struct KVNamespaceGetOptionsBuilder<Type> {
     inner: KVNamespaceGetOptions<Type>,
 }
 impl<Type: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceGetOptionsBuilder<Type> {
+    pub fn type_(self, val: Type) -> Self {
+        self.inner.set_type(val);
+        self
+    }
     pub fn cache_ttl(self, val: f64) -> Self {
         self.inner.set_cache_ttl(val);
         self
     }
     pub fn build(self) -> KVNamespaceGetOptions<Type> {
         self.inner
+    }
+}
+impl<Type: ::wasm_bindgen::convert::IntoWasmAbi> From<KVNamespaceGetOptions<Type>>
+    for KVNamespaceGetOptionsBuilder<Type>
+{
+    fn from(inner: KVNamespaceGetOptions<Type>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -10018,6 +11597,11 @@ impl KVNamespacePutOptionsBuilder {
     }
     pub fn build(self) -> KVNamespacePutOptions {
         self.inner
+    }
+}
+impl From<KVNamespacePutOptions> for KVNamespacePutOptionsBuilder {
+    fn from(inner: KVNamespacePutOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -10117,66 +11701,100 @@ impl<
         inner.set_cache_status_with_null();
         inner
     }
+    pub fn new_with_metadata_null_typed(
+        value: Value,
+        cache_status: impl ::wasm_bindgen::JsStringLike,
+    ) -> KVNamespaceGetWithMetadataResult<Value, Metadata> {
+        let inner: KVNamespaceGetWithMetadataResult<Value, Metadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_value(value);
+        inner.set_metadata_with_null();
+        inner.set_cache_status(cache_status);
+        inner
+    }
+    pub fn new_with_metadata_null_and_cache_status_null_typed(
+        value: Value,
+    ) -> KVNamespaceGetWithMetadataResult<Value, Metadata> {
+        let inner: KVNamespaceGetWithMetadataResult<Value, Metadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_value(value);
+        inner.set_metadata_with_null();
+        inner.set_cache_status_with_null();
+        inner
+    }
+    pub fn new_with_value_null_typed(
+        metadata: Metadata,
+        cache_status: impl ::wasm_bindgen::JsStringLike,
+    ) -> KVNamespaceGetWithMetadataResult<Value, Metadata> {
+        let inner: KVNamespaceGetWithMetadataResult<Value, Metadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_value_with_null();
+        inner.set_metadata(metadata);
+        inner.set_cache_status(cache_status);
+        inner
+    }
+    pub fn new_with_value_null_and_cache_status_null_typed(
+        metadata: Metadata,
+    ) -> KVNamespaceGetWithMetadataResult<Value, Metadata> {
+        let inner: KVNamespaceGetWithMetadataResult<Value, Metadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_value_with_null();
+        inner.set_metadata(metadata);
+        inner.set_cache_status_with_null();
+        inner
+    }
+    pub fn new_with_value_null_and_metadata_null_typed(
+        cache_status: impl ::wasm_bindgen::JsStringLike,
+    ) -> KVNamespaceGetWithMetadataResult<Value, Metadata> {
+        let inner: KVNamespaceGetWithMetadataResult<Value, Metadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_value_with_null();
+        inner.set_metadata_with_null();
+        inner.set_cache_status(cache_status);
+        inner
+    }
+    pub fn new_with_value_null_and_metadata_null_and_cache_status_null_typed(
+    ) -> KVNamespaceGetWithMetadataResult<Value, Metadata> {
+        let inner: KVNamespaceGetWithMetadataResult<Value, Metadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_value_with_null();
+        inner.set_metadata_with_null();
+        inner.set_cache_status_with_null();
+        inner
+    }
+}
+impl<Value: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceGetWithMetadataResult<Value, JsValue> {
     pub fn new_with_metadata_null(
         value: Value,
         cache_status: impl ::wasm_bindgen::JsStringLike,
-    ) -> KVNamespaceGetWithMetadataResult<Value, Metadata> {
-        let inner: KVNamespaceGetWithMetadataResult<Value, Metadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_value(value);
-        inner.set_metadata_with_null();
-        inner.set_cache_status(cache_status);
-        inner
+    ) -> Self {
+        Self::new_with_metadata_null_typed(value, cache_status)
     }
-    pub fn new_with_metadata_null_and_cache_status_null(
-        value: Value,
-    ) -> KVNamespaceGetWithMetadataResult<Value, Metadata> {
-        let inner: KVNamespaceGetWithMetadataResult<Value, Metadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_value(value);
-        inner.set_metadata_with_null();
-        inner.set_cache_status_with_null();
-        inner
+    pub fn new_with_metadata_null_and_cache_status_null(value: Value) -> Self {
+        Self::new_with_metadata_null_and_cache_status_null_typed(value)
     }
+}
+impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi>
+    KVNamespaceGetWithMetadataResult<JsValue, Metadata>
+{
     pub fn new_with_value_null(
         metadata: Metadata,
         cache_status: impl ::wasm_bindgen::JsStringLike,
-    ) -> KVNamespaceGetWithMetadataResult<Value, Metadata> {
-        let inner: KVNamespaceGetWithMetadataResult<Value, Metadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_value_with_null();
-        inner.set_metadata(metadata);
-        inner.set_cache_status(cache_status);
-        inner
+    ) -> Self {
+        Self::new_with_value_null_typed(metadata, cache_status)
     }
-    pub fn new_with_value_null_and_cache_status_null(
-        metadata: Metadata,
-    ) -> KVNamespaceGetWithMetadataResult<Value, Metadata> {
-        let inner: KVNamespaceGetWithMetadataResult<Value, Metadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_value_with_null();
-        inner.set_metadata(metadata);
-        inner.set_cache_status_with_null();
-        inner
+    pub fn new_with_value_null_and_cache_status_null(metadata: Metadata) -> Self {
+        Self::new_with_value_null_and_cache_status_null_typed(metadata)
     }
+}
+impl KVNamespaceGetWithMetadataResult<JsValue, JsValue> {
     pub fn new_with_value_null_and_metadata_null(
         cache_status: impl ::wasm_bindgen::JsStringLike,
-    ) -> KVNamespaceGetWithMetadataResult<Value, Metadata> {
-        let inner: KVNamespaceGetWithMetadataResult<Value, Metadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_value_with_null();
-        inner.set_metadata_with_null();
-        inner.set_cache_status(cache_status);
-        inner
+    ) -> Self {
+        Self::new_with_value_null_and_metadata_null_typed(cache_status)
     }
-    pub fn new_with_value_null_and_metadata_null_and_cache_status_null(
-    ) -> KVNamespaceGetWithMetadataResult<Value, Metadata> {
-        let inner: KVNamespaceGetWithMetadataResult<Value, Metadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_value_with_null();
-        inner.set_metadata_with_null();
-        inner.set_cache_status_with_null();
-        inner
+    pub fn new_with_value_null_and_metadata_null_and_cache_status_null() -> Self {
+        Self::new_with_value_null_and_metadata_null_and_cache_status_null_typed()
     }
 }
 #[wasm_bindgen(private)]
@@ -10278,6 +11896,11 @@ impl QueueSendOptionsBuilder {
         self.inner
     }
 }
+impl From<QueueSendOptions> for QueueSendOptionsBuilder {
+    fn from(inner: QueueSendOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -10313,6 +11936,11 @@ impl QueueSendBatchOptionsBuilder {
     }
     pub fn build(self) -> QueueSendBatchOptions {
         self.inner
+    }
+}
+impl From<QueueSendBatchOptions> for QueueSendBatchOptionsBuilder {
+    fn from(inner: QueueSendBatchOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -10363,6 +11991,13 @@ impl<Body: ::wasm_bindgen::convert::IntoWasmAbi> MessageSendRequestBuilder<Body>
         self.inner
     }
 }
+impl<Body: ::wasm_bindgen::convert::IntoWasmAbi> From<MessageSendRequest<Body>>
+    for MessageSendRequestBuilder<Body>
+{
+    fn from(inner: MessageSendRequest<Body>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -10398,6 +12033,11 @@ impl QueueRetryOptionsBuilder {
     }
     pub fn build(self) -> QueueRetryOptions {
         self.inner
+    }
+}
+impl From<QueueRetryOptions> for QueueRetryOptionsBuilder {
+    fn from(inner: QueueRetryOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -10538,11 +12178,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "startAfter")]
     pub fn set_start_after(this: &R2ListOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn include(this: &R2ListOptions) -> Option<Vec<String>>;
-    #[wasm_bindgen(method, getter, js_name = "include")]
-    pub fn include_js_string(this: &R2ListOptions) -> Option<Array<JsString>>;
+    pub fn include(this: &R2ListOptions) -> Option<Vec<R2ListOptionsInclude>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_include(this: &R2ListOptions, val: &[impl ::wasm_bindgen::JsStringLike]);
+    pub fn set_include(this: &R2ListOptions, val: &[R2ListOptionsInclude]);
 }
 impl R2ListOptions {
     pub fn new() -> R2ListOptions {
@@ -10583,12 +12221,17 @@ impl R2ListOptionsBuilder {
         self.inner.set_start_after(val);
         self
     }
-    pub fn include(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
+    pub fn include(self, val: &[R2ListOptionsInclude]) -> Self {
         self.inner.set_include(val);
         self
     }
     pub fn build(self) -> R2ListOptions {
         self.inner
+    }
+}
+impl From<R2ListOptions> for R2ListOptionsBuilder {
+    fn from(inner: R2ListOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -10653,28 +12296,16 @@ extern "C" {
         value: &ReadableStream<R>,
     ) -> Promise<Option<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_array_buffer(
+    pub async fn put_with_buffer(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike,
     ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_array_buffer_promise(
+    pub fn put_with_buffer_promise(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
-    ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_typed_array(
-        this: &R2Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
-    ) -> Result<Option<R2Object>, JsValue>;
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_typed_array_promise(
-        this: &R2Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
+        #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike,
     ) -> Promise<Option<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_str(
@@ -10727,31 +12358,17 @@ extern "C" {
         options: &R2BucketPutOptions,
     ) -> Promise<Option<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_array_buffer_and_r2_bucket_put_options(
+    pub async fn put_with_buffer_and_r2_bucket_put_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike,
         options: &R2BucketPutOptions,
     ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_array_buffer_and_r2_bucket_put_options_promise(
+    pub fn put_with_buffer_and_r2_bucket_put_options_promise(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
-        options: &R2BucketPutOptions,
-    ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_typed_array_and_r2_bucket_put_options(
-        this: &R2Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
-        options: &R2BucketPutOptions,
-    ) -> Result<Option<R2Object>, JsValue>;
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_typed_array_and_r2_bucket_put_options_promise(
-        this: &R2Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
+        #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike,
         options: &R2BucketPutOptions,
     ) -> Promise<Option<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
@@ -10811,31 +12428,17 @@ extern "C" {
         options: &R2PutOptions,
     ) -> Promise<R2Object>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_array_buffer_and_r2_put_options(
+    pub async fn put_with_buffer_and_r2_put_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike,
         options: &R2PutOptions,
     ) -> Result<R2Object, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_array_buffer_and_r2_put_options_promise(
+    pub fn put_with_buffer_and_r2_put_options_promise(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
-        options: &R2PutOptions,
-    ) -> Promise<R2Object>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_typed_array_and_r2_put_options(
-        this: &R2Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
-        options: &R2PutOptions,
-    ) -> Result<R2Object, JsValue>;
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_typed_array_and_r2_put_options_promise(
-        this: &R2Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
+        #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike,
         options: &R2PutOptions,
     ) -> Promise<R2Object>;
     #[wasm_bindgen(method, catch, js_name = "put")]
@@ -11050,6 +12653,11 @@ impl R2BucketOptionsBuilder {
         self.inner
     }
 }
+impl From<R2BucketOptions> for R2BucketOptionsBuilder {
+    fn from(inner: R2BucketOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = R2PutOptions , extends = Object , is_type_of = JsValue :: is_object)]
@@ -11096,75 +12704,40 @@ impl R2BucketPutOptionsBuilder {
         self.inner.set_custom_metadata(val);
         self
     }
-    pub fn md5(self, val: &ArrayBuffer) -> Self {
+    pub fn md5(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_md5(val);
-        self
-    }
-    pub fn md5_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_md5_with_typed_array(val);
         self
     }
     pub fn md5_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_md5_with_str(val);
         self
     }
-    pub fn sha1(self, val: &ArrayBuffer) -> Self {
+    pub fn sha1(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_sha1(val);
-        self
-    }
-    pub fn sha1_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_sha1_with_typed_array(val);
         self
     }
     pub fn sha1_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_sha1_with_str(val);
         self
     }
-    pub fn sha256(self, val: &ArrayBuffer) -> Self {
+    pub fn sha256(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_sha256(val);
-        self
-    }
-    pub fn sha256_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_sha256_with_typed_array(val);
         self
     }
     pub fn sha256_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_sha256_with_str(val);
         self
     }
-    pub fn sha384(self, val: &ArrayBuffer) -> Self {
+    pub fn sha384(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_sha384(val);
-        self
-    }
-    pub fn sha384_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_sha384_with_typed_array(val);
         self
     }
     pub fn sha384_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_sha384_with_str(val);
         self
     }
-    pub fn sha512(self, val: &ArrayBuffer) -> Self {
+    pub fn sha512(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_sha512(val);
-        self
-    }
-    pub fn sha512_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_sha512_with_typed_array(val);
         self
     }
     pub fn sha512_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
@@ -11185,6 +12758,11 @@ impl R2BucketPutOptionsBuilder {
     }
     pub fn build(self) -> R2BucketPutOptions {
         self.inner
+    }
+}
+impl From<R2BucketPutOptions> for R2BucketPutOptionsBuilder {
+    fn from(inner: R2BucketPutOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -11213,28 +12791,16 @@ extern "C" {
         value: &ReadableStream<R>,
     ) -> Promise<R2UploadedPart>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
-    pub async fn upload_part_with_array_buffer(
+    pub async fn upload_part_with_buffer(
         this: &R2MultipartUpload,
         part_number: f64,
-        value: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike,
     ) -> Result<R2UploadedPart, JsValue>;
     #[wasm_bindgen(method, js_name = "uploadPart")]
-    pub fn upload_part_with_array_buffer_promise(
+    pub fn upload_part_with_buffer_promise(
         this: &R2MultipartUpload,
         part_number: f64,
-        value: &ArrayBuffer,
-    ) -> Promise<R2UploadedPart>;
-    #[wasm_bindgen(method, catch, js_name = "uploadPart")]
-    pub async fn upload_part_with_typed_array(
-        this: &R2MultipartUpload,
-        part_number: f64,
-        value: &Object,
-    ) -> Result<R2UploadedPart, JsValue>;
-    #[wasm_bindgen(method, js_name = "uploadPart")]
-    pub fn upload_part_with_typed_array_promise(
-        this: &R2MultipartUpload,
-        part_number: f64,
-        value: &Object,
+        #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike,
     ) -> Promise<R2UploadedPart>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
     pub async fn upload_part_with_str(
@@ -11275,31 +12841,17 @@ extern "C" {
         options: &R2UploadPartOptions,
     ) -> Promise<R2UploadedPart>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
-    pub async fn upload_part_with_array_buffer_and_options(
+    pub async fn upload_part_with_buffer_and_options(
         this: &R2MultipartUpload,
         part_number: f64,
-        value: &ArrayBuffer,
+        #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike,
         options: &R2UploadPartOptions,
     ) -> Result<R2UploadedPart, JsValue>;
     #[wasm_bindgen(method, js_name = "uploadPart")]
-    pub fn upload_part_with_array_buffer_and_options_promise(
+    pub fn upload_part_with_buffer_and_options_promise(
         this: &R2MultipartUpload,
         part_number: f64,
-        value: &ArrayBuffer,
-        options: &R2UploadPartOptions,
-    ) -> Promise<R2UploadedPart>;
-    #[wasm_bindgen(method, catch, js_name = "uploadPart")]
-    pub async fn upload_part_with_typed_array_and_options(
-        this: &R2MultipartUpload,
-        part_number: f64,
-        value: &Object,
-        options: &R2UploadPartOptions,
-    ) -> Result<R2UploadedPart, JsValue>;
-    #[wasm_bindgen(method, js_name = "uploadPart")]
-    pub fn upload_part_with_typed_array_and_options_promise(
-        this: &R2MultipartUpload,
-        part_number: f64,
-        value: &Object,
+        #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike,
         options: &R2UploadPartOptions,
     ) -> Promise<R2UploadedPart>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
@@ -11437,11 +12989,15 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &R2ObjectBody) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
-    pub async fn json<T>(this: &R2ObjectBody) -> Result<T, JsValue>
+    pub async fn json(this: &R2ObjectBody) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, js_name = "json")]
+    pub fn json_promise(this: &R2ObjectBody) -> Promise;
+    #[wasm_bindgen(method, catch, js_name = "json")]
+    pub async fn json_typed<T>(this: &R2ObjectBody) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
     #[wasm_bindgen(method, js_name = "json")]
-    pub fn json_promise<T>(this: &R2ObjectBody) -> Promise<T>;
+    pub fn json_typed_promise<T>(this: &R2ObjectBody) -> Promise<T>;
     #[wasm_bindgen(method, catch)]
     pub async fn blob(this: &R2ObjectBody) -> Result<Blob, JsValue>;
     #[wasm_bindgen(method, js_name = "blob")]
@@ -11498,6 +13054,11 @@ impl R2RangeBuilder {
     }
     pub fn build(self) -> R2Range {
         self.inner
+    }
+}
+impl From<R2Range> for R2RangeBuilder {
+    fn from(inner: R2Range) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -11573,6 +13134,11 @@ impl R2ConditionalBuilder {
         self.inner
     }
 }
+impl From<R2Conditional> for R2ConditionalBuilder {
+    fn from(inner: R2Conditional) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -11644,6 +13210,11 @@ impl R2GetOptionsBuilder {
         self.inner
     }
 }
+impl From<R2GetOptions> for R2GetOptionsBuilder {
+    fn from(inner: R2GetOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -11666,53 +13237,48 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "customMetadata")]
     pub fn set_custom_metadata(this: &R2PutOptions, val: &Object<JsString>);
     #[wasm_bindgen(method, getter)]
-    pub fn md5(this: &R2PutOptions) -> Option<R2PutOptionsMd5Kind>;
+    pub fn md5(this: &R2PutOptions) -> Option<BufferOrStr>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_md5(this: &R2PutOptions, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "md5")]
-    pub fn set_md5_with_typed_array<T: ::js_sys::TypedArray>(this: &R2PutOptions, val: &T)
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_md5(
+        this: &R2PutOptions,
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, setter, js_name = "md5")]
     pub fn set_md5_with_str(this: &R2PutOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn sha1(this: &R2PutOptions) -> Option<R2PutOptionsMd5Kind>;
+    pub fn sha1(this: &R2PutOptions) -> Option<BufferOrStr>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_sha1(this: &R2PutOptions, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "sha1")]
-    pub fn set_sha1_with_typed_array<T: ::js_sys::TypedArray>(this: &R2PutOptions, val: &T)
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_sha1(
+        this: &R2PutOptions,
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, setter, js_name = "sha1")]
     pub fn set_sha1_with_str(this: &R2PutOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn sha256(this: &R2PutOptions) -> Option<R2PutOptionsMd5Kind>;
+    pub fn sha256(this: &R2PutOptions) -> Option<BufferOrStr>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_sha256(this: &R2PutOptions, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "sha256")]
-    pub fn set_sha256_with_typed_array<T: ::js_sys::TypedArray>(this: &R2PutOptions, val: &T)
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_sha256(
+        this: &R2PutOptions,
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, setter, js_name = "sha256")]
     pub fn set_sha256_with_str(this: &R2PutOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn sha384(this: &R2PutOptions) -> Option<R2PutOptionsMd5Kind>;
+    pub fn sha384(this: &R2PutOptions) -> Option<BufferOrStr>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_sha384(this: &R2PutOptions, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "sha384")]
-    pub fn set_sha384_with_typed_array<T: ::js_sys::TypedArray>(this: &R2PutOptions, val: &T)
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_sha384(
+        this: &R2PutOptions,
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, setter, js_name = "sha384")]
     pub fn set_sha384_with_str(this: &R2PutOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn sha512(this: &R2PutOptions) -> Option<R2PutOptionsMd5Kind>;
+    pub fn sha512(this: &R2PutOptions) -> Option<BufferOrStr>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_sha512(this: &R2PutOptions, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "sha512")]
-    pub fn set_sha512_with_typed_array<T: ::js_sys::TypedArray>(this: &R2PutOptions, val: &T)
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_sha512(
+        this: &R2PutOptions,
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, setter, js_name = "sha512")]
     pub fn set_sha512_with_str(this: &R2PutOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter, js_name = "storageClass")]
@@ -11767,75 +13333,40 @@ impl R2PutOptionsBuilder {
         self.inner.set_custom_metadata(val);
         self
     }
-    pub fn md5(self, val: &ArrayBuffer) -> Self {
+    pub fn md5(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_md5(val);
-        self
-    }
-    pub fn md5_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_md5_with_typed_array(val);
         self
     }
     pub fn md5_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_md5_with_str(val);
         self
     }
-    pub fn sha1(self, val: &ArrayBuffer) -> Self {
+    pub fn sha1(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_sha1(val);
-        self
-    }
-    pub fn sha1_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_sha1_with_typed_array(val);
         self
     }
     pub fn sha1_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_sha1_with_str(val);
         self
     }
-    pub fn sha256(self, val: &ArrayBuffer) -> Self {
+    pub fn sha256(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_sha256(val);
-        self
-    }
-    pub fn sha256_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_sha256_with_typed_array(val);
         self
     }
     pub fn sha256_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_sha256_with_str(val);
         self
     }
-    pub fn sha384(self, val: &ArrayBuffer) -> Self {
+    pub fn sha384(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_sha384(val);
-        self
-    }
-    pub fn sha384_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_sha384_with_typed_array(val);
         self
     }
     pub fn sha384_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_sha384_with_str(val);
         self
     }
-    pub fn sha512(self, val: &ArrayBuffer) -> Self {
+    pub fn sha512(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_sha512(val);
-        self
-    }
-    pub fn sha512_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_sha512_with_typed_array(val);
         self
     }
     pub fn sha512_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
@@ -11856,6 +13387,11 @@ impl R2PutOptionsBuilder {
     }
     pub fn build(self) -> R2PutOptions {
         self.inner
+    }
+}
+impl From<R2PutOptions> for R2PutOptionsBuilder {
+    fn from(inner: R2PutOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -11931,6 +13467,11 @@ impl R2MultipartOptionsBuilder {
     }
     pub fn build(self) -> R2MultipartOptions {
         self.inner
+    }
+}
+impl From<R2MultipartOptions> for R2MultipartOptionsBuilder {
+    fn from(inner: R2MultipartOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -12030,6 +13571,11 @@ impl R2StringChecksumsBuilder {
         self.inner
     }
 }
+impl From<R2StringChecksums> for R2StringChecksumsBuilder {
+    fn from(inner: R2StringChecksums) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -12117,6 +13663,11 @@ impl R2HTTPMetadataBuilder {
         self.inner
     }
 }
+impl From<R2HTTPMetadata> for R2HTTPMetadataBuilder {
+    fn from(inner: R2HTTPMetadata) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -12193,6 +13744,11 @@ impl R2ObjectsBuilder {
         self.inner
     }
 }
+impl From<R2Objects> for R2ObjectsBuilder {
+    fn from(inner: R2Objects) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -12237,6 +13793,11 @@ impl R2UploadPartOptionsBuilder {
     }
     pub fn build(self) -> R2UploadPartOptions {
         self.inner
+    }
+}
+impl From<R2UploadPartOptions> for R2UploadPartOptionsBuilder {
+    fn from(inner: R2UploadPartOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -12286,18 +13847,26 @@ extern "C" {
     pub fn set_size<T>(this: &QueuingStrategy<T>, val: &Function<fn(T) -> JsValue>);
 }
 impl<T: ::wasm_bindgen::convert::IntoWasmAbi> QueuingStrategy<T> {
-    pub fn new() -> QueuingStrategy<T> {
-        Self::builder().build()
+    pub fn new_typed() -> QueuingStrategy<T> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> QueuingStrategyBuilder<T> {
+    pub fn builder_typed() -> QueuingStrategyBuilder<T> {
         QueuingStrategyBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl QueuingStrategy<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> QueuingStrategyBuilder<JsValue> {
+        Self::builder_typed()
+    }
+}
 impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for QueuingStrategy<T> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct QueuingStrategyBuilder<T> {
@@ -12318,6 +13887,13 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> QueuingStrategyBuilder<T> {
     }
     pub fn build(self) -> QueuingStrategy<T> {
         self.inner
+    }
+}
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<QueuingStrategy<T>>
+    for QueuingStrategyBuilder<T>
+{
+    fn from(inner: QueuingStrategy<T>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -12372,18 +13948,26 @@ extern "C" {
     );
 }
 impl<W: ::wasm_bindgen::convert::IntoWasmAbi> UnderlyingSink<W> {
-    pub fn new() -> UnderlyingSink<W> {
-        Self::builder().build()
+    pub fn new_typed() -> UnderlyingSink<W> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> UnderlyingSinkBuilder<W> {
+    pub fn builder_typed() -> UnderlyingSinkBuilder<W> {
         UnderlyingSinkBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl UnderlyingSink<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> UnderlyingSinkBuilder<JsValue> {
+        Self::builder_typed()
+    }
+}
 impl<W: ::wasm_bindgen::convert::IntoWasmAbi> Default for UnderlyingSink<W> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct UnderlyingSinkBuilder<W> {
@@ -12418,6 +14002,11 @@ impl<W: ::wasm_bindgen::convert::IntoWasmAbi> UnderlyingSinkBuilder<W> {
     }
     pub fn build(self) -> UnderlyingSink<W> {
         self.inner
+    }
+}
+impl<W: ::wasm_bindgen::convert::IntoWasmAbi> From<UnderlyingSink<W>> for UnderlyingSinkBuilder<W> {
+    fn from(inner: UnderlyingSink<W>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -12505,6 +14094,11 @@ impl UnderlyingByteSourceBuilder {
         self.inner
     }
 }
+impl From<UnderlyingByteSource> for UnderlyingByteSourceBuilder {
+    fn from(inner: UnderlyingByteSource) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -12557,18 +14151,26 @@ extern "C" {
     pub fn set_expected_length_with_big_int<R>(this: &UnderlyingSource<R>, val: &BigInt);
 }
 impl<R: ::wasm_bindgen::convert::IntoWasmAbi> UnderlyingSource<R> {
-    pub fn new() -> UnderlyingSource<R> {
-        Self::builder().build()
+    pub fn new_typed() -> UnderlyingSource<R> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> UnderlyingSourceBuilder<R> {
+    pub fn builder_typed() -> UnderlyingSourceBuilder<R> {
         UnderlyingSourceBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl UnderlyingSource<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> UnderlyingSourceBuilder<JsValue> {
+        Self::builder_typed()
+    }
+}
 impl<R: ::wasm_bindgen::convert::IntoWasmAbi> Default for UnderlyingSource<R> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct UnderlyingSourceBuilder<R> {
@@ -12607,6 +14209,13 @@ impl<R: ::wasm_bindgen::convert::IntoWasmAbi> UnderlyingSourceBuilder<R> {
     }
     pub fn build(self) -> UnderlyingSource<R> {
         self.inner
+    }
+}
+impl<R: ::wasm_bindgen::convert::IntoWasmAbi> From<UnderlyingSource<R>>
+    for UnderlyingSourceBuilder<R>
+{
+    fn from(inner: UnderlyingSource<R>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -12686,20 +14295,28 @@ extern "C" {
 impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWasmAbi>
     Transformer<I, O>
 {
-    pub fn new() -> Transformer<I, O> {
-        Self::builder().build()
+    pub fn new_typed() -> Transformer<I, O> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> TransformerBuilder<I, O> {
+    pub fn builder_typed() -> TransformerBuilder<I, O> {
         TransformerBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl Transformer<JsValue, JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> TransformerBuilder<JsValue, JsValue> {
+        Self::builder_typed()
     }
 }
 impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWasmAbi> Default
     for Transformer<I, O>
 {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct TransformerBuilder<I, O> {
@@ -12747,6 +14364,13 @@ impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWa
     }
     pub fn build(self) -> Transformer<I, O> {
         self.inner
+    }
+}
+impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWasmAbi>
+    From<Transformer<I, O>> for TransformerBuilder<I, O>
+{
+    fn from(inner: Transformer<I, O>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -12825,6 +14449,11 @@ impl StreamPipeOptionsBuilder {
         self.inner
     }
 }
+impl From<StreamPipeOptions> for StreamPipeOptionsBuilder {
+    fn from(inner: StreamPipeOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -12852,14 +14481,24 @@ impl<R: ::wasm_bindgen::convert::IntoWasmAbi> ReadableStreamReadResult<R> {
         inner
     }
     #[doc = " Construct with `done: true`."]
-    pub fn new_true() -> ReadableStreamReadResult<R> {
-        Self::builder_true().build()
+    pub fn new_true_typed() -> ReadableStreamReadResult<R> {
+        Self::builder_true_typed().build()
     }
     #[doc = " Start a builder with `done: true`."]
-    pub fn builder_true() -> ReadableStreamReadResultBuilder<R> {
+    pub fn builder_true_typed() -> ReadableStreamReadResultBuilder<R> {
         let inner: ReadableStreamReadResult<R> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_done(true);
         ReadableStreamReadResultBuilder { inner }
+    }
+}
+impl ReadableStreamReadResult<JsValue> {
+    #[doc = " Construct with `done: true`."]
+    pub fn new_true() -> Self {
+        Self::new_true_typed()
+    }
+    #[doc = " Start a builder with `done: true`."]
+    pub fn builder_true() -> ReadableStreamReadResultBuilder<JsValue> {
+        Self::builder_true_typed()
     }
 }
 pub struct ReadableStreamReadResultBuilder<R> {
@@ -12874,19 +14513,37 @@ impl<R: ::wasm_bindgen::convert::IntoWasmAbi> ReadableStreamReadResultBuilder<R>
         self.inner
     }
 }
+impl<R: ::wasm_bindgen::convert::IntoWasmAbi> From<ReadableStreamReadResult<R>>
+    for ReadableStreamReadResultBuilder<R>
+{
+    fn from(inner: ReadableStreamReadResult<R>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableStream<R = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<R>() -> Result<ReadableStream<R>, JsValue>;
+    pub fn new() -> Result<ReadableStream, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_underlying_byte_source<R>(
+    pub fn new_typed<R>() -> Result<ReadableStream<R>, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_underlying_byte_source(
+        underlying_source: &UnderlyingByteSource,
+    ) -> Result<ReadableStream, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_underlying_byte_source_typed<R>(
         underlying_source: &UnderlyingByteSource,
     ) -> Result<ReadableStream<R>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_underlying_byte_source_and_queuing_strategy<R>(
+    pub fn new_with_underlying_byte_source_and_queuing_strategy(
+        underlying_source: &UnderlyingByteSource,
+        strategy: &QueuingStrategy<Uint8Array>,
+    ) -> Result<ReadableStream, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_underlying_byte_source_and_queuing_strategy_typed<R>(
         underlying_source: &UnderlyingByteSource,
         strategy: &QueuingStrategy<Uint8Array>,
     ) -> Result<ReadableStream<R>, JsValue>;
@@ -12937,11 +14594,8 @@ extern "C" {
     pub fn get_reader<R>(
         this: &ReadableStream<R>,
     ) -> Result<ReadableStreamDefaultReader<R>, JsValue>;
-    #[doc = " The **`getReader()`** method of the ReadableStream interface creates a reader and locks the stream to it."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/getReader)"]
     #[wasm_bindgen(method, catch, js_name = "getReader")]
-    pub fn get_reader_with_options<R>(
+    fn __get_reader_byob<R>(
         this: &ReadableStream<R>,
         options: &ReadableStreamGetReaderOptions,
     ) -> Result<ReadableStreamBYOBReader, JsValue>;
@@ -13011,13 +14665,29 @@ extern "C" {
         options: &ReadableStreamValuesOptions,
     ) -> Result<AsyncIterator<R>, JsValue>;
 }
+impl<R> ReadableStream<R> {
+    #[doc = " The **`getReader()`** method of the ReadableStream interface creates a reader and locks the stream to it."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/getReader)"]
+    pub fn get_reader_byob(&self) -> Result<ReadableStreamBYOBReader, JsValue> {
+        let options = ::js_sys::Object::new();
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("mode"),
+            &::wasm_bindgen::JsValue::from_str("byob"),
+        );
+        self.__get_reader_byob(::wasm_bindgen::JsCast::unchecked_ref(&options))
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableStreamDefaultReader<R = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<R, R2>(
+    pub fn new<R>(stream: &ReadableStream<R>) -> Result<ReadableStreamDefaultReader, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<R, R2>(
         stream: &ReadableStream<R2>,
     ) -> Result<ReadableStreamDefaultReader<R>, JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -13160,6 +14830,13 @@ impl ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptionsBuilder {
         self.inner
     }
 }
+impl From<ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions>
+    for ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptionsBuilder
+{
+    fn from(inner: ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -13213,15 +14890,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "respondWithNewView")]
     pub fn respond_with_new_view(
         this: &ReadableStreamBYOBRequest,
-        view: &ArrayBuffer,
-    ) -> Result<(), JsValue>;
-    #[doc = " The **`respondWithNewView()`** method of the ReadableStreamBYOBRequest interface specifies a new view that the consumer of the associated readable byte stream should write to instead of ReadableStreamBYOBRequest.view."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/respondWithNewView)"]
-    #[wasm_bindgen(method, catch, js_name = "respondWithNewView")]
-    pub fn respond_with_new_view_with_typed_array(
-        this: &ReadableStreamBYOBRequest,
-        view: &Object,
+        #[wasm_bindgen(slice = "copy")] view: impl ::js_sys::BufferSourceLike,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter, js_name = "atLeast")]
     pub fn at_least(this: &ReadableStreamBYOBRequest) -> Option<f64>;
@@ -13289,15 +14958,9 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/enqueue)"]
     #[wasm_bindgen(method, catch)]
-    pub fn enqueue(this: &ReadableByteStreamController, chunk: &ArrayBuffer)
-        -> Result<(), JsValue>;
-    #[doc = " The **`enqueue()`** method of the ReadableByteStreamController interface enqueues a given chunk on the associated readable byte stream (the chunk is copied into the stream's internal queues)."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/enqueue)"]
-    #[wasm_bindgen(method, catch, js_name = "enqueue")]
-    pub fn enqueue_with_typed_array(
+    pub fn enqueue(
         this: &ReadableByteStreamController,
-        chunk: &Object,
+        #[wasm_bindgen(slice = "copy")] chunk: impl ::js_sys::BufferSourceLike,
     ) -> Result<(), JsValue>;
     #[doc = " The **`error()`** method of the ReadableByteStreamController interface causes any future interactions with the associated stream to error with the specified reason."]
     #[doc = ""]
@@ -13407,13 +15070,24 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WritableStream<W = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<W>() -> Result<WritableStream<W>, JsValue>;
+    pub fn new() -> Result<WritableStream, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_underlying_sink<W>(
+    pub fn new_typed<W>() -> Result<WritableStream<W>, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_underlying_sink(
+        underlying_sink: &UnderlyingSink,
+    ) -> Result<WritableStream, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_underlying_sink_typed<W>(
         underlying_sink: &UnderlyingSink,
     ) -> Result<WritableStream<W>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_underlying_sink_and_queuing_strategy<W>(
+    pub fn new_with_underlying_sink_and_queuing_strategy(
+        underlying_sink: Option<&UnderlyingSink>,
+        queuing_strategy: &QueuingStrategy,
+    ) -> Result<WritableStream, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_underlying_sink_and_queuing_strategy_typed<W>(
         underlying_sink: Option<&UnderlyingSink>,
         queuing_strategy: &QueuingStrategy,
     ) -> Result<WritableStream<W>, JsValue>;
@@ -13472,7 +15146,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WritableStreamDefaultWriter<W = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<W, W2>(
+    pub fn new<W>(stream: &WritableStream<W>) -> Result<WritableStreamDefaultWriter, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<W, W2>(
         stream: &WritableStream<W2>,
     ) -> Result<WritableStreamDefaultWriter<W>, JsValue>;
     #[doc = " The **`closed`** read-only property of the the stream errors or the writer's lock is released."]
@@ -13568,7 +15244,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TransformStream<I = JsValue, O = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<I, O>() -> Result<TransformStream<I, O>, JsValue>;
+    pub fn new() -> Result<TransformStream, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_typed<I, O>() -> Result<TransformStream<I, O>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_transformer<I, O>(
         transformer: &Transformer<I, O>,
@@ -13673,6 +15351,13 @@ impl IdentityTransformStreamQueuingStrategyBuilder {
         self.inner
     }
 }
+impl From<IdentityTransformStreamQueuingStrategy>
+    for IdentityTransformStreamQueuingStrategyBuilder
+{
+    fn from(inner: IdentityTransformStreamQueuingStrategy) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -13708,6 +15393,11 @@ impl ReadableStreamValuesOptionsBuilder {
     }
     pub fn build(self) -> ReadableStreamValuesOptions {
         self.inner
+    }
+}
+impl From<ReadableStreamValuesOptions> for ReadableStreamValuesOptionsBuilder {
+    fn from(inner: ReadableStreamValuesOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -13806,6 +15496,13 @@ impl TextDecoderStreamTextDecoderStreamInitBuilder {
     }
     pub fn build(self) -> TextDecoderStreamTextDecoderStreamInit {
         self.inner
+    }
+}
+impl From<TextDecoderStreamTextDecoderStreamInit>
+    for TextDecoderStreamTextDecoderStreamInitBuilder
+{
+    fn from(inner: TextDecoderStreamTextDecoderStreamInit) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -13918,6 +15615,11 @@ impl ScriptVersionBuilder {
     }
     pub fn build(self) -> ScriptVersion {
         self.inner
+    }
+}
+impl From<ScriptVersion> for ScriptVersionBuilder {
+    fn from(inner: ScriptVersion) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -14777,10 +16479,30 @@ extern "C" {
     pub fn try_to_string(this: &URLSearchParams) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "toString")]
     pub fn to_string_js_string(this: &URLSearchParams) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    fn __iterator(this: &URLSearchParams) -> Iterator<ArrayTuple<(JsString, JsString)>>;
+    #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
+    pub fn iterator(
+        this: &URLSearchParams,
+    ) -> Result<Iterator<ArrayTuple<(JsString, JsString)>>, JsValue>;
 }
 impl core::fmt::Display for URLSearchParams {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.write_str(&self.try_to_string().map_err(|_| core::fmt::Error)?)
+    }
+}
+impl<'a> ::core::iter::IntoIterator for &'a URLSearchParams {
+    type Item = (JsString, JsString);
+    type IntoIter = ::core::iter::Scan<
+        ::core::iter::Repeat<()>,
+        Iterator<ArrayTuple<(JsString, JsString)>>,
+        fn(&mut Iterator<ArrayTuple<(JsString, JsString)>>, ()) -> Option<(JsString, JsString)>,
+    >;
+    fn into_iter(self) -> Self::IntoIter {
+        ::core::iter::repeat(()).scan(self.__iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value().into_tuple())
+        })
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -14793,24 +16515,24 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str(input: impl ::wasm_bindgen::JsStringLike) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_url_pattern_init(input: &URLPatternInit) -> Result<URLPattern, JsValue>;
+    pub fn new_with_input(input: &URLPatternInit) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_str(
         input: Option<&str>,
         base_url: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_url_pattern_init_and_str(
+    pub fn new_with_input_and_str(
         input: &URLPatternInit,
         base_url: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_str_and_url_pattern_options(
+    pub fn new_with_str_and_base_url(
         input: Option<&str>,
         base_url: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_url_pattern_init_and_url_pattern_options(
+    pub fn new_with_input_and_base_url(
         input: &URLPatternInit,
         base_url: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
@@ -14821,19 +16543,19 @@ extern "C" {
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_url_pattern_init_and_str_and_pattern_options(
+    pub fn new_with_input_and_str_and_pattern_options(
         input: &URLPatternInit,
         base_url: Option<&str>,
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_str_and_url_pattern_options_and_pattern_options(
+    pub fn new_with_str_and_base_url_and_pattern_options(
         input: Option<&str>,
         base_url: &URLPatternOptions,
         pattern_options: &URLPatternOptions,
     ) -> Result<URLPattern, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_url_pattern_init_and_url_pattern_options_and_pattern_options(
+    pub fn new_with_input_and_base_url_and_pattern_options(
         input: &URLPatternInit,
         base_url: &URLPatternOptions,
         pattern_options: &URLPatternOptions,
@@ -14880,10 +16602,7 @@ extern "C" {
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "test")]
-    pub fn test_with_url_pattern_init(
-        this: &URLPattern,
-        input: &URLPatternInit,
-    ) -> Result<bool, JsValue>;
+    pub fn test_with_input(this: &URLPattern, input: &URLPatternInit) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "test")]
     pub fn test_with_str_and_base_url(
         this: &URLPattern,
@@ -14891,7 +16610,7 @@ extern "C" {
         base_url: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "test")]
-    pub fn test_with_url_pattern_init_and_base_url(
+    pub fn test_with_input_and_base_url(
         this: &URLPattern,
         input: &URLPatternInit,
         base_url: impl ::wasm_bindgen::JsStringLike,
@@ -14904,7 +16623,7 @@ extern "C" {
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<URLPatternResult>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "exec")]
-    pub fn exec_with_url_pattern_init(
+    pub fn exec_with_input(
         this: &URLPattern,
         input: &URLPatternInit,
     ) -> Result<Option<URLPatternResult>, JsValue>;
@@ -14915,7 +16634,7 @@ extern "C" {
         base_url: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<URLPatternResult>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "exec")]
-    pub fn exec_with_url_pattern_init_and_base_url(
+    pub fn exec_with_input_and_base_url(
         this: &URLPattern,
         input: &URLPatternInit,
         base_url: impl ::wasm_bindgen::JsStringLike,
@@ -15040,6 +16759,11 @@ impl URLPatternInitBuilder {
         self.inner
     }
 }
+impl From<URLPatternInit> for URLPatternInitBuilder {
+    fn from(inner: URLPatternInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -15073,9 +16797,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type URLPatternResult;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &URLPatternResult) -> Vec<JsValue>;
+    pub fn inputs(this: &URLPatternResult) -> Vec<StrOrURLPatternInit>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &URLPatternResult, val: &[JsValue]);
+    pub fn set_inputs(this: &URLPatternResult, val: &[StrOrURLPatternInit]);
     #[wasm_bindgen(method, getter)]
     pub fn protocol(this: &URLPatternResult) -> URLPatternComponentResult;
     #[wasm_bindgen(method, setter)]
@@ -15111,7 +16835,7 @@ extern "C" {
 }
 impl URLPatternResult {
     pub fn new(
-        inputs: &[JsValue],
+        inputs: &[StrOrURLPatternInit],
         protocol: &URLPatternComponentResult,
         username: &URLPatternComponentResult,
         password: &URLPatternComponentResult,
@@ -15169,6 +16893,11 @@ impl URLPatternOptionsBuilder {
     }
     pub fn build(self) -> URLPatternOptions {
         self.inner
+    }
+}
+impl From<URLPatternOptions> for URLPatternOptionsBuilder {
+    fn from(inner: URLPatternOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -15259,6 +16988,11 @@ impl CloseEventInitBuilder {
         self.inner
     }
 }
+impl From<CloseEventInit> for CloseEventInitBuilder {
+    fn from(inner: CloseEventInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -15340,12 +17074,10 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
     #[wasm_bindgen(method, catch)]
-    pub fn send(this: &WebSocket, message: &ArrayBuffer) -> Result<(), JsValue>;
-    #[doc = " The **`WebSocket.send()`** method enqueues the specified data to be transmitted to the server over the WebSocket connection, increasing the value of `bufferedAmount` by the number of bytes needed to contain the data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
-    #[wasm_bindgen(method, catch, js_name = "send")]
-    pub fn send_with_typed_array(this: &WebSocket, message: &Object) -> Result<(), JsValue>;
+    pub fn send(
+        this: &WebSocket,
+        #[wasm_bindgen(slice = "copy")] message: impl ::js_sys::BufferSourceLike,
+    ) -> Result<(), JsValue>;
     #[doc = " The **`WebSocket.send()`** method enqueues the specified data to be transmitted to the server over the WebSocket connection, increasing the value of `bufferedAmount` by the number of bytes needed to contain the data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
@@ -15487,6 +17219,11 @@ impl WebSocketAcceptOptionsBuilder {
         self.inner
     }
 }
+impl From<WebSocketAcceptOptions> for WebSocketAcceptOptionsBuilder {
+    fn from(inner: WebSocketAcceptOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -15513,7 +17250,13 @@ extern "C" {
         this: &SqlStorage,
         query: impl ::wasm_bindgen::JsStringLike,
         bindings: &[JsValue],
-    ) -> Result<SqlStorageCursor, JsValue>;
+    ) -> Result<SqlStorageCursor<Object>, JsValue>;
+    #[wasm_bindgen(method, variadic, catch, js_name = "exec")]
+    pub fn exec_typed<T>(
+        this: &SqlStorage,
+        query: impl ::wasm_bindgen::JsStringLike,
+        bindings: &[JsValue],
+    ) -> Result<SqlStorageCursor<T>, JsValue>;
     #[wasm_bindgen(method, getter, js_name = "databaseSize")]
     pub fn database_size(this: &SqlStorage) -> f64;
     #[wasm_bindgen(method, getter, js_name = "Cursor")]
@@ -15611,6 +17354,8 @@ extern "C" {
         T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, catch)]
     pub fn raw<T>(this: &SqlStorageCursor<T>) -> Result<Iterator, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    pub fn raw_typed<T, U>(this: &SqlStorageCursor<T>) -> Result<Iterator<U>, JsValue>;
     #[wasm_bindgen(method, getter, js_name = "columnNames")]
     pub fn column_names<T>(this: &SqlStorageCursor<T>) -> Vec<String>;
     #[wasm_bindgen(method, getter, js_name = "columnNames")]
@@ -15624,6 +17369,27 @@ extern "C" {
     pub fn rows_read<T>(this: &SqlStorageCursor<T>) -> f64;
     #[wasm_bindgen(method, getter, js_name = "rowsWritten")]
     pub fn rows_written<T>(this: &SqlStorageCursor<T>) -> f64;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    fn __iterator<T>(this: &SqlStorageCursor<T>) -> Iterator<T>;
+    #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
+    pub fn iterator<T>(this: &SqlStorageCursor<T>) -> Result<Iterator<T>, JsValue>;
+}
+impl<'a, T> ::core::iter::IntoIterator for &'a SqlStorageCursor<T>
+where
+    T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi,
+{
+    type Item = T;
+    type IntoIter = ::core::iter::Scan<
+        ::core::iter::Repeat<()>,
+        Iterator<T>,
+        fn(&mut Iterator<T>, ()) -> Option<T>,
+    >;
+    fn into_iter(self) -> Self::IntoIter {
+        ::core::iter::repeat(()).scan(self.__iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value())
+        })
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -15644,18 +17410,26 @@ extern "C" {
         T: ::wasm_bindgen::convert::IntoWasmAbi;
 }
 impl<T: ::wasm_bindgen::convert::IntoWasmAbi> SqlStorageCursorNextReturn<T> {
-    pub fn new() -> SqlStorageCursorNextReturn<T> {
-        Self::builder().build()
+    pub fn new_typed() -> SqlStorageCursorNextReturn<T> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> SqlStorageCursorNextReturnBuilder<T> {
+    pub fn builder_typed() -> SqlStorageCursorNextReturnBuilder<T> {
         SqlStorageCursorNextReturnBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl SqlStorageCursorNextReturn<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> SqlStorageCursorNextReturnBuilder<JsValue> {
+        Self::builder_typed()
+    }
+}
 impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for SqlStorageCursorNextReturn<T> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct SqlStorageCursorNextReturnBuilder<T> {
@@ -15672,6 +17446,13 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> SqlStorageCursorNextReturnBuilder<
     }
     pub fn build(self) -> SqlStorageCursorNextReturn<T> {
         self.inner
+    }
+}
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<SqlStorageCursorNextReturn<T>>
+    for SqlStorageCursorNextReturnBuilder<T>
+{
+    fn from(inner: SqlStorageCursorNextReturn<T>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -15752,6 +17533,11 @@ impl SocketOptionsBuilder {
         self.inner
     }
 }
+impl From<SocketOptions> for SocketOptionsBuilder {
+    fn from(inner: SocketOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -15815,6 +17601,11 @@ impl TlsOptionsBuilder {
         self.inner
     }
 }
+impl From<TlsOptions> for TlsOptionsBuilder {
+    fn from(inner: TlsOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -15862,6 +17653,11 @@ impl SocketInfoBuilder {
     }
     pub fn build(self) -> SocketInfo {
         self.inner
+    }
+}
+impl From<SocketInfo> for SocketInfoBuilder {
+    fn from(inner: SocketInfo) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -15965,6 +17761,11 @@ impl EventSourceEventSourceInitBuilder {
     }
     pub fn build(self) -> EventSourceEventSourceInit {
         self.inner
+    }
+}
+impl From<EventSourceEventSourceInit> for EventSourceEventSourceInitBuilder {
+    fn from(inner: EventSourceEventSourceInit) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -16098,6 +17899,11 @@ impl ContainerStartupOptionsBuilder {
         self.inner
     }
 }
+impl From<ContainerStartupOptions> for ContainerStartupOptionsBuilder {
+    fn from(inner: ContainerStartupOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = EventTarget , extends = Object)]
@@ -16126,7 +17932,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/postMessage)"]
     #[wasm_bindgen(method, catch, js_name = "postMessage")]
-    pub fn post_message_with_data_and_message_port_post_message_options(
+    pub fn post_message_with_data_and_options(
         this: &MessagePort,
         data: &JsValue,
         options: &MessagePortPostMessageOptions,
@@ -16201,6 +18007,11 @@ impl MessagePortPostMessageOptionsBuilder {
         self.inner
     }
 }
+impl From<MessagePortPostMessageOptions> for MessagePortPostMessageOptionsBuilder {
+    fn from(inner: MessagePortPostMessageOptions) -> Self {
+        Self { inner }
+    }
+}
 #[allow(dead_code)]
 pub type LoopbackForExport = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
@@ -16221,7 +18032,12 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SyncKvStorage;
     #[wasm_bindgen(method, catch)]
-    pub fn get<T>(
+    pub fn get(
+        this: &SyncKvStorage,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn get_typed<T>(
         this: &SyncKvStorage,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<T>, JsValue>
@@ -16234,6 +18050,13 @@ extern "C" {
         this: &SyncKvStorage,
         options: &SyncKvListOptions,
     ) -> Result<SyncKvStorageList, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub fn list_typed<T>(this: &SyncKvStorage) -> Result<SyncKvStorageList<T>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub fn list_with_options_typed<T>(
+        this: &SyncKvStorage,
+        options: &SyncKvListOptions,
+    ) -> Result<SyncKvStorageList<T>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn put<T>(
         this: &SyncKvStorage,
@@ -16253,11 +18076,30 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SyncKvStorageList<T = JsValue>;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    fn __iterator<T>(this: &SyncKvStorageList<T>) -> Iterator<ArrayTuple<(JsString, T)>>;
     #[doc = " Conformance to the JS iteration protocol — returns the underlying iterator."]
     #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
     pub fn iterator<T>(
         this: &SyncKvStorageList<T>,
     ) -> Result<Iterator<ArrayTuple<(JsString, T)>>, JsValue>;
+}
+impl<'a, T> ::core::iter::IntoIterator for &'a SyncKvStorageList<T>
+where
+    T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi,
+{
+    type Item = (JsString, T);
+    type IntoIter = ::core::iter::Scan<
+        ::core::iter::Repeat<()>,
+        Iterator<ArrayTuple<(JsString, T)>>,
+        fn(&mut Iterator<ArrayTuple<(JsString, T)>>, ()) -> Option<(JsString, T)>,
+    >;
+    fn into_iter(self) -> Self::IntoIter {
+        ::core::iter::repeat(()).scan(self.__iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value().into_tuple())
+        })
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -16344,6 +18186,11 @@ impl SyncKvListOptionsBuilder {
         self.inner
     }
 }
+impl From<SyncKvListOptions> for SyncKvListOptionsBuilder {
+    fn from(inner: SyncKvListOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -16362,6 +18209,19 @@ extern "C" {
         name: Option<&str>,
         options: &WorkerStubEntrypointOptions,
     ) -> Result<Fetcher, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
+    pub fn get_entrypoint_typed<T>(this: &WorkerStub) -> Result<Fetcher<T>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
+    pub fn get_entrypoint_with_name_typed<T>(
+        this: &WorkerStub,
+        name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Fetcher<T>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
+    pub fn get_entrypoint_with_name_and_options_typed<T>(
+        this: &WorkerStub,
+        name: Option<&str>,
+        options: &WorkerStubEntrypointOptions,
+    ) -> Result<Fetcher<T>, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -16398,6 +18258,11 @@ impl WorkerStubEntrypointOptionsBuilder {
     }
     pub fn build(self) -> WorkerStubEntrypointOptions {
         self.inner
+    }
+}
+impl From<WorkerStubEntrypointOptions> for WorkerStubEntrypointOptionsBuilder {
+    fn from(inner: WorkerStubEntrypointOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -16514,6 +18379,11 @@ impl WorkerLoaderModuleBuilder {
     }
     pub fn build(self) -> WorkerLoaderModule {
         self.inner
+    }
+}
+impl From<WorkerLoaderModule> for WorkerLoaderModuleBuilder {
+    fn from(inner: WorkerLoaderModule) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -16636,6 +18506,11 @@ impl WorkerLoaderWorkerCodeBuilder {
         self.inner
     }
 }
+impl From<WorkerLoaderWorkerCode> for WorkerLoaderWorkerCodeBuilder {
+    fn from(inner: WorkerLoaderWorkerCode) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -16705,6 +18580,11 @@ impl AiSearchSearchRequestBuilder {
         self.inner
     }
 }
+impl From<AiSearchSearchRequest> for AiSearchSearchRequestBuilder {
+    fn from(inner: AiSearchSearchRequest) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -16766,6 +18646,11 @@ impl AiSearchChatCompletionsRequestBuilder {
     }
     pub fn build(self) -> AiSearchChatCompletionsRequest {
         self.inner
+    }
+}
+impl From<AiSearchChatCompletionsRequest> for AiSearchChatCompletionsRequestBuilder {
+    fn from(inner: AiSearchChatCompletionsRequest) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -16951,6 +18836,11 @@ impl AiSearchConfigBuilder {
         self.inner
     }
 }
+impl From<AiSearchConfig> for AiSearchConfigBuilder {
+    fn from(inner: AiSearchConfig) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -17005,6 +18895,11 @@ impl AiSearchInstanceBuilder {
     }
     pub fn build(self) -> AiSearchInstance {
         self.inner
+    }
+}
+impl From<AiSearchInstance> for AiSearchInstanceBuilder {
+    fn from(inner: AiSearchInstance) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -17264,6 +19159,11 @@ impl AiImageToTextInputBuilder {
         self.inner
     }
 }
+impl From<AiImageToTextInput> for AiImageToTextInputBuilder {
+    fn from(inner: AiImageToTextInput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -17423,6 +19323,11 @@ impl AiImageTextToTextInputBuilder {
     }
     pub fn build(self) -> AiImageTextToTextInput {
         self.inner
+    }
+}
+impl From<AiImageTextToTextInput> for AiImageTextToTextInputBuilder {
+    fn from(inner: AiImageTextToTextInput) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -17706,6 +19611,11 @@ impl AiAutomaticSpeechRecognitionOutputBuilder {
         self.inner
     }
 }
+impl From<AiAutomaticSpeechRecognitionOutput> for AiAutomaticSpeechRecognitionOutputBuilder {
+    fn from(inner: AiAutomaticSpeechRecognitionOutput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -17764,6 +19674,11 @@ impl AiSummarizationInputBuilder {
     }
     pub fn build(self) -> AiSummarizationInput {
         self.inner
+    }
+}
+impl From<AiSummarizationInput> for AiSummarizationInputBuilder {
+    fn from(inner: AiSummarizationInput) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -18001,6 +19916,11 @@ impl RoleScopedChatInputBuilder {
         self.inner
     }
 }
+impl From<RoleScopedChatInput> for RoleScopedChatInputBuilder {
+    fn from(inner: RoleScopedChatInput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -18060,6 +19980,11 @@ impl AiTextGenerationToolLegacyInputBuilder {
         self.inner
     }
 }
+impl From<AiTextGenerationToolLegacyInput> for AiTextGenerationToolLegacyInputBuilder {
+    fn from(inner: AiTextGenerationToolLegacyInput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -18114,6 +20039,11 @@ impl AiTextGenerationToolInputBuilder {
     }
     pub fn build(self) -> AiTextGenerationToolInput {
         self.inner
+    }
+}
+impl From<AiTextGenerationToolInput> for AiTextGenerationToolInputBuilder {
+    fn from(inner: AiTextGenerationToolInput) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -18183,6 +20113,11 @@ impl AiTextGenerationResponseFormatBuilder {
     }
     pub fn build(self) -> AiTextGenerationResponseFormat {
         self.inner
+    }
+}
+impl From<AiTextGenerationResponseFormat> for AiTextGenerationResponseFormatBuilder {
+    fn from(inner: AiTextGenerationResponseFormat) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -18351,6 +20286,11 @@ impl AiTextGenerationInputBuilder {
         self.inner
     }
 }
+impl From<AiTextGenerationInput> for AiTextGenerationInputBuilder {
+    fn from(inner: AiTextGenerationInput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -18503,6 +20443,11 @@ impl AiTextGenerationOutputBuilder {
         self.inner
     }
 }
+impl From<AiTextGenerationOutput> for AiTextGenerationOutputBuilder {
+    fn from(inner: AiTextGenerationOutput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -18555,6 +20500,11 @@ impl AiTextToSpeechInputBuilder {
     }
     pub fn build(self) -> AiTextToSpeechInput {
         self.inner
+    }
+}
+impl From<AiTextToSpeechInput> for AiTextToSpeechInputBuilder {
+    fn from(inner: AiTextToSpeechInput) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -18721,6 +20671,11 @@ impl AiTextToImageInputBuilder {
         self.inner
     }
 }
+impl From<AiTextToImageInput> for AiTextToImageInputBuilder {
+    fn from(inner: AiTextToImageInput) -> Self {
+        Self { inner }
+    }
+}
 #[allow(dead_code)]
 pub type AiTextToImageOutput = ReadableStream<Uint8Array>;
 #[wasm_bindgen(experimental_generic_mono)]
@@ -18790,6 +20745,11 @@ impl AiTranslationInputBuilder {
         self.inner
     }
 }
+impl From<AiTranslationInput> for AiTranslationInputBuilder {
+    fn from(inner: AiTranslationInput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -18829,6 +20789,11 @@ impl AiTranslationOutputBuilder {
         self.inner
     }
 }
+impl From<AiTranslationOutput> for AiTranslationOutputBuilder {
+    fn from(inner: AiTranslationOutput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -18866,11 +20831,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "conversation")]
     fn __set_conversation_with_null(this: &ResponsesInput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn include(this: &ResponsesInput) -> Option<Vec<String>>;
-    #[wasm_bindgen(method, getter, js_name = "include")]
-    pub fn include_js_string(this: &ResponsesInput) -> Option<Array<JsString>>;
+    pub fn include(this: &ResponsesInput) -> Option<Vec<ResponseIncludable>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_include(this: &ResponsesInput, val: &[impl ::wasm_bindgen::JsStringLike]);
+    pub fn set_include(this: &ResponsesInput, val: &[ResponseIncludable]);
     #[wasm_bindgen(method, setter, js_name = "include")]
     fn __set_include_with_null(this: &ResponsesInput, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
@@ -19066,7 +21029,7 @@ impl ResponsesInputBuilder {
         self.inner.set_conversation_with_null();
         self
     }
-    pub fn include(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
+    pub fn include(self, val: &[ResponseIncludable]) -> Self {
         self.inner.set_include(val);
         self
     }
@@ -19196,6 +21159,11 @@ impl ResponsesInputBuilder {
     }
     pub fn build(self) -> ResponsesInput {
         self.inner
+    }
+}
+impl From<ResponsesInput> for ResponsesInputBuilder {
+    fn from(inner: ResponsesInput) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -19537,6 +21505,11 @@ impl ResponsesOutputBuilder {
         self.inner
     }
 }
+impl From<ResponsesOutput> for ResponsesOutputBuilder {
+    fn from(inner: ResponsesOutput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -19663,6 +21636,11 @@ impl EasyInputMessageBuilder {
     }
     pub fn build(self) -> EasyInputMessage {
         self.inner
+    }
+}
+impl From<EasyInputMessage> for EasyInputMessageBuilder {
+    fn from(inner: EasyInputMessage) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -19808,6 +21786,11 @@ impl ResponsesFunctionToolBuilder {
         self.inner
     }
 }
+impl From<ResponsesFunctionTool> for ResponsesFunctionToolBuilder {
+    fn from(inner: ResponsesFunctionTool) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -19843,6 +21826,11 @@ impl ResponseIncompleteDetailsBuilder {
     }
     pub fn build(self) -> ResponseIncompleteDetails {
         self.inner
+    }
+}
+impl From<ResponseIncompleteDetails> for ResponseIncompleteDetailsBuilder {
+    fn from(inner: ResponseIncompleteDetails) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -19911,6 +21899,11 @@ impl ResponsePromptBuilder {
     }
     pub fn build(self) -> ResponsePrompt {
         self.inner
+    }
+}
+impl From<ResponsePrompt> for ResponsePromptBuilder {
+    fn from(inner: ResponsePrompt) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -19993,6 +21986,11 @@ impl ReasoningBuilder {
     }
     pub fn build(self) -> Reasoning {
         self.inner
+    }
+}
+impl From<Reasoning> for ReasoningBuilder {
+    fn from(inner: Reasoning) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -20224,6 +22222,11 @@ impl ResponseCustomToolCallOutputBuilder {
     }
     pub fn build(self) -> ResponseCustomToolCallOutput {
         self.inner
+    }
+}
+impl From<ResponseCustomToolCallOutput> for ResponseCustomToolCallOutputBuilder {
+    fn from(inner: ResponseCustomToolCallOutput) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -20568,6 +22571,11 @@ impl ResponseFormatTextJSONSchemaConfigBuilder {
         self.inner
     }
 }
+impl From<ResponseFormatTextJSONSchemaConfig> for ResponseFormatTextJSONSchemaConfigBuilder {
+    fn from(inner: ResponseFormatTextJSONSchemaConfig) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -20814,6 +22822,11 @@ impl ResponseFunctionToolCallBuilder {
         self.inner
     }
 }
+impl From<ResponseFunctionToolCall> for ResponseFunctionToolCallBuilder {
+    fn from(inner: ResponseFunctionToolCall) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = ResponseFunctionToolCall , extends = Object , is_type_of = JsValue :: is_object)]
@@ -20862,6 +22875,11 @@ impl ResponseFunctionToolCallItemBuilder {
     }
     pub fn build(self) -> ResponseFunctionToolCallItem {
         self.inner
+    }
+}
+impl From<ResponseFunctionToolCallItem> for ResponseFunctionToolCallItemBuilder {
+    fn from(inner: ResponseFunctionToolCallItem) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -20971,6 +22989,11 @@ impl ResponseFunctionToolCallOutputItemBuilder {
     }
     pub fn build(self) -> ResponseFunctionToolCallOutputItem {
         self.inner
+    }
+}
+impl From<ResponseFunctionToolCallOutputItem> for ResponseFunctionToolCallOutputItemBuilder {
+    fn from(inner: ResponseFunctionToolCallOutputItem) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]
@@ -21129,6 +23152,11 @@ impl ResponseInputImageBuilder {
         self.inner
     }
 }
+impl From<ResponseInputImage> for ResponseInputImageBuilder {
+    fn from(inner: ResponseInputImage) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -21199,6 +23227,11 @@ impl ResponseInputImageContentBuilder {
     }
     pub fn build(self) -> ResponseInputImageContent {
         self.inner
+    }
+}
+impl From<ResponseInputImageContent> for ResponseInputImageContentBuilder {
+    fn from(inner: ResponseInputImageContent) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -21424,6 +23457,11 @@ impl ResponseInputItemFunctionCallOutputBuilder {
         self.inner
     }
 }
+impl From<ResponseInputItemFunctionCallOutput> for ResponseInputItemFunctionCallOutputBuilder {
+    fn from(inner: ResponseInputItemFunctionCallOutput) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -21497,6 +23535,11 @@ impl ResponseInputItemMessageBuilder {
     }
     pub fn build(self) -> ResponseInputItemMessage {
         self.inner
+    }
+}
+impl From<ResponseInputItemMessage> for ResponseInputItemMessageBuilder {
+    fn from(inner: ResponseInputItemMessage) -> Self {
+        Self { inner }
     }
 }
 #[allow(dead_code)]
@@ -21601,6 +23644,11 @@ impl ResponseInputMessageItemBuilder {
     }
     pub fn build(self) -> ResponseInputMessageItem {
         self.inner
+    }
+}
+impl From<ResponseInputMessageItem> for ResponseInputMessageItemBuilder {
+    fn from(inner: ResponseInputMessageItem) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -21952,6 +24000,11 @@ impl ResponseOutputMessageBuilder {
         self.inner
     }
 }
+impl From<ResponseOutputMessage> for ResponseOutputMessageBuilder {
+    fn from(inner: ResponseOutputMessage) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -22024,6 +24077,11 @@ impl ResponseOutputTextBuilder {
     }
     pub fn build(self) -> ResponseOutputText {
         self.inner
+    }
+}
+impl From<ResponseOutputText> for ResponseOutputTextBuilder {
+    fn from(inner: ResponseOutputText) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -22117,6 +24175,11 @@ impl ResponseReasoningItemBuilder {
     }
     pub fn build(self) -> ResponseReasoningItem {
         self.inner
+    }
+}
+impl From<ResponseReasoningItem> for ResponseReasoningItemBuilder {
+    fn from(inner: ResponseReasoningItem) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -22500,6 +24563,11 @@ impl ResponseTextConfigBuilder {
         self.inner
     }
 }
+impl From<ResponseTextConfig> for ResponseTextConfigBuilder {
+    fn from(inner: ResponseTextConfig) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -22665,6 +24733,11 @@ impl LogprobBuilder {
         self.inner
     }
 }
+impl From<Logprob> for LogprobBuilder {
+    fn from(inner: Logprob) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -22710,6 +24783,11 @@ impl TopLogprobBuilder {
     }
     pub fn build(self) -> TopLogprob {
         self.inner
+    }
+}
+impl From<TopLogprob> for TopLogprobBuilder {
+    fn from(inner: TopLogprob) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -22812,6 +24890,11 @@ impl StreamOptionsBuilder {
         self.inner
     }
 }
+impl From<StreamOptions> for StreamOptionsBuilder {
+    fn from(inner: StreamOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -22887,6 +24970,11 @@ impl Ai_Cf_Baai_Bge_Base_En_V1_5_InputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_Base_En_V1_5_Input {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_Base_En_V1_5_Input> for Ai_Cf_Baai_Bge_Base_En_V1_5_InputBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_Base_En_V1_5_Input) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -22977,6 +25065,13 @@ impl Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponseBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse>
+    for Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponseBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -23117,6 +25212,11 @@ impl Ai_Cf_Openai_Whisper_OutputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Openai_Whisper_Output> for Ai_Cf_Openai_Whisper_OutputBuilder {
+    fn from(inner: Ai_Cf_Openai_Whisper_Output) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -23219,6 +25319,11 @@ impl Ai_Cf_Meta_M2M100_1_2B_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_M2M100_1_2B_Input> for Ai_Cf_Meta_M2M100_1_2B_InputBuilder {
+    fn from(inner: Ai_Cf_Meta_M2M100_1_2B_Input) -> Self {
+        Self { inner }
+    }
+}
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Meta_M2M100_1_2B_Output`",
     label = "expected Ai_Cf_Meta_M2M100_1_2B_OutputObject or Ai_Cf_Meta_M2M100_1_2B_AsyncResponse"
@@ -23305,6 +25410,11 @@ impl Ai_Cf_Meta_M2M100_1_2B_AsyncResponseBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_M2M100_1_2B_AsyncResponse {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_M2M100_1_2B_AsyncResponse> for Ai_Cf_Meta_M2M100_1_2B_AsyncResponseBuilder {
+    fn from(inner: Ai_Cf_Meta_M2M100_1_2B_AsyncResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -23401,6 +25511,11 @@ impl Ai_Cf_Baai_Bge_Small_En_V1_5_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_Small_En_V1_5_Input> for Ai_Cf_Baai_Bge_Small_En_V1_5_InputBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_Small_En_V1_5_Input) -> Self {
+        Self { inner }
+    }
+}
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Baai_Bge_Small_En_V1_5_Output`",
     label = "expected Ai_Cf_Baai_Bge_Small_En_V1_5_OutputObject or Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse"
@@ -23489,6 +25604,13 @@ impl Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponseBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse>
+    for Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponseBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -23588,6 +25710,11 @@ impl Ai_Cf_Baai_Bge_Large_En_V1_5_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_Large_En_V1_5_Input> for Ai_Cf_Baai_Bge_Large_En_V1_5_InputBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_Large_En_V1_5_Input) -> Self {
+        Self { inner }
+    }
+}
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `Ai_Cf_Baai_Bge_Large_En_V1_5_Output`",
     label = "expected Ai_Cf_Baai_Bge_Large_En_V1_5_OutputObject or Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse"
@@ -23676,6 +25803,13 @@ impl Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponseBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse>
+    for Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponseBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -23799,6 +25933,13 @@ impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output>
+    for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_OutputBuilder
+{
+    fn from(inner: Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -23959,6 +26100,11 @@ impl Ai_Cf_Openai_Whisper_Tiny_En_OutputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Openai_Whisper_Tiny_En_Output> for Ai_Cf_Openai_Whisper_Tiny_En_OutputBuilder {
+    fn from(inner: Ai_Cf_Openai_Whisper_Tiny_En_Output) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -24097,6 +26243,13 @@ impl Ai_Cf_Openai_Whisper_Large_V3_Turbo_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input>
+    for Ai_Cf_Openai_Whisper_Large_V3_Turbo_InputBuilder
+{
+    fn from(inner: Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -24190,6 +26343,13 @@ impl Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output>
+    for Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputBuilder
+{
+    fn from(inner: Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -24334,6 +26494,13 @@ impl Ai_Cf_Baai_Bge_M3_Input_QueryAnd_ContextsBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts>
+    for Ai_Cf_Baai_Bge_M3_Input_QueryAnd_ContextsBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -24393,6 +26560,11 @@ impl Ai_Cf_Baai_Bge_M3_Input_EmbeddingBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_M3_Input_Embedding {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_M3_Input_Embedding> for Ai_Cf_Baai_Bge_M3_Input_EmbeddingBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Input_Embedding) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -24460,6 +26632,13 @@ impl Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1Builder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1>
+    for Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1Builder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -24519,6 +26698,11 @@ impl Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_M3_Input_Embedding_1 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_M3_Input_Embedding_1> for Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder {
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Input_Embedding_1) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -24629,6 +26813,11 @@ impl Ai_Cf_Baai_Bge_M3_Ouput_QueryBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_M3_Ouput_Query> for Ai_Cf_Baai_Bge_M3_Ouput_QueryBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Ouput_Query) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -24696,6 +26885,13 @@ impl Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_ContextsBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts>
+    for Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_ContextsBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -24759,6 +26955,11 @@ impl Ai_Cf_Baai_Bge_M3_Ouput_EmbeddingBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_M3_Ouput_Embedding> for Ai_Cf_Baai_Bge_M3_Ouput_EmbeddingBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Ouput_Embedding) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -24801,6 +27002,11 @@ impl Ai_Cf_Baai_Bge_M3_AsyncResponseBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_M3_AsyncResponse {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_M3_AsyncResponse> for Ai_Cf_Baai_Bge_M3_AsyncResponseBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_M3_AsyncResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -24871,6 +27077,13 @@ impl Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input>
+    for Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_InputBuilder
+{
+    fn from(inner: Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -24915,6 +27128,13 @@ impl Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output>
+    for Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_OutputBuilder
+{
+    fn from(inner: Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -25175,6 +27395,13 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt>
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_PromptBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -25355,6 +27582,13 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages>
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -25416,6 +27650,13 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output>
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -25704,6 +27945,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_PromptBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -25755,6 +28003,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -25945,6 +28200,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -25998,6 +28260,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1Builder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1Builder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -26041,6 +28310,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_BatchBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_BatchBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -26094,6 +28370,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2Builder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2Builder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -26251,6 +28534,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponseBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponseBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -26346,6 +28636,11 @@ impl Ai_Cf_Meta_Llama_Guard_3_8B_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_Guard_3_8B_Input> for Ai_Cf_Meta_Llama_Guard_3_8B_InputBuilder {
+    fn from(inner: Ai_Cf_Meta_Llama_Guard_3_8B_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -26413,6 +28708,11 @@ impl Ai_Cf_Meta_Llama_Guard_3_8B_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_Guard_3_8B_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_Guard_3_8B_Output> for Ai_Cf_Meta_Llama_Guard_3_8B_OutputBuilder {
+    fn from(inner: Ai_Cf_Meta_Llama_Guard_3_8B_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -26487,6 +28787,11 @@ impl Ai_Cf_Baai_Bge_Reranker_Base_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_Reranker_Base_Input> for Ai_Cf_Baai_Bge_Reranker_Base_InputBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_Reranker_Base_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -26527,6 +28832,11 @@ impl Ai_Cf_Baai_Bge_Reranker_Base_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_Reranker_Base_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_Reranker_Base_Output> for Ai_Cf_Baai_Bge_Reranker_Base_OutputBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_Reranker_Base_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -26767,6 +29077,13 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt>
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_PromptBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -26815,6 +29132,13 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_ModeBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode>
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_ModeBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -26987,6 +29311,13 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_MessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages>
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_MessagesBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -27035,6 +29366,13 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1Builder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1>
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1Builder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -27105,6 +29443,13 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output>
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -27298,6 +29643,11 @@ impl Ai_Cf_Qwen_Qwq_32B_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwq_32B_Prompt> for Ai_Cf_Qwen_Qwq_32B_PromptBuilder {
+    fn from(inner: Ai_Cf_Qwen_Qwq_32B_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -27456,6 +29806,11 @@ impl Ai_Cf_Qwen_Qwq_32B_MessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwq_32B_Messages> for Ai_Cf_Qwen_Qwq_32B_MessagesBuilder {
+    fn from(inner: Ai_Cf_Qwen_Qwq_32B_Messages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -27513,6 +29868,11 @@ impl Ai_Cf_Qwen_Qwq_32B_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwq_32B_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwq_32B_Output> for Ai_Cf_Qwen_Qwq_32B_OutputBuilder {
+    fn from(inner: Ai_Cf_Qwen_Qwq_32B_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -27762,6 +30122,13 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt>
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_PromptBuilder
+{
+    fn from(inner: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -27959,6 +30326,13 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages>
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesBuilder
+{
+    fn from(inner: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -28032,6 +30406,13 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output>
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputBuilder
+{
+    fn from(inner: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -28239,6 +30620,11 @@ impl Ai_Cf_Google_Gemma_3_12B_It_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Google_Gemma_3_12B_It_Prompt> for Ai_Cf_Google_Gemma_3_12B_It_PromptBuilder {
+    fn from(inner: Ai_Cf_Google_Gemma_3_12B_It_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -28401,6 +30787,11 @@ impl Ai_Cf_Google_Gemma_3_12B_It_MessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Google_Gemma_3_12B_It_Messages> for Ai_Cf_Google_Gemma_3_12B_It_MessagesBuilder {
+    fn from(inner: Ai_Cf_Google_Gemma_3_12B_It_Messages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -28467,6 +30858,11 @@ impl Ai_Cf_Google_Gemma_3_12B_It_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Google_Gemma_3_12B_It_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Google_Gemma_3_12B_It_Output> for Ai_Cf_Google_Gemma_3_12B_It_OutputBuilder {
+    fn from(inner: Ai_Cf_Google_Gemma_3_12B_It_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -28743,6 +31139,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_PromptBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -28794,6 +31197,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_ModeBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_ModeBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -28991,6 +31401,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -29194,6 +31611,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_InnerBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_Inner {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_Inner>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_InnerBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_Inner) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -29412,6 +31836,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -29483,6 +31914,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -29726,6 +32164,11 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt> for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_PromptBuilder {
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -29774,6 +32217,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_ModeBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_ModeBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -29942,6 +32392,11 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages> for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesBuilder {
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -29990,6 +32445,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1Builder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1Builder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -30168,6 +32630,11 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1Builder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1> for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1Builder {
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -30216,6 +32683,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2Builder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2Builder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -30384,6 +32858,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1Builder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1Builder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -30432,6 +32913,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3Builder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3Builder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -30686,6 +33174,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -30806,6 +33301,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -30850,6 +33352,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponseBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponseBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -31266,6 +33775,11 @@ impl Ai_Cf_Deepgram_Nova_3_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Deepgram_Nova_3_Input> for Ai_Cf_Deepgram_Nova_3_InputBuilder {
+    fn from(inner: Ai_Cf_Deepgram_Nova_3_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -31306,6 +33820,11 @@ impl Ai_Cf_Deepgram_Nova_3_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Deepgram_Nova_3_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Deepgram_Nova_3_Output> for Ai_Cf_Deepgram_Nova_3_OutputBuilder {
+    fn from(inner: Ai_Cf_Deepgram_Nova_3_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -31431,6 +33950,11 @@ impl Ai_Cf_Qwen_Qwen3_Embedding_0_6B_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input> for Ai_Cf_Qwen_Qwen3_Embedding_0_6B_InputBuilder {
+    fn from(inner: Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -31477,6 +34001,13 @@ impl Ai_Cf_Qwen_Qwen3_Embedding_0_6B_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output>
+    for Ai_Cf_Qwen_Qwen3_Embedding_0_6B_OutputBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -31578,6 +34109,11 @@ impl Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input> for Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder {
+    fn from(inner: Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -31623,6 +34159,11 @@ impl Ai_Cf_Pipecat_Ai_Smart_Turn_V2_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Output> for Ai_Cf_Pipecat_Ai_Smart_Turn_V2_OutputBuilder {
+    fn from(inner: Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -31776,6 +34317,11 @@ impl Ai_Cf_Leonardo_Phoenix_1_0_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Leonardo_Phoenix_1_0_Input> for Ai_Cf_Leonardo_Phoenix_1_0_InputBuilder {
+    fn from(inner: Ai_Cf_Leonardo_Phoenix_1_0_Input) -> Self {
+        Self { inner }
+    }
+}
 #[allow(dead_code)]
 pub type Ai_Cf_Leonardo_Phoenix_1_0_Output = JsString;
 #[wasm_bindgen(experimental_generic_mono)]
@@ -31894,6 +34440,11 @@ impl Ai_Cf_Leonardo_Lucid_Origin_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Leonardo_Lucid_Origin_Input> for Ai_Cf_Leonardo_Lucid_Origin_InputBuilder {
+    fn from(inner: Ai_Cf_Leonardo_Lucid_Origin_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -31936,6 +34487,11 @@ impl Ai_Cf_Leonardo_Lucid_Origin_OutputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Leonardo_Lucid_Origin_Output {
         self.inner
+    }
+}
+impl From<Ai_Cf_Leonardo_Lucid_Origin_Output> for Ai_Cf_Leonardo_Lucid_Origin_OutputBuilder {
+    fn from(inner: Ai_Cf_Leonardo_Lucid_Origin_Output) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -32038,6 +34594,11 @@ impl Ai_Cf_Deepgram_Aura_1_InputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Deepgram_Aura_1_Input {
         self.inner
+    }
+}
+impl From<Ai_Cf_Deepgram_Aura_1_Input> for Ai_Cf_Deepgram_Aura_1_InputBuilder {
+    fn from(inner: Ai_Cf_Deepgram_Aura_1_Input) -> Self {
+        Self { inner }
     }
 }
 #[allow(dead_code)]
@@ -32434,6 +34995,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_PromptBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_PromptBuilder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -32485,6 +35053,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_ModeBuilder {
     }
     pub fn build(self) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode {
         self.inner
+    }
+}
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_ModeBuilder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -32675,6 +35250,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesBuilder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -32726,6 +35308,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1Builder {
     }
     pub fn build(self) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1Builder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -32930,6 +35519,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1Builder {
         self.inner
     }
 }
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1Builder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -32981,6 +35577,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2Builder {
     }
     pub fn build(self) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2Builder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -33173,6 +35776,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1Builder {
         self.inner
     }
 }
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1Builder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -33224,6 +35834,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3Builder {
     }
     pub fn build(self) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3 {
         self.inner
+    }
+}
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3Builder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3) -> Self {
+        Self { inner }
     }
 }
 #[diagnostic::on_unimplemented(
@@ -33520,6 +36137,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseBuilder 
         self.inner
     }
 }
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseBuilder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -33654,6 +36278,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseBuilder 
         self.inner
     }
 }
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseBuilder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -33700,6 +36331,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponseBuilder {
     }
     pub fn build(self) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse {
         self.inner
+    }
+}
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponseBuilder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -33966,6 +36604,11 @@ impl Ai_Cf_Deepgram_Flux_InputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Deepgram_Flux_Input> for Ai_Cf_Deepgram_Flux_InputBuilder {
+    fn from(inner: Ai_Cf_Deepgram_Flux_Input) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -34089,6 +36732,11 @@ impl Ai_Cf_Deepgram_Flux_OutputBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Deepgram_Flux_Output> for Ai_Cf_Deepgram_Flux_OutputBuilder {
+    fn from(inner: Ai_Cf_Deepgram_Flux_Output) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -34197,6 +36845,11 @@ impl Ai_Cf_Deepgram_Aura_2_En_InputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Deepgram_Aura_2_En_Input {
         self.inner
+    }
+}
+impl From<Ai_Cf_Deepgram_Aura_2_En_Input> for Ai_Cf_Deepgram_Aura_2_En_InputBuilder {
+    fn from(inner: Ai_Cf_Deepgram_Aura_2_En_Input) -> Self {
+        Self { inner }
     }
 }
 #[allow(dead_code)]
@@ -34311,6 +36964,11 @@ impl Ai_Cf_Deepgram_Aura_2_Es_InputBuilder {
     }
     pub fn build(self) -> Ai_Cf_Deepgram_Aura_2_Es_Input {
         self.inner
+    }
+}
+impl From<Ai_Cf_Deepgram_Aura_2_Es_Input> for Ai_Cf_Deepgram_Aura_2_Es_InputBuilder {
+    fn from(inner: Ai_Cf_Deepgram_Aura_2_Es_Input) -> Self {
+        Self { inner }
     }
 }
 #[allow(dead_code)]
@@ -35079,6 +37737,11 @@ impl AiOptionsBuilder {
         self.inner
     }
 }
+impl From<AiOptions> for AiOptionsBuilder {
+    fn from(inner: AiOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -35168,6 +37831,11 @@ impl AiModelsSearchParamsBuilder {
     }
     pub fn build(self) -> AiModelsSearchParams {
         self.inner
+    }
+}
+impl From<AiModelsSearchParams> for AiModelsSearchParamsBuilder {
+    fn from(inner: AiModelsSearchParams) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -35400,23 +38068,23 @@ extern "C" {
         options: &ConversionRequestOptions,
     ) -> Promise<Array<ConversionResponse>>;
     #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
-    pub async fn to_markdown_with_markdown_document<AiModelList>(
+    pub async fn to_markdown_with_files<AiModelList>(
         this: &Ai<AiModelList>,
         files: &MarkdownDocument,
     ) -> Result<ConversionResponse, JsValue>;
     #[wasm_bindgen(method, js_name = "toMarkdown")]
-    pub fn to_markdown_with_markdown_document_promise<AiModelList>(
+    pub fn to_markdown_with_files_promise<AiModelList>(
         this: &Ai<AiModelList>,
         files: &MarkdownDocument,
     ) -> Promise<ConversionResponse>;
     #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
-    pub async fn to_markdown_with_markdown_document_and_options<AiModelList>(
+    pub async fn to_markdown_with_files_and_options<AiModelList>(
         this: &Ai<AiModelList>,
         files: &MarkdownDocument,
         options: &ConversionRequestOptions,
     ) -> Result<ConversionResponse, JsValue>;
     #[wasm_bindgen(method, js_name = "toMarkdown")]
-    pub fn to_markdown_with_markdown_document_and_options_promise<AiModelList>(
+    pub fn to_markdown_with_files_and_options_promise<AiModelList>(
         this: &Ai<AiModelList>,
         files: &MarkdownDocument,
         options: &ConversionRequestOptions,
@@ -35478,6 +38146,11 @@ impl GatewayRetriesBuilder {
     }
     pub fn build(self) -> GatewayRetries {
         self.inner
+    }
+}
+impl From<GatewayRetries> for GatewayRetriesBuilder {
+    fn from(inner: GatewayRetries) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -35576,6 +38249,11 @@ impl GatewayOptionsBuilder {
     }
     pub fn build(self) -> GatewayOptions {
         self.inner
+    }
+}
+impl From<GatewayOptions> for GatewayOptionsBuilder {
+    fn from(inner: GatewayOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -35687,6 +38365,11 @@ impl UniversalGatewayOptionsBuilder {
         self.inner
     }
 }
+impl From<UniversalGatewayOptions> for UniversalGatewayOptionsBuilder {
+    fn from(inner: UniversalGatewayOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -35767,6 +38450,11 @@ impl AiGatewayPatchLogBuilder {
     }
     pub fn build(self) -> AiGatewayPatchLog {
         self.inner
+    }
+}
+impl From<AiGatewayPatchLog> for AiGatewayPatchLogBuilder {
+    fn from(inner: AiGatewayPatchLog) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -36014,6 +38702,11 @@ impl AiGatewayLogBuilder {
     }
     pub fn build(self) -> AiGatewayLog {
         self.inner
+    }
+}
+impl From<AiGatewayLog> for AiGatewayLogBuilder {
+    fn from(inner: AiGatewayLog) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]
@@ -36408,6 +39101,11 @@ impl AiGatewayOptionsBuilder {
         self.inner
     }
 }
+impl From<AiGatewayOptions> for AiGatewayOptionsBuilder {
+    fn from(inner: AiGatewayOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Error , extends = Object , is_type_of = JsValue :: is_object)]
@@ -36782,6 +39480,11 @@ impl ComparisonFilterBuilder {
         self.inner
     }
 }
+impl From<ComparisonFilter> for ComparisonFilterBuilder {
+    fn from(inner: ComparisonFilter) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -36830,6 +39533,11 @@ impl CompoundFilterBuilder {
     }
     pub fn build(self) -> CompoundFilter {
         self.inner
+    }
+}
+impl From<CompoundFilter> for CompoundFilterBuilder {
+    fn from(inner: CompoundFilter) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -36913,6 +39621,11 @@ impl AutoRagSearchRequestBuilder {
         self.inner
     }
 }
+impl From<AutoRagSearchRequest> for AutoRagSearchRequestBuilder {
+    fn from(inner: AutoRagSearchRequest) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = AutoRagSearchRequest , extends = Object , is_type_of = JsValue :: is_object)]
@@ -36977,6 +39690,11 @@ impl AutoRagAiSearchRequestBuilder {
     }
     pub fn build(self) -> AutoRagAiSearchRequest {
         self.inner
+    }
+}
+impl From<AutoRagAiSearchRequest> for AutoRagAiSearchRequestBuilder {
+    fn from(inner: AutoRagAiSearchRequest) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -37091,6 +39809,11 @@ impl AutoRagAiSearchRequestStreamingBuilder {
     }
     pub fn build(self) -> AutoRagAiSearchRequestStreaming {
         self.inner
+    }
+}
+impl From<AutoRagAiSearchRequestStreaming> for AutoRagAiSearchRequestStreamingBuilder {
+    fn from(inner: AutoRagAiSearchRequestStreaming) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -37424,6 +40147,11 @@ impl BasicImageTransformationsBuilder {
         self.inner
     }
 }
+impl From<BasicImageTransformations> for BasicImageTransformationsBuilder {
+    fn from(inner: BasicImageTransformations) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -37480,6 +40208,13 @@ impl BasicImageTransformationsGravityCoordinatesBuilder {
     }
     pub fn build(self) -> BasicImageTransformationsGravityCoordinates {
         self.inner
+    }
+}
+impl From<BasicImageTransformationsGravityCoordinates>
+    for BasicImageTransformationsGravityCoordinatesBuilder
+{
+    fn from(inner: BasicImageTransformationsGravityCoordinates) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -37676,6 +40411,11 @@ impl RequestInitCfPropertiesBuilder {
         self.inner
     }
 }
+impl From<RequestInitCfProperties> for RequestInitCfPropertiesBuilder {
+    fn from(inner: RequestInitCfProperties) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = BasicImageTransformations , extends = Object , is_type_of = JsValue :: is_object)]
@@ -37830,6 +40570,11 @@ impl RequestInitCfPropertiesImageDrawBuilder {
     }
     pub fn build(self) -> RequestInitCfPropertiesImageDraw {
         self.inner
+    }
+}
+impl From<RequestInitCfPropertiesImageDraw> for RequestInitCfPropertiesImageDrawBuilder {
+    fn from(inner: RequestInitCfPropertiesImageDraw) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -38180,6 +40925,11 @@ impl RequestInitCfPropertiesImageBuilder {
         self.inner
     }
 }
+impl From<RequestInitCfPropertiesImage> for RequestInitCfPropertiesImageBuilder {
+    fn from(inner: RequestInitCfPropertiesImage) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -38233,6 +40983,11 @@ impl RequestInitCfPropertiesImageMinifyBuilder {
         self.inner
     }
 }
+impl From<RequestInitCfPropertiesImageMinify> for RequestInitCfPropertiesImageMinifyBuilder {
+    fn from(inner: RequestInitCfPropertiesImageMinify) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -38269,6 +41024,11 @@ impl RequestInitCfPropertiesR2Builder {
     }
     pub fn build(self) -> RequestInitCfPropertiesR2 {
         self.inner
+    }
+}
+impl From<RequestInitCfPropertiesR2> for RequestInitCfPropertiesR2Builder {
+    fn from(inner: RequestInitCfPropertiesR2) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -38602,7 +41362,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
-    pub fn new_0(
+    pub fn new_0_typed(
         colo: impl ::wasm_bindgen::JsStringLike,
         http_protocol: impl ::wasm_bindgen::JsStringLike,
         request_priority: impl ::wasm_bindgen::JsStringLike,
@@ -38612,7 +41372,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
     ) -> IncomingRequestCfProperties<HostMetadata> {
-        Self::builder_0(
+        Self::builder_0_typed(
             colo,
             http_protocol,
             request_priority,
@@ -38675,7 +41435,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
-    pub fn new_0_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+    pub fn new_0_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
         colo: impl ::wasm_bindgen::JsStringLike,
         http_protocol: impl ::wasm_bindgen::JsStringLike,
         request_priority: impl ::wasm_bindgen::JsStringLike,
@@ -38685,7 +41445,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
     ) -> IncomingRequestCfProperties<HostMetadata> {
-        Self::builder_0_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+        Self::builder_0_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
             colo,
             http_protocol,
             request_priority,
@@ -38748,7 +41508,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
-    pub fn new_1(
+    pub fn new_1_typed(
         colo: impl ::wasm_bindgen::JsStringLike,
         http_protocol: impl ::wasm_bindgen::JsStringLike,
         request_priority: impl ::wasm_bindgen::JsStringLike,
@@ -38758,7 +41518,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
     ) -> IncomingRequestCfProperties<HostMetadata> {
-        Self::builder_1(
+        Self::builder_1_typed(
             colo,
             http_protocol,
             request_priority,
@@ -38821,7 +41581,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
-    pub fn new_1_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+    pub fn new_1_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
         colo: impl ::wasm_bindgen::JsStringLike,
         http_protocol: impl ::wasm_bindgen::JsStringLike,
         request_priority: impl ::wasm_bindgen::JsStringLike,
@@ -38831,7 +41591,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
     ) -> IncomingRequestCfProperties<HostMetadata> {
-        Self::builder_1_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+        Self::builder_1_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
             colo,
             http_protocol,
             request_priority,
@@ -38894,7 +41654,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
-    pub fn new_2(
+    pub fn new_2_typed(
         colo: impl ::wasm_bindgen::JsStringLike,
         http_protocol: impl ::wasm_bindgen::JsStringLike,
         request_priority: impl ::wasm_bindgen::JsStringLike,
@@ -38904,7 +41664,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
     ) -> IncomingRequestCfProperties<HostMetadata> {
-        Self::builder_2(
+        Self::builder_2_typed(
             colo,
             http_protocol,
             request_priority,
@@ -38967,7 +41727,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
-    pub fn new_2_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+    pub fn new_2_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
         colo: impl ::wasm_bindgen::JsStringLike,
         http_protocol: impl ::wasm_bindgen::JsStringLike,
         request_priority: impl ::wasm_bindgen::JsStringLike,
@@ -38977,7 +41737,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
     ) -> IncomingRequestCfProperties<HostMetadata> {
-        Self::builder_2_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+        Self::builder_2_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
             colo,
             http_protocol,
             request_priority,
@@ -39040,7 +41800,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
-    pub fn new_3(
+    pub fn new_3_typed(
         colo: impl ::wasm_bindgen::JsStringLike,
         http_protocol: impl ::wasm_bindgen::JsStringLike,
         request_priority: impl ::wasm_bindgen::JsStringLike,
@@ -39050,7 +41810,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
     ) -> IncomingRequestCfProperties<HostMetadata> {
-        Self::builder_3(
+        Self::builder_3_typed(
             colo,
             http_protocol,
             request_priority,
@@ -39113,7 +41873,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
-    pub fn new_3_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+    pub fn new_3_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
         colo: impl ::wasm_bindgen::JsStringLike,
         http_protocol: impl ::wasm_bindgen::JsStringLike,
         request_priority: impl ::wasm_bindgen::JsStringLike,
@@ -39123,7 +41883,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
     ) -> IncomingRequestCfProperties<HostMetadata> {
-        Self::builder_3_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+        Self::builder_3_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
             colo,
             http_protocol,
             request_priority,
@@ -39186,7 +41946,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
-    pub fn new_4(
+    pub fn new_4_typed(
         colo: impl ::wasm_bindgen::JsStringLike,
         http_protocol: impl ::wasm_bindgen::JsStringLike,
         request_priority: impl ::wasm_bindgen::JsStringLike,
@@ -39196,7 +41956,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
     ) -> IncomingRequestCfProperties<HostMetadata> {
-        Self::builder_4(
+        Self::builder_4_typed(
             colo,
             http_protocol,
             request_priority,
@@ -39259,7 +42019,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
-    pub fn new_4_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+    pub fn new_4_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
         colo: impl ::wasm_bindgen::JsStringLike,
         http_protocol: impl ::wasm_bindgen::JsStringLike,
         request_priority: impl ::wasm_bindgen::JsStringLike,
@@ -39269,7 +42029,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
     ) -> IncomingRequestCfProperties<HostMetadata> {
-        Self::builder_4_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+        Self::builder_4_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
             colo,
             http_protocol,
             request_priority,
@@ -39332,7 +42092,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
-    pub fn new_5(
+    pub fn new_5_typed(
         colo: impl ::wasm_bindgen::JsStringLike,
         http_protocol: impl ::wasm_bindgen::JsStringLike,
         request_priority: impl ::wasm_bindgen::JsStringLike,
@@ -39342,7 +42102,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
     ) -> IncomingRequestCfProperties<HostMetadata> {
-        Self::builder_5(
+        Self::builder_5_typed(
             colo,
             http_protocol,
             request_priority,
@@ -39405,7 +42165,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
     #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
-    pub fn new_5_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+    pub fn new_5_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
         colo: impl ::wasm_bindgen::JsStringLike,
         http_protocol: impl ::wasm_bindgen::JsStringLike,
         request_priority: impl ::wasm_bindgen::JsStringLike,
@@ -39415,7 +42175,7 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
     ) -> IncomingRequestCfProperties<HostMetadata> {
-        Self::builder_5_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+        Self::builder_5_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
             colo,
             http_protocol,
             request_priority,
@@ -39426,6 +42186,980 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
             tls_client_auth,
         )
         .build()
+    }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 0`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 0` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn builder_0_typed(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
+    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
+        let inner: IncomingRequestCfProperties<HostMetadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N0);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        inner.set_client_trust_score(client_trust_score);
+        inner.set_bot_management(bot_management);
+        inner.set_tls_client_auth(tls_client_auth);
+        IncomingRequestCfPropertiesBuilder { inner }
+    }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 0`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 0` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn builder_0_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
+    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
+        let inner: IncomingRequestCfProperties<HostMetadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N0);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        inner.set_client_trust_score(client_trust_score);
+        inner.set_bot_management(bot_management);
+        inner.set_tls_client_auth_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+            tls_client_auth,
+        );
+        IncomingRequestCfPropertiesBuilder { inner }
+    }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 1`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 1` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn builder_1_typed(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
+    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
+        let inner: IncomingRequestCfProperties<HostMetadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N1);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        inner.set_client_trust_score(client_trust_score);
+        inner.set_bot_management(bot_management);
+        inner.set_tls_client_auth(tls_client_auth);
+        IncomingRequestCfPropertiesBuilder { inner }
+    }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 1`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 1` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn builder_1_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
+    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
+        let inner: IncomingRequestCfProperties<HostMetadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N1);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        inner.set_client_trust_score(client_trust_score);
+        inner.set_bot_management(bot_management);
+        inner.set_tls_client_auth_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+            tls_client_auth,
+        );
+        IncomingRequestCfPropertiesBuilder { inner }
+    }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 2`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 2` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn builder_2_typed(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
+    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
+        let inner: IncomingRequestCfProperties<HostMetadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N2);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        inner.set_client_trust_score(client_trust_score);
+        inner.set_bot_management(bot_management);
+        inner.set_tls_client_auth(tls_client_auth);
+        IncomingRequestCfPropertiesBuilder { inner }
+    }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 2`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 2` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn builder_2_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
+    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
+        let inner: IncomingRequestCfProperties<HostMetadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N2);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        inner.set_client_trust_score(client_trust_score);
+        inner.set_bot_management(bot_management);
+        inner.set_tls_client_auth_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+            tls_client_auth,
+        );
+        IncomingRequestCfPropertiesBuilder { inner }
+    }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 3`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 3` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn builder_3_typed(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
+    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
+        let inner: IncomingRequestCfProperties<HostMetadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N3);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        inner.set_client_trust_score(client_trust_score);
+        inner.set_bot_management(bot_management);
+        inner.set_tls_client_auth(tls_client_auth);
+        IncomingRequestCfPropertiesBuilder { inner }
+    }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 3`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 3` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn builder_3_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
+    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
+        let inner: IncomingRequestCfProperties<HostMetadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N3);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        inner.set_client_trust_score(client_trust_score);
+        inner.set_bot_management(bot_management);
+        inner.set_tls_client_auth_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+            tls_client_auth,
+        );
+        IncomingRequestCfPropertiesBuilder { inner }
+    }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 4`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 4` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn builder_4_typed(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
+    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
+        let inner: IncomingRequestCfProperties<HostMetadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N4);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        inner.set_client_trust_score(client_trust_score);
+        inner.set_bot_management(bot_management);
+        inner.set_tls_client_auth(tls_client_auth);
+        IncomingRequestCfPropertiesBuilder { inner }
+    }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 4`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 4` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn builder_4_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
+    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
+        let inner: IncomingRequestCfProperties<HostMetadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N4);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        inner.set_client_trust_score(client_trust_score);
+        inner.set_bot_management(bot_management);
+        inner.set_tls_client_auth_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+            tls_client_auth,
+        );
+        IncomingRequestCfPropertiesBuilder { inner }
+    }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 5`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 5` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn builder_5_typed(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
+    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
+        let inner: IncomingRequestCfProperties<HostMetadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N5);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        inner.set_client_trust_score(client_trust_score);
+        inner.set_bot_management(bot_management);
+        inner.set_tls_client_auth(tls_client_auth);
+        IncomingRequestCfPropertiesBuilder { inner }
+    }
+    #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 5`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 5` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn builder_5_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
+    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
+        let inner: IncomingRequestCfProperties<HostMetadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N5);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        inner.set_client_trust_score(client_trust_score);
+        inner.set_bot_management(bot_management);
+        inner.set_tls_client_auth_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+            tls_client_auth,
+        );
+        IncomingRequestCfPropertiesBuilder { inner }
+    }
+}
+impl IncomingRequestCfProperties<JsValue> {
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 0`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 0` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn new_0(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
+    ) -> Self {
+        Self::new_0_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
     }
     #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 0`."]
     #[doc = ""]
@@ -39487,19 +43221,89 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         client_trust_score: f64,
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
-    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
-        let inner: IncomingRequestCfProperties<HostMetadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N0);
-        inner.set_http_protocol(http_protocol);
-        inner.set_request_priority(request_priority);
-        inner.set_tls_version(tls_version);
-        inner.set_tls_cipher(tls_cipher);
-        inner.set_client_trust_score(client_trust_score);
-        inner.set_bot_management(bot_management);
-        inner.set_tls_client_auth(tls_client_auth);
-        IncomingRequestCfPropertiesBuilder { inner }
+    ) -> IncomingRequestCfPropertiesBuilder<JsValue> {
+        Self::builder_0_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
+    }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 0`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 0` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn new_0_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
+    ) -> Self {
+        Self::new_0_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
     }
     #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 0`."]
     #[doc = ""]
@@ -39561,21 +43365,89 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         client_trust_score: f64,
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
-    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
-        let inner: IncomingRequestCfProperties<HostMetadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N0);
-        inner.set_http_protocol(http_protocol);
-        inner.set_request_priority(request_priority);
-        inner.set_tls_version(tls_version);
-        inner.set_tls_cipher(tls_cipher);
-        inner.set_client_trust_score(client_trust_score);
-        inner.set_bot_management(bot_management);
-        inner.set_tls_client_auth_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+    ) -> IncomingRequestCfPropertiesBuilder<JsValue> {
+        Self::builder_0_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
             tls_client_auth,
-        );
-        IncomingRequestCfPropertiesBuilder { inner }
+        )
+    }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 1`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 1` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn new_1(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
+    ) -> Self {
+        Self::new_1_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
     }
     #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 1`."]
     #[doc = ""]
@@ -39637,19 +43509,89 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         client_trust_score: f64,
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
-    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
-        let inner: IncomingRequestCfProperties<HostMetadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N1);
-        inner.set_http_protocol(http_protocol);
-        inner.set_request_priority(request_priority);
-        inner.set_tls_version(tls_version);
-        inner.set_tls_cipher(tls_cipher);
-        inner.set_client_trust_score(client_trust_score);
-        inner.set_bot_management(bot_management);
-        inner.set_tls_client_auth(tls_client_auth);
-        IncomingRequestCfPropertiesBuilder { inner }
+    ) -> IncomingRequestCfPropertiesBuilder<JsValue> {
+        Self::builder_1_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
+    }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 1`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 1` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn new_1_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
+    ) -> Self {
+        Self::new_1_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
     }
     #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 1`."]
     #[doc = ""]
@@ -39711,21 +43653,89 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         client_trust_score: f64,
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
-    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
-        let inner: IncomingRequestCfProperties<HostMetadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N1);
-        inner.set_http_protocol(http_protocol);
-        inner.set_request_priority(request_priority);
-        inner.set_tls_version(tls_version);
-        inner.set_tls_cipher(tls_cipher);
-        inner.set_client_trust_score(client_trust_score);
-        inner.set_bot_management(bot_management);
-        inner.set_tls_client_auth_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+    ) -> IncomingRequestCfPropertiesBuilder<JsValue> {
+        Self::builder_1_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
             tls_client_auth,
-        );
-        IncomingRequestCfPropertiesBuilder { inner }
+        )
+    }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 2`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 2` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn new_2(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
+    ) -> Self {
+        Self::new_2_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
     }
     #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 2`."]
     #[doc = ""]
@@ -39787,19 +43797,89 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         client_trust_score: f64,
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
-    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
-        let inner: IncomingRequestCfProperties<HostMetadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N2);
-        inner.set_http_protocol(http_protocol);
-        inner.set_request_priority(request_priority);
-        inner.set_tls_version(tls_version);
-        inner.set_tls_cipher(tls_cipher);
-        inner.set_client_trust_score(client_trust_score);
-        inner.set_bot_management(bot_management);
-        inner.set_tls_client_auth(tls_client_auth);
-        IncomingRequestCfPropertiesBuilder { inner }
+    ) -> IncomingRequestCfPropertiesBuilder<JsValue> {
+        Self::builder_2_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
+    }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 2`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 2` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn new_2_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
+    ) -> Self {
+        Self::new_2_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
     }
     #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 2`."]
     #[doc = ""]
@@ -39861,21 +43941,89 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         client_trust_score: f64,
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
-    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
-        let inner: IncomingRequestCfProperties<HostMetadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N2);
-        inner.set_http_protocol(http_protocol);
-        inner.set_request_priority(request_priority);
-        inner.set_tls_version(tls_version);
-        inner.set_tls_cipher(tls_cipher);
-        inner.set_client_trust_score(client_trust_score);
-        inner.set_bot_management(bot_management);
-        inner.set_tls_client_auth_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+    ) -> IncomingRequestCfPropertiesBuilder<JsValue> {
+        Self::builder_2_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
             tls_client_auth,
-        );
-        IncomingRequestCfPropertiesBuilder { inner }
+        )
+    }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 3`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 3` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn new_3(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
+    ) -> Self {
+        Self::new_3_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
     }
     #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 3`."]
     #[doc = ""]
@@ -39937,19 +44085,89 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         client_trust_score: f64,
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
-    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
-        let inner: IncomingRequestCfProperties<HostMetadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N3);
-        inner.set_http_protocol(http_protocol);
-        inner.set_request_priority(request_priority);
-        inner.set_tls_version(tls_version);
-        inner.set_tls_cipher(tls_cipher);
-        inner.set_client_trust_score(client_trust_score);
-        inner.set_bot_management(bot_management);
-        inner.set_tls_client_auth(tls_client_auth);
-        IncomingRequestCfPropertiesBuilder { inner }
+    ) -> IncomingRequestCfPropertiesBuilder<JsValue> {
+        Self::builder_3_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
+    }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 3`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 3` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn new_3_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
+    ) -> Self {
+        Self::new_3_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
     }
     #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 3`."]
     #[doc = ""]
@@ -40011,21 +44229,89 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         client_trust_score: f64,
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
-    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
-        let inner: IncomingRequestCfProperties<HostMetadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N3);
-        inner.set_http_protocol(http_protocol);
-        inner.set_request_priority(request_priority);
-        inner.set_tls_version(tls_version);
-        inner.set_tls_cipher(tls_cipher);
-        inner.set_client_trust_score(client_trust_score);
-        inner.set_bot_management(bot_management);
-        inner.set_tls_client_auth_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+    ) -> IncomingRequestCfPropertiesBuilder<JsValue> {
+        Self::builder_3_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
             tls_client_auth,
-        );
-        IncomingRequestCfPropertiesBuilder { inner }
+        )
+    }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 4`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 4` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn new_4(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
+    ) -> Self {
+        Self::new_4_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
     }
     #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 4`."]
     #[doc = ""]
@@ -40087,19 +44373,89 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         client_trust_score: f64,
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
-    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
-        let inner: IncomingRequestCfProperties<HostMetadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N4);
-        inner.set_http_protocol(http_protocol);
-        inner.set_request_priority(request_priority);
-        inner.set_tls_version(tls_version);
-        inner.set_tls_cipher(tls_cipher);
-        inner.set_client_trust_score(client_trust_score);
-        inner.set_bot_management(bot_management);
-        inner.set_tls_client_auth(tls_client_auth);
-        IncomingRequestCfPropertiesBuilder { inner }
+    ) -> IncomingRequestCfPropertiesBuilder<JsValue> {
+        Self::builder_4_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
+    }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 4`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 4` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn new_4_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
+    ) -> Self {
+        Self::new_4_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
     }
     #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 4`."]
     #[doc = ""]
@@ -40161,21 +44517,89 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         client_trust_score: f64,
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
-    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
-        let inner: IncomingRequestCfProperties<HostMetadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N4);
-        inner.set_http_protocol(http_protocol);
-        inner.set_request_priority(request_priority);
-        inner.set_tls_version(tls_version);
-        inner.set_tls_cipher(tls_cipher);
-        inner.set_client_trust_score(client_trust_score);
-        inner.set_bot_management(bot_management);
-        inner.set_tls_client_auth_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+    ) -> IncomingRequestCfPropertiesBuilder<JsValue> {
+        Self::builder_4_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
             tls_client_auth,
-        );
-        IncomingRequestCfPropertiesBuilder { inner }
+        )
+    }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 5`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 5` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn new_5(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
+    ) -> Self {
+        Self::new_5_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
     }
     #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 5`."]
     #[doc = ""]
@@ -40237,19 +44661,89 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         client_trust_score: f64,
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
-    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
-        let inner: IncomingRequestCfProperties<HostMetadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N5);
-        inner.set_http_protocol(http_protocol);
-        inner.set_request_priority(request_priority);
-        inner.set_tls_version(tls_version);
-        inner.set_tls_cipher(tls_cipher);
-        inner.set_client_trust_score(client_trust_score);
-        inner.set_bot_management(bot_management);
-        inner.set_tls_client_auth(tls_client_auth);
-        IncomingRequestCfPropertiesBuilder { inner }
+    ) -> IncomingRequestCfPropertiesBuilder<JsValue> {
+        Self::builder_5_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
+    }
+    #[doc = " Construct with `edgeRequestKeepAliveStatus: 5`."]
+    #[doc = ""]
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 5` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
+    #[doc = ""]
+    #[doc = " @deprecated"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
+    #[doc = ""]
+    #[doc = " This is populated when the incoming request is served over TLS using"]
+    #[doc = " either Cloudflare Access or API Shield (mTLS)"]
+    #[doc = " and the presented SSL certificate has a valid"]
+    #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
+    #[doc = " (i.e., not `null` or `\"\"`)."]
+    #[doc = ""]
+    #[doc = " Otherwise, a set of placeholder values are used."]
+    #[doc = ""]
+    #[doc = " The property `certPresented` will be set to `\"1\"` when"]
+    #[doc = " the object is populated (i.e. the above conditions were met)."]
+    pub fn new_5_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+        colo: impl ::wasm_bindgen::JsStringLike,
+        http_protocol: impl ::wasm_bindgen::JsStringLike,
+        request_priority: impl ::wasm_bindgen::JsStringLike,
+        tls_version: impl ::wasm_bindgen::JsStringLike,
+        tls_cipher: impl ::wasm_bindgen::JsStringLike,
+        client_trust_score: f64,
+        bot_management: &JsValue,
+        tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
+    ) -> Self {
+        Self::new_5_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
+            tls_client_auth,
+        )
     }
     #[doc = " Start a builder with `edgeRequestKeepAliveStatus: 5`."]
     #[doc = ""]
@@ -40311,21 +44805,17 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> IncomingRequestCfProper
         client_trust_score: f64,
         bot_management: &JsValue,
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
-    ) -> IncomingRequestCfPropertiesBuilder<HostMetadata> {
-        let inner: IncomingRequestCfProperties<HostMetadata> =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(EdgeRequestKeepAliveStatusKind::N5);
-        inner.set_http_protocol(http_protocol);
-        inner.set_request_priority(request_priority);
-        inner.set_tls_version(tls_version);
-        inner.set_tls_cipher(tls_cipher);
-        inner.set_client_trust_score(client_trust_score);
-        inner.set_bot_management(bot_management);
-        inner.set_tls_client_auth_with_incoming_request_cf_properties_tls_client_auth_placeholder(
+    ) -> IncomingRequestCfPropertiesBuilder<JsValue> {
+        Self::builder_5_with_incoming_request_cf_properties_tls_client_auth_placeholder_typed(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+            client_trust_score,
+            bot_management,
             tls_client_auth,
-        );
-        IncomingRequestCfPropertiesBuilder { inner }
+        )
     }
 }
 pub struct IncomingRequestCfPropertiesBuilder<HostMetadata> {
@@ -40411,6 +44901,14 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi>
     }
     pub fn build(self) -> IncomingRequestCfProperties<HostMetadata> {
         self.inner
+    }
+}
+impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi>
+    From<IncomingRequestCfProperties<HostMetadata>>
+    for IncomingRequestCfPropertiesBuilder<HostMetadata>
+{
+    fn from(inner: IncomingRequestCfProperties<HostMetadata>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -41222,6 +45720,11 @@ impl IncomingRequestCfPropertiesBaseBuilder {
         self.inner
     }
 }
+impl From<IncomingRequestCfPropertiesBase> for IncomingRequestCfPropertiesBaseBuilder {
+    fn from(inner: IncomingRequestCfPropertiesBase) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -41385,21 +45888,29 @@ extern "C" {
 impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi>
     IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata>
 {
-    pub fn new() -> IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata> {
-        Self::builder().build()
+    pub fn new_typed() -> IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder<HostMetadata>
-    {
+    pub fn builder_typed(
+    ) -> IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder<HostMetadata> {
         IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder<JsValue> {
+        Self::builder_typed()
     }
 }
 impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> Default
     for IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata>
 {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder<HostMetadata> {
@@ -41414,6 +45925,14 @@ impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi>
     }
     pub fn build(self) -> IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata> {
         self.inner
+    }
+}
+impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi>
+    From<IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata>>
+    for IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder<HostMetadata>
+{
+    fn from(inner: IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -41869,6 +46388,13 @@ impl IncomingRequestCfPropertiesGeographicInformationBuilder {
     }
     pub fn build(self) -> IncomingRequestCfPropertiesGeographicInformation {
         self.inner
+    }
+}
+impl From<IncomingRequestCfPropertiesGeographicInformation>
+    for IncomingRequestCfPropertiesGeographicInformationBuilder
+{
+    fn from(inner: IncomingRequestCfPropertiesGeographicInformation) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -42501,6 +47027,13 @@ impl IncomingRequestCfPropertiesTLSClientAuthBuilder {
     }
     pub fn build(self) -> IncomingRequestCfPropertiesTLSClientAuth {
         self.inner
+    }
+}
+impl From<IncomingRequestCfPropertiesTLSClientAuth>
+    for IncomingRequestCfPropertiesTLSClientAuthBuilder
+{
+    fn from(inner: IncomingRequestCfPropertiesTLSClientAuth) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -43147,6 +47680,11 @@ impl D1MetaBuilder {
         self.inner
     }
 }
+impl From<D1Meta> for D1MetaBuilder {
+    fn from(inner: D1Meta) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -43182,6 +47720,11 @@ impl D1ResponseBuilder {
         self.inner
     }
 }
+impl From<D1Response> for D1ResponseBuilder {
+    fn from(inner: D1Response) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = D1Response , extends = Object , is_type_of = JsValue :: is_object)]
@@ -43194,9 +47737,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_results<T>(this: &D1Result<T>, #[wasm_bindgen(slice = "array")] val: &[T])
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::VectorRefIntoWasmAbi>
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::RefIntoWasmAbi>
     D1Result<T>
 {
     #[doc = " Construct with `success: true`."]
@@ -43215,11 +47758,18 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::VectorRe
 pub struct D1ResultBuilder<T> {
     inner: D1Result<T>,
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::VectorRefIntoWasmAbi>
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::RefIntoWasmAbi>
     D1ResultBuilder<T>
 {
     pub fn build(self) -> D1Result<T> {
         self.inner
+    }
+}
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::RefIntoWasmAbi>
+    From<D1Result<T>> for D1ResultBuilder<T>
+{
+    fn from(inner: D1Result<T>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -43272,6 +47822,18 @@ extern "C" {
         this: &D1Database,
         statements: &[D1PreparedStatement],
     ) -> Promise<Array<D1Result>>;
+    #[wasm_bindgen(method, catch, js_name = "batch")]
+    pub async fn batch_typed<T>(
+        this: &D1Database,
+        statements: &[D1PreparedStatement],
+    ) -> Result<Array<D1Result<T>>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "batch")]
+    pub fn batch_typed_promise<T>(
+        this: &D1Database,
+        statements: &[D1PreparedStatement],
+    ) -> Promise<Array<D1Result<T>>>;
     #[wasm_bindgen(method, catch)]
     pub async fn exec(
         this: &D1Database,
@@ -43336,6 +47898,18 @@ extern "C" {
         this: &D1DatabaseSession,
         statements: &[D1PreparedStatement],
     ) -> Promise<Array<D1Result>>;
+    #[wasm_bindgen(method, catch, js_name = "batch")]
+    pub async fn batch_typed<T>(
+        this: &D1DatabaseSession,
+        statements: &[D1PreparedStatement],
+    ) -> Result<Array<D1Result<T>>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "batch")]
+    pub fn batch_typed_promise<T>(
+        this: &D1DatabaseSession,
+        statements: &[D1PreparedStatement],
+    ) -> Promise<Array<D1Result<T>>>;
     #[doc = "          If no query has been executed yet, `null` is returned."]
     #[doc = ""]
     #[doc = " Returns: The latest session bookmark across all executed queries on the session."]
@@ -43358,14 +47932,28 @@ extern "C" {
         values: &[JsValue],
     ) -> Result<D1PreparedStatement, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn first<T>(this: &D1PreparedStatement) -> Result<Option<T>, JsValue>
+    pub async fn first(this: &D1PreparedStatement) -> Result<Option<Object>, JsValue>;
+    #[wasm_bindgen(method, js_name = "first")]
+    pub fn first_promise(this: &D1PreparedStatement) -> Promise<Option<Object>>;
+    #[wasm_bindgen(method, catch, js_name = "first")]
+    pub async fn first_with_col_name(
+        this: &D1PreparedStatement,
+        col_name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, js_name = "first")]
+    pub fn first_with_col_name_promise(
+        this: &D1PreparedStatement,
+        col_name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise;
+    #[wasm_bindgen(method, catch, js_name = "first")]
+    pub async fn first_typed<T>(this: &D1PreparedStatement) -> Result<Option<T>, JsValue>
     where
         Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
         T: 'static;
     #[wasm_bindgen(method, js_name = "first")]
-    pub fn first_promise<T>(this: &D1PreparedStatement) -> Promise<Option<T>>;
+    pub fn first_typed_promise<T>(this: &D1PreparedStatement) -> Promise<Option<T>>;
     #[wasm_bindgen(method, catch, js_name = "first")]
-    pub async fn first_with_col_name<T>(
+    pub async fn first_with_col_name_typed<T>(
         this: &D1PreparedStatement,
         col_name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<T>, JsValue>
@@ -43373,7 +47961,7 @@ extern "C" {
         Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
         T: 'static;
     #[wasm_bindgen(method, js_name = "first")]
-    pub fn first_with_col_name_promise<T>(
+    pub fn first_with_col_name_typed_promise<T>(
         this: &D1PreparedStatement,
         col_name: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<T>>;
@@ -43381,10 +47969,22 @@ extern "C" {
     pub async fn run(this: &D1PreparedStatement) -> Result<D1Result, JsValue>;
     #[wasm_bindgen(method, js_name = "run")]
     pub fn run_promise(this: &D1PreparedStatement) -> Promise<D1Result>;
+    #[wasm_bindgen(method, catch, js_name = "run")]
+    pub async fn run_typed<T>(this: &D1PreparedStatement) -> Result<D1Result<T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "run")]
+    pub fn run_typed_promise<T>(this: &D1PreparedStatement) -> Promise<D1Result<T>>;
     #[wasm_bindgen(method, catch)]
     pub async fn all(this: &D1PreparedStatement) -> Result<D1Result, JsValue>;
     #[wasm_bindgen(method, js_name = "all")]
     pub fn all_promise(this: &D1PreparedStatement) -> Promise<D1Result>;
+    #[wasm_bindgen(method, catch, js_name = "all")]
+    pub async fn all_typed<T>(this: &D1PreparedStatement) -> Result<D1Result<T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "all")]
+    pub fn all_typed_promise<T>(this: &D1PreparedStatement) -> Promise<D1Result<T>>;
     #[wasm_bindgen(method, catch)]
     pub async fn raw(this: &D1PreparedStatement) -> Result<Vec<Array>, JsValue>;
     #[wasm_bindgen(method, js_name = "raw")]
@@ -43409,6 +48009,36 @@ extern "C" {
         this: &D1PreparedStatement,
         options: &D1PreparedStatementRawOptions,
     ) -> Promise<Array<Array>>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    pub async fn raw_typed<T>(this: &D1PreparedStatement) -> Result<Array<T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "raw")]
+    pub fn raw_typed_promise<T>(this: &D1PreparedStatement) -> Promise<Array<T>>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    pub async fn raw_with_d1_prepared_statement_options_typed<T>(
+        this: &D1PreparedStatement,
+        options: &D1PreparedStatementOptions,
+    ) -> Result<ArrayTuple<(Array<JsString>, Array<T>)>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "raw")]
+    pub fn raw_with_d1_prepared_statement_options_typed_promise<T>(
+        this: &D1PreparedStatement,
+        options: &D1PreparedStatementOptions,
+    ) -> Promise<ArrayTuple<(Array<JsString>, Array<T>)>>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    pub async fn raw_with_d1_prepared_statement_raw_options_typed<T>(
+        this: &D1PreparedStatement,
+        options: &D1PreparedStatementRawOptions,
+    ) -> Result<Array<T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "raw")]
+    pub fn raw_with_d1_prepared_statement_raw_options_typed_promise<T>(
+        this: &D1PreparedStatement,
+        options: &D1PreparedStatementRawOptions,
+    ) -> Promise<Array<T>>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -43463,6 +48093,11 @@ impl D1PreparedStatementRawOptionsBuilder {
     }
     pub fn build(self) -> D1PreparedStatementRawOptions {
         self.inner
+    }
+}
+impl From<D1PreparedStatementRawOptions> for D1PreparedStatementRawOptionsBuilder {
+    fn from(inner: D1PreparedStatementRawOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -43616,11 +48251,10 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &EmailAttachment, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "content")]
-    pub fn set_content_with_array_buffer(this: &EmailAttachment, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "content")]
-    pub fn set_content_with_typed_array<T: ::js_sys::TypedArray>(this: &EmailAttachment, val: &T)
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_content_with_buffer(
+        this: &EmailAttachment,
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
 }
 impl EmailAttachment {
     #[doc = " Construct with `disposition: \"inline\"`."]
@@ -43639,36 +48273,18 @@ impl EmailAttachment {
         inner
     }
     #[doc = " Construct with `disposition: \"inline\"`."]
-    pub fn new_inline_with_array_buffer(
+    pub fn new_inline_with_buffer(
         content_id: impl ::wasm_bindgen::JsStringLike,
         filename: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
-        content: &ArrayBuffer,
+        content: impl ::js_sys::BufferSourceLike,
     ) -> EmailAttachment {
         let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_disposition(EmailAttachmentDisposition::Inline);
         inner.set_content_id(content_id);
         inner.set_filename(filename);
         inner.set_type(r#type);
-        inner.set_content_with_array_buffer(content);
-        inner
-    }
-    #[doc = " Construct with `disposition: \"inline\"`."]
-    pub fn new_inline_with_typed_array<T: ::js_sys::TypedArray>(
-        content_id: impl ::wasm_bindgen::JsStringLike,
-        filename: impl ::wasm_bindgen::JsStringLike,
-        r#type: impl ::wasm_bindgen::JsStringLike,
-        content: &T,
-    ) -> EmailAttachment
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(EmailAttachmentDisposition::Inline);
-        inner.set_content_id(content_id);
-        inner.set_filename(filename);
-        inner.set_type(r#type);
-        inner.set_content_with_typed_array(content);
+        inner.set_content_with_buffer(content);
         inner
     }
     #[doc = " Construct with `disposition: \"attachment\"`."]
@@ -43680,23 +48296,12 @@ impl EmailAttachment {
         Self::builder_attachment(filename, r#type, content).build()
     }
     #[doc = " Construct with `disposition: \"attachment\"`."]
-    pub fn new_attachment_with_array_buffer(
+    pub fn new_attachment_with_buffer(
         filename: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
-        content: &ArrayBuffer,
+        content: impl ::js_sys::BufferSourceLike,
     ) -> EmailAttachment {
-        Self::builder_attachment_with_array_buffer(filename, r#type, content).build()
-    }
-    #[doc = " Construct with `disposition: \"attachment\"`."]
-    pub fn new_attachment_with_typed_array<T: ::js_sys::TypedArray>(
-        filename: impl ::wasm_bindgen::JsStringLike,
-        r#type: impl ::wasm_bindgen::JsStringLike,
-        content: &T,
-    ) -> EmailAttachment
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        Self::builder_attachment_with_typed_array(filename, r#type, content).build()
+        Self::builder_attachment_with_buffer(filename, r#type, content).build()
     }
     #[doc = " Start a builder with `disposition: \"attachment\"`."]
     pub fn builder_attachment(
@@ -43712,32 +48317,16 @@ impl EmailAttachment {
         EmailAttachmentBuilder { inner }
     }
     #[doc = " Start a builder with `disposition: \"attachment\"`."]
-    pub fn builder_attachment_with_array_buffer(
+    pub fn builder_attachment_with_buffer(
         filename: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
-        content: &ArrayBuffer,
+        content: impl ::js_sys::BufferSourceLike,
     ) -> EmailAttachmentBuilder {
         let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_disposition(EmailAttachmentDisposition::Attachment);
         inner.set_filename(filename);
         inner.set_type(r#type);
-        inner.set_content_with_array_buffer(content);
-        EmailAttachmentBuilder { inner }
-    }
-    #[doc = " Start a builder with `disposition: \"attachment\"`."]
-    pub fn builder_attachment_with_typed_array<T: ::js_sys::TypedArray>(
-        filename: impl ::wasm_bindgen::JsStringLike,
-        r#type: impl ::wasm_bindgen::JsStringLike,
-        content: &T,
-    ) -> EmailAttachmentBuilder
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(EmailAttachmentDisposition::Attachment);
-        inner.set_filename(filename);
-        inner.set_type(r#type);
-        inner.set_content_with_typed_array(content);
+        inner.set_content_with_buffer(content);
         EmailAttachmentBuilder { inner }
     }
 }
@@ -43751,6 +48340,11 @@ impl EmailAttachmentBuilder {
     }
     pub fn build(self) -> EmailAttachment {
         self.inner
+    }
+}
+impl From<EmailAttachment> for EmailAttachmentBuilder {
+    fn from(inner: EmailAttachment) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -43992,6 +48586,11 @@ impl SendEmailBuilderBuilder {
         self.inner
     }
 }
+impl From<SendEmailBuilder> for SendEmailBuilderBuilder {
+    fn from(inner: SendEmailBuilder) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = ExtendableEvent , extends = Object)]
@@ -44095,6 +48694,11 @@ pub mod cloudflare {
                 self.inner
             }
         }
+        impl From<NodeStyleServerAddressReturn> for NodeStyleServerAddressReturnBuilder {
+            fn from(inner: NodeStyleServerAddressReturn) -> Self {
+                Self { inner }
+            }
+        }
         #[wasm_bindgen(module = "cloudflare:node", experimental_generic_mono)]
         extern "C" {
             #[wasm_bindgen(catch, js_name = "httpServerHandler")]
@@ -44172,7 +48776,7 @@ pub mod cloudflare {
                 metadata: &PipelineBatchMetadata,
             ) -> Result<Array<O>, JsValue>
             where
-                I: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
+                I: ::wasm_bindgen::convert::RefIntoWasmAbi,
                 O: 'static;
             #[doc = " run receives an array of PipelineRecord which can be"]
             #[doc = " transformed and returned to the pipeline"]
@@ -44188,7 +48792,7 @@ pub mod cloudflare {
                 metadata: &PipelineBatchMetadata,
             ) -> Promise<Array<O>>
             where
-                I: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+                I: ::wasm_bindgen::convert::RefIntoWasmAbi;
         }
         #[allow(dead_code)]
         pub type PipelineRecord = Object;
@@ -44241,7 +48845,7 @@ pub mod cloudflare {
                 #[wasm_bindgen(slice = "array")] records: &[T],
             ) -> Result<(), JsValue>
             where
-                T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+                T: ::wasm_bindgen::convert::RefIntoWasmAbi;
             #[doc = " The Pipeline interface represents the type of a binding to a Pipeline"]
             #[doc = ""]
             #[doc = " * `records` - The records to send to the pipeline"]
@@ -44251,7 +48855,7 @@ pub mod cloudflare {
                 #[wasm_bindgen(slice = "array")] records: &[T],
             ) -> Promise<Undefined>
             where
-                T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+                T: ::wasm_bindgen::convert::RefIntoWasmAbi;
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -44679,6 +49283,11 @@ pub mod cloudflare {
                 self.inner
             }
         }
+        impl From<WorkflowStepConfig> for WorkflowStepConfigBuilder {
+            fn from(inner: WorkflowStepConfig) -> Self {
+                Self { inner }
+            }
+        }
         #[wasm_bindgen(module = "cloudflare:workers", experimental_generic_mono)]
         extern "C" {
             # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -44838,6 +49447,20 @@ pub mod cloudflare {
                 name: impl ::wasm_bindgen::JsStringLike,
                 options: &WorkflowStepOptions,
             ) -> Promise<WorkflowStepEvent>;
+            #[wasm_bindgen(method, catch, js_name = "waitForEvent")]
+            pub async fn wait_for_event_typed<T>(
+                this: &WorkflowStep,
+                name: impl ::wasm_bindgen::JsStringLike,
+                options: &WorkflowStepOptions,
+            ) -> Result<WorkflowStepEvent<T>, JsValue>
+            where
+                T: 'static;
+            #[wasm_bindgen(method, js_name = "waitForEvent")]
+            pub fn wait_for_event_typed_promise<T>(
+                this: &WorkflowStep,
+                name: impl ::wasm_bindgen::JsStringLike,
+                options: &WorkflowStepOptions,
+            ) -> Promise<WorkflowStepEvent<T>>;
         }
         #[wasm_bindgen(module = "cloudflare:workers", experimental_generic_mono)]
         extern "C" {
@@ -44877,6 +49500,11 @@ pub mod cloudflare {
             }
             pub fn build(self) -> WorkflowStepOptions {
                 self.inner
+            }
+        }
+        impl From<WorkflowStepOptions> for WorkflowStepOptionsBuilder {
+            fn from(inner: WorkflowStepOptions) -> Self {
+                Self { inner }
             }
         }
         #[wasm_bindgen(private)]
@@ -45008,6 +49636,11 @@ pub mod cloudflare {
                 self.inner
             }
         }
+        impl From<WorkflowStepConfigRetries> for WorkflowStepConfigRetriesBuilder {
+            fn from(inner: WorkflowStepConfigRetries) -> Self {
+                Self { inner }
+            }
+        }
     }
     pub mod sockets {
         #[allow(unused_imports)]
@@ -45022,7 +49655,7 @@ pub mod cloudflare {
         #[wasm_bindgen(module = "cloudflare:sockets", experimental_generic_mono)]
         extern "C" {
             #[wasm_bindgen(catch, js_name = "connect")]
-            pub fn connect_with_socket_address(
+            pub fn connect_with_address(
                 address: &super::super::SocketAddress,
             ) -> Result<super::super::Socket, JsValue>;
         }
@@ -45037,7 +49670,7 @@ pub mod cloudflare {
         #[wasm_bindgen(module = "cloudflare:sockets", experimental_generic_mono)]
         extern "C" {
             #[wasm_bindgen(catch, js_name = "connect")]
-            pub fn connect_with_socket_address_and_options(
+            pub fn connect_with_address_and_options(
                 address: &super::super::SocketAddress,
                 options: &super::super::SocketOptions,
             ) -> Result<super::super::Socket, JsValue>;
@@ -45192,6 +49825,11 @@ impl ImageInfoResponseBuilder {
     }
     pub fn build(self) -> ImageInfoResponse {
         self.inner
+    }
+}
+impl From<ImageInfoResponse> for ImageInfoResponseBuilder {
+    fn from(inner: ImageInfoResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -45379,6 +50017,11 @@ impl ImageTransformBuilder {
         self.inner
     }
 }
+impl From<ImageTransform> for ImageTransformBuilder {
+    fn from(inner: ImageTransform) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -45462,6 +50105,11 @@ impl ImageDrawOptionsBuilder {
         self.inner
     }
 }
+impl From<ImageDrawOptions> for ImageDrawOptionsBuilder {
+    fn from(inner: ImageDrawOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -45499,6 +50147,11 @@ impl ImageInputOptionsBuilder {
     }
     pub fn build(self) -> ImageInputOptions {
         self.inner
+    }
+}
+impl From<ImageInputOptions> for ImageInputOptionsBuilder {
+    fn from(inner: ImageInputOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -45617,6 +50270,11 @@ impl ImageOutputOptionsBuilder {
         self.inner
     }
 }
+impl From<ImageOutputOptions> for ImageOutputOptionsBuilder {
+    fn from(inner: ImageOutputOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -45713,6 +50371,11 @@ impl ImageMetadataBuilder {
         self.inner
     }
 }
+impl From<ImageMetadata> for ImageMetadataBuilder {
+    fn from(inner: ImageMetadata) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -45798,6 +50461,11 @@ impl ImageUploadOptionsBuilder {
         self.inner
     }
 }
+impl From<ImageUploadOptions> for ImageUploadOptionsBuilder {
+    fn from(inner: ImageUploadOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -45851,6 +50519,11 @@ impl ImageUpdateOptionsBuilder {
     }
     pub fn build(self) -> ImageUpdateOptions {
         self.inner
+    }
+}
+impl From<ImageUpdateOptions> for ImageUpdateOptionsBuilder {
+    fn from(inner: ImageUpdateOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -45918,6 +50591,11 @@ impl ImageListOptionsBuilder {
         self.inner
     }
 }
+impl From<ImageListOptions> for ImageListOptionsBuilder {
+    fn from(inner: ImageListOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -45959,6 +50637,11 @@ impl ImageListBuilder {
     }
     pub fn build(self) -> ImageList {
         self.inner
+    }
+}
+impl From<ImageList> for ImageListBuilder {
+    fn from(inner: ImageList) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -46430,6 +51113,11 @@ impl ImageTransformationOutputOptionsBuilder {
         self.inner
     }
 }
+impl From<ImageTransformationOutputOptions> for ImageTransformationOutputOptionsBuilder {
+    fn from(inner: ImageTransformationOutputOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -46663,6 +51351,11 @@ impl MediaTransformationInputOptionsBuilder {
         self.inner
     }
 }
+impl From<MediaTransformationInputOptions> for MediaTransformationInputOptionsBuilder {
+    fn from(inner: MediaTransformationInputOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -46766,6 +51459,11 @@ impl MediaTransformationOutputOptionsBuilder {
     }
     pub fn build(self) -> MediaTransformationOutputOptions {
         self.inner
+    }
+}
+impl From<MediaTransformationOutputOptions> for MediaTransformationOutputOptionsBuilder {
+    fn from(inner: MediaTransformationOutputOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -47297,7 +51995,7 @@ pub mod rpc {
         pub fn dup<T>(this: &Stub<T>) -> Result<StubBase<T>, JsValue>;
     }
     #[allow(dead_code)]
-    pub type BaseType = Option<Nullable<JsValue>>;
+    pub type BaseType = Nullable<Option<JsValue>>;
     #[allow(dead_code)]
     pub type Stubify = JsValue;
     #[allow(dead_code)]
@@ -48055,6 +52753,11 @@ impl StreamVideoBuilder {
         self.inner
     }
 }
+impl From<StreamVideo> for StreamVideoBuilder {
+    fn from(inner: StreamVideo) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -48141,6 +52844,11 @@ impl StreamVideoStatusBuilder {
     }
     pub fn build(self) -> StreamVideoStatus {
         self.inner
+    }
+}
+impl From<StreamVideoStatus> for StreamVideoStatusBuilder {
+    fn from(inner: StreamVideoStatus) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -48698,6 +53406,11 @@ impl StreamDirectUploadCreateParamsBuilder {
         self.inner
     }
 }
+impl From<StreamDirectUploadCreateParams> for StreamDirectUploadCreateParamsBuilder {
+    fn from(inner: StreamDirectUploadCreateParams) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -48859,6 +53572,11 @@ impl StreamUrlUploadParamsBuilder {
     }
     pub fn build(self) -> StreamUrlUploadParams {
         self.inner
+    }
+}
+impl From<StreamUrlUploadParams> for StreamUrlUploadParamsBuilder {
+    fn from(inner: StreamUrlUploadParams) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -49554,6 +54272,11 @@ impl StreamUpdateVideoParamsBuilder {
         self.inner
     }
 }
+impl From<StreamUpdateVideoParams> for StreamUpdateVideoParamsBuilder {
+    fn from(inner: StreamUpdateVideoParams) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -49623,6 +54346,11 @@ impl StreamCaptionBuilder {
         self.inner
     }
 }
+impl From<StreamCaption> for StreamCaptionBuilder {
+    fn from(inner: StreamCaption) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StreamDownloadStatus {
@@ -49687,6 +54415,11 @@ impl StreamDownloadBuilder {
         self.inner
     }
 }
+impl From<StreamDownload> for StreamDownloadBuilder {
+    fn from(inner: StreamDownload) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -49732,6 +54465,11 @@ impl StreamDownloadGetResponseBuilder {
     }
     pub fn build(self) -> StreamDownloadGetResponse {
         self.inner
+    }
+}
+impl From<StreamDownloadGetResponse> for StreamDownloadGetResponseBuilder {
+    fn from(inner: StreamDownloadGetResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]
@@ -50014,6 +54752,11 @@ impl StreamWatermarkCreateParamsBuilder {
         self.inner
     }
 }
+impl From<StreamWatermarkCreateParams> for StreamWatermarkCreateParamsBuilder {
+    fn from(inner: StreamWatermarkCreateParams) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -50098,6 +54841,11 @@ impl StreamVideosListParamsBuilder {
     }
     pub fn build(self) -> StreamVideosListParams {
         self.inner
+    }
+}
+impl From<StreamVideosListParams> for StreamVideosListParamsBuilder {
+    fn from(inner: StreamVideosListParams) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]
@@ -50487,6 +55235,11 @@ impl ConversionResponseBuilder {
         self.inner
     }
 }
+impl From<ConversionResponse> for ConversionResponseBuilder {
+    fn from(inner: ConversionResponse) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -50527,6 +55280,11 @@ impl ImageConversionOptionsBuilder {
     }
     pub fn build(self) -> ImageConversionOptions {
         self.inner
+    }
+}
+impl From<ImageConversionOptions> for ImageConversionOptionsBuilder {
+    fn from(inner: ImageConversionOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -50576,6 +55334,11 @@ impl EmbeddedImageConversionOptionsBuilder {
     }
     pub fn build(self) -> EmbeddedImageConversionOptions {
         self.inner
+    }
+}
+impl From<EmbeddedImageConversionOptions> for EmbeddedImageConversionOptionsBuilder {
+    fn from(inner: EmbeddedImageConversionOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -50639,6 +55402,11 @@ impl ConversionOptionsBuilder {
         self.inner
     }
 }
+impl From<ConversionOptions> for ConversionOptionsBuilder {
+    fn from(inner: ConversionOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -50690,6 +55458,11 @@ impl ConversionRequestOptionsBuilder {
     }
     pub fn build(self) -> ConversionRequestOptions {
         self.inner
+    }
+}
+impl From<ConversionRequestOptions> for ConversionRequestOptionsBuilder {
+    fn from(inner: ConversionRequestOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -50749,23 +55522,23 @@ extern "C" {
         options: &ConversionRequestOptions,
     ) -> Promise<Array<ConversionResponse>>;
     #[wasm_bindgen(method, catch, js_name = "transform")]
-    pub async fn transform_with_markdown_document(
+    pub async fn transform_with_files(
         this: &ToMarkdownService,
         files: &MarkdownDocument,
     ) -> Result<ConversionResponse, JsValue>;
     #[wasm_bindgen(method, js_name = "transform")]
-    pub fn transform_with_markdown_document_promise(
+    pub fn transform_with_files_promise(
         this: &ToMarkdownService,
         files: &MarkdownDocument,
     ) -> Promise<ConversionResponse>;
     #[wasm_bindgen(method, catch, js_name = "transform")]
-    pub async fn transform_with_markdown_document_and_options(
+    pub async fn transform_with_files_and_options(
         this: &ToMarkdownService,
         files: &MarkdownDocument,
         options: &ConversionRequestOptions,
     ) -> Result<ConversionResponse, JsValue>;
     #[wasm_bindgen(method, js_name = "transform")]
-    pub fn transform_with_markdown_document_and_options_promise(
+    pub fn transform_with_files_and_options_promise(
         this: &ToMarkdownService,
         files: &MarkdownDocument,
         options: &ConversionRequestOptions,
@@ -51491,11 +56264,17 @@ pub mod tail_stream {
     }
     impl<Event: ::wasm_bindgen::convert::IntoWasmAbi> TailEvent<Event> {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> TailEvent<Event> {
+        pub fn new_typed() -> TailEvent<Event> {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
             }
+        }
+    }
+    impl TailEvent<JsValue> {
+        #[allow(clippy::new_without_default)]
+        pub fn new() -> Self {
+            Self::new_typed()
         }
     }
     #[allow(dead_code)]
@@ -51658,6 +56437,11 @@ pub mod tail_stream {
             self.inner
         }
     }
+    impl From<TailEventHandlerObject> for TailEventHandlerObjectBuilder {
+        fn from(inner: TailEventHandlerObject) -> Self {
+            Self { inner }
+        }
+    }
 }
 #[diagnostic::on_unimplemented(
     message = "`{Self}` is not a `VectorFloatArray`",
@@ -51731,6 +56515,11 @@ impl VectorizeErrorBuilder {
     }
     pub fn build(self) -> VectorizeError {
         self.inner
+    }
+}
+impl From<VectorizeError> for VectorizeErrorBuilder {
+    fn from(inner: VectorizeError) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]
@@ -51853,6 +56642,11 @@ impl VectorizeQueryOptionsBuilder {
         self.inner
     }
 }
+impl From<VectorizeQueryOptions> for VectorizeQueryOptionsBuilder {
+    fn from(inner: VectorizeQueryOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -51906,6 +56700,11 @@ impl VectorizeIndexConfigBuilder {
     }
     pub fn build(self) -> VectorizeIndexConfig {
         self.inner
+    }
+}
+impl From<VectorizeIndexConfig> for VectorizeIndexConfigBuilder {
+    fn from(inner: VectorizeIndexConfig) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -52093,6 +56892,11 @@ impl VectorizeVectorBuilder {
         self.inner
     }
 }
+impl From<VectorizeVector> for VectorizeVectorBuilder {
+    fn from(inner: VectorizeVector) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -52172,6 +56976,11 @@ impl VectorizeMatchBuilder {
     }
     pub fn build(self) -> VectorizeMatch {
         self.inner
+    }
+}
+impl From<VectorizeMatch> for VectorizeMatchBuilder {
+    fn from(inner: VectorizeMatch) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -52757,6 +57566,11 @@ impl DynamicDispatchLimitsBuilder {
         self.inner
     }
 }
+impl From<DynamicDispatchLimits> for DynamicDispatchLimitsBuilder {
+    fn from(inner: DynamicDispatchLimits) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -52802,6 +57616,11 @@ impl DynamicDispatchOptionsBuilder {
     }
     pub fn build(self) -> DynamicDispatchOptions {
         self.inner
+    }
+}
+impl From<DynamicDispatchOptions> for DynamicDispatchOptionsBuilder {
+    fn from(inner: DynamicDispatchOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -52932,7 +57751,7 @@ extern "C" {
         batch: &[WorkflowInstanceCreateOptions<PARAMS>],
     ) -> Result<Vec<WorkflowInstance>, JsValue>
     where
-        WorkflowInstanceCreateOptions<PARAMS>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        WorkflowInstanceCreateOptions<PARAMS>: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[doc = " Create a batch of instances and return handle for all of them. If a provided id exists, an error will be thrown."]
     #[doc = " `createBatch` is limited at 100 instances at a time or when the RPC limit for the batch (1MiB) is reached."]
     #[doc = ""]
@@ -52945,7 +57764,7 @@ extern "C" {
         batch: &[WorkflowInstanceCreateOptions<PARAMS>],
     ) -> Promise<Array<WorkflowInstance>>
     where
-        WorkflowInstanceCreateOptions<PARAMS>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        WorkflowInstanceCreateOptions<PARAMS>: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -53096,20 +57915,28 @@ extern "C" {
     );
 }
 impl<PARAMS: ::wasm_bindgen::convert::IntoWasmAbi> WorkflowInstanceCreateOptions<PARAMS> {
-    pub fn new() -> WorkflowInstanceCreateOptions<PARAMS> {
-        Self::builder().build()
+    pub fn new_typed() -> WorkflowInstanceCreateOptions<PARAMS> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> WorkflowInstanceCreateOptionsBuilder<PARAMS> {
+    pub fn builder_typed() -> WorkflowInstanceCreateOptionsBuilder<PARAMS> {
         WorkflowInstanceCreateOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
+    }
+}
+impl WorkflowInstanceCreateOptions<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> WorkflowInstanceCreateOptionsBuilder<JsValue> {
+        Self::builder_typed()
     }
 }
 impl<PARAMS: ::wasm_bindgen::convert::IntoWasmAbi> Default
     for WorkflowInstanceCreateOptions<PARAMS>
 {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct WorkflowInstanceCreateOptionsBuilder<PARAMS> {
@@ -53130,6 +57957,13 @@ impl<PARAMS: ::wasm_bindgen::convert::IntoWasmAbi> WorkflowInstanceCreateOptions
     }
     pub fn build(self) -> WorkflowInstanceCreateOptions<PARAMS> {
         self.inner
+    }
+}
+impl<PARAMS: ::wasm_bindgen::convert::IntoWasmAbi> From<WorkflowInstanceCreateOptions<PARAMS>>
+    for WorkflowInstanceCreateOptionsBuilder<PARAMS>
+{
+    fn from(inner: WorkflowInstanceCreateOptions<PARAMS>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -53258,6 +58092,11 @@ impl InstanceStatusBuilder {
         self.inner
     }
 }
+impl From<InstanceStatus> for InstanceStatusBuilder {
+    fn from(inner: InstanceStatus) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -53294,6 +58133,11 @@ impl WorkflowErrorBuilder {
     }
     pub fn build(self) -> WorkflowError {
         self.inner
+    }
+}
+impl From<WorkflowError> for WorkflowErrorBuilder {
+    fn from(inner: WorkflowError) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -53427,6 +58271,11 @@ impl AiImageClassificationOutputItemBuilder {
         self.inner
     }
 }
+impl From<AiImageClassificationOutputItem> for AiImageClassificationOutputItemBuilder {
+    fn from(inner: AiImageClassificationOutputItem) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -53474,6 +58323,11 @@ impl AiObjectDetectionOutputItemBuilder {
         self.inner
     }
 }
+impl From<AiObjectDetectionOutputItem> for AiObjectDetectionOutputItemBuilder {
+    fn from(inner: AiObjectDetectionOutputItem) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -53519,6 +58373,11 @@ impl AiTextClassificationOutputItemBuilder {
     }
     pub fn build(self) -> AiTextClassificationOutputItem {
         self.inner
+    }
+}
+impl From<AiTextClassificationOutputItem> for AiTextClassificationOutputItemBuilder {
+    fn from(inner: AiTextClassificationOutputItem) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -53601,6 +58460,13 @@ impl Ai_Cf_Baai_Bge_Base_En_V1_5_OutputObjectBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_Base_En_V1_5_OutputObject>
+    for Ai_Cf_Baai_Bge_Base_En_V1_5_OutputObjectBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_Base_En_V1_5_OutputObject) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -53665,6 +58531,11 @@ impl Ai_Cf_Meta_M2M100_1_2B_OutputObjectBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_M2M100_1_2B_OutputObject> for Ai_Cf_Meta_M2M100_1_2B_OutputObjectBuilder {
+    fn from(inner: Ai_Cf_Meta_M2M100_1_2B_OutputObject) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -53726,6 +58597,13 @@ impl Ai_Cf_Baai_Bge_Small_En_V1_5_OutputObjectBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_Small_En_V1_5_OutputObject>
+    for Ai_Cf_Baai_Bge_Small_En_V1_5_OutputObjectBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_Small_En_V1_5_OutputObject) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -53785,6 +58663,13 @@ impl Ai_Cf_Baai_Bge_Large_En_V1_5_OutputObjectBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_Large_En_V1_5_OutputObject {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_Large_En_V1_5_OutputObject>
+    for Ai_Cf_Baai_Bge_Large_En_V1_5_OutputObjectBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_Large_En_V1_5_OutputObject) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -53915,6 +58800,13 @@ impl Ai_Cf_Unum_Uform_Gen2_Qwen_500M_InputObjectBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Unum_Uform_Gen2_Qwen_500M_InputObject>
+    for Ai_Cf_Unum_Uform_Gen2_Qwen_500M_InputObjectBuilder
+{
+    fn from(inner: Ai_Cf_Unum_Uform_Gen2_Qwen_500M_InputObject) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -54021,6 +58913,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputObjectUsageBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputObjectUsage>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputObjectUsageBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputObjectUsage) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -54078,6 +58977,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputObjectToolCallsBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputObjectToolCalls {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputObjectToolCalls>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputObjectToolCallsBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputObjectToolCalls) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -54147,6 +59053,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputObjectBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputObject {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputObject>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputObjectBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_OutputObject) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -54252,6 +59165,11 @@ impl PartialKvNamespaceGetOptionsUndefinedBuilder {
     }
     pub fn build(self) -> PartialKvNamespaceGetOptionsUndefined {
         self.inner
+    }
+}
+impl From<PartialKvNamespaceGetOptionsUndefined> for PartialKvNamespaceGetOptionsUndefinedBuilder {
+    fn from(inner: PartialKvNamespaceGetOptionsUndefined) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -54416,6 +59334,11 @@ impl AiSearchSearchRequestMessagesBuilder {
     }
     pub fn build(self) -> AiSearchSearchRequestMessages {
         self.inner
+    }
+}
+impl From<AiSearchSearchRequestMessages> for AiSearchSearchRequestMessagesBuilder {
+    fn from(inner: AiSearchSearchRequestMessages) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -54606,6 +59529,13 @@ impl AiSearchChatCompletionsRequestMessagesBuilder {
         self.inner
     }
 }
+impl From<AiSearchChatCompletionsRequestMessages>
+    for AiSearchChatCompletionsRequestMessagesBuilder
+{
+    fn from(inner: AiSearchChatCompletionsRequestMessages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -54654,6 +59584,11 @@ impl AiSearchSearchResponseChunksItemBuilder {
         self.inner
     }
 }
+impl From<AiSearchSearchResponseChunksItem> for AiSearchSearchResponseChunksItemBuilder {
+    fn from(inner: AiSearchSearchResponseChunksItem) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -54697,6 +59632,13 @@ impl AiSearchSearchResponseChunksScoringDetailsBuilder {
     }
     pub fn build(self) -> AiSearchSearchResponseChunksScoringDetails {
         self.inner
+    }
+}
+impl From<AiSearchSearchResponseChunksScoringDetails>
+    for AiSearchSearchResponseChunksScoringDetailsBuilder
+{
+    fn from(inner: AiSearchSearchResponseChunksScoringDetails) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -54776,6 +59718,11 @@ impl AiSearchSearchResponseChunksBuilder {
     }
     pub fn build(self) -> AiSearchSearchResponseChunks {
         self.inner
+    }
+}
+impl From<AiSearchSearchResponseChunks> for AiSearchSearchResponseChunksBuilder {
+    fn from(inner: AiSearchSearchResponseChunks) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -54870,6 +59817,13 @@ impl AiTextGenerationToolLegacyInputParametersPropertiesBuilder {
         self.inner
     }
 }
+impl From<AiTextGenerationToolLegacyInputParametersProperties>
+    for AiTextGenerationToolLegacyInputParametersPropertiesBuilder
+{
+    fn from(inner: AiTextGenerationToolLegacyInputParametersProperties) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -54955,6 +59909,13 @@ impl AiTextGenerationToolLegacyInputParametersBuilder {
         self.inner
     }
 }
+impl From<AiTextGenerationToolLegacyInputParameters>
+    for AiTextGenerationToolLegacyInputParametersBuilder
+{
+    fn from(inner: AiTextGenerationToolLegacyInputParameters) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -55010,6 +59971,13 @@ impl AiTextGenerationToolInputFunctionParametersPropertiesBuilder {
     }
     pub fn build(self) -> AiTextGenerationToolInputFunctionParametersProperties {
         self.inner
+    }
+}
+impl From<AiTextGenerationToolInputFunctionParametersProperties>
+    for AiTextGenerationToolInputFunctionParametersPropertiesBuilder
+{
+    fn from(inner: AiTextGenerationToolInputFunctionParametersProperties) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -55099,6 +60067,13 @@ impl AiTextGenerationToolInputFunctionParametersBuilder {
         self.inner
     }
 }
+impl From<AiTextGenerationToolInputFunctionParameters>
+    for AiTextGenerationToolInputFunctionParametersBuilder
+{
+    fn from(inner: AiTextGenerationToolInputFunctionParameters) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -55160,6 +60135,11 @@ impl AiTextGenerationToolInputFunctionBuilder {
     }
     pub fn build(self) -> AiTextGenerationToolInputFunction {
         self.inner
+    }
+}
+impl From<AiTextGenerationToolInputFunction> for AiTextGenerationToolInputFunctionBuilder {
+    fn from(inner: AiTextGenerationToolInputFunction) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -55265,6 +60245,13 @@ impl Ai_Cf_Baai_Bge_Base_En_V1_5_InputRequestsBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_Base_En_V1_5_InputRequests>
+    for Ai_Cf_Baai_Bge_Base_En_V1_5_InputRequestsBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_Base_En_V1_5_InputRequests) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -55321,6 +60308,11 @@ impl Ai_Cf_Openai_Whisper_OutputWordsBuilder {
     }
     pub fn build(self) -> Ai_Cf_Openai_Whisper_OutputWords {
         self.inner
+    }
+}
+impl From<Ai_Cf_Openai_Whisper_OutputWords> for Ai_Cf_Openai_Whisper_OutputWordsBuilder {
+    fn from(inner: Ai_Cf_Openai_Whisper_OutputWords) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -55384,6 +60376,11 @@ impl Ai_Cf_Meta_M2M100_1_2B_InputRequestsBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_M2M100_1_2B_InputRequests {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_M2M100_1_2B_InputRequests> for Ai_Cf_Meta_M2M100_1_2B_InputRequestsBuilder {
+    fn from(inner: Ai_Cf_Meta_M2M100_1_2B_InputRequests) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -55453,6 +60450,13 @@ impl Ai_Cf_Baai_Bge_Small_En_V1_5_InputRequestsBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_Small_En_V1_5_InputRequests>
+    for Ai_Cf_Baai_Bge_Small_En_V1_5_InputRequestsBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_Small_En_V1_5_InputRequests) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -55520,6 +60524,13 @@ impl Ai_Cf_Baai_Bge_Large_En_V1_5_InputRequestsBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_Large_En_V1_5_InputRequests>
+    for Ai_Cf_Baai_Bge_Large_En_V1_5_InputRequestsBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_Large_En_V1_5_InputRequests) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -55576,6 +60587,13 @@ impl Ai_Cf_Openai_Whisper_Tiny_En_OutputWordsBuilder {
     }
     pub fn build(self) -> Ai_Cf_Openai_Whisper_Tiny_En_OutputWords {
         self.inner
+    }
+}
+impl From<Ai_Cf_Openai_Whisper_Tiny_En_OutputWords>
+    for Ai_Cf_Openai_Whisper_Tiny_En_OutputWordsBuilder
+{
+    fn from(inner: Ai_Cf_Openai_Whisper_Tiny_En_OutputWords) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -55663,6 +60681,13 @@ impl Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputTranscriptionInfoBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputTranscriptionInfo>
+    for Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputTranscriptionInfoBuilder
+{
+    fn from(inner: Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputTranscriptionInfo) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -55721,6 +60746,13 @@ impl Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputSegmentsWordsBuilder {
     }
     pub fn build(self) -> Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputSegmentsWords {
         self.inner
+    }
+}
+impl From<Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputSegmentsWords>
+    for Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputSegmentsWordsBuilder
+{
+    fn from(inner: Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputSegmentsWords) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -55834,6 +60866,13 @@ impl Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputSegmentsBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputSegments>
+    for Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputSegmentsBuilder
+{
+    fn from(inner: Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputSegments) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -55878,6 +60917,13 @@ impl Ai_Cf_Baai_Bge_M3_Input_QueryAnd_ContextsContextsBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_M3_Input_QueryAnd_ContextsContexts>
+    for Ai_Cf_Baai_Bge_M3_Input_QueryAnd_ContextsContextsBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Input_QueryAnd_ContextsContexts) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -55920,6 +60966,13 @@ impl Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1ContextsBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1Contexts {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1Contexts>
+    for Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1ContextsBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1Contexts) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -55967,6 +61020,11 @@ impl Ai_Cf_Baai_Bge_M3_Ouput_QueryResponseBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Baai_Bge_M3_Ouput_QueryResponse> for Ai_Cf_Baai_Bge_M3_Ouput_QueryResponseBuilder {
+    fn from(inner: Ai_Cf_Baai_Bge_M3_Ouput_QueryResponse) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -56012,6 +61070,15 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessagesContentImageUrlBui
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessagesContentImageUrl {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessagesContentImageUrl>
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessagesContentImageUrlBuilder
+{
+    fn from(
+        inner: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessagesContentImageUrl,
+    ) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -56091,6 +61158,13 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessagesContentBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessagesContent {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessagesContent>
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessagesContentBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessagesContent) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -56193,6 +61267,13 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessagesBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessages {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessages>
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessagesBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessages) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -56356,6 +61437,13 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsNameParametersBuilder
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsNameParameters>
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsNameParametersBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsNameParameters) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -56501,6 +61589,13 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputToolCallsBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputToolCalls {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputToolCalls>
+    for Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputToolCallsBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputToolCalls) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -56701,6 +61796,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesToolsNameParametersBuild
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesToolsNameParameters {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesToolsNameParameters>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesToolsNameParametersBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesToolsNameParameters) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -56977,6 +62079,13 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_BatchRequestsBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_BatchRequests>
+    for Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_BatchRequestsBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_BatchRequests) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -57047,6 +62156,13 @@ impl Ai_Cf_Meta_Llama_Guard_3_8B_InputMessagesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_Guard_3_8B_InputMessages>
+    for Ai_Cf_Meta_Llama_Guard_3_8B_InputMessagesBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_Guard_3_8B_InputMessages) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -57089,6 +62205,13 @@ impl Ai_Cf_Meta_Llama_Guard_3_8B_InputResponseFormatBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_Guard_3_8B_InputResponseFormat {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_Guard_3_8B_InputResponseFormat>
+    for Ai_Cf_Meta_Llama_Guard_3_8B_InputResponseFormatBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_Guard_3_8B_InputResponseFormat) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -57141,6 +62264,13 @@ impl Ai_Cf_Meta_Llama_Guard_3_8B_OutputResponseBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_Guard_3_8B_OutputResponse {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_Guard_3_8B_OutputResponse>
+    for Ai_Cf_Meta_Llama_Guard_3_8B_OutputResponseBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_Guard_3_8B_OutputResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -57196,6 +62326,13 @@ impl Ai_Cf_Meta_Llama_Guard_3_8B_OutputUsageBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_Guard_3_8B_OutputUsage>
+    for Ai_Cf_Meta_Llama_Guard_3_8B_OutputUsageBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_Guard_3_8B_OutputUsage) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -57236,6 +62373,13 @@ impl Ai_Cf_Baai_Bge_Reranker_Base_InputContextsBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_Reranker_Base_InputContexts {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_Reranker_Base_InputContexts>
+    for Ai_Cf_Baai_Bge_Reranker_Base_InputContextsBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_Reranker_Base_InputContexts) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -57281,6 +62425,13 @@ impl Ai_Cf_Baai_Bge_Reranker_Base_OutputResponseBuilder {
     }
     pub fn build(self) -> Ai_Cf_Baai_Bge_Reranker_Base_OutputResponse {
         self.inner
+    }
+}
+impl From<Ai_Cf_Baai_Bge_Reranker_Base_OutputResponse>
+    for Ai_Cf_Baai_Bge_Reranker_Base_OutputResponseBuilder
+{
+    fn from(inner: Ai_Cf_Baai_Bge_Reranker_Base_OutputResponse) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -57482,6 +62633,13 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_MessagesToolsNameParametersBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_MessagesToolsNameParameters>
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_MessagesToolsNameParametersBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_MessagesToolsNameParameters) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -57629,6 +62787,13 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputUsageBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputUsage>
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputUsageBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputUsage) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -57686,6 +62851,13 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputToolCallsBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputToolCalls>
+    for Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputToolCallsBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputToolCalls) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -57728,6 +62900,13 @@ impl Ai_Cf_Qwen_Qwq_32B_MessagesMessagesContentImageUrlBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwq_32B_MessagesMessagesContentImageUrl {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwq_32B_MessagesMessagesContentImageUrl>
+    for Ai_Cf_Qwen_Qwq_32B_MessagesMessagesContentImageUrlBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwq_32B_MessagesMessagesContentImageUrl) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -57796,6 +62975,13 @@ impl Ai_Cf_Qwen_Qwq_32B_MessagesMessagesContentBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwq_32B_MessagesMessagesContent {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwq_32B_MessagesMessagesContent>
+    for Ai_Cf_Qwen_Qwq_32B_MessagesMessagesContentBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwq_32B_MessagesMessagesContent) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -57886,6 +63072,11 @@ impl Ai_Cf_Qwen_Qwq_32B_MessagesMessagesBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwq_32B_MessagesMessages {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwq_32B_MessagesMessages> for Ai_Cf_Qwen_Qwq_32B_MessagesMessagesBuilder {
+    fn from(inner: Ai_Cf_Qwen_Qwq_32B_MessagesMessages) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -58029,6 +63220,13 @@ impl Ai_Cf_Qwen_Qwq_32B_MessagesToolsNameParametersBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwq_32B_MessagesToolsNameParameters>
+    for Ai_Cf_Qwen_Qwq_32B_MessagesToolsNameParametersBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwq_32B_MessagesToolsNameParameters) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -58165,6 +63363,11 @@ impl Ai_Cf_Qwen_Qwq_32B_OutputUsageBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwq_32B_OutputUsage> for Ai_Cf_Qwen_Qwq_32B_OutputUsageBuilder {
+    fn from(inner: Ai_Cf_Qwen_Qwq_32B_OutputUsage) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -58215,6 +63418,11 @@ impl Ai_Cf_Qwen_Qwq_32B_OutputToolCallsBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwq_32B_OutputToolCalls> for Ai_Cf_Qwen_Qwq_32B_OutputToolCallsBuilder {
+    fn from(inner: Ai_Cf_Qwen_Qwq_32B_OutputToolCalls) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -58262,6 +63470,15 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessagesContentImage
         self,
     ) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessagesContentImageUrl {
         self.inner
+    }
+}
+impl From<Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessagesContentImageUrl>
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessagesContentImageUrlBuilder
+{
+    fn from(
+        inner: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessagesContentImageUrl,
+    ) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -58342,6 +63559,13 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessagesContentBuild
     }
     pub fn build(self) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessagesContent {
         self.inner
+    }
+}
+impl From<Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessagesContent>
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessagesContentBuilder
+{
+    fn from(inner: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessagesContent) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -58442,6 +63666,13 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessagesBuilder {
     }
     pub fn build(self) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessages {
         self.inner
+    }
+}
+impl From<Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessages>
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessagesBuilder
+{
+    fn from(inner: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessages) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -58606,6 +63837,15 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesToolsNameParametersB
         self.inner
     }
 }
+impl From<Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesToolsNameParameters>
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesToolsNameParametersBuilder
+{
+    fn from(
+        inner: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesToolsNameParameters,
+    ) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -58766,6 +64006,13 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputUsageBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputUsage>
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputUsageBuilder
+{
+    fn from(inner: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputUsage) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -58825,6 +64072,13 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputToolCallsBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputToolCalls>
+    for Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputToolCallsBuilder
+{
+    fn from(inner: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputToolCalls) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -58869,6 +64123,13 @@ impl Ai_Cf_Google_Gemma_3_12B_It_MessagesMessagesContentImageUrlBuilder {
     }
     pub fn build(self) -> Ai_Cf_Google_Gemma_3_12B_It_MessagesMessagesContentImageUrl {
         self.inner
+    }
+}
+impl From<Ai_Cf_Google_Gemma_3_12B_It_MessagesMessagesContentImageUrl>
+    for Ai_Cf_Google_Gemma_3_12B_It_MessagesMessagesContentImageUrlBuilder
+{
+    fn from(inner: Ai_Cf_Google_Gemma_3_12B_It_MessagesMessagesContentImageUrl) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -58946,6 +64207,13 @@ impl Ai_Cf_Google_Gemma_3_12B_It_MessagesMessagesContentBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Google_Gemma_3_12B_It_MessagesMessagesContent>
+    for Ai_Cf_Google_Gemma_3_12B_It_MessagesMessagesContentBuilder
+{
+    fn from(inner: Ai_Cf_Google_Gemma_3_12B_It_MessagesMessagesContent) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -59011,6 +64279,13 @@ impl Ai_Cf_Google_Gemma_3_12B_It_MessagesMessagesBuilder {
     }
     pub fn build(self) -> Ai_Cf_Google_Gemma_3_12B_It_MessagesMessages {
         self.inner
+    }
+}
+impl From<Ai_Cf_Google_Gemma_3_12B_It_MessagesMessages>
+    for Ai_Cf_Google_Gemma_3_12B_It_MessagesMessagesBuilder
+{
+    fn from(inner: Ai_Cf_Google_Gemma_3_12B_It_MessagesMessages) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -59162,6 +64437,13 @@ impl Ai_Cf_Google_Gemma_3_12B_It_MessagesToolsNameParametersBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Google_Gemma_3_12B_It_MessagesToolsNameParameters>
+    for Ai_Cf_Google_Gemma_3_12B_It_MessagesToolsNameParametersBuilder
+{
+    fn from(inner: Ai_Cf_Google_Gemma_3_12B_It_MessagesToolsNameParameters) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -59298,6 +64580,13 @@ impl Ai_Cf_Google_Gemma_3_12B_It_OutputUsageBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Google_Gemma_3_12B_It_OutputUsage>
+    for Ai_Cf_Google_Gemma_3_12B_It_OutputUsageBuilder
+{
+    fn from(inner: Ai_Cf_Google_Gemma_3_12B_It_OutputUsage) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -59348,6 +64637,13 @@ impl Ai_Cf_Google_Gemma_3_12B_It_OutputToolCallsBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Google_Gemma_3_12B_It_OutputToolCalls>
+    for Ai_Cf_Google_Gemma_3_12B_It_OutputToolCallsBuilder
+{
+    fn from(inner: Ai_Cf_Google_Gemma_3_12B_It_OutputToolCalls) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -59395,6 +64691,15 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesMessagesContentImageUrlBu
         self,
     ) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesMessagesContentImageUrl {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesMessagesContentImageUrl>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesMessagesContentImageUrlBuilder
+{
+    fn from(
+        inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesMessagesContentImageUrl,
+    ) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -59474,6 +64779,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesMessagesContentBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesMessagesContent {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesMessagesContent>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesMessagesContentBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesMessagesContent) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -59577,6 +64889,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesMessagesBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesMessages {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesMessages>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesMessagesBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesMessages) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -59740,6 +65059,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesToolsNameParametersBuilde
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesToolsNameParameters>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesToolsNameParametersBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesToolsNameParameters) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -59882,6 +65208,15 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerMessagesContentImag
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerMessagesContentImageUrl>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerMessagesContentImageUrlBuilder
+{
+    fn from(
+        inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerMessagesContentImageUrl,
+    ) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -59960,6 +65295,15 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerMessagesContentBuil
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerMessagesContent {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerMessagesContent>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerMessagesContentBuilder
+{
+    fn from(
+        inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerMessagesContent,
+    ) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -60060,6 +65404,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerMessagesBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerMessages {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerMessages>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerMessagesBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerMessages) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -60226,6 +65577,15 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerToolsNameParameters
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerToolsNameParameters>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerToolsNameParametersBuilder
+{
+    fn from(
+        inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerToolsNameParameters,
+    ) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -60385,6 +65745,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputUsageBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputUsage>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputUsageBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputUsage) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -60442,6 +65809,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputToolCallsFunctionBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputToolCallsFunction {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputToolCallsFunction>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputToolCallsFunctionBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputToolCallsFunction) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -60519,6 +65893,13 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputToolCallsBuilder {
     }
     pub fn build(self) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputToolCalls {
         self.inner
+    }
+}
+impl From<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputToolCalls>
+    for Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputToolCallsBuilder
+{
+    fn from(inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputToolCalls) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -60704,6 +66085,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesToolsNameParametersBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesToolsNameParameters {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesToolsNameParameters>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesToolsNameParametersBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesToolsNameParameters) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -60973,6 +66361,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1ToolsNameParametersBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1ToolsNameParameters {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1ToolsNameParameters>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1ToolsNameParametersBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1ToolsNameParameters) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -61249,6 +66644,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseChoicesMessageBuilder 
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseChoicesMessage>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseChoicesMessageBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseChoicesMessage) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -61377,6 +66779,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseChoicesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseChoices>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseChoicesBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseChoices) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -61443,6 +66852,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseUsageBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseUsage {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseUsage>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseUsageBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseUsage) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -61589,6 +67005,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseChoicesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseChoices>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseChoicesBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseChoices) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -61655,6 +67078,13 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseUsageBuilder {
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseUsage {
         self.inner
+    }
+}
+impl From<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseUsage>
+    for Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseUsageBuilder
+{
+    fn from(inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseUsage) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -61764,6 +67194,13 @@ impl Ai_Cf_Deepgram_Nova_3_OutputResultsChannelsAlternativesWordsBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Deepgram_Nova_3_OutputResultsChannelsAlternativesWords>
+    for Ai_Cf_Deepgram_Nova_3_OutputResultsChannelsAlternativesWordsBuilder
+{
+    fn from(inner: Ai_Cf_Deepgram_Nova_3_OutputResultsChannelsAlternativesWords) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -61836,6 +67273,13 @@ impl Ai_Cf_Deepgram_Nova_3_OutputResultsChannelsAlternativesBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Deepgram_Nova_3_OutputResultsChannelsAlternatives>
+    for Ai_Cf_Deepgram_Nova_3_OutputResultsChannelsAlternativesBuilder
+{
+    fn from(inner: Ai_Cf_Deepgram_Nova_3_OutputResultsChannelsAlternatives) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -61879,6 +67323,13 @@ impl Ai_Cf_Deepgram_Nova_3_OutputResultsChannelsBuilder {
     }
     pub fn build(self) -> Ai_Cf_Deepgram_Nova_3_OutputResultsChannels {
         self.inner
+    }
+}
+impl From<Ai_Cf_Deepgram_Nova_3_OutputResultsChannels>
+    for Ai_Cf_Deepgram_Nova_3_OutputResultsChannelsBuilder
+{
+    fn from(inner: Ai_Cf_Deepgram_Nova_3_OutputResultsChannels) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -61934,6 +67385,13 @@ impl Ai_Cf_Deepgram_Nova_3_OutputResultsSummaryBuilder {
     }
     pub fn build(self) -> Ai_Cf_Deepgram_Nova_3_OutputResultsSummary {
         self.inner
+    }
+}
+impl From<Ai_Cf_Deepgram_Nova_3_OutputResultsSummary>
+    for Ai_Cf_Deepgram_Nova_3_OutputResultsSummaryBuilder
+{
+    fn from(inner: Ai_Cf_Deepgram_Nova_3_OutputResultsSummary) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -62026,6 +67484,13 @@ impl Ai_Cf_Deepgram_Nova_3_OutputResultsSentimentsSegmentsBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Deepgram_Nova_3_OutputResultsSentimentsSegments>
+    for Ai_Cf_Deepgram_Nova_3_OutputResultsSentimentsSegmentsBuilder
+{
+    fn from(inner: Ai_Cf_Deepgram_Nova_3_OutputResultsSentimentsSegments) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -62084,6 +67549,13 @@ impl Ai_Cf_Deepgram_Nova_3_OutputResultsSentimentsAverageBuilder {
         self.inner
     }
 }
+impl From<Ai_Cf_Deepgram_Nova_3_OutputResultsSentimentsAverage>
+    for Ai_Cf_Deepgram_Nova_3_OutputResultsSentimentsAverageBuilder
+{
+    fn from(inner: Ai_Cf_Deepgram_Nova_3_OutputResultsSentimentsAverage) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -62137,6 +67609,13 @@ impl Ai_Cf_Deepgram_Nova_3_OutputResultsSentimentsBuilder {
     }
     pub fn build(self) -> Ai_Cf_Deepgram_Nova_3_OutputResultsSentiments {
         self.inner
+    }
+}
+impl From<Ai_Cf_Deepgram_Nova_3_OutputResultsSentiments>
+    for Ai_Cf_Deepgram_Nova_3_OutputResultsSentimentsBuilder
+{
+    fn from(inner: Ai_Cf_Deepgram_Nova_3_OutputResultsSentiments) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -62205,6 +67684,11 @@ impl Ai_Cf_Deepgram_Nova_3_OutputResultsBuilder {
     }
     pub fn build(self) -> Ai_Cf_Deepgram_Nova_3_OutputResults {
         self.inner
+    }
+}
+impl From<Ai_Cf_Deepgram_Nova_3_OutputResults> for Ai_Cf_Deepgram_Nova_3_OutputResultsBuilder {
+    fn from(inner: Ai_Cf_Deepgram_Nova_3_OutputResults) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -62436,6 +67920,13 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesToolsNameParametersBuild
     }
     pub fn build(self) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesToolsNameParameters {
         self.inner
+    }
+}
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesToolsNameParameters>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesToolsNameParametersBuilder
+{
+    fn from(inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesToolsNameParameters) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -62729,6 +68220,15 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1ToolsNameParametersBui
         self.inner
     }
 }
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1ToolsNameParameters>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1ToolsNameParametersBuilder
+{
+    fn from(
+        inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1ToolsNameParameters,
+    ) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -62998,6 +68498,15 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseChoicesM
         self.inner
     }
 }
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseChoicesMessage>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseChoicesMessageBuilder
+{
+    fn from(
+        inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseChoicesMessage,
+    ) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -63132,6 +68641,15 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseChoicesB
         self.inner
     }
 }
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseChoices>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseChoicesBuilder
+{
+    fn from(
+        inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseChoices,
+    ) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -63199,6 +68717,15 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseUsageBui
     }
     pub fn build(self) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseUsage {
         self.inner
+    }
+}
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseUsage>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseUsageBuilder
+{
+    fn from(
+        inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseUsage,
+    ) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -63354,6 +68881,15 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseChoicesB
         self.inner
     }
 }
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseChoices>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseChoicesBuilder
+{
+    fn from(
+        inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseChoices,
+    ) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -63421,6 +68957,15 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseUsageBui
     }
     pub fn build(self) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseUsage {
         self.inner
+    }
+}
+impl From<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseUsage>
+    for Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseUsageBuilder
+{
+    fn from(
+        inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseUsage,
+    ) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -63564,6 +69109,13 @@ impl AIGatewayHeadersCfAigCustomCostPerTokenInBuilder {
         self.inner
     }
 }
+impl From<AIGatewayHeadersCfAigCustomCostPerTokenIn>
+    for AIGatewayHeadersCfAigCustomCostPerTokenInBuilder
+{
+    fn from(inner: AIGatewayHeadersCfAigCustomCostPerTokenIn) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -63599,6 +69151,13 @@ impl AIGatewayHeadersCfAigCustomCostTotalCostBuilder {
     }
     pub fn build(self) -> AIGatewayHeadersCfAigCustomCostTotalCost {
         self.inner
+    }
+}
+impl From<AIGatewayHeadersCfAigCustomCostTotalCost>
+    for AIGatewayHeadersCfAigCustomCostTotalCostBuilder
+{
+    fn from(inner: AIGatewayHeadersCfAigCustomCostTotalCost) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -63844,6 +69403,11 @@ impl PartialAiGatewayHeadersBuilder {
         self.inner
     }
 }
+impl From<PartialAiGatewayHeaders> for PartialAiGatewayHeadersBuilder {
+    fn from(inner: PartialAiGatewayHeaders) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -63894,6 +69458,11 @@ impl AutoRagSearchRequestRankingOptionsBuilder {
         self.inner
     }
 }
+impl From<AutoRagSearchRequestRankingOptions> for AutoRagSearchRequestRankingOptionsBuilder {
+    fn from(inner: AutoRagSearchRequestRankingOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -63939,6 +69508,11 @@ impl AutoRagSearchRequestRerankingBuilder {
     }
     pub fn build(self) -> AutoRagSearchRequestReranking {
         self.inner
+    }
+}
+impl From<AutoRagSearchRequestReranking> for AutoRagSearchRequestRerankingBuilder {
+    fn from(inner: AutoRagSearchRequestReranking) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -64079,6 +69653,13 @@ impl RequestInitCfPropertiesImageTrimBorderBuilder {
         self.inner
     }
 }
+impl From<RequestInitCfPropertiesImageTrimBorder>
+    for RequestInitCfPropertiesImageTrimBorderBuilder
+{
+    fn from(inner: RequestInitCfPropertiesImageTrimBorder) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -64177,6 +69758,11 @@ impl RequestInitCfPropertiesImageTrimBuilder {
     }
     pub fn build(self) -> RequestInitCfPropertiesImageTrim {
         self.inner
+    }
+}
+impl From<RequestInitCfPropertiesImageTrim> for RequestInitCfPropertiesImageTrimBuilder {
+    fn from(inner: RequestInitCfPropertiesImageTrim) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -64353,6 +69939,11 @@ impl PromiseValueStringMsNumberBuilder {
         self.inner
     }
 }
+impl From<PromiseValueStringMsNumber> for PromiseValueStringMsNumberBuilder {
+    fn from(inner: PromiseValueStringMsNumber) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -64398,6 +69989,11 @@ impl ImageTransformBorderColorBuilder {
     }
     pub fn build(self) -> ImageTransformBorderColor {
         self.inner
+    }
+}
+impl From<ImageTransformBorderColor> for ImageTransformBorderColorBuilder {
+    fn from(inner: ImageTransformBorderColor) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -64461,6 +70057,11 @@ impl ImageTransformBorderTopBuilder {
         self.inner
     }
 }
+impl From<ImageTransformBorderTop> for ImageTransformBorderTopBuilder {
+    fn from(inner: ImageTransformBorderTop) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -64517,6 +70118,11 @@ impl ImageTransformGravityBuilder {
         self.inner
     }
 }
+impl From<ImageTransformGravity> for ImageTransformGravityBuilder {
+    fn from(inner: ImageTransformGravity) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -64570,6 +70176,11 @@ impl ImageTransformTrimBorderBuilder {
     }
     pub fn build(self) -> ImageTransformTrimBorder {
         self.inner
+    }
+}
+impl From<ImageTransformTrimBorder> for ImageTransformTrimBorderBuilder {
+    fn from(inner: ImageTransformTrimBorder) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -64666,6 +70277,11 @@ impl ImageTransformTrimBuilder {
         self.inner
     }
 }
+impl From<ImageTransformTrim> for ImageTransformTrimBuilder {
+    fn from(inner: ImageTransformTrim) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -64701,6 +70317,11 @@ impl ConversionOptionsHtmlImagesBuilder {
     }
     pub fn build(self) -> ConversionOptionsHtmlImages {
         self.inner
+    }
+}
+impl From<ConversionOptionsHtmlImages> for ConversionOptionsHtmlImagesBuilder {
+    fn from(inner: ConversionOptionsHtmlImages) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -64760,6 +70381,11 @@ impl ConversionOptionsHtmlBuilder {
         self.inner
     }
 }
+impl From<ConversionOptionsHtml> for ConversionOptionsHtmlBuilder {
+    fn from(inner: ConversionOptionsHtml) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -64795,6 +70421,11 @@ impl ConversionOptionsDocxBuilder {
     }
     pub fn build(self) -> ConversionOptionsDocx {
         self.inner
+    }
+}
+impl From<ConversionOptionsDocx> for ConversionOptionsDocxBuilder {
+    fn from(inner: ConversionOptionsDocx) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -64840,6 +70471,11 @@ impl ConversionOptionsPdfBuilder {
     }
     pub fn build(self) -> ConversionOptionsPdf {
         self.inner
+    }
+}
+impl From<ConversionOptionsPdf> for ConversionOptionsPdfBuilder {
+    fn from(inner: ConversionOptionsPdf) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -65083,19 +70719,34 @@ impl VectorizeVectorMetadataFilterOpMapBuilder {
         self.inner
     }
 }
+impl From<VectorizeVectorMetadataFilterOpMap> for VectorizeVectorMetadataFilterOpMapBuilder {
+    fn from(inner: VectorizeVectorMetadataFilterOpMap) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeVectorMetadataFilterCollectionOpMap;
     #[wasm_bindgen(method, getter, js_name = "$in")]
-    pub fn in_(this: &VectorizeVectorMetadataFilterCollectionOpMap) -> Option<Vec<JsValue>>;
+    pub fn in_(
+        this: &VectorizeVectorMetadataFilterCollectionOpMap,
+    ) -> Option<Vec<ExcludeVectorizeVectorMetadataValueStringArray>>;
     #[wasm_bindgen(method, setter, js_name = "$in")]
-    pub fn set_in(this: &VectorizeVectorMetadataFilterCollectionOpMap, val: &[JsValue]);
+    pub fn set_in(
+        this: &VectorizeVectorMetadataFilterCollectionOpMap,
+        val: &[ExcludeVectorizeVectorMetadataValueStringArray],
+    );
     #[wasm_bindgen(method, getter, js_name = "$nin")]
-    pub fn nin(this: &VectorizeVectorMetadataFilterCollectionOpMap) -> Option<Vec<JsValue>>;
+    pub fn nin(
+        this: &VectorizeVectorMetadataFilterCollectionOpMap,
+    ) -> Option<Vec<ExcludeVectorizeVectorMetadataValueStringArray>>;
     #[wasm_bindgen(method, setter, js_name = "$nin")]
-    pub fn set_nin(this: &VectorizeVectorMetadataFilterCollectionOpMap, val: &[JsValue]);
+    pub fn set_nin(
+        this: &VectorizeVectorMetadataFilterCollectionOpMap,
+        val: &[ExcludeVectorizeVectorMetadataValueStringArray],
+    );
 }
 impl VectorizeVectorMetadataFilterCollectionOpMap {
     pub fn new() -> VectorizeVectorMetadataFilterCollectionOpMap {
@@ -65116,16 +70767,23 @@ pub struct VectorizeVectorMetadataFilterCollectionOpMapBuilder {
     inner: VectorizeVectorMetadataFilterCollectionOpMap,
 }
 impl VectorizeVectorMetadataFilterCollectionOpMapBuilder {
-    pub fn in_(self, val: &[JsValue]) -> Self {
+    pub fn in_(self, val: &[ExcludeVectorizeVectorMetadataValueStringArray]) -> Self {
         self.inner.set_in(val);
         self
     }
-    pub fn nin(self, val: &[JsValue]) -> Self {
+    pub fn nin(self, val: &[ExcludeVectorizeVectorMetadataValueStringArray]) -> Self {
         self.inner.set_nin(val);
         self
     }
     pub fn build(self) -> VectorizeVectorMetadataFilterCollectionOpMap {
         self.inner
+    }
+}
+impl From<VectorizeVectorMetadataFilterCollectionOpMap>
+    for VectorizeVectorMetadataFilterCollectionOpMapBuilder
+{
+    fn from(inner: VectorizeVectorMetadataFilterCollectionOpMap) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -65183,6 +70841,13 @@ impl WorkflowInstanceCreateOptionsRetentionBuilder {
         self.inner
     }
 }
+impl From<WorkflowInstanceCreateOptionsRetention>
+    for WorkflowInstanceCreateOptionsRetentionBuilder
+{
+    fn from(inner: WorkflowInstanceCreateOptionsRetention) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -65218,6 +70883,20 @@ pub enum ResponseOrFuture {
     Response(Response),
     Promise(Promise<Response>),
 }
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum ArrayBufferOrStr {
+    ArrayBuffer(ArrayBuffer),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum BufferOrStrOrBlob {
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+    String(String),
+    Blob(Blob),
+}
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
 pub enum CryptoKeyOrCryptoKeyPair {
@@ -65247,12 +70926,6 @@ pub enum StrOrSubtleCryptoHashAlgorithm {
 pub enum F64OrBigInt2 {
     F64(f64),
     BigInt(BigInt),
-}
-#[wasm_bindgen(private)]
-#[derive(Clone, Debug)]
-pub enum ArrayBufferOrStr {
-    ArrayBuffer(ArrayBuffer),
-    String(String),
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
@@ -65309,6 +70982,12 @@ pub enum RequestInitEncodeResponseBody {
     Automatic = "automatic",
     Manual = "manual",
 }
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum R2ListOptionsInclude {
+    HttpMetadata = "httpMetadata",
+    CustomMetadata = "customMetadata",
+}
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
 pub enum R2ConditionalOrHeaders {
@@ -65329,7 +71008,7 @@ pub enum R2HTTPMetadataOrHeaders {
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
-pub enum R2PutOptionsMd5Kind {
+pub enum BufferOrStr {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
     String(String),
@@ -65347,6 +71026,12 @@ pub enum DecompressionStreamFormat {
     Gzip = "gzip",
     Deflate = "deflate",
     DeflateRaw = "deflate-raw",
+}
+#[wasm_bindgen(private, fallback)]
+#[derive(Clone, Debug)]
+pub enum StrOrURLPatternInit {
+    String(String),
+    UrlPatternInit(URLPatternInit),
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -66474,4 +72159,441 @@ pub enum ExcludeVectorizeVectorMetadataValueStringArray {
     String(String),
     F64(f64),
     Bool(bool),
+}
+#[doc = r" A key of the map `M`: the property it names, and the type"]
+#[doc = r" of that property's value."]
+pub trait MapKey<M: ?Sized> {
+    type Value: ::wasm_bindgen::JsGeneric;
+    const KEY: &'static str;
+}
+#[doc = "The keys of [`WorkerGlobalScopeEventMap`]."]
+pub mod worker_global_scope_event_map {
+    #[allow(unused_imports)]
+    use super::*;
+    #[doc = "`fetch` of [`WorkerGlobalScopeEventMap`]."]
+    pub struct Fetch;
+    impl MapKey<WorkerGlobalScopeEventMap> for Fetch {
+        type Value = FetchEvent;
+        const KEY: &'static str = "fetch";
+    }
+    #[doc = "`scheduled` of [`WorkerGlobalScopeEventMap`]."]
+    pub struct Scheduled;
+    impl MapKey<WorkerGlobalScopeEventMap> for Scheduled {
+        type Value = ScheduledEvent;
+        const KEY: &'static str = "scheduled";
+    }
+    #[doc = "`unhandledrejection` of [`WorkerGlobalScopeEventMap`]."]
+    pub struct Unhandledrejection;
+    impl MapKey<WorkerGlobalScopeEventMap> for Unhandledrejection {
+        type Value = PromiseRejectionEvent;
+        const KEY: &'static str = "unhandledrejection";
+    }
+    #[doc = "`rejectionhandled` of [`WorkerGlobalScopeEventMap`]."]
+    pub struct Rejectionhandled;
+    impl MapKey<WorkerGlobalScopeEventMap> for Rejectionhandled {
+        type Value = PromiseRejectionEvent;
+        const KEY: &'static str = "rejectionhandled";
+    }
+}
+#[doc = "The keys of [`WebSocketEventMap`]."]
+pub mod web_socket_event_map {
+    #[allow(unused_imports)]
+    use super::*;
+    #[doc = "`close` of [`WebSocketEventMap`]."]
+    pub struct Close;
+    impl MapKey<WebSocketEventMap> for Close {
+        type Value = CloseEvent;
+        const KEY: &'static str = "close";
+    }
+    #[doc = "`message` of [`WebSocketEventMap`]."]
+    pub struct Message;
+    impl MapKey<WebSocketEventMap> for Message {
+        type Value = MessageEvent;
+        const KEY: &'static str = "message";
+    }
+    #[doc = "`open` of [`WebSocketEventMap`]."]
+    pub struct Open;
+    impl MapKey<WebSocketEventMap> for Open {
+        type Value = Event;
+        const KEY: &'static str = "open";
+    }
+    #[doc = "`error` of [`WebSocketEventMap`]."]
+    pub struct Error;
+    impl MapKey<WebSocketEventMap> for Error {
+        type Value = ErrorEvent;
+        const KEY: &'static str = "error";
+    }
+}
+impl WorkerGlobalScope {
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener_with_event_listener_object(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_function_and_options_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener_with_function_and_options(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_and_options_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_function_and_bool_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener_with_function_and_bool(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_and_bool_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_typed<K: MapKey<WorkerGlobalScopeEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener_with_event_listener_object(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_function_and_options_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener_with_function_and_options(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_and_options_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_function_and_bool_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &Function<fn(<K as MapKey<WorkerGlobalScopeEventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener_with_function_and_bool(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_and_bool_typed<
+        K: MapKey<WorkerGlobalScopeEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WorkerGlobalScopeEventMap>>::Value>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<WorkerGlobalScopeEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+}
+impl WebSocket {
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener_with_event_listener_object(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_function_and_options_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener_with_function_and_options(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_and_options_typed<
+        K: MapKey<WebSocketEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+        options: &EventTargetAddEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_function_and_bool_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener_with_function_and_bool(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
+    pub fn add_event_listener_with_event_listener_object_and_bool_typed<
+        K: MapKey<WebSocketEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.add_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener_with_event_listener_object(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_function_and_options_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener_with_function_and_options(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_and_options_typed<
+        K: MapKey<WebSocketEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+        options: &EventTargetEventListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener_with_event_listener_object_and_options(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_function_and_bool_typed<K: MapKey<WebSocketEventMap>>(
+        &self,
+        handler: &Function<fn(<K as MapKey<WebSocketEventMap>>::Value) -> Undefined>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener_with_function_and_bool(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+    #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
+    pub fn remove_event_listener_with_event_listener_object_and_bool_typed<
+        K: MapKey<WebSocketEventMap>,
+    >(
+        &self,
+        handler: &EventListenerObject<<K as MapKey<WebSocketEventMap>>::Value>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.remove_event_listener_with_event_listener_object_and_bool(
+            <K as MapKey<WebSocketEventMap>>::KEY,
+            ::wasm_bindgen::JsCast::unchecked_ref(handler),
+            options,
+        )
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "Uint8Array")]
+    type __TsGenBytes;
+    #[wasm_bindgen(constructor, js_class = "Uint8Array")]
+    fn new(buffer: &JsValue, offset: f64, length: f64) -> __TsGenBytes;
+    #[wasm_bindgen(method, getter, js_class = "Uint8Array")]
+    fn buffer(this: &__TsGenBytes) -> JsValue;
+    #[wasm_bindgen(method, getter, js_class = "Uint8Array", js_name = "byteOffset")]
+    fn byte_offset(this: &__TsGenBytes) -> f64;
+    #[wasm_bindgen(method, getter, js_class = "Uint8Array", js_name = "byteLength")]
+    fn byte_length(this: &__TsGenBytes) -> f64;
+    # [wasm_bindgen (js_namespace = ArrayBuffer , js_name = "isView")]
+    fn __ts_gen_is_view(value: &JsValue) -> bool;
+}
+fn __ts_gen_buffer_bytes(value: &JsValue) -> Vec<u8> {
+    let view: &__TsGenBytes = ::wasm_bindgen::JsCast::unchecked_ref(value);
+    let bytes = match __ts_gen_is_view(value) {
+        true => __TsGenBytes::new(&view.buffer(), view.byte_offset(), view.byte_length()),
+        false => __TsGenBytes::new(value, 0.0, view.byte_length()),
+    };
+    ::wasm_bindgen::JsCast::unchecked_into::<::js_sys::Uint8Array>(bytes).to_vec()
 }

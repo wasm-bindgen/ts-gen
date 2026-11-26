@@ -9,13 +9,15 @@
 //! A variant is named for what it adds beyond the primary: the positions
 //! where it departs, by parameter name where the primary lacks the
 //! parameter, by type where a sibling has the same parameter with another
-//! type. A hidden string constant names the variant itself (`getJson`), and
-//! a hidden `null` names its position (`withNull`, or `withANull` when
-//! several positions take one).
+//! type, except that a parameter's only dictionary type is named by the
+//! parameter. A hidden string constant names the variant itself
+//! (`getJson`), and a hidden `null` names its position (`withNull`, or
+//! `withANull` when several positions take one).
 
 use std::collections::{HashMap, HashSet};
 
-use crate::ir::{Literal, Type};
+use crate::ir::{JsEntry, Literal, MemberKind, Type};
+use crate::resolve::{Context, Symbols, TypeDecl};
 
 /// One position of a variant's JS argument list, before constants are
 /// hidden.
@@ -26,6 +28,8 @@ pub enum Slot<'a> {
         ty: &'a Type,
         /// A trailing rest parameter (`...rest`).
         rest: bool,
+        /// `ty` is a dictionary (see [`is_dictionary`]).
+        dictionary: bool,
     },
     /// A constant moved into `@js(args)`; `name` is the source parameter's.
     Const { name: &'a str, value: &'a Literal },
@@ -63,6 +67,16 @@ pub fn variant_names_with(
     used.claim(&parsed[0].stem);
 
     let primary = sigs[0];
+    // A parameter's only dictionary type is the parameter spelled out; two
+    // are told apart by type.
+    let sole_dictionary = |abs: usize, p: &Pos<'_>| {
+        p.dictionary
+            && sigs
+                .iter()
+                .filter_map(|s| s.get(abs))
+                .filter(|o| o.name == p.name && o.dictionary)
+                .all(|o| o.kind == p.kind)
+    };
     let plan = |idx: usize| -> (Vec<Part>, Vec<Part>) {
         let sig = sigs[idx];
         let end = if sig.len() >= trim_end {
@@ -99,6 +113,7 @@ pub fn variant_names_with(
             let (text, from_type) = match p.kind {
                 Kind::Null if null_positions.len() > 1 => (format!("{param}Null"), false),
                 Kind::Null => ("Null".to_string(), false),
+                Kind::Ty(..) if retyped && sole_dictionary(abs, p) => (param.clone(), false),
                 Kind::Ty(ty, _) if retyped => (type_word(ty), true),
                 Kind::Ty(..) => (param.clone(), false),
             };
@@ -151,6 +166,24 @@ pub fn variant_names_with(
     names
 }
 
+/// Whether `t` is a dictionary: an interface the bridge makes with
+/// `@js(object) new()`.
+pub fn is_dictionary(symbols: &Symbols<'_>, t: &Type, cx: &Context<'_>) -> bool {
+    let t = match t {
+        Type::Nullable(t, _) => t,
+        t => t,
+    };
+    let Type::Named(r) = t else {
+        return false;
+    };
+    match symbols.resolve_decl(&r.path, cx) {
+        Some((_, TypeDecl::Class(c))) => c.members.iter().any(|m| {
+            matches!(m.kind, MemberKind::New(_)) && m.meta.attrs.js.contains(&JsEntry::Object)
+        }),
+        _ => false,
+    }
+}
+
 /// The default type vocabulary: the IR spelling as one PascalCase chunk
 /// (`Str`, `F64`, `ArrayBuffer`, `Array`). Nullability doesn't name.
 pub fn type_word(t: &Type) -> String {
@@ -161,6 +194,7 @@ pub fn type_word(t: &Type) -> String {
         Type::Scalar(s) | Type::ScalarBox(s) => pascal(s.name()),
         Type::Str | Type::StrBox => "Str".into(),
         Type::BigInt | Type::BigIntBox => "BigInt".into(),
+        Type::Buffer => "Buffer".into(),
         Type::Any => "Any".into(),
         Type::Vec(_) | Type::VecBox(_) | Type::MutVec(_) => "Vec".into(),
         Type::Array(_) | Type::ArrBox(_) => "Array".into(),
@@ -169,6 +203,8 @@ pub fn type_word(t: &Type) -> String {
         Type::Fn(_) => "Fn".into(),
         Type::View { .. } => "View".into(),
         Type::Nullable(t, _) => type_word(t),
+        Type::Lit(l) => literal_word(l),
+        Type::Index(m, _) => type_word(m),
         Type::Named(r) => {
             let spec = match &r.path.base {
                 crate::ir::Base::Module(spec) => Some(spec),
@@ -219,6 +255,7 @@ enum Kind<'a> {
 struct Pos<'a> {
     name: &'a str,
     kind: Kind<'a>,
+    dictionary: bool,
 }
 
 impl Pos<'_> {
@@ -240,9 +277,15 @@ impl<'a> Variant<'a> {
         let mut positions = Vec::new();
         for s in slots {
             match *s {
-                Slot::Param { name, ty, rest } => positions.push(Pos {
+                Slot::Param {
+                    name,
+                    ty,
+                    rest,
+                    dictionary,
+                } => positions.push(Pos {
                     name,
                     kind: Kind::Ty(ty, rest),
+                    dictionary,
                 }),
                 Slot::Const {
                     name,
@@ -250,6 +293,7 @@ impl<'a> Variant<'a> {
                 } => positions.push(Pos {
                     name,
                     kind: Kind::Null,
+                    dictionary: false,
                 }),
                 Slot::Const { value, .. } => stem.push_str(&literal_word(value)),
             }

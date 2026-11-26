@@ -69,3 +69,10 @@ export class Gate {
     return 1;
   }
 }
+
+export class Kinds {
+  *[Symbol.iterator]() {
+    yield "sub";
+    yield "fault";
+  }
+}

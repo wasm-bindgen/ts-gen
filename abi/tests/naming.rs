@@ -32,10 +32,13 @@ fn sig(src: &str) -> Vec<Slot<'static>> {
             let Decl::Member(m) = &ir.items[0] else {
                 unreachable!()
             };
+            // A type ending in `Options` or `Init` stands for a dictionary.
+            let dictionary = ty.ends_with("Options") || ty.ends_with("Init");
             Slot::Param {
                 name: leak(name),
                 ty: Box::leak(Box::new(m.params[0].ty.clone())),
                 rest,
+                dictionary,
             }
         })
         .collect()
@@ -72,6 +75,43 @@ fn union_parameters_name_by_type() {
     assert_eq!(
         names("send", &["body: str", "body: ArrayBuffer"]),
         ["send", "sendWithArrayBuffer"]
+    );
+}
+
+#[test]
+fn a_lone_dictionary_is_named_by_its_parameter() {
+    assert_eq!(
+        names(
+            "decrypt",
+            &[
+                "algorithm: str, data: str",
+                "algorithm: EncryptOptions, data: str"
+            ]
+        ),
+        ["decrypt", "decryptWithAlgorithm"]
+    );
+    assert_eq!(
+        names(
+            "listen",
+            &[
+                "type: str",
+                "type: str, options: ListenOptions",
+                "type: str, options: bool"
+            ]
+        ),
+        ["listen", "listenWithOptions", "listenWithBool"]
+    );
+    // Two dictionaries at one position are told apart by type.
+    assert_eq!(
+        names(
+            "get",
+            &[
+                "key: str, options: str",
+                "key: str, options: GetOptions",
+                "key: str, options: RangeOptions"
+            ]
+        ),
+        ["get", "getWithGetOptions", "getWithRangeOptions"]
     );
 }
 
@@ -353,5 +393,13 @@ fn pascal_words() {
     assert_eq!(
         names("f", &["a = \"\"", "a = -1", "a = 2"]),
         ["fEmpty", "fNeg1", "f2"]
+    );
+}
+
+#[test]
+fn a_buffer_names_itself() {
+    assert_eq!(
+        names("put", &["v: str", "v: buffer", "v: *buffer"]),
+        ["put", "putWithBuffer", "putWithView"]
     );
 }

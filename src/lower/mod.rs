@@ -55,6 +55,10 @@ pub struct Options {
     /// `T | null | undefined` keeps three states as `T??`. Otherwise it's
     /// `T?`, writing `undefined`, which TS accepts there (§9).
     pub strict_nullable: bool,
+    /// Keep `K extends keyof M` and `M[K]` as written (§13). Otherwise
+    /// they lower as an erasing reading has them: the key a string, the
+    /// index the union of the map's values.
+    pub keyed: bool,
 }
 
 /// A lib IR to produce: `lib <name>;` with the root declarations, at
@@ -77,6 +81,7 @@ impl Default for Options {
             lib: None,
             with: Vec::new(),
             strict_nullable: false,
+            keyed: true,
         }
     }
 }
@@ -345,6 +350,8 @@ pub(crate) struct Lowerer<'a> {
     stubs: IndexMap<String, (abi::ClassKind, usize)>,
     /// The `Record` interfaces referenced, by name.
     records: indexmap::IndexSet<&'static str>,
+    /// The key parameters of the signature being lowered as written.
+    keyed: Vec<String>,
     /// Each `with` lib type's lib, arity and whether it's an interface.
     lib_types: HashMap<String, (String, usize, bool)>,
     /// Each `with` lib string enum: its lib, dotted path and sorted literals.
@@ -432,6 +439,7 @@ impl<'a> Lowerer<'a> {
             modules: IndexMap::new(),
             stubs: IndexMap::new(),
             records: Default::default(),
+            keyed: Vec::new(),
             lib_types: lib_types(&opts.with),
             lib_literals: lib_literals(&opts.with),
             with_used: HashSet::new(),
@@ -841,6 +849,10 @@ impl<'a> Lowerer<'a> {
                 }
             }
             pad::type_ref(r, &arities);
+            // Bare, a lone name the text quotes is a literal type (§3).
+            if matches!(&r.path.segments[..], [s] if !ts_gen_abi::text::is_ident(s)) {
+                r.path.base = abi::Base::Root;
+            }
         });
         // An overload named for a renamed enum (`modeWithXOrY`) follows it.
         walk::members(&mut items, &mut |m| {

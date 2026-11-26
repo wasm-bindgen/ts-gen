@@ -41,3 +41,26 @@ declare function scalar(v: Exclude<Value, string[]> | null): void;
 interface Settings { id: string; cache?: boolean }
 type Universal = Exclude<Settings, "id"> & { extra?: string };
 declare function configure(s: Universal): void;
+
+// `ArrayBuffer` beside `ArrayBufferView` is a `buffer`, whatever else the
+// union holds and however it's named. As a type argument the two stay an
+// enum. `{@slice view}` writes it by arm, beside its view.
+type BufferSource = ArrayBufferView | ArrayBuffer;
+declare class Box<T> {
+  value: T;
+}
+declare function digest(data: BufferSource): ArrayBuffer;
+declare function store(key: string, value: string | ArrayBuffer | ArrayBufferView): void;
+declare function storeBlob(value: Blob | BufferSource | string): void;
+declare function load(): ArrayBuffer | ArrayBufferView | null;
+declare function loadText(): BufferSource | string;
+declare function join(parts: BufferSource[]): Promise<BufferSource>;
+declare function boxed(): Box<BufferSource>;
+/** @param data {@slice view} */
+declare function hash(data: BufferSource): void;
+/** @param data {@slice view} */
+declare function hashText(data: string | BufferSource): void;
+interface Frame {
+  payload: ArrayBuffer | ArrayBufferView;
+  tag?: ArrayBufferView | ArrayBuffer | string;
+}

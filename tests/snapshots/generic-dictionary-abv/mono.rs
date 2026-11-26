@@ -44,18 +44,26 @@ extern "C" {
         V: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 impl<T: ::wasm_bindgen::convert::IntoWasmAbi> GenAbv<T> {
-    pub fn new() -> GenAbv<T> {
-        Self::builder().build()
+    pub fn new_typed() -> GenAbv<T> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> GenAbvBuilder<T> {
+    pub fn builder_typed() -> GenAbvBuilder<T> {
         GenAbvBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl GenAbv<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> GenAbvBuilder<JsValue> {
+        Self::builder_typed()
+    }
+}
 impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for GenAbv<T> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct GenAbvBuilder<T> {
@@ -75,6 +83,11 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> GenAbvBuilder<T> {
     }
     pub fn build(self) -> GenAbv<T> {
         self.inner
+    }
+}
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<GenAbv<T>> for GenAbvBuilder<T> {
+    fn from(inner: GenAbv<T>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

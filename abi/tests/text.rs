@@ -120,7 +120,16 @@ fn sample_reads_as_written() {
             args: Vec::new(),
         })
     );
-    assert_eq!(q[1].ty, Type::named(["Str"]));
+    assert_eq!(
+        q[1].ty,
+        Type::Named(TypeRef {
+            path: Path {
+                base: Base::Root,
+                segments: vec!["Str".into()],
+            },
+            args: Vec::new(),
+        })
+    );
     assert_eq!(
         method(types, "futures").result,
         Type::Future(Box::new(Type::Unit), Path::err())
@@ -216,6 +225,10 @@ fn equivalent_spellings_read_equal() {
         ("f(a: *(u8)[]);", "f(a: *u8[]);"),
         ("f(a: mut (u8)[]);", "f(a: mut u8[]);"),
         ("f(a: (u8)[]);", "f(a: u8[]);"),
+        (
+            "f(a: (buffer), b: *buffer, c: buffer?): arr<buffer>;",
+            "f(a: buffer, b: *buffer, c: buffer?): arr<buffer>;",
+        ),
     ];
     for (a, b) in pairs {
         assert_eq!(
@@ -425,4 +438,39 @@ fn throws_takes_a_root_path() {
     };
     assert_eq!(m.throws.as_ref().map(|p| &p.base), Some(&Base::Root));
     assert_eq!(parse(&text::print(&ir)), ir);
+}
+
+#[test]
+fn keys_and_literal_types_round_trip() {
+    let src = r#"ir 1;
+interface M { get a(): f64; }
+class C<N: M> {
+  f<K in keyof N>(key: K): N[K];
+  g(key: "a", n: 1, on: true): arr<M["a"]>?;
+  h<K in keyof M>(key: K): M[K]["x"][];
+  i(x: ."a-b"[]);
+}
+"#;
+    let ir = parse(src);
+    let text = text::print(&ir);
+    assert_eq!(parse(&text), ir, "{text}");
+    let c = class(&ir, "C");
+    let n = Type::named(["N"]);
+    let k = Type::named(["K"]);
+    assert_eq!(c.members[0].tparams[0].bound, Some(Bound::KeyOf(n.clone())));
+    assert_eq!(c.members[0].result, Type::Index(Box::new(n), Box::new(k)));
+    let lits: Vec<&Type> = c.members[1].params.iter().map(|p| &p.ty).collect();
+    assert_eq!(
+        lits,
+        [
+            &Type::Lit(Literal::Str("a".into())),
+            &Type::Lit(Literal::Int(1)),
+            &Type::Lit(Literal::Bool(true))
+        ]
+    );
+    assert!(
+        text.contains(r#"h<K in keyof M>(key: K): M[K]["x"][];"#),
+        "{text}"
+    );
+    assert!(text.contains(r#"i(x: ."a-b"[]);"#), "{text}");
 }

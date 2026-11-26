@@ -23,16 +23,17 @@ wasm-bindgen = "0.2.128"
 wasm-bindgen-futures = "0.4.78"
 wasm-bindgen-test = "0.3.78"
 
-# Temporarily pin a tag of the wasm-bindgen/wasm-bindgen#5433 branch (generic
-# sequences over the element ABI, stacked on #5390's real-generic js-sys
-# element types and on main with #5428 and #5437) until these ship in a
-# release. The tag survives rebases of the branch. All four crates must come
-# from the same source.
+# Temporarily pin a tag of wasm-bindgen's generic stack (#5471's element ABI
+# for sequences, #5440, #5445 and #5390's real-generic js-sys element types)
+# with the open js-sys and macro changes the mono bindings use (#5375, #5441,
+# #5443, #5444, #5448, #5450, #5484), until these ship in a release. The tag
+# survives rebases of the branches. All four crates must come from the same
+# source.
 [patch.crates-io]
-js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", tag = "ts-gen/mono-vec-228d2027" }
-wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", tag = "ts-gen/mono-vec-228d2027" }
-wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", tag = "ts-gen/mono-vec-228d2027" }
-wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", tag = "ts-gen/mono-vec-228d2027" }
+js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", tag = "ts-gen/mono-cells-a164c17d" }
+wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", tag = "ts-gen/mono-cells-a164c17d" }
+wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", tag = "ts-gen/mono-cells-a164c17d" }
+wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", tag = "ts-gen/mono-cells-a164c17d" }
 
 [package]
 categories = ["wasm", "development-tools::ffi"]

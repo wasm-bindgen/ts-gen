@@ -8,6 +8,11 @@ interface Response {
   readonly status: number;
   /** A note that is not carried over. */
   readonly ok: boolean;
+  // A property with no setter here is read-only in the input too.
+  readonly url: string;
+  get type(): string;
+  /** @retype */
+  readonly body: ReadableStream<Uint8Array> | null;
   /**
    * Creates a clone of the response.
    * @throws {TypeError} if the body has already been used
@@ -34,6 +39,14 @@ interface Storage {
 interface Console {
   /** @throws {never} */
   log(...data: any[]): void;
+}
+
+// A `{@slice}` tag reaches the input's parameter, under its TS name.
+interface Bucket {
+  /** @param bodyBytes {@slice view} copied before the call returns */
+  put(key: string, bodyBytes: any): Promise<void>;
+  /** @param data {@slice view} */
+  upload(key: string, data: any): Promise<void>;
 }
 
 /** @tw-abi i32 */

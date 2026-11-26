@@ -218,6 +218,11 @@ impl FormatSettingsBuilder {
         self.inner
     }
 }
+impl From<FormatSettings> for FormatSettingsBuilder {
+    fn from(inner: FormatSettings) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "builtin-errors")]
 extern "C" {
     pub fn settings(value: &FormatSettings) -> String;

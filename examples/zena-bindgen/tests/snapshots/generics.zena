@@ -3,7 +3,147 @@
 
 import { Option, Some, None, none, some } from 'zena:core';
 
-function __tw_entered(): void {}
+import { Future, Completer, drainMicrotasks } from 'zena:async';
+
+@external("tw:future", "poll", "tw")
+declare function __tw_future_poll(future: externref, waker: i32): i32;
+
+@external("tw:future", "take<{T}>", "tw")
+declare function __tw_future_take<T>(future: externref): T;
+
+@external("tw:future", "error<err>", "tw")
+declare function __tw_future_error(future: externref): inline (i32, String);
+
+@external("tw:future", "drop", "tw")
+declare function __tw_future_drop(future: externref): void;
+
+@external("tw:future", "new", "tw")
+declare function __tw_future_new(): inline (externref, externref);
+
+@external("tw:future", "resolve<{T}>", "tw")
+declare function __tw_future_resolve<T>(resolver: externref, value: T): void;
+
+@external("tw:future", "reject<err>", "tw")
+declare function __tw_future_reject(resolver: externref, arm: i32, message: String): void;
+
+@external("tw:loop", "work_available", "tw")
+declare function __tw_work_available(loop: i32): void;
+
+// The bindings run one tw loop, Zena's microtask queue: a JS future
+// settling wakes its awaiter, whose completion asks the bridge for a
+// tick, which drains the queue.
+interface __TwPoll {
+  poll(): void;
+}
+
+let __tw_polls = new HashMap<i32, __TwPoll>();
+var __tw_next_waker = 1;
+
+class __TwAwait<T> implements __TwPoll {
+  future: externref;
+  waker: i32;
+  completer: Completer<T>;
+  fail: (future: externref) => Error;
+
+  new(future: externref, waker: i32, fail: (future: externref) => Error)
+      : future = future, waker = waker, completer = new Completer<T>(), fail = fail {}
+
+  poll(): void {
+    let state = __tw_future_poll(this.future, this.waker);
+    if (state == 0) {
+      __tw_polls[this.waker] = this;
+      return;
+    }
+    if (state == 1) {
+      this.completer.complete(__tw_future_take<T>(this.future));
+    } else {
+      let fail = this.fail;
+      this.completer.fail(fail(this.future));
+    }
+    __tw_work_available(1);
+  }
+}
+
+/** A JS future as a Zena future, `fail` mapping its rejection to the
+ * error it fails with. Cancelling its awaiter drops the JS future, which
+ * cancels it. */
+export async function __tw_await_with<T>(
+    future: externref, fail: (future: externref) => Error): Future<T> {
+  let waker = __tw_next_waker;
+  __tw_next_waker += 1;
+  let a = new __TwAwait<T>(future, waker, fail);
+  a.poll();
+  try {
+    return await a.completer.future;
+  } cancel {
+    __tw_polls.delete(waker);
+    __tw_future_drop(future);
+  }
+}
+
+function __tw_err_fail(future: externref): Error {
+  let (arm, message) = __tw_future_error(future);
+  return new ErrException(arm as ErrArm, message);
+}
+
+export function __tw_await<T>(future: externref): Future<T> {
+  return __tw_await_with<T>(future, __tw_err_fail);
+}
+
+async function __tw_settle<T>(
+    resolver: externref, future: Future<T>,
+    reject: (resolver: externref, e: Error) => void): Future<void> {
+  try {
+    __tw_future_resolve<T>(resolver, await future);
+  } catch (e) {
+    reject(resolver, e);
+  }
+}
+
+function __tw_err_reject(resolver: externref, e: Error): void {
+  if (e is ErrException) {
+    __tw_future_reject(resolver, e.arm as i32, e.message);
+  } else {
+    __tw_future_reject(resolver, -1, e.message);
+  }
+}
+
+/** A Zena future as a JS future, `reject` rejecting it with the error
+ * the Zena future fails with. */
+export function __tw_promise_with<T>(
+    future: Future<T>, reject: (resolver: externref, e: Error) => void): externref {
+  let (promise, resolver) = __tw_future_new();
+  __tw_settle<T>(resolver, future, reject);
+  __tw_work_available(1);
+  return promise;
+}
+
+export function __tw_promise<T>(future: Future<T>): externref {
+  return __tw_promise_with<T>(future, __tw_err_reject);
+}
+
+@export("tw:future/wake")
+export function __tw_wake(waker: i32): void {
+  if (let (true, p) = __tw_polls.get(waker)) {
+    __tw_polls.delete(waker);
+    p.poll();
+  }
+}
+
+@export("tw:loop/tick")
+export function __tw_tick(loop: i32, max: i32): i32 {
+  drainMicrotasks();
+  return 0;
+}
+
+@export("tw:loop/next_sleep")
+export function __tw_next_sleep(loop: i32): i64 {
+  return (-9223372036854775808 as i64);
+}
+
+function __tw_entered(): void {
+  __tw_work_available(1);
+}
 
 export enum DateUnit {
   Year = 1,
@@ -94,6 +234,35 @@ export enum HourOrWeek {
 export sealed class SignalOrHalt {
   case SignalOrHaltSignal(value: Signal)
   case SignalOrHaltHalt(value: Halt)
+}
+
+export sealed class EventListenerOrEventListenerObject {
+  case EventListenerOrEventListenerObjectEventListener(value: (a0: Event) => void)
+  case EventListenerOrEventListenerObjectEventListenerObject(value: EventListenerObject<Event>)
+}
+
+export sealed class MessageEventOrCloseEvent {
+  case MessageEventOrCloseEventMessageEvent(value: MessageEvent)
+  case MessageEventOrCloseEventCloseEvent(value: CloseEvent)
+}
+
+/** The box `MessageEventOrCloseEvent`: the JS value, which `unbox` converts. */
+@spelling("Any")
+export extension class MessageEventOrCloseEventBox on externref {
+  unbox(): MessageEventOrCloseEvent {
+    let (r0, r1) = __tw_unbox_MessageEventOrCloseEventBox((this as externref));
+    return (__MessageEventOrCloseEvent_decode(r0, r1) as MessageEventOrCloseEvent);
+  }
+}
+
+export sealed class EventListenerOrEventListenerObjectMessageEventOrCloseEvent {
+  case EventListenerOrEventListenerObjectMessageEventOrCloseEventEventListener(value: (a0: MessageEventOrCloseEvent) => void)
+  case EventListenerOrEventListenerObjectMessageEventOrCloseEventEventListenerObject(value: EventListenerObject<MessageEventOrCloseEventBox>)
+}
+
+export sealed class F64OrStr {
+  case F64OrStrF64(value: f64)
+  case F64OrStrStr(value: String)
 }
 
 export enum PluralExcludeTimeUnitHour {
@@ -984,6 +1153,213 @@ export extension class Cell<T> on externref {
   new(value: T) : super(__Cell_new<T>(value));
 }
 
+export extension class Event on externref {
+  new __wrap(value: externref) : super(value);
+}
+
+export extension class MessageEvent extends Event {
+  data: String {
+    get {
+      return __MessageEvent_data((this as externref));
+    }
+  }
+}
+
+export extension class CloseEvent extends Event {
+  code: f64 {
+    get {
+      return __CloseEvent_code((this as externref));
+    }
+  }
+}
+
+export extension class EventListenerObject<E = Event> on externref {
+  handleEvent(event: E): void {
+    __EventListenerObject_handleEvent<E>((this as externref), event);
+  }
+}
+
+export extension class WebSocketEventMap on externref {
+  close: CloseEvent {
+    get {
+      return __WebSocketEventMap_close((this as externref));
+    }
+    set(value) {
+      __WebSocketEventMap_close2((this as externref), value);
+    }
+  }
+  message: MessageEvent {
+    get {
+      return __WebSocketEventMap_message((this as externref));
+    }
+    set(value) {
+      __WebSocketEventMap_message2((this as externref), value);
+    }
+  }
+  new() : super(__WebSocketEventMap_new());
+}
+
+export extension class EventTarget<EventMap = Record<Event>> on externref {
+  new __wrap(value: externref) : super(value);
+  new() : super(__EventTarget_new<EventMap>());
+  addEventListener(type_: String, handler: (a0: Event) => void): void {
+    __EventTarget_addEventListener<EventMap>((this as externref), type_, (handler as anyref));
+  }
+  addEventListener(type_: String, handler: EventListenerObject<Event>): void {
+    __EventTarget_addEventListener2<EventMap>((this as externref), type_, handler);
+  }
+  dispatchEvent(event: Event): boolean {
+    return __EventTarget_dispatchEvent<EventMap>((this as externref), event);
+  }
+}
+
+export extension class WebSocket extends EventTarget<WebSocketEventMap> {
+  new(url: String) : super.__wrap(__WebSocket_new(url));
+}
+
+export extension class TextModel on externref {
+  inputs: TextModelInputs {
+    get {
+      return __TextModel_inputs((this as externref));
+    }
+    set(value) {
+      __TextModel_inputs2((this as externref), value);
+    }
+  }
+  postProcessedOutputs: TextModelPostProcessedOutputs {
+    get {
+      return __TextModel_postProcessedOutputs((this as externref));
+    }
+    set(value) {
+      __TextModel_postProcessedOutputs2((this as externref), value);
+    }
+  }
+  new() : super(__TextModel_new());
+}
+
+export extension class ImageModel on externref {
+  inputs: ImageModelInputs {
+    get {
+      return __ImageModel_inputs((this as externref));
+    }
+    set(value) {
+      __ImageModel_inputs2((this as externref), value);
+    }
+  }
+  postProcessedOutputs: ImageModelPostProcessedOutputs {
+    get {
+      return __ImageModel_postProcessedOutputs((this as externref));
+    }
+    set(value) {
+      __ImageModel_postProcessedOutputs2((this as externref), value);
+    }
+  }
+  new() : super(__ImageModel_new());
+}
+
+export extension class AiModelList on externref {
+  image_model: ImageModel {
+    get {
+      return __AiModelList_image_model((this as externref));
+    }
+    set(value) {
+      __AiModelList_image_model2((this as externref), value);
+    }
+  }
+  text_model: TextModel {
+    get {
+      return __AiModelList_text_model((this as externref));
+    }
+    set(value) {
+      __AiModelList_text_model2((this as externref), value);
+    }
+  }
+  new() : super(__AiModelList_new());
+}
+
+export extension class Sizes on externref {
+  label: String {
+    get {
+      return __Sizes_label((this as externref));
+    }
+    set(value) {
+      __Sizes_label2((this as externref), value);
+    }
+  }
+  width: f64 {
+    get {
+      return __Sizes_width((this as externref));
+    }
+    set(value) {
+      __Sizes_width2((this as externref), value);
+    }
+  }
+  new() : super(__Sizes_new());
+}
+
+export extension class Ai on externref {
+  run(model: String, inputs: externref): Future<externref> {
+    let r0 = __Ai_run((this as externref), model, inputs);
+    return __tw_await<externref>(r0 as externref);
+  }
+  size(key: String): F64OrStr {
+    let (r0, r1, r2) = __Ai_size((this as externref), key);
+    return (__F64OrStr_decode(r0, r1, r2) as F64OrStr);
+  }
+  sizes(): F64OrStr {
+    let (r0, r1, r2) = __Ai_sizes((this as externref));
+    return (__F64OrStr_decode(r0, r1, r2) as F64OrStr);
+  }
+}
+
+export extension class TextModelInputs on externref {
+  prompt: String {
+    get {
+      return __TextModelInputs_prompt((this as externref));
+    }
+    set(value) {
+      __TextModelInputs_prompt2((this as externref), value);
+    }
+  }
+  new() : super(__TextModelInputs_new());
+}
+
+export extension class TextModelPostProcessedOutputs on externref {
+  text: String {
+    get {
+      return __TextModelPostProcessedOutputs_text((this as externref));
+    }
+    set(value) {
+      __TextModelPostProcessedOutputs_text2((this as externref), value);
+    }
+  }
+  new() : super(__TextModelPostProcessedOutputs_new());
+}
+
+export extension class ImageModelInputs on externref {
+  image: FixedArray<f64> {
+    get {
+      return __ImageModelInputs_image((this as externref));
+    }
+    set(value) {
+      __ImageModelInputs_image2((this as externref), value);
+    }
+  }
+  new() : super(__ImageModelInputs_new());
+}
+
+export extension class ImageModelPostProcessedOutputs on externref {
+  label: String {
+    get {
+      return __ImageModelPostProcessedOutputs_label((this as externref));
+    }
+    set(value) {
+      __ImageModelPostProcessedOutputs_label2((this as externref), value);
+    }
+  }
+  new() : super(__ImageModelPostProcessedOutputs_new());
+}
+
 export extension class Record<V> on externref {
   at(key: String): Option<V> {
     return __Record_at<V>((this as externref), key);
@@ -1004,6 +1380,9 @@ export extension class ArrStr on externref {
     return __str_array_in(r0);
   }
 }
+
+@external("tw:unbox", "MessageEventOrCloseEvent", "tw")
+declare function __tw_unbox_MessageEventOrCloseEventBox(p0: externref): inline (i32, externref | null);
 
 @external("tw:js/global", "Box.new<Str>(T)", "tw, throws:err")
 declare function __Box_new(p0: externref): externref;
@@ -1440,6 +1819,150 @@ declare function __Cell_new<T>(p0: T): externref;
 @external("tw:js/global", "Cell#get:value<{T}>()", "tw")
 declare function __Cell_value<T>(p0: externref): T;
 
+@external("tw:js/global", "MessageEvent#get:data()", "tw")
+declare function __MessageEvent_data(p0: externref): String;
+
+@external("tw:js/global", "CloseEvent#get:code()", "tw")
+declare function __CloseEvent_code(p0: externref): f64;
+
+@external("tw:js/global", "EventListenerObject#handleEvent<{E}>(E)", "tw, throws:err")
+declare function __EventListenerObject_handleEvent<E>(p0: externref, p1: E): void;
+
+@external("tw:js/global", "WebSocketEventMap.new()", "tw")
+declare function __WebSocketEventMap_new(): externref;
+
+@external("tw:js/global", "WebSocketEventMap#get:message()", "tw")
+declare function __WebSocketEventMap_message(p0: externref): MessageEvent;
+
+@external("tw:js/global", "WebSocketEventMap#set:message(MessageEvent)", "tw")
+declare function __WebSocketEventMap_message2(p0: externref, p1: MessageEvent): void;
+
+@external("tw:js/global", "WebSocketEventMap#get:close()", "tw")
+declare function __WebSocketEventMap_close(p0: externref): CloseEvent;
+
+@external("tw:js/global", "WebSocketEventMap#set:close(CloseEvent)", "tw")
+declare function __WebSocketEventMap_close2(p0: externref, p1: CloseEvent): void;
+
+@external("tw:js/global", "EventTarget.new<{EventMap}>()", "tw, throws:err")
+declare function __EventTarget_new<EventMap>(): externref;
+
+@external("tw:js/global", "EventTarget#addEventListener<{EventMap},str>(Type,fn(EventMap[Type]))", "tw, throws:err")
+declare function __EventTarget_addEventListener<EventMap>(p0: externref, p1: String, p2: anyref): void;
+
+@external("tw:js/global", "EventTarget#addEventListener<{EventMap},str>(Type,EventListenerObject<EventMap[Type]>)", "tw, throws:err")
+declare function __EventTarget_addEventListener2<EventMap>(p0: externref, p1: String, p2: EventListenerObject<Event>): void;
+
+@external("tw:js/global", "EventTarget#dispatchEvent<{EventMap}>(Event)", "tw, throws:err")
+declare function __EventTarget_dispatchEvent<EventMap>(p0: externref, p1: Event): boolean;
+
+@external("tw:js/global", "WebSocket.new(str)", "tw, throws:err")
+declare function __WebSocket_new(p0: String): externref;
+
+@external("tw:js/global", "TextModel.new()", "tw")
+declare function __TextModel_new(): externref;
+
+@external("tw:js/global", "TextModel#get:inputs()", "tw")
+declare function __TextModel_inputs(p0: externref): TextModelInputs;
+
+@external("tw:js/global", "TextModel#set:inputs(TextModelInputs)", "tw")
+declare function __TextModel_inputs2(p0: externref, p1: TextModelInputs): void;
+
+@external("tw:js/global", "TextModel#get:postProcessedOutputs()", "tw")
+declare function __TextModel_postProcessedOutputs(p0: externref): TextModelPostProcessedOutputs;
+
+@external("tw:js/global", "TextModel#set:postProcessedOutputs(TextModelPostProcessedOutputs)", "tw")
+declare function __TextModel_postProcessedOutputs2(p0: externref, p1: TextModelPostProcessedOutputs): void;
+
+@external("tw:js/global", "ImageModel.new()", "tw")
+declare function __ImageModel_new(): externref;
+
+@external("tw:js/global", "ImageModel#get:inputs()", "tw")
+declare function __ImageModel_inputs(p0: externref): ImageModelInputs;
+
+@external("tw:js/global", "ImageModel#set:inputs(ImageModelInputs)", "tw")
+declare function __ImageModel_inputs2(p0: externref, p1: ImageModelInputs): void;
+
+@external("tw:js/global", "ImageModel#get:postProcessedOutputs()", "tw")
+declare function __ImageModel_postProcessedOutputs(p0: externref): ImageModelPostProcessedOutputs;
+
+@external("tw:js/global", "ImageModel#set:postProcessedOutputs(ImageModelPostProcessedOutputs)", "tw")
+declare function __ImageModel_postProcessedOutputs2(p0: externref, p1: ImageModelPostProcessedOutputs): void;
+
+@external("tw:js/global", "AiModelList.new()", "tw")
+declare function __AiModelList_new(): externref;
+
+@external("tw:js/global", "AiModelList#get:\"text-model\"()", "tw")
+declare function __AiModelList_text_model(p0: externref): TextModel;
+
+@external("tw:js/global", "AiModelList#set:\"text-model\"(TextModel)", "tw")
+declare function __AiModelList_text_model2(p0: externref, p1: TextModel): void;
+
+@external("tw:js/global", "AiModelList#get:\"image-model\"()", "tw")
+declare function __AiModelList_image_model(p0: externref): ImageModel;
+
+@external("tw:js/global", "AiModelList#set:\"image-model\"(ImageModel)", "tw")
+declare function __AiModelList_image_model2(p0: externref, p1: ImageModel): void;
+
+@external("tw:js/global", "Sizes.new()", "tw")
+declare function __Sizes_new(): externref;
+
+@external("tw:js/global", "Sizes#get:width()", "tw")
+declare function __Sizes_width(p0: externref): f64;
+
+@external("tw:js/global", "Sizes#set:width(f64)", "tw")
+declare function __Sizes_width2(p0: externref, p1: f64): void;
+
+@external("tw:js/global", "Sizes#get:label()", "tw")
+declare function __Sizes_label(p0: externref): String;
+
+@external("tw:js/global", "Sizes#set:label(str)", "tw")
+declare function __Sizes_label2(p0: externref, p1: String): void;
+
+@external("tw:js/global", "Ai#run(Name,AiModelList[Name][\"inputs\"])", "tw")
+declare function __Ai_run(p0: externref, p1: String, p2: externref): externref;
+
+@external("tw:js/global", "Ai#size(K)", "tw, throws:err")
+declare function __Ai_size(p0: externref, p1: String): inline (i32, f64, externref | null);
+
+@external("tw:js/global", "Ai#sizes()", "tw, throws:err")
+declare function __Ai_sizes(p0: externref): inline (i32, f64, externref | null);
+
+@external("tw:js/global", "TextModelInputs.new()", "tw")
+declare function __TextModelInputs_new(): externref;
+
+@external("tw:js/global", "TextModelInputs#get:prompt()", "tw")
+declare function __TextModelInputs_prompt(p0: externref): String;
+
+@external("tw:js/global", "TextModelInputs#set:prompt(str)", "tw")
+declare function __TextModelInputs_prompt2(p0: externref, p1: String): void;
+
+@external("tw:js/global", "TextModelPostProcessedOutputs.new()", "tw")
+declare function __TextModelPostProcessedOutputs_new(): externref;
+
+@external("tw:js/global", "TextModelPostProcessedOutputs#get:text()", "tw")
+declare function __TextModelPostProcessedOutputs_text(p0: externref): String;
+
+@external("tw:js/global", "TextModelPostProcessedOutputs#set:text(str)", "tw")
+declare function __TextModelPostProcessedOutputs_text2(p0: externref, p1: String): void;
+
+@external("tw:js/global", "ImageModelInputs.new()", "tw")
+declare function __ImageModelInputs_new(): externref;
+
+@external("tw:js/global", "ImageModelInputs#get:image()", "tw")
+declare function __ImageModelInputs_image(p0: externref): FixedArray<f64>;
+
+@external("tw:js/global", "ImageModelInputs#set:image(arr<f64>)", "tw")
+declare function __ImageModelInputs_image2(p0: externref, p1: FixedArray<f64>): void;
+
+@external("tw:js/global", "ImageModelPostProcessedOutputs.new()", "tw")
+declare function __ImageModelPostProcessedOutputs_new(): externref;
+
+@external("tw:js/global", "ImageModelPostProcessedOutputs#get:label()", "tw")
+declare function __ImageModelPostProcessedOutputs_label(p0: externref): String;
+
+@external("tw:js/global", "ImageModelPostProcessedOutputs#set:label(str)", "tw")
+declare function __ImageModelPostProcessedOutputs_label2(p0: externref, p1: String): void;
+
 @external("tw:js/global", "Record#at<{V}>(str)", "tw")
 declare function __Record_at<V>(p0: externref, p1: String): Option<V>;
 
@@ -1491,11 +2014,23 @@ declare function __step(p0: SteppedHourOrMinute, p1: SpanningHourOrWeek): void;
 @external("tw:js/global", "spanHour(Spanning<Hour>)", "tw, throws:err")
 declare function __spanHour(p0: SpanningHour): void;
 
-@external("tw:js/global", "listen(str,fn(SignalOrHalt))", "tw, throws:err")
+@external("tw:js/global", "listen(K,fn(SignalMap[K]))", "tw, throws:err")
 declare function __listen(p0: String, p1: anyref): void;
 
 @external("tw:js/global", "first<{T}>(T)", "tw, throws:err")
 declare function __first<T>(p0: T): T;
+
+@external("tw:js/global", "addEventListener(Type,fn(WebSocketEventMap[Type]))", "tw, throws:err")
+declare function __addEventListener(p0: String, p1: anyref): void;
+
+@external("tw:js/global", "addEventListener(Type,EventListenerObject<WebSocketEventMap[Type]>)", "tw, throws:err")
+declare function __addEventListener2(p0: String, p1: EventListenerObject<MessageEventOrCloseEventBox>): void;
+
+export function __MessageEventOrCloseEvent_decode(arm: i32, s0: externref | null): MessageEventOrCloseEvent | null {
+  if (arm == 1) { return new MessageEventOrCloseEventMessageEvent((s0 as MessageEvent)); }
+  if (arm == 2) { return new MessageEventOrCloseEventCloseEvent((s0 as CloseEvent)); }
+  return null;
+}
 
 @export("tw:call:fn(Str)->{U}", "tw")
 export function __tw_trampoline<U>(env: anyref, p0_0: externref): U {
@@ -1513,6 +2048,20 @@ export function __tw_trampoline2<U>(env: anyref, p0_0: f64): U {
   let result: U = f(a0);
   __tw_entered();
   return result;
+}
+
+@export("tw:call:fn(Event)", "tw")
+export function __tw_trampoline3(env: anyref, p0_0: Event): void {
+  let f = env as (a0: Event) => void;
+  let a0: Event = p0_0;
+  f(a0);
+  __tw_entered();
+}
+
+export function __F64OrStr_decode(arm: i32, s0: f64, s1: externref | null): F64OrStr | null {
+  if (arm == 1) { return new F64OrStrF64(s0); }
+  if (arm == 2) { return new F64OrStrStr(String.fromHandle(s1 as externref)); }
+  return null;
 }
 
 export function __str_array_in(a: array<var externref | null>): FixedArray<String> {
@@ -1547,9 +2096,17 @@ export function __SignalOrHalt_decode(arm: i32, s0: externref | null): SignalOrH
 }
 
 @export("tw:call:fn(SignalOrHalt)", "tw")
-export function __tw_trampoline3(env: anyref, p0_0: i32, p0_1: externref | null): void {
+export function __tw_trampoline4(env: anyref, p0_0: i32, p0_1: externref | null): void {
   let f = env as (a0: SignalOrHalt) => void;
   let a0: SignalOrHalt = (__SignalOrHalt_decode(p0_0, p0_1) as SignalOrHalt);
+  f(a0);
+  __tw_entered();
+}
+
+@export("tw:call:fn(MessageEventOrCloseEvent)", "tw")
+export function __tw_trampoline5(env: anyref, p0_0: i32, p0_1: externref | null): void {
+  let f = env as (a0: MessageEventOrCloseEvent) => void;
+  let a0: MessageEventOrCloseEvent = (__MessageEventOrCloseEvent_decode(p0_0, p0_1) as MessageEventOrCloseEvent);
   f(a0);
   __tw_entered();
 }
@@ -1617,4 +2174,12 @@ export function listen(type_: String, handler: (a0: SignalOrHalt) => void): void
 
 export function first<T>(items: T): T {
   return __first<T>(items);
+}
+
+export function addEventListener(type_: String, handler: (a0: MessageEventOrCloseEvent) => void): void {
+  __addEventListener(type_, (handler as anyref));
+}
+
+export function addEventListenerWithEventListenerObject(type_: String, handler: EventListenerObject<MessageEventOrCloseEventBox>): void {
+  __addEventListener2(type_, handler);
 }

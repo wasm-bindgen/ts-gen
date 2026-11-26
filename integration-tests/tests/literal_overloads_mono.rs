@@ -4,14 +4,15 @@
 
 use js_sys::{ArrayBuffer, JsNullable, JsString, Map, Object, Promise, Uint8Array};
 use wasm_bindgen::JsValue;
+use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::literal_overloads_mono::{
-    pick_free, pick_free_with_null, Boxed, BoxedKind, Clash, ClashFKind, ClashKind, Headers,
-    KVNamespace, KVNamespaceKind, KVStore, KVStoreKind, Opener, OpenerKind, PickFreeKind, Picker,
-    PickerKind, Repeats, SubtleCrypto,
+    pick_free, pick_free_with_null, store, Boxed, BoxedKind, Clash, ClashFKind, ClashKind,
+    GetOptions, Headers, KVNamespace, KVNamespaceKind, KVStore, KVStoreKind, Opener, OpenerKind,
+    PickFreeKind, Picker, PickerKind, Repeats, StoreReader, SubtleCrypto,
 };
 
-// No backing JavaScript module; compile-only coverage that under
+// Compile-only coverage that under
 // per-monomorphization each literal arm's `_js_string` sibling is a wrapper
 // of its own name beside the arm's native-string one, and that a generic
 // arm carries its extern's ABI bounds.
@@ -47,7 +48,7 @@ async fn mono_arms_compile(
 async fn generic_arms_compile(store: &KVStore<JsString>) -> Result<(), JsValue> {
     let _: Option<String> = store.get_text(JsString::from("k")).await?;
     let _: Option<JsString> = store.get_text_js_string(JsString::from("k")).await?;
-    let _: Option<Object> = store.get_json::<Object>(JsString::from("k")).await?;
+    let _: Option<Object> = store.get_json_typed::<Object>(JsString::from("k")).await?;
     Ok(())
 }
 
@@ -121,4 +122,36 @@ fn free_and_constructor_null_arms_compile(buf: &ArrayBuffer, obj: &Object) -> Re
     let _: Opener = Opener::new(OpenerKind::A, buf)?;
     let _: Opener = Opener::new_with_null(OpenerKind::B)?;
     Ok(())
+}
+
+// A literal a parameter's type argument fixes is set by the binding, on a
+// copy of the caller's options; one a field's own type fixes, by the
+// dictionary's factory.
+#[wasm_bindgen_test]
+async fn literal_fields_are_filled_by_the_binding() {
+    let store = store();
+    let options = GetOptions::new();
+    options.set_ttl(60.0);
+    assert_eq!(store.read("k").await.unwrap().unwrap(), "k");
+    let text = store.read_text_with_options("k", &options).await.unwrap();
+    assert_eq!(text.unwrap(), "k:ttl=60,type=text");
+    let json = store.read_json_with_options("k", &options).await.unwrap();
+    assert_eq!(json.as_string().unwrap(), "k:ttl=60,type=json");
+    let bytes = store
+        .read_array_buffer_with_options("k", &options)
+        .await
+        .unwrap();
+    let bytes = bytes.unwrap().byte_length() as usize;
+    assert_eq!(bytes, "k:ttl=60,type=arrayBuffer".len());
+    assert_eq!(store.tail(&options), "ttl=60,type=lines");
+    // The caller's own value doesn't reach the call, and stays on its options.
+    options.set_type(JsValue::from_str("json"));
+    let text = store.read_text_with_options("k", &options).await.unwrap();
+    assert_eq!(text.unwrap(), "k:ttl=60,type=text");
+    assert_eq!(options.type_(), Some(JsValue::from_str("json")));
+    assert_eq!(store.open(&StoreReader::new()), "mode=byob");
+    // A dictionary of constants alone is the call's to make.
+    assert_eq!(store.get_reader(), "default");
+    assert_eq!(store.get_reader_byob(), "mode=byob".len() as f64);
+    assert_eq!(store.lock(), "mode=exclusive");
 }

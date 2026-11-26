@@ -145,6 +145,7 @@ an opaque value the bridge hasn't converted
 | `str` | `Str` | string | |
 | `T[]` | `Vec<T>` | typed array | `T` is a typed-array element type |
 | `arr<T>` | `Arr<T>` | Array | any element type |
+| `buffer` | — | `ArrayBuffer` or any view of one | its bytes ([§11](#11-sequences-and-memory)) |
 | `(A, B, …)` | `Tuple<A, B, …>` | fixed-length Array | `(A,)` is a one-tuple; `()` is invalid |
 | `enum` path | itself, as a type argument | per arm | the box is the arm's host value ([§13](#13-boxes-reference-wire-types-and-generics)) |
 | class or interface path | itself | the object | always a reference |
@@ -152,7 +153,7 @@ an opaque value the bridge hasn't converted
 | std `Symbol` | itself | symbol | a class the bridge tests with `typeof === "symbol"`, not `instanceof` |
 | `future<T>`, `future<T, E>` | — | Promise | [§16](#16-async) |
 | `fn(A, …) -> R throws E`, `fn(A, ...arr<T>)` | — | function | [§18](#18-callbacks) |
-| `*T[]`, `*mut T[]` | — | typed array over the memory | zero-copy view, import parameters only ([§11](#11-sequences-and-memory)) |
+| `*T[]`, `*mut T[]`, `*buffer` | — | typed array over the memory | zero-copy view, import parameters only ([§11](#11-sequences-and-memory)) |
 | `mut T[]` | — | typed array | writeback, parameters only |
 | type parameter `T` | — | per instantiation | [§13](#13-boxes-reference-wire-types-and-generics) |
 | associated type | — | per instantiation | [§13](#13-boxes-reference-wire-types-and-generics) |
@@ -193,7 +194,7 @@ an opaque value the bridge hasn't converted
   operand of a postfix operator it's parenthesized, `(@js(null) T?)[]`.
 * `*`, `*mut` and `mut` are prefixes that apply only to a whole `T[]`, and
   to nothing else: `*u8[]` is a view, not an array of pointers, and `*u8`
-  is a syntax error.
+  is a syntax error. `*buffer` is the one other view.
 
 * `?` is invalid on `*T[]` and `*mut T[]`. `mut T[]?` is allowed and uses
   the `T[]?` encoding ([§11](#11-sequences-and-memory)); an absent value
@@ -554,6 +555,12 @@ class Response {
   payload is its type, several a tuple. Each such key is a valid import,
   `Response#new(str?)`, `Response#new(u8[]?)` and so on, generated only
   when a language imports it, as with mono instantiations (§13).
+* **Derived buffer variants.** A `buffer` parameter, `union` or not, and
+  a `buffer` payload an arm variant takes, can each take `ArrayBuffer` or
+  `ArrayBufferView` in its place, keeping its `?`s: the object itself,
+  which the bridge passes as it is ([§11](#11-sequences-and-memory)).
+  `Kv#put(str,buffer)` is so also `Kv#put(str,ArrayBuffer)` and
+  `Kv#put(str,ArrayBufferView)`, derived the same way.
 
 Validation:
 
@@ -643,6 +650,39 @@ constants, and array literals of expressions (`[a, b]`). A field fill can
 take a parameter, so a flattened overload builds its dictionary in one
 call: `args = (m? { from = from, text = text })`. They're type-checked
 against IR members, and no JS API gets special treatment.
+
+A dictionary field that can hold only one string literal is a constant
+as well, and the producer fills it: a required field typed by the literal
+(`mode: "byob"`), or by a type parameter the parameter's type gives one
+(`options: GetOptions<"arrayBuffer">` over `type: Type`).
+
+```
+@js(name = "get", args = (key, options? { type = "arrayBuffer" }))
+getArrayBuffer(key: str, options: GetOptions<Any?>?): future<ArrayBuffer?>;
+```
+
+* The parameter is nullable, as a fill makes the object when it's absent.
+* The type argument giving the literal is left open (`Any?`), and the
+  field it types is optional on the dictionary, so no caller writes it,
+  and one that does is overridden.
+* Overloads that differ only in the literal collide, and are renamed by
+  it as for a positional constant (`getText`, `getArrayBuffer`).
+* A type parameter bounded by literals keeps its enums instead.
+
+A dictionary whose every field is such a constant leaves the caller
+nothing to set. Its parameter is dropped, and the fill's object is a
+`let` the bridge makes:
+
+```
+getReader(): ReadableStreamDefaultReader;
+@js(name = "getReader", args = (options? { mode = "byob" }), let options = ReadableStreamGetReaderOptions.new())
+getReaderByob(): ReadableStreamBYOBReader;
+```
+
+* It collides with the overload omitting the parameter, and is renamed
+  by the literal.
+* A dictionary with a field the caller can set, or a parent, keeps its
+  parameter.
 
 * A path through a nullable parameter reads it without supplying it, and
   is `undefined` when the parameter is absent: `init.signal` with no
@@ -784,6 +824,7 @@ Arm tests are derived from the arm type:
 | interface | non-null object |
 | `str`, numbers, `bool`, `i64`/`u64`, std `Symbol` | `typeof` (plus the scalar validation) |
 | `T[]` | `instanceof` the typed-array class |
+| `buffer` | `instanceof ArrayBuffer`, or `ArrayBuffer.isView` |
 | `arr<T>`, tuples | `Array.isArray` (plus length for tuples) |
 | `fn(...)` | `typeof === "function"` |
 | `future<T, E>` | thenable: `typeof v?.then === "function"` |
@@ -832,7 +873,8 @@ with `ZonedLike { Zoned(Zoned); ZonedFields(ZonedFields); Str(str); }` and
 
 This order is separate from index order: `BodyInit`'s `Blob` arm (a class)
 is tested before its `ArrayBufferView` arm (an interface) even when it's
-declared after it.
+declared after it. A `buffer` arm is tested after the classes, since it
+takes every view class, and before the interfaces.
 
 Arm tests are dispatch, not validation, so they run even with validation
 disabled. Tagged unions (`@js(when)`) are deferred.
@@ -1099,6 +1141,32 @@ For `size(): u53`, a JS result of `2 ** 53` is a `TypeError`. For
   makes the call, and copies back over the same storage.
 * `*T[]` and `*mut T[]` (import parameters only) are zero-copy **views**
   ([below](#views-t-and-mut-t)).
+* `buffer` is a JS `ArrayBuffer` or any view of one (a typed array or a
+  `DataView`), and the language's bytes: it's laid out as `u8[]`, in every
+  position a `u8[]` is.
+
+  ```ts
+  class Kv {
+    put(key: str, value: buffer);
+    get(key: str): buffer?;
+  }
+  ```
+
+  * JS → language the bridge takes either, as a fresh copy of its bytes: a
+    view gives exactly its window (`byteOffset`, `byteLength`), whatever its
+    element type, and anything else is a `TypeError`.
+  * Language → JS the bytes are a fresh `Uint8Array`.
+  * `*buffer` (import parameters only) is the bytes as a zero-copy
+    `Uint8Array` over the memory, a view like `*u8[]`.
+  * It is exactly `ArrayBuffer | ArrayBufferView`, and nothing is lost by
+    it: a parameter takes either class as the object itself through its
+    derived variants ([§7](#7-overloads-and-the-js-call-dsl)), every one
+    the same JS call, and a consumer may read it back as the two classes.
+    A producer writes it wherever a union holds both, whatever else the
+    union holds; `ArrayBuffer` alone, or a typed array alone, stays its
+    class.
+  * It has no box, so it isn't a type argument: there the two classes
+    stay an enum.
 * `Uint8Array`, `ArrayBuffer`, `DataView`, `Uint8ClampedArray` and the other
   buffer types are ordinary classes (externref). They convert to and from
   memory through `("tw:box", T[])` and `("tw:unbox", T[])`
@@ -1576,6 +1644,8 @@ enumerates them.
 * `T: C` is a subtype bound (TS `<T extends C>`).
 * `T in (A, B)` is a concrete bound: a finite set of allowed
   concretizations. A one-element set is `T in (A)`.
+* `K in keyof M` is a key bound: the literal types of `M`'s property names
+  ([Keys](#keys)).
 
 The IR has no generics mode flag.
 
@@ -1608,6 +1678,66 @@ Example: Kotlin, erased, `Map<Str, Tuple<u32, bool>>`.
    unconverted.
 3. Kotlin knows `V` statically, and calls `("tw:unbox", "(u32,bool)")`,
    which validates and returns `(i32 7, i32 1)`.
+
+### Keys
+
+A literal type, a key bound and an index state what TypeScript's
+`K extends keyof M` and `M[K]` do: a value picks a property, and the
+property types the rest of the signature.
+
+```ts
+class Event {}
+class MessageEvent extends Event {}
+interface Record<V> {
+  @js(index) at(key: str): V?;
+}
+interface WebSocketEventMap {
+  get message(): MessageEvent;
+  get close(): Event;
+}
+class EventTarget<EventMap: Record<Event> = Record<Event>> {
+  addEventListener<Type in keyof EventMap>(type: Type, handler: fn(EventMap[Type]));
+}
+interface Model {
+  get inputs(): str;
+  get outputs(): f64;
+}
+interface AiModelList {
+  get "text-model"(): Model;
+}
+class Ai {
+  run<Name in keyof AiModelList>(model: Name, inputs: AiModelList[Name]["inputs"]): future<AiModelList[Name]["outputs"]>;
+}
+```
+
+* **A literal type** is a string, integer or boolean literal in type
+  position: `"message"`, `1`, `true`. It has one value, which never
+  crosses: the bridge supplies it to JS, and checks a value from JS
+  against it with `===`. A type whose name the text would quote is written
+  from the root there (`."content-type"`), since a lone string is a
+  literal type.
+* **`K in keyof M`** bounds `K` to the literal types of `M`'s property
+  names. `M` is a class or an interface, an alias of one, or a type
+  parameter bounded by one. Its properties are its getters, its own before
+  its parents'. An `M` with an `@js(index)` getter (a `Record`) is open:
+  every string is a key, and each has the getter's value.
+* **`M[K]`** is the type of the property `K` names: `K` is a key
+  parameter or a literal type, and indexes chain (`M[K]["inputs"]`).
+* **A mono variant** gives a key as a type argument, a literal type, after
+  those of the class: `EventTarget#addEventListener<WebSocketEventMap,"message">(Type,fn(EventMap[Type]))`.
+  Its key parameter has no wire value, and each index is that property's
+  type: here `fn(MessageEvent)`. A literal that names no property of a
+  closed map is a link error. A variant that leaves a key a value gives it
+  `str`: the key crosses as a string, and each index reads as the
+  member's does erased, whatever map the variant gives.
+* **Erased**, a key parameter is a `str`, and `M[K]` is the type every key
+  gives: an open map's value, else the one type its properties share, else
+  the declared enum whose arms carry exactly their types, else `Any`. An
+  index that names no property of some key's value is `Any`. The key is
+  still the keyed member's: `EventTarget#addEventListener(Type,fn(EventMap[Type]))`
+  takes `(externref, str, fn(Event))`.
+* A key parameter has no default, and an enum arm can't name one: a union
+  over an index is an overload per arm (§7).
 
 ### Associated types
 
@@ -2422,14 +2552,15 @@ params      = param ("," param)*
 param       = pattr* name ":" "union"? type
 pattr       = "@js" "(" ("null" | "unshared") ")" | "@once"   // `@js(null)` is the type's
 tparams     = "<" tparam ("," tparam)* ">"
-tparam      = ident (":" type | "in" "(" type ("," type)* ")")? ("=" type)?
+tparam      = ident (":" type | "in" "(" type ("," type)* ")" | "in" "keyof" type)? ("=" type)?
 type        = "@js" "(" "null" ")" type | prefix postfix*  // the attribute needs a `T?`
-postfix     = "?" | "[" "]"
-prefix      = "*" "mut"? primary "[" "]" | "mut" primary "[" "]" | fntype | primary
+postfix     = "?" | "[" "]" | "[" type "]"            // `M[K]` (§13)
+prefix      = "*" "mut"? primary "[" "]" | "*" "buffer" | "mut" primary "[" "]" | fntype | primary
 fntype      = "fn" "(" ((type ",")* "..."? type)? ")" ("->" type)? throws?
-primary     = scalar | "bigint" | "str" | "unit" | "never" | "Any" | box
+primary     = scalar | "bigint" | "str" | "buffer" | "unit" | "never" | "Any" | box
             | "arr" "<" type ">" | "future" "<" type ("," path)? ">"
             | "(" type ")" | "(" type "," ")" | "(" type ("," type)+ ")"
+            | string | int | "true" | "false"         // a literal type (§13)
             | typeref
 box         = "Bool" | "I8" | "U8" | "I16" | "U16" | "I32" | "U32" | "I53" | "U53"
             | "I64" | "U64" | "F16" | "F32" | "F64" | "BigInt" | "Str" | "Unit"
@@ -2465,7 +2596,11 @@ targs       = "<" ctype ("," ctype)* ">"
 ctype       = the canonical spelling of a type (§3)
 ```
 
-* `T: C` is a subtype bound and `T in (A, B)` a concrete bound (§13).
+* `T: C` is a subtype bound, `T in (A, B)` a concrete bound and
+  `K in keyof M` a key bound (§13).
+* A `string` in type position that no `.` follows is a literal type, so a
+  lone quoted type name is written `."name"` there, and in a canonical
+  spelling.
 * `type` begins an associated type only before a name and `=`, so it stays
   a member name (§13).
 * In a `ctype`, a type declared in a `module` block is the path

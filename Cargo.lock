@@ -372,7 +372,7 @@ checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
 [[package]]
 name = "js-sys"
 version = "0.3.107"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-vec-228d2027#228d2027e2e30fc69d68beb4990839a27868674f"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-cells-a164c17d#a164c17de173c15dc7df85db1cb93ad47a2c24e6"
 dependencies = [
  "cfg-if",
  "futures-util",
@@ -1073,9 +1073,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.53.2"
+version = "1.54.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e95f91fcc7a621e8b030f6aa23c71fe9838ae2fb4d8118b75602a328f5144044"
+checksum = "b52fd3255258d26fac7264ab5a76b53c13367136dc011d3d6ad4f8ed070396a3"
 dependencies = [
  "pin-project-lite",
 ]
@@ -1235,7 +1235,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen"
 version = "0.2.130"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-vec-228d2027#228d2027e2e30fc69d68beb4990839a27868674f"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-cells-a164c17d#a164c17de173c15dc7df85db1cb93ad47a2c24e6"
 dependencies = [
  "cfg-if",
  "rustversion",
@@ -1246,7 +1246,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-futures"
 version = "0.4.80"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-vec-228d2027#228d2027e2e30fc69d68beb4990839a27868674f"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-cells-a164c17d#a164c17de173c15dc7df85db1cb93ad47a2c24e6"
 dependencies = [
  "js-sys",
  "tokio",
@@ -1256,7 +1256,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-macro"
 version = "0.2.130"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-vec-228d2027#228d2027e2e30fc69d68beb4990839a27868674f"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-cells-a164c17d#a164c17de173c15dc7df85db1cb93ad47a2c24e6"
 dependencies = [
  "quote",
  "wasm-bindgen-macro-support",
@@ -1265,7 +1265,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-macro-support"
 version = "0.2.130"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-vec-228d2027#228d2027e2e30fc69d68beb4990839a27868674f"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-cells-a164c17d#a164c17de173c15dc7df85db1cb93ad47a2c24e6"
 dependencies = [
  "bumpalo",
  "proc-macro2",
@@ -1277,7 +1277,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-shared"
 version = "0.2.130"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-vec-228d2027#228d2027e2e30fc69d68beb4990839a27868674f"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-cells-a164c17d#a164c17de173c15dc7df85db1cb93ad47a2c24e6"
 dependencies = [
  "unicode-ident",
 ]
@@ -1285,7 +1285,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-test"
 version = "0.3.80"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-vec-228d2027#228d2027e2e30fc69d68beb4990839a27868674f"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-cells-a164c17d#a164c17de173c15dc7df85db1cb93ad47a2c24e6"
 dependencies = [
  "cast",
  "js-sys",
@@ -1305,7 +1305,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-test-macro"
 version = "0.3.80"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-vec-228d2027#228d2027e2e30fc69d68beb4990839a27868674f"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-cells-a164c17d#a164c17de173c15dc7df85db1cb93ad47a2c24e6"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1315,7 +1315,7 @@ dependencies = [
 [[package]]
 name = "wasm-bindgen-test-shared"
 version = "0.2.130"
-source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-vec-228d2027#228d2027e2e30fc69d68beb4990839a27868674f"
+source = "git+https://github.com/wasm-bindgen/wasm-bindgen?tag=ts-gen%2Fmono-cells-a164c17d#a164c17de173c15dc7df85db1cb93ad47a2c24e6"
 
 [[package]]
 name = "wasm-encoder"

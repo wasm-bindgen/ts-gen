@@ -14,3 +14,12 @@ class Util {
 class Bag<T in (u32, str)> {
   put(v: T);
 }
+
+interface Sizes {
+  get width(): u32;
+  get label(): str;
+}
+
+class Shape {
+  static read<K in keyof Sizes>(key: K): Sizes[K];
+}

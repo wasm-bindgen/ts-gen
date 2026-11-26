@@ -46,3 +46,8 @@ impl UnsealedBuilder {
         self.inner
     }
 }
+impl From<Unsealed> for UnsealedBuilder {
+    fn from(inner: Unsealed) -> Self {
+        Self { inner }
+    }
+}

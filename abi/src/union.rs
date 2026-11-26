@@ -113,6 +113,7 @@ fn test(symbols: &Symbols<'_>, t: &Type, cx: &Context<'_>) -> Option<String> {
         Type::Fn(_) => "a function".into(),
         Type::Future(..) => "a thenable".into(),
         Type::Vec(e) | Type::VecBox(e) | Type::MutVec(e) => format!("a `{e:?}[]`"),
+        Type::Buffer => "a buffer".into(),
         Type::Any | Type::Nullable(..) => "anything".into(),
         Type::Named(r) => match symbols.resolve_decl(&r.path, cx) {
             Some((_, TypeDecl::Enum(_))) => return None,
@@ -124,12 +125,47 @@ fn test(symbols: &Symbols<'_>, t: &Type, cx: &Context<'_>) -> Option<String> {
     })
 }
 
-/// Each arm-specialized variant of `k`'s `union` parameters, as its key
-/// and parameter types: every parameter takes `E` or one arm's payload,
-/// independently, and at least one takes an arm.
+/// The classes a `buffer` is one of (IR.md §3).
+pub const BUFFER_HANDLES: [&str; 2] = ["ArrayBuffer", "ArrayBufferView"];
+
+pub(crate) fn is_buffer(t: &Type) -> bool {
+    match t {
+        Type::Nullable(t, _) => is_buffer(t),
+        t => *t == Type::Buffer,
+    }
+}
+
+/// Whether `m` has [`variants`]: a `union` or `buffer` parameter.
+pub fn varies(m: &Member) -> bool {
+    m.params.iter().any(|p| p.union || is_buffer(&p.ty))
+}
+
+/// `t` and, where it's a `buffer`, each class it also takes as the
+/// object itself.
+fn with_handles(t: Type) -> Vec<Type> {
+    let handles: Vec<Type> = match is_buffer(&t) {
+        true => BUFFER_HANDLES
+            .iter()
+            .map(|n| {
+                let class = Type::Named(TypeRef {
+                    path: Path::rooted([*n]),
+                    args: Vec::new(),
+                });
+                substitute(&t, &class)
+            })
+            .collect(),
+        false => Vec::new(),
+    };
+    std::iter::once(t).chain(handles).collect()
+}
+
+/// Each specialized variant of `k`'s parameters, as its key and parameter
+/// types. A `union` parameter takes `E` or one arm's payload and a
+/// `buffer` its bytes or one of its classes, independently, and at least
+/// one parameter takes other than its own type.
 pub fn variants(keys: &Keys<'_>, k: &Keyed<'_>) -> Vec<(String, Vec<Type>)> {
     let m = k.member;
-    if !m.params.iter().any(|p| p.union) {
+    if !varies(m) {
         return Vec::new();
     }
     let own: Vec<String> = m.params.iter().map(|p| keys.ty(&p.ty, &k.cx)).collect();
@@ -139,7 +175,7 @@ pub fn variants(keys: &Keys<'_>, k: &Keyed<'_>) -> Vec<(String, Vec<Type>)> {
     };
     let mut choices: Vec<Vec<Type>> = Vec::new();
     for p in &m.params {
-        let mut c = vec![p.ty.clone()];
+        let mut c = with_handles(p.ty.clone());
         if p.union {
             if let Some(e) =
                 enum_path(&p.ty).and_then(|path| enums::resolve(&keys.symbols, path, &k.cx))
@@ -148,7 +184,7 @@ pub fn variants(keys: &Keys<'_>, k: &Keyed<'_>) -> Vec<(String, Vec<Type>)> {
                     c.extend(
                         payloads(&keys.symbols, &flat)
                             .iter()
-                            .map(|a| substitute(&p.ty, a)),
+                            .flat_map(|a| with_handles(substitute(&p.ty, a))),
                     );
                 }
             }

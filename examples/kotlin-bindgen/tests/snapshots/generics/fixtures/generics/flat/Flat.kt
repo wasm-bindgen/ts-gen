@@ -243,9 +243,9 @@ external fun SignalMap_set_halt_Halt(p0: JsAny?, p1: JsAny?)
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun SignalMap_get_halt(p0: JsAny?): JsAny?
 
-/** tw:js/global listen(str,fn(SignalOrHalt)) */
+/** tw:js/global listen(K,fn(SignalMap[K])) */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
-external fun listen_str_fn_SignalOrHalt(p0: JsAny?, p1: JsAny?)
+external fun listen_K_fn_SignalMap_K(p0: JsAny?, p1: JsAny?)
 
 /** tw:js/global first(T) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -258,6 +258,218 @@ external fun Cell_new_T(p0: JsAny?): JsAny?
 /** tw:js/global Cell#get:value() */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun Cell_get_value(p0: JsAny?): JsAny?
+
+/** tw:js/global MessageEvent#get:data() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun MessageEvent_get_data(p0: JsAny?): JsAny?
+
+/** tw:js/global CloseEvent#get:code() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun CloseEvent_get_code(p0: JsAny?): Double
+
+/** tw:js/global EventListenerObject#handleEvent(E) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun EventListenerObject_handleEvent_E(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global WebSocketEventMap.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun WebSocketEventMap_new(): JsAny?
+
+/** tw:js/global WebSocketEventMap#set:message(MessageEvent) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun WebSocketEventMap_set_message_MessageEvent(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global WebSocketEventMap#get:message() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun WebSocketEventMap_get_message(p0: JsAny?): JsAny?
+
+/** tw:js/global WebSocketEventMap#set:close(CloseEvent) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun WebSocketEventMap_set_close_CloseEvent(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global WebSocketEventMap#get:close() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun WebSocketEventMap_get_close(p0: JsAny?): JsAny?
+
+/** tw:js/global EventTarget.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun EventTarget_new(): JsAny?
+
+/** tw:js/global EventTarget#addEventListener(Type,fn(EventMap[Type])) */
+@JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
+external fun EventTarget_addEventListener_Type_fn_EventMap_Type(p0: JsAny?, p1: JsAny?, p2: JsAny?)
+
+/** tw:js/global EventTarget#addEventListener(Type,EventListenerObject<EventMap[Type]>) */
+@JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
+external fun EventTarget_addEventListener_Type_EventListenerObject_EventMap_Type(p0: JsAny?, p1: JsAny?, p2: JsAny?)
+
+/** tw:js/global EventTarget#dispatchEvent(Event) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun EventTarget_dispatchEvent_Event(p0: JsAny?, p1: JsAny?): Int
+
+/** tw:js/global WebSocket.new(str) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun WebSocket_new_str(p0: JsAny?): JsAny?
+
+/** tw:js/global addEventListener(Type,fn(WebSocketEventMap[Type])) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun addEventListener_Type_fn_WebSocketEventMap_Type(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global addEventListener(Type,EventListenerObject<WebSocketEventMap[Type]>) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun addEventListener_Type_EventListenerObject_WebSocketEventMap_Type(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global TextModel.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun TextModel_new(): JsAny?
+
+/** tw:js/global TextModel#set:inputs(TextModelInputs) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun TextModel_set_inputs_TextModelInputs(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global TextModel#get:inputs() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun TextModel_get_inputs(p0: JsAny?): JsAny?
+
+/** tw:js/global TextModel#set:postProcessedOutputs(TextModelPostProcessedOutputs) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun TextModel_set_postProcessedOutputs_TextModelPostProcessedOutputs(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global TextModel#get:postProcessedOutputs() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun TextModel_get_postProcessedOutputs(p0: JsAny?): JsAny?
+
+/** tw:js/global ImageModel.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun ImageModel_new(): JsAny?
+
+/** tw:js/global ImageModel#set:inputs(ImageModelInputs) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun ImageModel_set_inputs_ImageModelInputs(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global ImageModel#get:inputs() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun ImageModel_get_inputs(p0: JsAny?): JsAny?
+
+/** tw:js/global ImageModel#set:postProcessedOutputs(ImageModelPostProcessedOutputs) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun ImageModel_set_postProcessedOutputs_ImageModelPostProcessedOutputs(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global ImageModel#get:postProcessedOutputs() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun ImageModel_get_postProcessedOutputs(p0: JsAny?): JsAny?
+
+/** tw:js/global AiModelList.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun AiModelList_new(): JsAny?
+
+/** tw:js/global AiModelList#set:"text-model"(TextModel) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun AiModelList_set_text_model_TextModel(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global AiModelList#get:"text-model"() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun AiModelList_get_text_model(p0: JsAny?): JsAny?
+
+/** tw:js/global AiModelList#set:"image-model"(ImageModel) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun AiModelList_set_image_model_ImageModel(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global AiModelList#get:"image-model"() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun AiModelList_get_image_model(p0: JsAny?): JsAny?
+
+/** tw:js/global Sizes.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun Sizes_new(): JsAny?
+
+/** tw:js/global Sizes#set:width(f64) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Sizes_set_width_f64(p0: JsAny?, p1: Double)
+
+/** tw:js/global Sizes#get:width() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Sizes_get_width(p0: JsAny?): Double
+
+/** tw:js/global Sizes#set:label(str) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Sizes_set_label_str(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global Sizes#get:label() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Sizes_get_label(p0: JsAny?): JsAny?
+
+/** tw:future take<Any> */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun take_Any(p0: JsAny?): JsAny?
+
+/** tw:future error<err> */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun error_err(p0: JsAny?): Int
+
+/** tw:js/global Ai#run(Name,AiModelList[Name]["inputs"]) */
+@JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
+external fun Ai_run_Name_AiModelList_Name_inputs(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
+
+/** tw:ret f64 */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun ret_f64(): Double
+
+/** tw:js/global Ai#size(K) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun Ai_size_K(p0: JsAny?, p1: JsAny?): Int
+
+/** tw:js/global Ai#sizes() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun Ai_sizes(p0: JsAny?): Int
+
+/** tw:js/global TextModelInputs.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun TextModelInputs_new(): JsAny?
+
+/** tw:js/global TextModelInputs#set:prompt(str) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun TextModelInputs_set_prompt_str(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global TextModelInputs#get:prompt() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun TextModelInputs_get_prompt(p0: JsAny?): JsAny?
+
+/** tw:js/global TextModelPostProcessedOutputs.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun TextModelPostProcessedOutputs_new(): JsAny?
+
+/** tw:js/global TextModelPostProcessedOutputs#set:text(str) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun TextModelPostProcessedOutputs_set_text_str(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global TextModelPostProcessedOutputs#get:text() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun TextModelPostProcessedOutputs_get_text(p0: JsAny?): JsAny?
+
+/** tw:js/global ImageModelInputs.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun ImageModelInputs_new(): JsAny?
+
+/** tw:js/global ImageModelInputs#set:image(arr<f64>) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun ImageModelInputs_set_image_arr_f64(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global ImageModelInputs#get:image() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun ImageModelInputs_get_image(p0: JsAny?): JsAny?
+
+/** tw:js/global ImageModelPostProcessedOutputs.new() */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun ImageModelPostProcessedOutputs_new(): JsAny?
+
+/** tw:js/global ImageModelPostProcessedOutputs#set:label(str) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun ImageModelPostProcessedOutputs_set_label_str(p0: JsAny?, p1: JsAny?)
+
+/** tw:js/global ImageModelPostProcessedOutputs#get:label() */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun ImageModelPostProcessedOutputs_get_label(p0: JsAny?): JsAny?
 
 /** tw:js/global Record#at(str) */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
@@ -378,6 +590,38 @@ external fun unbox_SignalOrHalt(p0: JsAny?): Int
 /** tw:box SignalOrHalt */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun box_SignalOrHalt(p0: Int, p1: JsAny?): JsAny?
+
+/** tw:unbox EventListenerOrEventListenerObject */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_EventListenerOrEventListenerObject(p0: JsAny?): Int
+
+/** tw:box EventListenerOrEventListenerObject */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_EventListenerOrEventListenerObject(p0: Int, p1: JsAny?): JsAny?
+
+/** tw:unbox MessageEventOrCloseEvent */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_MessageEventOrCloseEvent(p0: JsAny?): Int
+
+/** tw:box MessageEventOrCloseEvent */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_MessageEventOrCloseEvent(p0: Int, p1: JsAny?): JsAny?
+
+/** tw:unbox EventListenerOrEventListenerObjectMessageEventOrCloseEvent */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_EventListenerOrEventListenerObjectMessageEventOrCloseEvent(p0: JsAny?): Int
+
+/** tw:box EventListenerOrEventListenerObjectMessageEventOrCloseEvent */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_EventListenerOrEventListenerObjectMessageEventOrCloseEvent(p0: Int, p1: JsAny?): JsAny?
+
+/** tw:unbox F64OrStr */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_F64OrStr(p0: JsAny?): Int
+
+/** tw:box F64OrStr */
+@JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_F64OrStr(p0: Int, p1: Double, p2: JsAny?): JsAny?
 
 /** tw:unbox PluralExcludeTimeUnitHour */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -610,4 +854,28 @@ external fun box_fn_SignalOrHalt(p0: JsAny?): JsAny?
 /** tw:unbox fn(SignalOrHalt) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun unbox_fn_SignalOrHalt(p0: JsAny?): JsAny?
+
+/** tw:box fn(Event) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_fn_Event(p0: JsAny?): JsAny?
+
+/** tw:unbox fn(Event) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_fn_Event(p0: JsAny?): JsAny?
+
+/** tw:box fn(MessageEventOrCloseEvent) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun box_fn_MessageEventOrCloseEvent(p0: JsAny?): JsAny?
+
+/** tw:unbox fn(MessageEventOrCloseEvent) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun unbox_fn_MessageEventOrCloseEvent(p0: JsAny?): JsAny?
+
+/** tw:call fn(Event) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun call_fn_Event(p0: JsAny?, p1: JsAny?)
+
+/** tw:call fn(MessageEventOrCloseEvent) */
+@JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
+external fun call_fn_MessageEventOrCloseEvent(p0: JsAny?, p1: Int, p2: JsAny?)
 

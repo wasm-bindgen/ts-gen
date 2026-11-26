@@ -190,6 +190,8 @@ pub struct CodegenContext<'a> {
     pub ir: Option<crate::from_ir::IrDecls>,
     /// The readings the IR zip takes from the parse, when they're asked for.
     pub zip: Option<crate::ir_callables::Zip>,
+    /// The IR with its keys kept, for the twins of keyed members.
+    pub keyed: Option<crate::keyed::Keyed>,
     /// The type declaration being emitted.
     pub current_decl: std::cell::Cell<Option<ts_gen::context::TypeId>>,
     /// The statics the module being emitted sees, which a parameter or
@@ -1113,6 +1115,7 @@ impl<'a> CodegenContext<'a> {
             lib_name: module.lib_name.clone(),
             emit_path: RefCell::new(Vec::new()),
             ir: None,
+            keyed: None,
             zip: options.zip_diffs.then(Default::default),
             current_decl: std::cell::Cell::new(None),
             statics_in_scope: RefCell::new(HashSet::new()),
@@ -1187,6 +1190,7 @@ impl<'a> CodegenContext<'a> {
             lib_name: None,
             emit_path: RefCell::new(Vec::new()),
             ir: None,
+            keyed: None,
             zip: None,
             current_decl: std::cell::Cell::new(None),
             statics_in_scope: RefCell::new(HashSet::new()),
@@ -1327,6 +1331,17 @@ impl<'a> CodegenContext<'a> {
         };
         let key: Vec<String> = members.iter().map(format_type_ref_key).collect();
         self.name_ir_enum(key, scope, name);
+    }
+
+    /// The IR's enum for a union of `members`, as `scope` reads them.
+    fn ir_enum_name(&self, members: &[TypeRef], scope: ScopeId) -> Option<String> {
+        let key: Vec<String> = members.iter().map(format_type_ref_key).collect();
+        let name = self.ir_enum_names.borrow().get(&key).cloned();
+        self.ir_enum_uses
+            .borrow()
+            .get(&(scope, key))
+            .cloned()
+            .or(name)
     }
 
     fn name_ir_enum(&self, key: Vec<String>, scope: ScopeId, name: &str) {
@@ -2246,7 +2261,7 @@ pub fn to_syn_type(
             if bare == "JsValue" || (bare == "& JsValue" && n.admits_null()) {
                 return inner_ty;
             }
-            return nullable_carrier(inner_ty, n);
+            return nullable_carrier(inner_ty, n, CodegenContext::generic_mono(ctx));
         }
         // A read of the top type stays bare: `any` and `unknown` already
         // admit both empties in-band (`is_null`, `is_undefined`), and
@@ -2257,7 +2272,7 @@ pub fn to_syn_type(
         if is_jsvalue_arg(&inner_ty) && is_top_type(&core, ctx, scope) {
             return inner_ty;
         }
-        return read_carrier(inner_ty, n);
+        return read_carrier(inner_ty, n, CodegenContext::generic_mono(ctx));
     }
 
     // Helper: should this type get `&` in argument position?
@@ -2360,6 +2375,12 @@ pub fn to_syn_type(
         TypeRef::Array(inner) => {
             if pos.inner {
                 generic_container(quote! { Array }, inner, pos, ctx, scope, from_module)
+            } else if let Some(elem) = union_element(inner, pos, ctx, scope, from_module) {
+                if pos.is_argument() {
+                    quote! { &[#elem] }
+                } else {
+                    quote! { Vec<#elem> }
+                }
             } else {
                 let repr = ctx.and_then(|c| c.enum_repr(inner, scope));
                 let inner = repr.as_ref().unwrap_or(inner);
@@ -2730,7 +2751,11 @@ pub(crate) fn union_alias_argument(
     Some(match n {
         None if alias.kind.is_some() => quote! { impl #path },
         None => quote! { impl ::core::convert::Into<#path> },
-        Some(n) => nullable_carrier(union_alias_enum_path(&alias, path), n),
+        Some(n) => nullable_carrier(
+            union_alias_enum_path(&alias, path),
+            n,
+            ctx.experimental_generic_mono,
+        ),
     })
 }
 
@@ -2758,7 +2783,7 @@ fn union_alias_read(
             .chain(alias.nullability)
             .reduce(|a, b| a.with(b))
         {
-            Some(n) => read_carrier(path, n),
+            Some(n) => read_carrier(path, n, ctx.experimental_generic_mono),
             None => path,
         },
     )
@@ -2788,8 +2813,13 @@ fn union_alias_enum_path(alias: &UnionAlias, path: TokenStream) -> TokenStream {
 /// `Option<Nullable<T>>` admits both. `IntoWasmAbi` has to choose what an
 /// empty crosses as, so on a write each carrier owns one empty; a type
 /// argument has no direction and names the union as written.
-pub(crate) fn nullable_carrier(inner: TokenStream, n: ir::Nullability) -> TokenStream {
+///
+/// Per-monomorphization (`mono`) builds on wasm-bindgen#5468, where the
+/// carrier of both is `Nullable<Option<T>>` and the released nesting no
+/// longer crosses.
+pub(crate) fn nullable_carrier(inner: TokenStream, n: ir::Nullability, mono: bool) -> TokenStream {
     match n {
+        ir::Nullability::Both if mono => quote! { Nullable<Option<#inner>> },
         ir::Nullability::Both => quote! { Option<Nullable<#inner>> },
         ir::Nullability::Null => quote! { Nullable<#inner> },
         ir::Nullability::Undefined => quote! { Option<#inner> },
@@ -2800,10 +2830,11 @@ pub(crate) fn nullable_carrier(inner: TokenStream, n: ir::Nullability) -> TokenS
 /// changes nothing JS to Wasm, so `T?` and `@js(null) T?` read as
 /// `Option<T>`, which takes `null` and `undefined` alike as `None`
 /// (wasm-bindgen#5428), where `Nullable<T>` would reject `undefined`. Only
-/// the strict IR's `T??` tells them apart, as `Option<Nullable<T>>`.
-pub(crate) fn read_carrier(inner: TokenStream, n: ir::Nullability) -> TokenStream {
+/// the strict IR's `T??` tells them apart, in the [exact
+/// carrier](nullable_carrier) of both.
+pub(crate) fn read_carrier(inner: TokenStream, n: ir::Nullability, mono: bool) -> TokenStream {
     match n {
-        ir::Nullability::Both => nullable_carrier(inner, n),
+        ir::Nullability::Both => nullable_carrier(inner, n, mono),
         _ => quote! { Option<#inner> },
     }
 }
@@ -3176,7 +3207,8 @@ fn mono_promise_carrier(
     }
     let (core, n, scope) = split_empties_in(inner, ctx, scope)?;
     let inner_ty = to_syn_type(&core, pos.to_inner(), ctx, scope, from_module);
-    (!is_jsvalue_arg(&inner_ty)).then(|| read_carrier(inner_ty, n))
+    (!is_jsvalue_arg(&inner_ty))
+        .then(|| read_carrier(inner_ty, n, CodegenContext::generic_mono(ctx)))
 }
 
 /// Append `generic_args` to `base` when `name` is a locally emitted generic
@@ -3479,6 +3511,7 @@ fn return_value(
                     from_module,
                 ),
                 n,
+                CodegenContext::generic_mono(ctx),
             ),
             None => to_syn_type(ty, TypePosition::RETURN.to_inner(), ctx, scope, from_module),
         };
@@ -3688,7 +3721,7 @@ fn to_mono_user_generic_arg_impl(
         ),
         t if let Some((inner, n, s)) = split_empties_in(t, Some(ctx), peeled_scope) => {
             let inner = to_mono_user_generic_arg_impl(&inner, ctx, s, from_module, visited);
-            nullable_carrier(inner, n)
+            nullable_carrier(inner, n, true)
         }
         t if local_generic_args(t, ctx, peeled_scope).is_some() => to_syn_type(
             t,
@@ -3788,9 +3821,9 @@ fn to_mono_js_string_return_type_impl(
             let inner =
                 to_mono_js_string_return_type_impl(&inner, ctx, s, from_module, read, visited);
             if read {
-                read_carrier(inner, n)
+                read_carrier(inner, n, true)
             } else {
-                nullable_carrier(inner, n)
+                nullable_carrier(inner, n, true)
             }
         }
         t @ TypeRef::Reference { segments, .. }
@@ -3887,7 +3920,7 @@ fn synthesised_read(
     }
     let (core, n) = read.split_empties()?;
     let inner = maybe_synthesise_return_union(&core, ctx, scope, from_module, anchor)?;
-    Some(read_carrier(inner, n))
+    Some(read_carrier(inner, n, CodegenContext::generic_mono(ctx)))
 }
 
 /// Whether `ty` is `any` or `unknown`, through aliases.
@@ -4417,6 +4450,8 @@ pub fn param_slice_mode(
     let core = p.type_ref.split_empties().map(|(core, _)| core);
     let ty = core.as_ref().unwrap_or(&p.type_ref);
     let inferred = match ty {
+        // A list of an enum crosses as the enum's own list.
+        TypeRef::Array(elem) if ctx.is_some_and(|c| is_enum_element(elem, c, scope)) => None,
         TypeRef::Array(elem)
             if is_numeric_array_element(elem, ctx, scope)
                 || is_mono_type_param(elem, ctx, scope) =>
@@ -4424,6 +4459,11 @@ pub fn param_slice_mode(
             Some(SliceMode::Array)
         }
         TypeRef::TypedSlice(..) => Some(SliceMode::Copy),
+        // A `buffer`'s bytes are a copy unless the callee is said to read
+        // them before it returns; its classes cross as themselves.
+        ty if CodegenContext::generic_mono(ctx) && crate::signatures::is_buffer(ty) => {
+            Some(SliceMode::Copy)
+        }
         _ => None,
     };
     // A `{@slice mode}` JSDoc hint overrides the inferred mode when the
@@ -4468,6 +4508,71 @@ fn is_mono_type_param(ty: &TypeRef, ctx: Option<&CodegenContext<'_>>, scope: Sco
                     Some(ts_gen::parse::scope::Binding::TypeParam),
                 )
     )
+}
+
+/// Under per-monomorphization, the enum the IR names for a top-level `T[]`
+/// element that is a union, so the list can mix its arms. An element admitting
+/// empties takes its carrier: the read one in a `Vec`, the exact one in a
+/// slice, which has to choose what an empty crosses as.
+fn union_element(
+    elem: &TypeRef,
+    pos: TypePosition,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> Option<TokenStream> {
+    let c = ctx.filter(|c| c.experimental_generic_mono)?;
+    let carried = |elem: TokenStream, n: Option<ir::Nullability>| match n {
+        None => elem,
+        Some(n) if pos.is_argument() => nullable_carrier(elem, n, true),
+        Some(n) => read_carrier(elem, n, true),
+    };
+    // A declared enum is the element itself.
+    let (own, n) = match elem.split_empties() {
+        Some((core, n)) => (core, Some(n)),
+        None => (elem.clone(), None),
+    };
+    if c.enum_kind(&own, scope).is_some() {
+        let own = to_syn_type(&own, TypePosition::RETURN, ctx, scope, from_module);
+        return Some(carried(own, n));
+    }
+    let read = resolve_union_aliases(elem, ctx, scope);
+    let (core, n) = match read.split_empties() {
+        Some((core, n)) => (core, Some(n)),
+        None => (read, None),
+    };
+    let TypeRef::Union(u) = &core else {
+        return None;
+    };
+    let members = u.members();
+    let name = c.ir_enum_name(members, scope)?;
+    // Literals alone are the enum the IR declares for them.
+    let literals = is_integer_literal_union(members)
+        || members
+            .iter()
+            .all(|m| matches!(m, TypeRef::StringLiteral(_)));
+    let name = match literals {
+        true => c.synthesise_literal_enum(&name, members, true, scope, from_module)?,
+        false => {
+            let arms = dynamic_union_members(members, ctx, scope, from_module)?;
+            c.synthesise_dynamic_union(
+                members,
+                &arms,
+                &name,
+                None,
+                IrEnum::Named(&name),
+                scope,
+                from_module,
+            )
+        }
+    };
+    let ident = make_ident(&name);
+    let elem = quote! { #ident };
+    Some(match n {
+        None => elem,
+        Some(n) if pos.is_argument() => nullable_carrier(elem, n, true),
+        Some(n) => read_carrier(elem, n, true),
+    })
 }
 
 /// Whether a top-level `T[]` element keeps its Rust-native form
@@ -4527,6 +4632,8 @@ fn mono_string_like(
     let borrow = top.then(|| quote! { & });
     let (peeled, scope) = peel_mono(ty, ctx, scope, &mut HashSet::new());
     match peeled.as_ref() {
+        // A list of an enum takes the enum, not its strings.
+        TypeRef::Array(elem) if top && is_enum_element(elem, ctx, scope) => None,
         TypeRef::Array(elem) => {
             let elem = mono_string_like(elem, false, ctx, scope, from_module)?;
             Some(if top {
@@ -4592,7 +4699,8 @@ pub(crate) fn is_mono_string_list_return(
     let (peeled, scope) = peel_mono(&list, ctx, scope, &mut HashSet::new());
     matches!(
         peeled.as_ref(),
-        TypeRef::Array(elem) if is_string_array_element(elem, ctx, scope)
+        TypeRef::Array(elem)
+            if is_string_array_element(elem, ctx, scope) && !is_enum_element(elem, ctx, scope)
     )
 }
 
@@ -4620,6 +4728,33 @@ fn native_array_leaf<'t>(
             None => peel_mono(elem, c, scope, &mut HashSet::new()).0,
         },
         None => std::borrow::Cow::Borrowed(elem),
+    }
+}
+
+/// Whether, under per-monomorphization, a top-level `T[]` element is an
+/// enum of literals alone, declared or the IR's for the union: the list
+/// then takes the enum as its element (see [`union_element`]).
+fn is_enum_element(elem: &TypeRef, c: &CodegenContext<'_>, scope: ScopeId) -> bool {
+    if !c.experimental_generic_mono {
+        return false;
+    }
+    let core = |t: &TypeRef| {
+        t.split_empties()
+            .map_or_else(|| t.clone(), |(core, _)| core)
+    };
+    if c.enum_kind(&core(elem), scope).is_some() {
+        return true;
+    }
+    match core(&resolve_union_aliases(elem, Some(c), scope)) {
+        TypeRef::Union(u) => {
+            let members = u.members();
+            (is_integer_literal_union(members)
+                || members
+                    .iter()
+                    .all(|m| matches!(m, TypeRef::StringLiteral(_))))
+                && c.ir_enum_name(members, scope).is_some()
+        }
+        _ => false,
     }
 }
 
@@ -4954,10 +5089,12 @@ mod tests {
             };
             let numbers =
                 TypeRef::union([TypeRef::NumberLiteral(1.0), TypeRef::NumberLiteral(2.0)]);
-            for elem in [TypeRef::Number, TypeRef::ident("Level"), numbers] {
+            for elem in [TypeRef::Number, numbers] {
                 assert_eq!(mode(&elem), Some(SliceMode::Array), "for {elem:?}");
             }
+            // A declared enum is the element itself.
             for elem in [
+                TypeRef::ident("Level"),
                 TypeRef::String,
                 TypeRef::ident("IdChain"),
                 TypeRef::ident("Mode"),
@@ -5913,8 +6050,9 @@ mod tests {
             let like = "impl :: wasm_bindgen :: JsStringLike";
             let slice = format!("& [{like}]");
             assert_eq!(arg(list(TypeRef::String)), Some(slice.clone()));
-            assert_eq!(arg(list(TypeRef::ident("IdChain"))), Some(slice.clone()));
-            assert_eq!(arg(list(TypeRef::ident("ModeAlias"))), Some(slice));
+            assert_eq!(arg(list(TypeRef::ident("IdChain"))), Some(slice));
+            // A declared enum is the element itself.
+            assert_eq!(arg(list(TypeRef::ident("ModeAlias"))), None);
             assert_eq!(
                 arg(TypeRef::generic("ArrayLike", vec![TypeRef::String])),
                 Some(format!("& Array < {like} >"))

@@ -84,11 +84,17 @@ extern "C" {
 }
 impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> Properties<HostMetadata> {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Properties<HostMetadata> {
+    pub fn new_typed() -> Properties<HostMetadata> {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
         }
+    }
+}
+impl Properties<JsValue> {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self::new_typed()
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -103,17 +109,23 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_results<T>(this: &QueryResult<T>, #[wasm_bindgen(slice = "array")] val: &[T])
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::VectorRefIntoWasmAbi>
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::RefIntoWasmAbi>
     QueryResult<T>
 {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> QueryResult<T> {
+    pub fn new_typed() -> QueryResult<T> {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
         }
+    }
+}
+impl QueryResult<JsValue> {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self::new_typed()
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -124,11 +136,17 @@ extern "C" {
 }
 impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Stub<T> {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Stub<T> {
+    pub fn new_typed() -> Stub<T> {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
         }
+    }
+}
+impl Stub<JsValue> {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self::new_typed()
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -213,6 +231,11 @@ impl<R: ::wasm_bindgen::convert::IntoWasmAbi> RangeBuilder<R> {
         self.inner
     }
 }
+impl<R: ::wasm_bindgen::convert::IntoWasmAbi> From<Range<R>> for RangeBuilder<R> {
+    fn from(inner: Range<R>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -240,14 +263,24 @@ impl<R: ::wasm_bindgen::convert::IntoWasmAbi> ReadResult<R> {
         inner
     }
     #[doc = " Construct with `done: true`."]
-    pub fn new_true() -> ReadResult<R> {
-        Self::builder_true().build()
+    pub fn new_true_typed() -> ReadResult<R> {
+        Self::builder_true_typed().build()
     }
     #[doc = " Start a builder with `done: true`."]
-    pub fn builder_true() -> ReadResultBuilder<R> {
+    pub fn builder_true_typed() -> ReadResultBuilder<R> {
         let inner: ReadResult<R> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_done(true);
         ReadResultBuilder { inner }
+    }
+}
+impl ReadResult<JsValue> {
+    #[doc = " Construct with `done: true`."]
+    pub fn new_true() -> Self {
+        Self::new_true_typed()
+    }
+    #[doc = " Start a builder with `done: true`."]
+    pub fn builder_true() -> ReadResultBuilder<JsValue> {
+        Self::builder_true_typed()
     }
 }
 pub struct ReadResultBuilder<R> {
@@ -260,6 +293,11 @@ impl<R: ::wasm_bindgen::convert::IntoWasmAbi> ReadResultBuilder<R> {
     }
     pub fn build(self) -> ReadResult<R> {
         self.inner
+    }
+}
+impl<R: ::wasm_bindgen::convert::IntoWasmAbi> From<ReadResult<R>> for ReadResultBuilder<R> {
+    fn from(inner: ReadResult<R>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -308,6 +346,11 @@ impl ListingBuilder {
     }
     pub fn build(self) -> Listing {
         self.inner
+    }
+}
+impl From<Listing> for ListingBuilder {
+    fn from(inner: Listing) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

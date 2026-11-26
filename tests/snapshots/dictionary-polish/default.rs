@@ -48,6 +48,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl From<BoxLikeObject> for BoxLikeObjectBuilder {
+        fn from(inner: BoxLikeObject) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -91,6 +96,11 @@ pub mod polish {
         }
         pub fn build(self) -> TimeLikeObject {
             self.inner
+        }
+    }
+    impl From<TimeLikeObject> for TimeLikeObjectBuilder {
+        fn from(inner: TimeLikeObject) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(private)]
@@ -170,6 +180,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl From<Options> for OptionsBuilder {
+        fn from(inner: Options) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -181,18 +196,26 @@ pub mod polish {
         pub fn set_value<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>, val: &T);
     }
     impl<T: ::wasm_bindgen::JsGeneric> Holder<T> {
-        pub fn new() -> Holder<T> {
-            Self::builder().build()
+        pub fn new_typed() -> Holder<T> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> HolderBuilder<T> {
+        pub fn builder_typed() -> HolderBuilder<T> {
             HolderBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
+    impl Holder<JsValue> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> HolderBuilder<JsValue> {
+            Self::builder_typed()
+        }
+    }
     impl<T: ::wasm_bindgen::JsGeneric> Default for Holder<T> {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct HolderBuilder<T: ::wasm_bindgen::JsGeneric> {
@@ -205,6 +228,11 @@ pub mod polish {
         }
         pub fn build(self) -> Holder<T> {
             self.inner
+        }
+    }
+    impl<T: ::wasm_bindgen::JsGeneric> From<Holder<T>> for HolderBuilder<T> {
+        fn from(inner: Holder<T>) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen]
@@ -251,6 +279,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl From<Transition> for TransitionBuilder {
+        fn from(inner: Transition) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -280,18 +313,26 @@ pub mod polish {
         pub fn set_increment<U: ::wasm_bindgen::JsGeneric>(this: &Rounding<U>, val: f64);
     }
     impl<U: ::wasm_bindgen::JsGeneric> Rounding<U> {
-        pub fn new() -> Rounding<U> {
-            Self::builder().build()
+        pub fn new_typed() -> Rounding<U> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> RoundingBuilder<U> {
+        pub fn builder_typed() -> RoundingBuilder<U> {
             RoundingBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
+    impl Rounding<JsValue> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> RoundingBuilder<JsValue> {
+            Self::builder_typed()
+        }
+    }
     impl<U: ::wasm_bindgen::JsGeneric> Default for Rounding<U> {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct RoundingBuilder<U: ::wasm_bindgen::JsGeneric> {
@@ -314,6 +355,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl<U: ::wasm_bindgen::JsGeneric> From<Rounding<U>> for RoundingBuilder<U> {
+        fn from(inner: Rounding<U>) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Rounding , extends = Object , is_type_of = JsValue :: is_object)]
@@ -325,18 +371,26 @@ pub mod polish {
         pub fn set_step<S: ::wasm_bindgen::JsGeneric>(this: &Stepped<S>, val: &S);
     }
     impl<S: ::wasm_bindgen::JsGeneric> Stepped<S> {
-        pub fn new() -> Stepped<S> {
-            Self::builder().build()
+        pub fn new_typed() -> Stepped<S> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> SteppedBuilder<S> {
+        pub fn builder_typed() -> SteppedBuilder<S> {
             SteppedBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
+    impl Stepped<JsValue> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> SteppedBuilder<JsValue> {
+            Self::builder_typed()
+        }
+    }
     impl<S: ::wasm_bindgen::JsGeneric> Default for Stepped<S> {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct SteppedBuilder<S: ::wasm_bindgen::JsGeneric> {
@@ -361,6 +415,11 @@ pub mod polish {
         }
         pub fn build(self) -> Stepped<S> {
             self.inner
+        }
+    }
+    impl<S: ::wasm_bindgen::JsGeneric> From<Stepped<S>> for SteppedBuilder<S> {
+        fn from(inner: Stepped<S>) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen]
@@ -408,6 +467,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl From<MinuteStepping> for MinuteSteppingBuilder {
+        fn from(inner: MinuteStepping) -> Self {
+            Self { inner }
+        }
+    }
     #[allow(dead_code)]
     pub type HourStepping = Stepped<JsString>;
     #[wasm_bindgen]
@@ -426,18 +490,26 @@ pub mod polish {
         );
     }
     impl<U: ::wasm_bindgen::JsGeneric> Bounded<U> {
-        pub fn new() -> Bounded<U> {
-            Self::builder().build()
+        pub fn new_typed() -> Bounded<U> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> BoundedBuilder<U> {
+        pub fn builder_typed() -> BoundedBuilder<U> {
             BoundedBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
+    impl Bounded<JsValue> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> BoundedBuilder<JsValue> {
+            Self::builder_typed()
+        }
+    }
     impl<U: ::wasm_bindgen::JsGeneric> Default for Bounded<U> {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct BoundedBuilder<U: ::wasm_bindgen::JsGeneric> {
@@ -464,6 +536,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl<U: ::wasm_bindgen::JsGeneric> From<Bounded<U>> for BoundedBuilder<U> {
+        fn from(inner: Bounded<U>) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -484,18 +561,26 @@ pub mod polish {
         pub fn set_increment<U: ::wasm_bindgen::JsGeneric>(this: &PickedRounding<U>, val: f64);
     }
     impl<U: ::wasm_bindgen::JsGeneric> PickedRounding<U> {
-        pub fn new() -> PickedRounding<U> {
-            Self::builder().build()
+        pub fn new_typed() -> PickedRounding<U> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> PickedRoundingBuilder<U> {
+        pub fn builder_typed() -> PickedRoundingBuilder<U> {
             PickedRoundingBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
+    impl PickedRounding<JsValue> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> PickedRoundingBuilder<JsValue> {
+            Self::builder_typed()
+        }
+    }
     impl<U: ::wasm_bindgen::JsGeneric> Default for PickedRounding<U> {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct PickedRoundingBuilder<U: ::wasm_bindgen::JsGeneric> {
@@ -512,6 +597,11 @@ pub mod polish {
         }
         pub fn build(self) -> PickedRounding<U> {
             self.inner
+        }
+    }
+    impl<U: ::wasm_bindgen::JsGeneric> From<PickedRounding<U>> for PickedRoundingBuilder<U> {
+        fn from(inner: PickedRounding<U>) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen]
@@ -551,6 +641,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl From<TimePicking> for TimePickingBuilder {
+        fn from(inner: TimePicking) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -567,18 +662,26 @@ pub mod polish {
         );
     }
     impl<U: ::wasm_bindgen::JsGeneric> Spanning<U> {
-        pub fn new() -> Spanning<U> {
-            Self::builder().build()
+        pub fn new_typed() -> Spanning<U> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> SpanningBuilder<U> {
+        pub fn builder_typed() -> SpanningBuilder<U> {
             SpanningBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
+    impl Spanning<JsValue> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> SpanningBuilder<JsValue> {
+            Self::builder_typed()
+        }
+    }
     impl<U: ::wasm_bindgen::JsGeneric> Default for Spanning<U> {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct SpanningBuilder<U: ::wasm_bindgen::JsGeneric> {
@@ -591,6 +694,11 @@ pub mod polish {
         }
         pub fn build(self) -> Spanning<U> {
             self.inner
+        }
+    }
+    impl<U: ::wasm_bindgen::JsGeneric> From<Spanning<U>> for SpanningBuilder<U> {
+        fn from(inner: Spanning<U>) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen]
@@ -626,6 +734,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl From<HourSpanning> for HourSpanningBuilder {
+        fn from(inner: HourSpanning) -> Self {
+            Self { inner }
+        }
+    }
     pub mod spans {
         #[allow(unused_imports)]
         use super::*;
@@ -651,18 +764,26 @@ pub mod polish {
             );
         }
         impl<U: ::wasm_bindgen::JsGeneric> Span<U> {
-            pub fn new() -> Span<U> {
-                Self::builder().build()
+            pub fn new_typed() -> Span<U> {
+                Self::builder_typed().build()
             }
-            pub fn builder() -> SpanBuilder<U> {
+            pub fn builder_typed() -> SpanBuilder<U> {
                 SpanBuilder {
                     inner: JsCast::unchecked_into(js_sys::Object::new()),
                 }
             }
         }
+        impl Span<JsValue> {
+            pub fn new() -> Self {
+                Self::new_typed()
+            }
+            pub fn builder() -> SpanBuilder<JsValue> {
+                Self::builder_typed()
+            }
+        }
         impl<U: ::wasm_bindgen::JsGeneric> Default for Span<U> {
             fn default() -> Self {
-                Self::new()
+                Self::new_typed()
             }
         }
         pub struct SpanBuilder<U: ::wasm_bindgen::JsGeneric> {
@@ -675,6 +796,11 @@ pub mod polish {
             }
             pub fn build(self) -> Span<U> {
                 self.inner
+            }
+        }
+        impl<U: ::wasm_bindgen::JsGeneric> From<Span<U>> for SpanBuilder<U> {
+            fn from(inner: Span<U>) -> Self {
+                Self { inner }
             }
         }
         #[wasm_bindgen]
@@ -710,6 +836,11 @@ pub mod polish {
                 self.inner
             }
         }
+        impl From<HourSpan> for HourSpanBuilder {
+            fn from(inner: HourSpan) -> Self {
+                Self { inner }
+            }
+        }
         #[wasm_bindgen]
         extern "C" {
             # [wasm_bindgen (extends = Span , extends = Object , is_type_of = JsValue :: is_object)]
@@ -717,18 +848,26 @@ pub mod polish {
             pub type Mid<U: ::wasm_bindgen::JsGeneric = JsValue>;
         }
         impl<U: ::wasm_bindgen::JsGeneric> Mid<U> {
-            pub fn new() -> Mid<U> {
-                Self::builder().build()
+            pub fn new_typed() -> Mid<U> {
+                Self::builder_typed().build()
             }
-            pub fn builder() -> MidBuilder<U> {
+            pub fn builder_typed() -> MidBuilder<U> {
                 MidBuilder {
                     inner: JsCast::unchecked_into(js_sys::Object::new()),
                 }
             }
         }
+        impl Mid<JsValue> {
+            pub fn new() -> Self {
+                Self::new_typed()
+            }
+            pub fn builder() -> MidBuilder<JsValue> {
+                Self::builder_typed()
+            }
+        }
         impl<U: ::wasm_bindgen::JsGeneric> Default for Mid<U> {
             fn default() -> Self {
-                Self::new()
+                Self::new_typed()
             }
         }
         pub struct MidBuilder<U: ::wasm_bindgen::JsGeneric> {
@@ -741,6 +880,11 @@ pub mod polish {
             }
             pub fn build(self) -> Mid<U> {
                 self.inner
+            }
+        }
+        impl<U: ::wasm_bindgen::JsGeneric> From<Mid<U>> for MidBuilder<U> {
+            fn from(inner: Mid<U>) -> Self {
+                Self { inner }
             }
         }
         #[wasm_bindgen]
@@ -759,18 +903,26 @@ pub mod polish {
             );
         }
         impl<U: ::wasm_bindgen::JsGeneric> Spanned<U> {
-            pub fn new() -> Spanned<U> {
-                Self::builder().build()
+            pub fn new_typed() -> Spanned<U> {
+                Self::builder_typed().build()
             }
-            pub fn builder() -> SpannedBuilder<U> {
+            pub fn builder_typed() -> SpannedBuilder<U> {
                 SpannedBuilder {
                     inner: JsCast::unchecked_into(js_sys::Object::new()),
                 }
             }
         }
+        impl Spanned<JsString> {
+            pub fn new() -> Self {
+                Self::new_typed()
+            }
+            pub fn builder() -> SpannedBuilder<JsString> {
+                Self::builder_typed()
+            }
+        }
         impl<U: ::wasm_bindgen::JsGeneric> Default for Spanned<U> {
             fn default() -> Self {
-                Self::new()
+                Self::new_typed()
             }
         }
         pub struct SpannedBuilder<U: ::wasm_bindgen::JsGeneric> {
@@ -783,6 +935,11 @@ pub mod polish {
             }
             pub fn build(self) -> Spanned<U> {
                 self.inner
+            }
+        }
+        impl<U: ::wasm_bindgen::JsGeneric> From<Spanned<U>> for SpannedBuilder<U> {
+            fn from(inner: Spanned<U>) -> Self {
+                Self { inner }
             }
         }
     }
@@ -828,6 +985,11 @@ pub mod polish {
                 self.inner
             }
         }
+        impl From<DaySpan> for DaySpanBuilder {
+            fn from(inner: DaySpan) -> Self {
+                Self { inner }
+            }
+        }
         #[wasm_bindgen]
         extern "C" {
             # [wasm_bindgen (extends = super :: spans :: Mid , extends = Object , is_type_of = JsValue :: is_object)]
@@ -861,6 +1023,11 @@ pub mod polish {
                 self.inner
             }
         }
+        impl From<DaySpan2> for DaySpan2Builder {
+            fn from(inner: DaySpan2) -> Self {
+                Self { inner }
+            }
+        }
         #[wasm_bindgen]
         extern "C" {
             # [wasm_bindgen (extends = super :: spans :: Spanned , extends = Object , is_type_of = JsValue :: is_object)]
@@ -892,6 +1059,11 @@ pub mod polish {
             }
             pub fn build(self) -> AnySpan {
                 self.inner
+            }
+        }
+        impl From<AnySpan> for AnySpanBuilder {
+            fn from(inner: AnySpan) -> Self {
+                Self { inner }
             }
         }
     }
@@ -942,12 +1114,9 @@ pub mod polish {
         #[wasm_bindgen(method, catch, js_name = "snap")]
         pub fn try_snap(this: &Rounder, to: PluralizeTimeUnit) -> Result<(), JsValue>;
         #[wasm_bindgen(method, js_name = "snap")]
-        pub fn snap_with_rounding(this: &Rounder, to: &Rounding<JsString>);
+        pub fn snap_with_to(this: &Rounder, to: &Rounding<JsString>);
         #[wasm_bindgen(method, catch, js_name = "snap")]
-        pub fn try_snap_with_rounding(
-            this: &Rounder,
-            to: &Rounding<JsString>,
-        ) -> Result<(), JsValue>;
+        pub fn try_snap_with_to(this: &Rounder, to: &Rounding<JsString>) -> Result<(), JsValue>;
         #[wasm_bindgen(method)]
         pub fn nudge(this: &Rounder, options: &Rounding<JsString>);
         #[wasm_bindgen(method, catch, js_name = "nudge")]
@@ -993,18 +1162,26 @@ pub mod polish {
         );
     }
     impl<S: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric> Defaulted<S, T> {
-        pub fn new() -> Defaulted<S, T> {
-            Self::builder().build()
+        pub fn new_typed() -> Defaulted<S, T> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> DefaultedBuilder<S, T> {
+        pub fn builder_typed() -> DefaultedBuilder<S, T> {
             DefaultedBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
         }
     }
+    impl Defaulted<JsValue, Approximate> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> DefaultedBuilder<JsValue, Approximate> {
+            Self::builder_typed()
+        }
+    }
     impl<S: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric> Default for Defaulted<S, T> {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct DefaultedBuilder<S: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric> {
@@ -1021,6 +1198,13 @@ pub mod polish {
         }
         pub fn build(self) -> Defaulted<S, T> {
             self.inner
+        }
+    }
+    impl<S: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric> From<Defaulted<S, T>>
+        for DefaultedBuilder<S, T>
+    {
+        fn from(inner: Defaulted<S, T>) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen]
@@ -1106,6 +1290,11 @@ pub mod polish {
             self.inner
         }
     }
+    impl From<PartialBoxLikeObject> for PartialBoxLikeObjectBuilder {
+        fn from(inner: PartialBoxLikeObject) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -1149,6 +1338,11 @@ pub mod polish {
         }
         pub fn build(self) -> PartialOmitLikeBoxLikeObject {
             self.inner
+        }
+    }
+    impl From<PartialOmitLikeBoxLikeObject> for PartialOmitLikeBoxLikeObjectBuilder {
+        fn from(inner: PartialOmitLikeBoxLikeObject) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(private)]

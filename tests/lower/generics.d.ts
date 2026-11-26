@@ -133,3 +133,61 @@ interface Cell<T> {
 declare var Cell: {
   new <U>(value: U): Cell<U>;
 };
+
+// A `keyof` parameter that types a parameter is a key, and an index by it
+// stays one: over a map parameter, a declared map, and through a literal.
+declare class Event {}
+declare class MessageEvent extends Event {
+  readonly data: string;
+}
+declare class CloseEvent extends Event {
+  readonly code: number;
+}
+type EventListener<E extends Event = Event> = (event: E) => void;
+interface EventListenerObject<E extends Event = Event> {
+  handleEvent(event: E): void;
+}
+type EventListenerOrEventListenerObject<E extends Event = Event> =
+  | EventListener<E>
+  | EventListenerObject<E>;
+type WebSocketEventMap = { message: MessageEvent; close: CloseEvent };
+declare class EventTarget<EventMap extends Record<string, Event> = Record<string, Event>> {
+  constructor();
+  addEventListener<Type extends keyof EventMap>(
+    type: Type,
+    handler: EventListenerOrEventListenerObject<EventMap[Type]>,
+  ): void;
+  dispatchEvent(event: EventMap[keyof EventMap]): boolean;
+}
+declare class WebSocket extends EventTarget<WebSocketEventMap> {
+  constructor(url: string);
+}
+declare function addEventListener<Type extends keyof WebSocketEventMap>(
+  type: Type,
+  handler: EventListenerOrEventListenerObject<WebSocketEventMap[Type]>,
+): void;
+interface TextModel {
+  inputs: { prompt: string };
+  postProcessedOutputs: { text: string };
+}
+interface ImageModel {
+  inputs: { image: number[] };
+  postProcessedOutputs: { label: string };
+}
+interface AiModelList {
+  "text-model": TextModel;
+  "image-model": ImageModel;
+}
+interface Sizes {
+  width: number;
+  label: string;
+}
+declare class Ai {
+  run<Name extends keyof AiModelList>(
+    model: Name,
+    inputs: AiModelList[Name]["inputs"],
+  ): Promise<AiModelList[Name]["postProcessedOutputs"]>;
+  size<K extends keyof Sizes>(key: K): Sizes[K];
+  // No parameter is the key, so it reads evaluated.
+  sizes<K extends keyof Sizes>(): Sizes[K];
+}

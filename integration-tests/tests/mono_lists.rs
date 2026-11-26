@@ -2,7 +2,7 @@
 
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{Array, JsString, Map, Number, Set};
+use js_sys::{Array, JsString, Map, Nullable, Number, Set};
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::mono_lists::*;
@@ -110,4 +110,79 @@ fn properties_and_builders_take_string_lists() {
 #[wasm_bindgen_test]
 fn variadic_constructors_spread_the_list() {
     assert_eq!(Total::new(&[1.0, 2.5]).unwrap().value(), 3.5);
+}
+
+#[wasm_bindgen_test]
+fn union_lists_keep_the_enum_as_their_element() {
+    let read = marks();
+    assert!(matches!(&read[0], MarkOrStr::Mark(m) if m.text() == "m"));
+    assert!(matches!(&read[1], MarkOrStr::String(s) if s == "s"));
+    assert_eq!(describe_marks(&read), "Array(object:Mark(m),string:s)");
+
+    let read = maybe_marks();
+    assert!(matches!(&read[0], Some(MarkOrStr::Mark(m)) if m.text() == "m"));
+    assert!(read[1].is_none());
+    assert!(matches!(&read[2], Some(MarkOrStr::String(s)) if s == "s"));
+
+    let mark = Mark::new("w").unwrap();
+    assert_eq!(
+        describe_maybe_marks(&[
+            Nullable::Value(MarkOrStr::Mark(mark.clone())),
+            Nullable::Null,
+            Nullable::Value(MarkOrStr::String("t".into())),
+        ]),
+        "Array(object:Mark(w),object:null,string:t)"
+    );
+
+    let options = MarkOptions::builder()
+        .marks(&[MarkOrStr::String("o".into()), MarkOrStr::Mark(mark)])
+        .build();
+    assert_eq!(
+        describe_mark_options(&options),
+        "Array(string:o,object:Mark(w))"
+    );
+    assert_eq!(options.marks().map(|marks| marks.len()), Some(2));
+
+    // A list of a union is an arm of a union.
+    let Some(MarkRouteToKind::VecOfJsValue(to)) = route().to() else {
+        panic!("expected the list arm");
+    };
+    assert!(matches!(&to[0], MarkOrStr::Mark(m) if m.text() == "m"));
+    let route = MarkRoute::builder().to_with_slice(&to).build();
+    assert_eq!(describe_route(&route), "Array(object:Mark(m),string:s)");
+}
+
+#[wasm_bindgen_test]
+fn literal_lists_keep_the_enum_as_their_element() {
+    assert_eq!(modes(&[Mode::Slow, Mode::Fast]), [Mode::Slow, Mode::Fast]);
+    assert_eq!(
+        levels(&[LevelsReturn::N2, LevelsReturn::N1]),
+        [LevelsReturn::N2, LevelsReturn::N1]
+    );
+    assert_eq!(
+        maybe_kinds(&[
+            Nullable::Value(MaybeKindsReturn::Y),
+            Nullable::Null,
+            Nullable::Value(MaybeKindsReturn::X),
+        ]),
+        [Some(MaybeKindsReturn::Y), None, Some(MaybeKindsReturn::X)]
+    );
+
+    // A getter reads what its setter wrote.
+    let options = ModeOptions::builder()
+        .modes(&[Mode::Fast])
+        .kinds(&[ModeOptionsKinds::Y, ModeOptionsKinds::X])
+        .levels(&[ModeOptionsLevels::N2])
+        .build();
+    assert_eq!(
+        describe_mode_options(&options),
+        "Array(string:fast) Array(string:y,string:x) Array(number:2)"
+    );
+    assert_eq!(options.modes(), Some(vec![Mode::Fast]));
+    assert_eq!(
+        options.kinds(),
+        Some(vec![ModeOptionsKinds::Y, ModeOptionsKinds::X])
+    );
+    options.set_levels(&options.levels().unwrap());
+    assert_eq!(options.levels(), Some(vec![ModeOptionsLevels::N2]));
 }

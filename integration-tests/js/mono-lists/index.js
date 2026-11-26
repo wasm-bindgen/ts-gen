@@ -51,3 +51,23 @@ export class Total {
     this.value = values.reduce((a, b) => a + b, 0);
   }
 }
+export class Mark {
+  constructor(text) {
+    this.text = text;
+  }
+  toString() {
+    return `Mark(${this.text})`;
+  }
+}
+export const marks = () => [new Mark("m"), "s"];
+export const maybeMarks = () => [new Mark("m"), null, "s"];
+export const describeMarks = describe;
+export const describeMaybeMarks = describe;
+export const describeMarkOptions = (options) => describe(options.marks);
+export const route = () => ({ to: [new Mark("m"), "s"] });
+export const describeRoute = (route) => describe(route.to);
+export const modes = (values) => values;
+export const levels = (values) => values;
+export const maybeKinds = (values) => values;
+export const describeModeOptions = (options) =>
+  [options.modes, options.kinds, options.levels].map(describe).join(" ");

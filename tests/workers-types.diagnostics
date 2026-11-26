@@ -91,10 +91,6 @@ ir: `Crypto.getRandomValues.T extends Int8Array | Uint8Array | Int16Array | Uint
 ir: `Crypto.DigestStream`: `typeof query` has no IR type and reads as `Any`
 ir: `Cf`: a union over type parameters (IncomingRequestCfProperties<CfHostMetadata> | RequestInitCfProperties) reads as `Any`
 ir: `Fetcher.T extends Rpc.EntrypointBranded | undefined`: only a class, interface or enum bounds a type parameter, so it is unbounded
-ir: `KVNamespace.Options`: the literal type `"text"` widens to `str`
-ir: `KVNamespace.Options`: the literal type `"json"` widens to `str`
-ir: `KVNamespace.Options`: the literal type `"arrayBuffer"` widens to `str`
-ir: `KVNamespace.Options`: the literal type `"stream"` widens to `str`
 ir: `UnderlyingByteSource.Type`: the literal type `"bytes"` widens to `str`
 ir: `UnderlyingSource.Type`: the literal type `""` widens to `str`
 ir: `ReadableStreamGetReaderOptions.Mode`: the literal type `"byob"` widens to `str`

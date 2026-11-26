@@ -476,6 +476,18 @@
       "doc": null
     },
     {
+      "kind": "interface",
+      "path": "SliceOptions",
+      "module": null,
+      "name": "SliceOptions",
+      "jsName": null,
+      "export": false,
+      "tparams": [],
+      "assoc": [],
+      "extends": [],
+      "doc": null
+    },
+    {
       "kind": "class",
       "path": "KVNamespace",
       "module": null,
@@ -2734,6 +2746,149 @@
       "construct": null
     },
     {
+      "key": "Bytes#slice(str)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Bytes",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "slice",
+      "variant": "slice",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "range",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false,
+          "spread": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Bytes",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Bytes",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "str",
+              "wire": ["externref"],
+              "kind": "str",
+              "carrier": "host",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Bytes",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Bytes",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref", "externref"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "Bytes#slice(SliceOptions)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "Bytes",
+      "scope": null,
+      "namespace": [],
+      "kind": "method",
+      "name": "slice",
+      "variant": "sliceWithRange",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "range",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false,
+          "spread": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "Bytes",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Bytes",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "SliceOptions",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "interface",
+              "path": "SliceOptions",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "Bytes",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "class",
+              "path": "Bytes",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref", "externref"],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
       "key": "Bytes#one()",
       "role": "import",
       "module": "tw:js/global",
@@ -2862,6 +3017,154 @@
         "core": {
           "params": ["externref"],
           "results": ["i32", "i32", "f64", "externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "SliceOptions.new()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "SliceOptions",
+      "scope": null,
+      "namespace": [],
+      "kind": "new",
+      "name": null,
+      "variant": "new",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "SliceOptions",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "interface",
+              "path": "SliceOptions",
+              "nullable": false
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": [],
+          "results": ["externref"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "SliceOptions#get:start()",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "SliceOptions",
+      "scope": null,
+      "namespace": [],
+      "kind": "get",
+      "name": "start",
+      "variant": "start",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "SliceOptions",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "interface",
+              "path": "SliceOptions",
+              "nullable": false
+            }
+          }
+        ],
+        "results": [
+          {
+            "role": "result",
+            "repr": {
+              "ty": "u32?",
+              "wire": ["i32", "i32"],
+              "kind": "scalar",
+              "scalar": "u32",
+              "nullable": true,
+              "niche": null
+            }
+          }
+        ],
+        "throws": null,
+        "core": {
+          "params": ["externref"],
+          "results": ["i32", "i32"],
+          "spill": []
+        }
+      },
+      "construct": null
+    },
+    {
+      "key": "SliceOptions#set:start(u32)",
+      "role": "import",
+      "module": "tw:js/global",
+      "owner": "SliceOptions",
+      "scope": null,
+      "namespace": [],
+      "kind": "set",
+      "name": "start",
+      "variant": "start",
+      "static": false,
+      "jsName": null,
+      "tparams": [],
+      "params": [
+        {
+          "name": "value",
+          "alias": null,
+          "once": false,
+          "unshared": false,
+          "union": false,
+          "spread": false
+        }
+      ],
+      "doc": null,
+      "sig": {
+        "params": [
+          {
+            "role": "this",
+            "repr": {
+              "ty": "SliceOptions",
+              "wire": ["externref"],
+              "kind": "host",
+              "of": "interface",
+              "path": "SliceOptions",
+              "nullable": false
+            }
+          },
+          {
+            "role": "param",
+            "index": 0,
+            "repr": {
+              "ty": "u32",
+              "wire": ["i32"],
+              "kind": "scalar",
+              "scalar": "u32"
+            }
+          }
+        ],
+        "results": [],
+        "throws": null,
+        "core": {
+          "params": ["externref", "i32"],
+          "results": [],
           "spill": []
         }
       },

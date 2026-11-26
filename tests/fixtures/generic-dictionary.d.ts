@@ -21,3 +21,10 @@ interface EvaluationDetails<T> {
   variant?: string | undefined;
   reason?: string | undefined;
 }
+
+// With no required field naming `Cf`, `new()` and `builder()` are the
+// default instantiation, and `new_typed()` / `builder_typed()` take `Cf`.
+interface FetchOptions<Cf = string> {
+  method?: string;
+  cf?: Cf;
+}

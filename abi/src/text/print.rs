@@ -319,6 +319,7 @@ fn tparams(ps: &[TypeParam]) -> String {
                     let set: Vec<String> = set.iter().map(ty).collect();
                     format!("{} in ({})", p.name, set.join(", "))
                 }
+                Some(Bound::KeyOf(m)) => format!("{} in keyof {}", p.name, ty(m)),
             };
             match &p.default {
                 Some(d) => format!("{head} = {}", ty(d)),
@@ -415,6 +416,7 @@ pub(super) fn ty(t: &Type) -> String {
         Type::ScalarBox(s) => s.box_name().into(),
         Type::StrBox => "Str".into(),
         Type::BigInt => "bigint".into(),
+        Type::Buffer => "buffer".into(),
         Type::BigIntBox => "BigInt".into(),
         Type::UnitBox => "Unit".into(),
         Type::Vec(t) => format!("{}[]", operand(t)),
@@ -446,13 +448,24 @@ pub(super) fn ty(t: &Type) -> String {
             s.push_str(&throws(&f.throws));
             s
         }
+        Type::View { elem, .. } if **elem == Type::Buffer => "*buffer".into(),
         Type::View { mutable, elem } => {
             let m = if *mutable { "mut " } else { "" };
             format!("*{m}{}", whole_vec(elem))
         }
         Type::Nullable(t, false) => format!("{}?", operand(t)),
         Type::Nullable(t, true) => format!("@js(null) {}?", operand(t)),
+        // A lone quoted name would read back as a literal type.
+        Type::Named(r) if r.path.base == Base::Lexical && r.path.segments.len() == 1 => {
+            let s = typeref(r);
+            match s.starts_with('"') {
+                true => format!(".{s}"),
+                false => s,
+            }
+        }
         Type::Named(r) => typeref(r),
+        Type::Lit(l) => literal(l),
+        Type::Index(m, k) => format!("{}[{}]", operand(m), ty(k)),
     }
 }
 

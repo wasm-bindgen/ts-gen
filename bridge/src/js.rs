@@ -192,6 +192,16 @@ pub(crate) fn lit(l: &Literal) -> String {
     }
 }
 
+/// `v` as the bytes of a `buffer`: a view over the object's byte window.
+fn bytes_of(v: &str, checked: bool) -> String {
+    match checked {
+        true => format!("$bytes({v})"),
+        false => format!(
+            "({v} instanceof ArrayBuffer ? new Uint8Array({v}) : ArrayBuffer.isView({v}) ? new Uint8Array({v}.buffer, {v}.byteOffset, {v}.byteLength) : new Uint8Array(0))"
+        ),
+    }
+}
+
 fn typed_array(s: Scalar) -> &'static str {
     match s {
         Scalar::I8 => "Int8Array",
@@ -462,6 +472,7 @@ impl<'a, 'b> Glue<'a, 'b> {
         Ok(match &r.kind {
             Kind::Rec { .. } => unreachable!(),
             Kind::Unit | Kind::Never => "undefined".into(),
+            Kind::Lit(l) => literal(l),
             Kind::Scalar(s) => lift_scalar(*s, &w[0]),
             Kind::NullScalar(s, ScalarNull::Niche(n)) => format!(
                 "({} === {} ? {absent} : {})",
@@ -504,6 +515,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 nullable,
                 writeback: false,
                 bigint: false,
+                ..
             } => {
                 let ta = typed_array(*elem);
                 if *nullable {
@@ -1053,6 +1065,10 @@ impl<'a, 'b> Glue<'a, 'b> {
         let cx = if lowers_alloc(r) { "cx" } else { "null" };
         Ok(match &r.kind {
             Kind::Unit | Kind::Never => Vec::new(),
+            Kind::Lit(l) => {
+                b.line(format!("if ({v} !== {}) $fail({what}, {v});", literal(l)));
+                Vec::new()
+            }
             Kind::Scalar(s) => vec![b.bind(lower_scalar(*s, v, m))],
             Kind::NullScalar(s, ScalarNull::Niche(n)) => vec![b.bind(format!(
                 "({v} == null ? {} : {})",
@@ -1123,10 +1139,13 @@ impl<'a, 'b> Glue<'a, 'b> {
                 carrier: Carrier::Host,
                 nullable,
                 writeback,
+                buffer,
                 ..
             } => {
                 let ta = typed_array(*elem);
-                let check = if m.checked {
+                let check = if *buffer {
+                    bytes_of(v, m.checked)
+                } else if m.checked {
                     format!("$typed({v}, {ta}, {what})")
                 } else {
                     format!("({v} instanceof {ta} ? {v} : new {ta}(0))")
@@ -1160,11 +1179,14 @@ impl<'a, 'b> Glue<'a, 'b> {
                 elem,
                 carrier,
                 nullable,
+                buffer,
                 ..
             } => {
                 let s = Space::of(*carrier);
                 let ta = typed_array(*elem);
-                let check = if m.checked {
+                let check = if *buffer {
+                    bytes_of(v, m.checked)
+                } else if m.checked {
                     format!("$typed({v}, {ta}, {what})")
                 } else {
                     format!("({v} instanceof {ta} ? {v} : new {ta}(0))")
@@ -1746,6 +1768,9 @@ impl<'a, 'b> Glue<'a, 'b> {
             // A `unit` value is ignored, not checked (§3).
             Kind::Unit => "true".into(),
             Kind::Vec { bigint: true, .. } => format!("typeof {v} === \"bigint\""),
+            Kind::Vec { buffer: true, .. } => {
+                format!("({v} instanceof ArrayBuffer || ArrayBuffer.isView({v}))")
+            }
             Kind::Vec { elem, .. } => format!("{v} instanceof {}", typed_array(*elem)),
             Kind::Array { .. } => format!("Array.isArray({v})"),
             Kind::Tuple { elems, .. } => {
@@ -2730,4 +2755,9 @@ pub(crate) fn lowers_alloc(r: &Repr) -> bool {
             .any(|a| a.payload.iter().any(lowers_alloc)),
         _ => false,
     }
+}
+
+/// A literal type's value (§13).
+fn literal(l: &ts_gen_abi::ir::Literal) -> String {
+    ts_gen_abi::text::print_type(&ts_gen_abi::ir::Type::Lit(l.clone()))
 }

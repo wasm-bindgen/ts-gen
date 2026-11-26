@@ -6,8 +6,8 @@
 //! parse when the IR doesn't yet carry what its Rust form reads.
 
 use crate::signatures::{
-    build_signatures, build_signatures_from, expand_signatures, CallableSpec, ConcreteParam,
-    ExpandedSignature, FunctionSignature, LiteralArm, Overload,
+    build_signatures_postfixed, expand_signatures, CallableSpec, ConcreteParam, ExpandedSignature,
+    FunctionSignature, LiteralArm, Overload,
 };
 use crate::typemap::CodegenContext;
 use ts_gen::ir::{Throws, TypeRef};
@@ -105,17 +105,35 @@ pub fn build(
     names: &mut LocalScope,
     cgctx: Option<&CodegenContext<'_>>,
 ) -> Vec<FunctionSignature> {
+    build_postfixed(spec, site, "", names, cgctx)
+}
+
+/// [`build`], naming each binding with `postfix`: a second reading of a
+/// callable [`build`] has already bound, so one the IR doesn't state is
+/// left out quietly.
+pub(crate) fn build_postfixed(
+    spec: &CallableSpec<'_>,
+    site: Option<Site<'_>>,
+    postfix: &str,
+    names: &mut LocalScope,
+    cgctx: Option<&CodegenContext<'_>>,
+) -> Vec<FunctionSignature> {
     let (cgctx, site) = match (cgctx, site) {
         (Some(c), Some(site)) if c.ir.is_some() => (c, site),
         // No IR declares it: the parse's reading (a model without IR).
-        (cgctx, _) => return build_signatures(spec, names, cgctx),
+        (cgctx, _) => {
+            let expansions = expand_signatures(spec.overloads, spec.kind, cgctx);
+            return build_signatures_postfixed(spec, expansions, postfix, names, cgctx);
+        }
     };
     let Some((ir, scopes, expansions)) = overloads(cgctx, spec, &site) else {
-        let at = [site.path, &[spec.js_name.to_string()]].concat().join(".");
-        let module = site.module.map(|m| format!("{m}:")).unwrap_or_default();
-        cgctx.warn(format!(
-            "`{module}{at}`: the IR doesn't state the parse's reading; skipped"
-        ));
+        if postfix.is_empty() {
+            let at = [site.path, &[spec.js_name.to_string()]].concat().join(".");
+            let module = site.module.map(|m| format!("{m}:")).unwrap_or_default();
+            cgctx.warn(format!(
+                "`{module}{at}`: the IR doesn't state the parse's reading; skipped"
+            ));
+        }
         return Vec::new();
     };
     let cgctx = Some(cgctx);
@@ -136,12 +154,13 @@ pub fn build(
             doc: &o.doc,
         })
         .collect();
-    build_signatures_from(
+    build_signatures_postfixed(
         &CallableSpec {
             overloads: &overloads,
             ..*spec
         },
         expansions,
+        postfix,
         names,
         cgctx,
     )
@@ -183,6 +202,25 @@ fn restated(
     let legacy = expand_signatures(spec.overloads, spec.kind, Some(cgctx));
     let bound: Vec<ScopeId> = spec.overloads.iter().map(|o| o.body_scope).collect();
     let mut overloads = ir.callable(cgctx.gctx, site, spec.js_name, scope, &bound)?;
+    // A field the declaration types by one literal is set by the
+    // dictionary's factories; a wrapper fills those a type argument gives.
+    for o in &mut overloads {
+        let (params, made) = (&o.params, &o.made);
+        o.fills.retain(|(j, field, _)| {
+            if made.contains(j) {
+                return true;
+            }
+            let t = &params[*j].type_ref;
+            let core = t.split_empties().map(|(core, _)| core);
+            match core.as_ref().unwrap_or(t) {
+                TypeRef::Reference { segments, .. } => cgctx
+                    .gctx
+                    .resolve_path(scope, &segments.join("."))
+                    .is_some_and(|id| cgctx.gctx.literal_fills.contains(&(id, field.clone()))),
+                _ => false,
+            }
+        });
+    }
     // Each overload's typed array parameters, beside which Rust reads an
     // element array as a view of one.
     let typed: Vec<Vec<Option<ts_gen::ir::TypedArrayElement>>> = overloads
@@ -198,6 +236,25 @@ fn restated(
                 })
                 .collect()
         })
+        .collect();
+    // Each overload's `buffer` parameters.
+    let buffers: Vec<Vec<bool>> = overloads
+        .iter()
+        .map(|o| {
+            o.params
+                .iter()
+                .map(|p| {
+                    let core = p.type_ref.split_empties().map(|(core, _)| core);
+                    super::ir_types::buffer_pair(core.as_ref().unwrap_or(&p.type_ref))
+                })
+                .collect()
+        })
+        .collect();
+    // Each overload's parameter types as the IR states them: matching an
+    // expansion rewrites those of the overload it binds.
+    let stated: Vec<Vec<TypeRef>> = overloads
+        .iter()
+        .map(|o| o.params.iter().map(|p| p.type_ref.clone()).collect())
         .collect();
     let mut used = vec![false; overloads.len()];
     let mut scopes = vec![(scope, first.async_modifier); overloads.len()];
@@ -302,11 +359,13 @@ fn restated(
                 }
             }
             for (ours, theirs) in o.args.iter().zip(&args) {
-                if let (super::ir_types::Arg::Param(j), LegacyArg::Param(k)) = (ours, theirs) {
+                if let (super::ir_types::Arg::Param(j), Some(k)) = (ours, theirs.param().as_ref()) {
                     if enums.iter().any(|e| (e.0, e.1) == (i, *j)) {
                         continue;
                     }
-                    let theirs = &e.params[*k].type_ref;
+                    // A literal the call fills isn't the caller's to give.
+                    let open = open_like(&o.params[*j].type_ref, &e.params[*k].type_ref);
+                    let theirs = &open;
                     let mut ours = erase(&o.params[*j].type_ref, theirs);
                     let mut t = state(cgctx, scope, &ours, theirs);
                     // A `T?` the parse writes as `T`, passing fewer states:
@@ -476,14 +535,16 @@ fn restated(
                         ..p.clone()
                     }
                 }
-                (super::ir_types::Arg::Param(j), LegacyArg::Param(_)) => ConcreteParam {
-                    type_ref: arm_types
-                        .iter()
-                        .find(|(k, _)| k == j)
-                        .map_or(&o.params[*j].type_ref, |(_, t)| t)
-                        .clone(),
-                    ..p.clone()
-                },
+                (super::ir_types::Arg::Param(j), LegacyArg::Param(_) | LegacyArg::Fill(..)) => {
+                    ConcreteParam {
+                        type_ref: arm_types
+                            .iter()
+                            .find(|(k, _)| k == j)
+                            .map_or(&o.params[*j].type_ref, |(_, t)| t)
+                            .clone(),
+                        ..p.clone()
+                    }
+                }
                 _ => p.clone(),
             })
             .collect();
@@ -495,6 +556,8 @@ fn restated(
                 .map(|(arm, &overload)| LiteralArm {
                     values: arm.values.clone(),
                     overload,
+                    in_type_arg: arm.in_type_arg,
+                    fills: fills_at(&overloads[overload]),
                 })
                 .collect(),
         };
@@ -502,7 +565,21 @@ fn restated(
             overload: matched[0],
             name_suffix: e.name_suffix,
             params,
+            fills: match literal_arms.is_empty() {
+                true => fills_at(o),
+                false => Vec::new(),
+            },
             literal_arms,
+            made: o
+                .made
+                .iter()
+                .filter_map(|j| {
+                    let at = |a: &super::ir_types::Arg| {
+                        matches!(a, super::ir_types::Arg::Param(p) if p == j)
+                    };
+                    o.args.iter().position(at)
+                })
+                .collect(),
         }];
         for (k, members) in splits {
             collapsed = true;
@@ -540,31 +617,135 @@ fn restated(
             .iter()
             .map(|&k| expansions[k].params.clone())
             .collect();
-        let suffixes = crate::signatures::compute_suffixes_pub(&params);
+        let suffixes = crate::signatures::compute_suffixes_in(&params, cgctx, scope);
         for (k, s) in plain.into_iter().zip(suffixes) {
             expansions[k].name_suffix = s;
         }
     }
+    // A parameter the binding makes names nothing; the literal it's filled
+    // with does, where the IR renamed the overload by it.
+    if expansions.iter().any(|x| !x.made.is_empty()) {
+        let plain: Vec<usize> = (0..expansions.len())
+            .filter(|&k| expansions[k].literal_arms.is_empty())
+            .collect();
+        let given: Vec<Vec<ConcreteParam>> = plain
+            .iter()
+            .map(|&k| {
+                let x = &expansions[k];
+                let kept =
+                    |(i, p): (usize, &ConcreteParam)| (!x.made.contains(&i)).then(|| p.clone());
+                x.params.iter().enumerate().filter_map(kept).collect()
+            })
+            .collect();
+        // One taking what another does is told apart by its literal.
+        let mut distinct: Vec<Vec<ConcreteParam>> = Vec::new();
+        for g in &given {
+            if !distinct.contains(g) {
+                distinct.push(g.clone());
+            }
+        }
+        let suffixes = crate::signatures::compute_suffixes_in(&distinct, cgctx, scope);
+        for (k, g) in plain.into_iter().zip(&given) {
+            let s = suffixes[distinct.iter().position(|d| d == g).unwrap()].clone();
+            let x = &mut expansions[k];
+            x.name_suffix = match x.made.is_empty() {
+                true => s,
+                false => {
+                    let literal = &overloads[x.overload].made_suffix;
+                    match literal.is_empty() {
+                        true => s,
+                        false => format!("{s}_{}", ts_gen::util::naming::to_snake_case(literal)),
+                    }
+                }
+            };
+        }
+    }
     // The IR pairs each typed array with its copy (`u8[]`), which the
     // parse binds only beside an element array.
-    let copy = |o: &super::ir_types::Overload, k: &super::ir_types::Overload| {
-        o.params.len() == k.params.len()
-            && o.params.iter().zip(&k.params).all(|(a, b)| {
-                a.name == b.name
-                    && (a.type_ref == b.type_ref
-                        || matches!((&a.type_ref, &b.type_ref), (
-                            TypeRef::TypedSlice(e, _),
-                            TypeRef::Reference { segments, .. },
-                        ) if segments.len() == 1
-                            && ts_gen::ir::TypedArrayElement::of_typed_array(&segments[0]) == Some(*e)))
-            })
+    let copy = |i: usize, k: usize| {
+        let (o, of) = (&overloads[i], &overloads[k]);
+        o.params.len() == of.params.len()
+            && o.params
+                .iter()
+                .zip(&of.params)
+                .zip(&stated[k])
+                .all(|((a, b), b_ty)| {
+                    a.name == b.name
+                        && (a.type_ref == *b_ty
+                            || matches!((&a.type_ref, b_ty), (
+                                TypeRef::TypedSlice(e, _),
+                                TypeRef::Reference { segments, .. },
+                            ) if segments.len() == 1
+                                && ts_gen::ir::TypedArrayElement::of_typed_array(&segments[0]) == Some(*e)))
+                })
     };
-    let unbound =
-        |i: usize| (0..overloads.len()).any(|k| used[k] && copy(&overloads[i], &overloads[k]));
+    // And a `buffer` with its view (`*buffer`), which the parse doesn't
+    // bind.
+    let view = |i: usize, k: usize| {
+        let (o, of) = (&overloads[i], &overloads[k]);
+        o.params.len() == of.params.len()
+            && o.params
+                .iter()
+                .zip(&of.params)
+                .enumerate()
+                .all(|(j, (a, b))| {
+                    a.name == b.name
+                        && (a.type_ref == stated[k][j]
+                            || buffers[k][j]
+                                && a.slice_mode == Some(ts_gen::ir::SliceModeHint::View)
+                                && matches!(a.type_ref, TypeRef::TypedSlice(..)))
+                })
+    };
+    let unbound = |i: usize| (0..overloads.len()).any(|k| used[k] && (copy(i, k) || view(i, k)));
     if (0..overloads.len()).any(|i| !used[i] && !unbound(i) && !covered.contains(&i)) {
         return None;
     }
     Some((overloads, scopes, expansions))
+}
+
+/// `theirs` with the string literals it passes as type arguments left open
+/// where `ours` leaves them: those the call fills a field with.
+fn open_like(ours: &TypeRef, theirs: &TypeRef) -> TypeRef {
+    let core = |t: &TypeRef| t.split_empties().map_or_else(|| t.clone(), |(c, _)| c);
+    let (
+        TypeRef::Reference {
+            generic_args: x, ..
+        },
+        TypeRef::Reference {
+            segments,
+            generic_args: y,
+        },
+    ) = (core(ours), core(theirs))
+    else {
+        return theirs.clone();
+    };
+    let open = |(i, a): (usize, &TypeRef)| match (x.get(i), a) {
+        (Some(TypeRef::Any), TypeRef::StringLiteral(_)) => TypeRef::Any,
+        _ => a.clone(),
+    };
+    if x.len() != y.len() || !y.iter().enumerate().any(|a| open(a) != *a.1) {
+        return theirs.clone();
+    }
+    let opened = TypeRef::Reference {
+        segments,
+        generic_args: y.iter().enumerate().map(open).collect(),
+    };
+    match theirs.split_empties() {
+        Some((_, n)) => opened.with_empties(n),
+        None => opened,
+    }
+}
+
+/// An overload's fills, at the positions of an expansion of its call.
+fn fills_at(o: &super::ir_types::Overload) -> Vec<(usize, String, String)> {
+    o.fills
+        .iter()
+        .filter_map(|(j, field, value)| {
+            let at =
+                |a: &super::ir_types::Arg| matches!(a, super::ir_types::Arg::Param(p) if p == j);
+            Some((o.args.iter().position(at)?, field.clone(), value.clone()))
+        })
+        .collect()
 }
 
 /// A JS argument of a parse expansion.
@@ -573,6 +754,18 @@ enum LegacyArg<'a> {
     Param(usize),
     Str(&'a str),
     Null,
+    /// The parameter at this index, a dictionary the call fills with the
+    /// literals its type passes as type arguments.
+    Fill(usize, &'a str),
+}
+
+impl LegacyArg<'_> {
+    fn param(&self) -> Option<usize> {
+        match self {
+            LegacyArg::Param(k) | LegacyArg::Fill(k, _) => Some(*k),
+            _ => None,
+        }
+    }
 }
 
 /// The JS arguments of `params`, with `arm`'s literals in place.
@@ -583,6 +776,7 @@ fn legacy_args<'a>(params: &'a [ConcreteParam], arm: Option<&'a LiteralArm>) -> 
         .map(|(i, p)| {
             let literal = arm.and_then(|a| a.values.iter().find(|(at, _)| *at == i));
             match (literal, &p.type_ref) {
+                (Some((_, v)), _) if arm.is_some_and(|a| a.in_type_arg) => LegacyArg::Fill(i, v),
                 (Some((_, v)), _) | (None, TypeRef::StringLiteral(v)) => LegacyArg::Str(v),
                 (None, TypeRef::Null) => LegacyArg::Null,
                 _ => LegacyArg::Param(i),
@@ -624,6 +818,10 @@ fn matching(
                                 && view(&o.params[*j].type_ref, o.params[*j].slice_mode)
                                     == view(&params[*k].type_ref, params[*k].slice_mode)
                         }
+                        (Arg::Param(j), LegacyArg::Fill(k, v)) => {
+                            o.params[*j].name == params[*k].name
+                                && !matches!(o.fill_tag(*j), Some(t) if t != *v)
+                        }
                         (Arg::Param(j), LegacyArg::Str(v)) => o.members[*j]
                             .as_ref()
                             .is_some_and(|m| m.contains(&TypeRef::StringLiteral((*v).into()))),
@@ -646,7 +844,8 @@ fn matching(
                 .zip(args)
                 .all(|(ours, theirs)| match (ours, theirs) {
                     (Arg::Param(j), LegacyArg::Param(k)) => {
-                        let theirs = &params[*k].type_ref;
+                        let open = open_like(&o.params[*j].type_ref, &params[*k].type_ref);
+                        let theirs = &open;
                         // An argument the IR erases (`Options<Str>` for
                         // `Options<"text">`), or reads as its enum, binds
                         // alike.
@@ -925,6 +1124,7 @@ fn emit(cgctx: &CodegenContext<'_>, scope: ScopeId, ours: &TypeRef, theirs: &Typ
     let t = take(ours, theirs, &|o, t| {
         declared(cgctx, scope, o, t)
             .or_else(|| unaliased(cgctx, scope, o, t))
+            .or_else(|| buffer(cgctx, scope, o, t))
             // A union or literal the IR reads as a synthesised enum inside
             // another type, named as the parse spells it.
             .or_else(|| {
@@ -1135,6 +1335,7 @@ fn exact(
     let ours = &take(ours, theirs, &|o, t| {
         declared(cgctx, scope, o, t)
             .or_else(|| unaliased(cgctx, scope, o, t))
+            .or_else(|| buffer(cgctx, scope, o, t))
             .or_else(|| defaulted(cgctx, scope, o, t))
             .or_else(|| aliased(cgctx, scope, o, t))
             .or_else(|| inferred(cgctx, scope, o, t))
@@ -1685,6 +1886,39 @@ fn unaliased(
     cgctx
         .resolve_alias_instance(ours, scope)
         .filter(|t| matches!(t, TypeRef::Function(_) | TypeRef::Reference { .. }))
+}
+
+/// The parse's `theirs`, where the IR's `ours` is a `buffer` and it names
+/// the two classes in either order, or an alias of them.
+fn buffer(
+    cgctx: &CodegenContext<'_>,
+    scope: ScopeId,
+    ours: &TypeRef,
+    theirs: &TypeRef,
+) -> Option<TypeRef> {
+    let split = |t: &TypeRef| {
+        t.split_empties()
+            .map_or((t.clone(), None), |(c, n)| (c, Some(n)))
+    };
+    let ((o_core, o_empty), (t_core, t_empty)) = (split(ours), split(theirs));
+    if !super::ir_types::buffer_pair(&o_core) || o_empty != t_empty {
+        return None;
+    }
+    let (mut target, mut at) = (t_core, scope);
+    while let TypeRef::Reference {
+        segments,
+        generic_args,
+    } = &target
+    {
+        if !generic_args.is_empty() {
+            break;
+        }
+        let Some((t, s)) = cgctx.resolve_alias(&segments.join("."), at) else {
+            break;
+        };
+        (target, at) = (t.into_owned(), s);
+    }
+    super::ir_types::buffer_pair(&target).then(|| theirs.clone())
 }
 
 /// The parse's alias `theirs`, where `ours` states what it names: the

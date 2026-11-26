@@ -70,6 +70,11 @@ impl HasOptionalBuilder {
         self.inner
     }
 }
+impl From<HasOptional> for HasOptionalBuilder {
+    fn from(inner: HasOptional) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -115,6 +120,11 @@ impl AllOptionalBuilder {
     }
     pub fn build(self) -> AllOptional {
         self.inner
+    }
+}
+impl From<AllOptional> for AllOptionalBuilder {
+    fn from(inner: AllOptional) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]
