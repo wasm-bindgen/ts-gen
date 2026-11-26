@@ -15,10 +15,11 @@ const fs = await import("node:fs");
 const compile = (f) => new WebAssembly.Module(fs.readFileSync(f));
 const calls = [];
 let L;
-const f64s = (p, n) => Array.from({ length: n }, (_, i) => L.dv().getFloat64(p + i * 8, true));
+// A callback's arguments are the language's, which frees them.
+const f64s = (p, n) => Array.from(new Float64Array(L.take(p, n, 8, 8).buffer));
 const impl = {
   "tw:call:fn(...arr<f64>)": (env, p, n) => calls.push([env, f64s(p, n)]),
-  "tw:call:fn(str,...arr<f64>)": (env, sp, sl, p, n) => calls.push([env, L.readStr(sp, sl), f64s(p, n)]),
+  "tw:call:fn(str,...arr<f64>)": (env, sp, sl, p, n) => calls.push([env, L.takeStr(sp, sl), f64s(p, n)]),
   "tw:drop:fn(...arr<f64>)": () => {},
   "tw:drop:fn(str,...arr<f64>)": () => {},
 };

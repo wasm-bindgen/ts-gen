@@ -564,21 +564,6 @@ function $release(cx, m) {
   cx.n = m;
 }
 
-// Moves a suspended entry's argument records, those above `m`, off the
-// stack, and releases them once its future `f` settles: under JSPI the call
-// returns its future at its first suspension, and the language may read its
-// arguments after it resumes (IR.md §16).
-function $hold(cx, m, f) {
-  if (cx.n === m) return;
-  const held = { a: cx.a.slice(m, cx.n), n: cx.n - m };
-  cx.n = m;
-  // A terminated language isn't entered again, even to free (§15).
-  const done = () => {
-    if ($live()) $release(held, 0);
-  };
-  f.promise.then(done, done);
-}
-
 // The bridge's return area, the first bytes of its scratch memory, where a
 // JS import writes its results past the first.
 let $ra = null;

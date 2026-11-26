@@ -17,12 +17,14 @@ const bridgeModule = compile("bridge.wasm");
 // Each bridge instantiates its own language instance, with its own state.
 const make = (k) => {
   const b = mod.createBridge();
+  let L;
   const impl = {
     "util.add(u32,u32)": (a, c) => a + c + k,
-    // The pass-through language hands the string over as its wire.
-    "util.len(str)": (p, n) => n + k,
+    // The pass-through language hands the string over as its wire, and
+    // frees it as its own.
+    "util.len(str)": (p, n) => L.take(p, n).length + k,
   };
-  const L = lang(b.instantiate(language, bridgeModule, { "test:impl": impl }));
+  L = lang(b.instantiate(language, bridgeModule, { "test:impl": impl }));
   return { b, L };
 };
 const one = make(1);

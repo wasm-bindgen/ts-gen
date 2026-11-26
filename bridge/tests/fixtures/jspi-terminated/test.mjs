@@ -45,7 +45,7 @@ api.resolvers[0](5);
 await new Promise((r) => setTimeout(r, 0));
 assert.equal(resumed(), 1, "the language didn't run again");
 assert.equal(caught(), 0);
-// Nor is a held argument freed through it.
+// Nor is a parked call's argument freed: it was the language's.
 assert.equal(live(), before);
 
 console.log("ok");

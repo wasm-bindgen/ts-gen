@@ -883,6 +883,7 @@ class $C0 {
         const t2 = $lowerUtf8($L, $str(t1), cx);
         const t3 = t2[0];
         const t4 = t2[1];
+        cx.n = cxm;
         const r = $E[6](this, $HC.unwrap(this, $C0, "Counter"), t3, t4);
         const t5 = r[0];
         const t6 = r[1];
@@ -892,9 +893,8 @@ class $C0 {
           if (t6 !== 0) $L.free(t5, t6 * 1, 1);
         }
       } catch (e) {
-        throw $outgoing(e);
-      } finally {
         $release(cx, cxm);
+        throw $outgoing(e);
       }
     }
     throw new TypeError("`Counter.label` doesn't match its arguments");
@@ -937,6 +937,7 @@ class $C0 {
         const t6 = $lowerUtf8($L, $str(t5), cx);
         const t7 = t6[0];
         const t8 = t6[1];
+        cx.n = cxm;
         const r = $E[9](this, $HC.unwrap(this, $C0, "Counter"), t7, t8);
         const t9 = r[0];
         const t10 = r[1];
@@ -946,9 +947,8 @@ class $C0 {
           if (t10 !== 0) $L.free(t9, t10 * 1, 1);
         }
       } catch (e) {
-        throw $outgoing(e);
-      } finally {
         $release(cx, cxm);
+        throw $outgoing(e);
       }
     }
     throw new TypeError("no overload of `Counter.pick` matches its arguments");
@@ -1066,12 +1066,12 @@ class $C3 extends globalThis.Plain {
         const t4 = $lowerUtf8($L, $str(t3), cx);
         const t5 = t4[0];
         const t6 = t4[1];
+        cx.n = cxm;
         const r = $E[19](this, t5, t6);
         $HC.pair(this, r, "tw:drop:Dual");
       } catch (e) {
-        throw $outgoing(e);
-      } finally {
         $release(cx, cxm);
+        throw $outgoing(e);
       }
       return;
     }

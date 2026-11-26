@@ -3,8 +3,9 @@
 //! wraps language handles in JS values.
 //!
 //! Every entry checks the termination flag, lowers its arguments on a
-//! cleanup list released after the call (arguments are borrowed), lifts and
-//! frees the result, and maps a language tag escaping into JS (§15).
+//! cleanup list released only if the call isn't made (entered, they're the
+//! language's, §11), lifts and frees the result, and maps a language tag
+//! escaping into JS (§15).
 
 use std::collections::HashMap;
 use std::fmt::Write;
@@ -124,22 +125,21 @@ impl<'a, 'b> Glue<'a, 'b> {
                 }
             }
         }
+        // Entered, the language owns its arguments (§11): the records left
+        // are only those of a call that isn't made.
+        if alloc {
+            b.line("cx.n = cxm;");
+        }
         let call = format!("$E[{idx}]({})", wire.join(", "));
         match sig.results.first() {
             None => b.line(format!("{call};")),
             Some(r) => {
                 b.line(format!("const r = {call};"));
                 // A promising call returns at its first suspension, while
-                // the language may still use its arguments and receiver
-                // (§16): they stay borrowed, and reachable, until its
-                // future settles.
-                if promising(self.l, sig) {
-                    if alloc {
-                        b.line("$hold(cx, cxm, r);");
-                    }
-                    if !keep.is_empty() {
-                        b.line(format!("$keep(r, [{}]);", keep.join(", ")));
-                    }
+                // the language may still use its receiver and arguments
+                // (§16): they stay reachable until its future settles.
+                if promising(self.l, sig) && !keep.is_empty() {
+                    b.line(format!("$keep(r, [{}]);", keep.join(", ")));
                 }
                 let n = self.f.jsw(&r.repr)?.len();
                 let ws: Vec<String> = if n == 1 {
@@ -166,16 +166,14 @@ impl<'a, 'b> Glue<'a, 'b> {
         }
         b.close("} catch (e) {");
         b.depth += 1;
+        if alloc {
+            b.line("$release(cx, cxm);");
+        }
         b.line("throw $outgoing(e);");
-        if alloc || gc {
+        if gc {
             b.close("} finally {");
             b.depth += 1;
-            if alloc {
-                b.line("$release(cx, cxm);");
-            }
-            if gc {
-                b.line("$S.reset(m);");
-            }
+            b.line("$S.reset(m);");
         }
         b.close("}");
         Ok(on_raw.is_none() && !sig.results.is_empty())

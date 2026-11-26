@@ -38,11 +38,22 @@ await collect();
 assert.equal(drops(), 1);
 assert.deepEqual(L.live(), start);
 
-// An exception unwinds through the language's cleanup and the entry's.
+// An exception unwinds through the language's cleanup, which frees its
+// argument too.
 assert.equal(L.balanced(() => app.guarded(t, "abc")), 6);
 t.boom = new RangeError("boom");
 L.balanced(() => assert.throws(() => app.guarded(t, "héllo"), (e) => e === t.boom));
 t.boom = null;
+
+// An argument belongs to the language once its call is entered: it outlives
+// the call, and nothing frees it until the language gives it up.
+app.keep("héllo", t);
+assert.equal(L.live().allocations, start.allocations + 1);
+assert.equal(L.balanced(() => app.guarded(t, "abc")), 6);
+assert.equal(app.kept(), "héllo");
+assert.deepEqual(L.live(), start);
+// Only a call that's never entered leaves them to the bridge.
+L.balanced(() => L.throwsType(() => app.keep("x", {}), /Target/));
 
 // Termination: entries refuse, and finalizers skip their drops.
 app.listen(t, 1);

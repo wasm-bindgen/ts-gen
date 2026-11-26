@@ -79,7 +79,8 @@ assert.equal(envs(), dropped);
 c2.resolvers[0](2);
 assert.equal(await parked, 3);
 
-// A suspended call keeps its arguments until it settles.
+// A suspended call's arguments are its own: the language reads them once
+// resumed, and frees them.
 const e = new Api();
 const live = instance.exports["test:live"];
 const before = live();

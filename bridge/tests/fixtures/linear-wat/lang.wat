@@ -27,7 +27,11 @@
     (call $destroy (global.get $last))
     (call $free (global.get $last) (i32.const 8) (i32.const 4)))
 
-  ;; A buffer freed on both the normal and the unwinding path.
+  ;; A buffer and the string argument, both the language's, freed on both
+  ;; the normal and the unwinding path.
+  (func $cleanup (param $buf i32) (param $p i32) (param $n i32)
+    (call $free (local.get $buf) (i32.const 16) (i32.const 1))
+    (if (local.get $n) (then (call $free (local.get $p) (local.get $n) (i32.const 1)))))
   (func (export "app.guarded(Target,str)") (param $t externref) (param $p i32) (param $n i32) (result i32)
     (local $buf i32) (local $r i32) (local $e exnref)
     (local.set $buf (call $realloc (i32.const 0) (i32.const 0) (i32.const 1) (i32.const 16)))
@@ -37,10 +41,20 @@
           (try_table (catch_all_ref $catch)
             (local.set $r (call $fire (local.get $t) (local.get $n))))
           (br $done)))
-      (call $free (local.get $buf) (i32.const 16) (i32.const 1))
+      (call $cleanup (local.get $buf) (local.get $p) (local.get $n))
       (throw_ref (local.get $e)))
-    (call $free (local.get $buf) (i32.const 16) (i32.const 1))
+    (call $cleanup (local.get $buf) (local.get $p) (local.get $n))
     (local.get $r))
+
+  ;; An argument is the language's: kept past its call, and handed back as
+  ;; a result.
+  (global $kept (mut i32) (i32.const 0))
+  (global $keptn (mut i32) (i32.const 0))
+  (func (export "app.keep(str,Target)") (param $p i32) (param $n i32) (param externref)
+    (global.set $kept (local.get $p))
+    (global.set $keptn (local.get $n)))
+  (func (export "app.kept()") (result i32 i32)
+    (global.get $kept) (global.get $keptn))
 
   (func (export "app.terminate()")
     (i32.store8 (i32.const 8) (i32.const 1)))

@@ -37,12 +37,13 @@
     (local.set $b (call $later (local.get $api)))
     (call $ready (i32.add (call $await (local.get $a)) (call $await (local.get $b)))))
 
-  ;; Awaits before reading `s`, so the bridge must keep the argument's
-  ;; memory until the call settles.
+  ;; Awaits before reading `s`: the argument is the language's, which
+  ;; frees it once it's done with it.
   (func (export "app.echo(Api,str)") (param $api externref) (param $p i32) (param $n i32) (result externref)
     (local $v i32)
-    (local.set $v (call $await (call $later (local.get $api))))
-    (call $ready (i32.add (local.get $v) (i32.load8_u (local.get $p)))))
+    (local.set $v (i32.add (call $await (call $later (local.get $api))) (i32.load8_u (local.get $p))))
+    (call $free (local.get $p) (local.get $n) (i32.const 1))
+    (call $ready (local.get $v)))
 
   ;; One future that several calls suspend on.
   (global $shared (mut externref) (ref.null extern))

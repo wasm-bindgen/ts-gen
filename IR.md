@@ -1265,14 +1265,16 @@ bridge can share them with another binary. The table's index ranges are in
     `tw:table/alloc`, and the language owns the result.
   * Export results: the bridge reads, converts, then frees with `tw:free`
     and `tw:table/free`.
-* **Parameters** are borrowed for the call, and owned by the caller.
-  * Outgoing (import parameters): the language owns them, and the bridge
-    never frees them.
-  * Incoming (export parameters): the bridge allocates, calls, and frees
-    after the call, or on unwind ([§15](#15-exceptions)). The language must
-    not retain them, nor rewrite the descriptors inside them, since the
-    bridge frees nested allocations (an `arr<str>`'s strings) through
-    those descriptors. Element data is the language's to change.
+* **Import parameters** are borrowed for the call: the language owns them,
+  and the bridge never frees them.
+* **Export parameters** transfer ownership to the language, as do the
+  arguments of a callback it provides (`tw:call:F`).
+  * The bridge allocates them with `tw:realloc` and `tw:table/alloc`, and
+    they're the language's from the moment the call is entered. It frees
+    them, nested allocations included (an `arr<str>`'s strings), whether it
+    returns or unwinds, and may keep them past the call.
+  * The bridge frees them itself only when the call is never made, because
+    a later argument failed to convert ([§15](#15-exceptions)).
 * `mut T[]` outgoing: the bridge copies the language's storage into a
   typed array, calls, then copies back into the same storage. The length is
   fixed.
@@ -2007,16 +2009,18 @@ validation failures.
     `throw_ref`;
   * legacy EH: `try` / `catch_all` / `rethrow`.
 
-  The cleanup releases incoming argument buffers (`tw:realloc`), table slots
-  (`tw:table/alloc`), scratch use, and per-call `@js` state. Then it
-  rethrows, or maps the exception if it's a tag.
+  The cleanup releases scratch use and per-call `@js` state. Then it
+  rethrows, or maps the exception if it's a tag. The arguments of a call
+  that was entered are the language's to free as it unwinds (§11).
 * **Conversions are transactional.** Every allocation made while converting
   a value goes onto a per-call cleanup list, which the JS glue and the Wasm
   wrapper share.
   * A failure part-way through (a `TypeError` at element 500 of a list, a
     throwing getter or Proxy trap) releases everything allocated so far,
     including nested strings and slots, before the error propagates.
-  * Ownership of a result passes to the language only on success.
+  * Ownership of a result passes to the language only on success, and of
+    an export's arguments only once every one has converted and the call
+    is entered.
 * User JS can run during a conversion (getters, Proxy traps), and may
   reenter the language. That's ordinary reentrancy: partially built values
   are never visible to the language.
@@ -2114,11 +2118,11 @@ Promising calls:
 * The bridge calls an export or callback returning a `future` through
   `WebAssembly.promising`. The JS result is the promise of the call's own
   future, and an error escaping the call rejects it.
-* Such a call returns to JS at its first suspension, but its arguments
-  stay borrowed until its future settles: the bridge frees them then, not
-  when the call first returns (§11). It also keeps the call's receiver and
-  JS arguments reachable until then, so a finalizer doesn't drop a handle
-  the call still uses (`await new Foo().run()`).
+* Such a call returns to JS at its first suspension. Its arguments are
+  the language's own (§11), so they outlive that return. The bridge keeps
+  the call's receiver and JS arguments reachable until its future settles,
+  so a finalizer doesn't drop a handle the call still uses
+  (`await new Foo().run()`).
 * It enters the language through a root in the bridge module, which
   records the scratch base: a suspension moves what's live above it out of
   scratch while it's parked, and puts it back once resumed. The root also
@@ -2152,8 +2156,7 @@ Termination (§15): once the language has terminated, a settlement doesn't
 resume a parked stack. Every promising call in flight rejects with the
 termination error from JS instead, where the bridge first sees the flag
 set (any entry, or a settlement), and the stacks stay parked, so the
-language runs nothing more: not its exception handlers, nor `tw:free` for
-the arguments the calls were keeping.
+language runs nothing more, its exception handlers included.
 
 ### Future operations (bridge imports, group `tw:future`)
 
