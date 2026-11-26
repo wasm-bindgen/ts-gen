@@ -118,7 +118,16 @@ impl<'a, 'b> Glue<'a, 'b> {
         // are only those of a call that isn't made, so what can fail before
         // the language runs is checked first.
         if alloc {
-            if self.l.profile.results == Results::Single {
+            // Only an entry that checks the spill on its way in (§12).
+            let spills = self.l.profile.results == Results::Single
+                && (promising(self.l, sig)
+                    || sig
+                        .params
+                        .iter()
+                        .chain(&sig.results)
+                        .any(|p| self.f.has_gc(&p.repr))
+                    || !self.l.lang_core(&sig.core())?.spill.is_empty());
+            if spills {
                 b.line("$spillCheck();");
             }
             b.line("cx.n = cxm;");

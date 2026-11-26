@@ -24,4 +24,7 @@
     (if (local.get $n) (then (call $free (local.get $p) (local.get $n) (i32.const 1))))
     (call $push (local.get $n))
     (local.get $n))
+  (func (export "app.len(str)") (param $p i32) (param $n i32) (result i32)
+    (if (local.get $n) (then (call $free (local.get $p) (local.get $n) (i32.const 1))))
+    (local.get $n))
 )

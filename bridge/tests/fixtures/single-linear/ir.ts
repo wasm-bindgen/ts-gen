@@ -6,4 +6,5 @@ class P {
 
 export namespace app {
   pair(s: str): (u32, u32);
+  len(s: str): u32;
 }

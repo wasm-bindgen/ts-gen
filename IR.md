@@ -1443,8 +1443,9 @@ operations (`tw:future` `new`, `get<T>` and `states`,
 Order is slot order both ways: from the language's side the spill is first
 in, first out within a crossing. It's empty at every crossing boundary:
 
-* the bridge checks it's empty before each spilled import and around each
-  export;
+* the bridge checks it's empty before each spilled import, and around each
+  export that spills results or that the bridge module calls (one with GC
+  positions, or a promising call, [§16](#16-async));
 * reading a slot that wasn't pushed, overflowing, or leaving slots unread
   throws a `TypeError` and resets it, as does any exception unwinding out of
   an export.
@@ -2033,8 +2034,8 @@ validation failures.
   * Ownership of a result passes to the language only on success, and of
     an export's arguments only once the call is entered. Handing them over
     is the last thing the bridge does before it: every argument has
-    converted, the receiver is a live instance, and the spill is empty
-    (`results = single`).
+    converted, the receiver is a live instance, and a call that checks
+    the spill (`results = single`, §12) has found it empty.
   * A call that fails before the language runs (the stack exhausted at
     the call itself, or memory in the bridge module's GC entry) can't be
     told from one that failed inside it. Its arguments are already the

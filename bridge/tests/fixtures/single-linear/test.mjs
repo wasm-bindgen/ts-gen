@@ -17,6 +17,9 @@ assert.equal(live(), 0);
 // A spill left unread faults the next entry before its arguments are the
 // language's, so the bridge frees them.
 ex.dirty(new P());
+// Only a call with spilled results checks it (§12).
+assert.equal(app.len("abc"), 3);
+assert.equal(live(), 0);
 assert.throws(() => app.pair("abc"), (e) => e instanceof TypeError && /left unread/.test(e.message));
 assert.equal(live(), 0);
 assert.equal(spillEmpty(), true);
