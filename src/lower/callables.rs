@@ -40,6 +40,10 @@ pub(crate) struct Sig<'s> {
     pub scope: ScopeId,
 }
 
+/// The type arguments giving a dictionary parameter's literal fields, and
+/// the fields a call fills.
+type LiteralFields = (Vec<usize>, Vec<(String, abi::Expr)>);
+
 /// One expanded overload's parameters and JS argument list.
 struct Variant {
     params: Vec<abi::Param>,
@@ -47,6 +51,8 @@ struct Variant {
     /// Whether `args` differs from the parameters in order.
     shaped: bool,
     slots: Vec<Slot>,
+    /// The objects the bridge makes for the call.
+    lets: Vec<abi::JsEntry>,
 }
 
 /// A source position of an overload's JS argument list, for naming it
@@ -722,6 +728,7 @@ impl Lowerer<'_> {
                 args: Vec::new(),
                 shaped: false,
                 slots: Vec::new(),
+                lets: Vec::new(),
             };
             match arm {
                 Arm::Value(t) => {
@@ -939,11 +946,23 @@ impl Lowerer<'_> {
         named: Option<&Named>,
         cx: &Tcx,
     ) -> Option<(abi::Type, bool)> {
+        // An arm over a key isn't an enum's: enums have no type parameters.
+        let keyed = |t: &abi::Type| {
+            let mut keyed = false;
+            t.walk(&mut |t| keyed |= matches!(t, abi::Type::Index(..) | abi::Type::Lit(_)));
+            keyed
+        };
+        if l.values.iter().any(keyed) {
+            return None;
+        }
         let kinds = l.values.len()
             + usize::from(!l.strs.is_empty())
             + usize::from(!l.nums.is_empty())
             + usize::from(!l.bools.is_empty());
         if l.values.is_empty() || kinds < 2 {
+            return None;
+        }
+        if cx.view && l.values.contains(&abi::Type::Buffer) {
             return None;
         }
         let union = !cx.export;
@@ -1089,6 +1108,122 @@ impl Lowerer<'_> {
         doc: Option<String>,
         cx: &Tcx,
     ) -> Vec<Overload> {
+        let keyed = match form {
+            Form::Method(_) => self.keyed_sig(&sig, ret, cx),
+            _ => None,
+        };
+        let Some((params, kret, keys)) = keyed else {
+            let none = Vec::new();
+            return self.callable_as(form, is_static, tparams, sig, ret, throws, doc, cx, none);
+        };
+        // The evaluated reading declares the enums an erasing reading of
+        // the keyed one names.
+        let evaluated = Sig {
+            params: sig.params,
+            scope: sig.scope,
+        };
+        let said = self.diagnostics.len();
+        self.callable_as(
+            form.clone(),
+            is_static,
+            tparams,
+            evaluated,
+            ret,
+            throws,
+            doc.clone(),
+            cx,
+            Vec::new(),
+        );
+        self.diagnostics.truncate(said);
+        self.keyed = keys.iter().map(|k| k.name.clone()).collect();
+        let written = Sig {
+            params: &params,
+            scope: sig.scope,
+        };
+        let kret = kret.as_ref();
+        let out = self.callable_as(
+            form, is_static, tparams, written, kret, throws, doc, cx, keys,
+        );
+        self.keyed.clear();
+        out
+    }
+
+    /// The signature as written where it is keyed (§13): its parameters
+    /// and result before evaluation, and `K in keyof M` for each type
+    /// parameter that types a parameter. `None` when it isn't keyed, or
+    /// the IR can't state it.
+    #[allow(clippy::type_complexity)]
+    fn keyed_sig(
+        &mut self,
+        sig: &Sig<'_>,
+        ret: Option<&TypeRef>,
+        cx: &Tcx,
+    ) -> Option<(Vec<Param>, Option<TypeRef>, Vec<abi::TypeParam>)> {
+        if !self.opts.keyed || self.opts.lib.is_some() {
+            return None;
+        }
+        let scopes = &self.gctx.scopes;
+        let mut names: Vec<String> = Vec::new();
+        let mut params = sig.params.to_vec();
+        for (i, p) in params.iter_mut().enumerate() {
+            if let Some(k) = scopes.key_param(sig.scope, i) {
+                if !names.contains(k) {
+                    names.push(k.clone());
+                }
+                p.type_ref = TypeRef::ident(k.clone());
+            } else if let Some(t) = scopes.keyed(sig.scope, i) {
+                p.type_ref = t.clone();
+            }
+        }
+        if names.is_empty() {
+            return None;
+        }
+        let ret = match scopes.keyed(sig.scope, usize::MAX) {
+            Some(t) => Some(t.clone()),
+            None => ret.cloned(),
+        };
+        let cx = cx.at(sig.scope);
+        let mut keys = Vec::new();
+        for k in &names {
+            let (_, TypeRef::KeyOf(m)) = scopes.erased_bound(sig.scope, k)? else {
+                return None;
+            };
+            if !self.is_map(m, &cx) {
+                return None;
+            }
+            let m @ abi::Type::Named(_) = self.ty(m, &cx) else {
+                return None;
+            };
+            keys.push(abi::TypeParam {
+                name: k.clone(),
+                bound: Some(abi::Bound::KeyOf(m)),
+                default: None,
+            });
+        }
+        self.keyed = names;
+        let plain = params
+            .iter()
+            .map(|p| &p.type_ref)
+            .chain(&ret)
+            .all(|t| self.keyed_plain(t));
+        self.keyed.clear();
+        plain.then_some((params, ret, keys))
+    }
+
+    /// [`Self::callable`], with `keys` among its type parameters.
+    #[allow(clippy::too_many_arguments)]
+    fn callable_as(
+        &mut self,
+        form: Form,
+        is_static: bool,
+        tparams: &[TypeParam],
+        sig: Sig<'_>,
+        ret: Option<&TypeRef>,
+        throws: &Throws,
+        doc: Option<String>,
+        cx: &Tcx,
+        keys: Vec<abi::TypeParam>,
+    ) -> Vec<Overload> {
         let place = cx.place.clone();
         // The IR has no constructor type parameters: they read as their
         // default, else a class or interface they're bounded by, else `Any?`.
@@ -1157,7 +1292,9 @@ impl Lowerer<'_> {
                 .filter(|p| rest.is_none_or(|r| r.name != p.name))
                 .cloned()
                 .collect();
-            (self.tparams(&kept, sig.scope, &place, Some(&key), None), cx)
+            let mut own = self.tparams(&kept, sig.scope, &place, Some(&key), None);
+            own.extend(keys);
+            (own, cx)
         };
         let (mut result, js_null) = match ret {
             Some(TypeRef::Never) => (abi::Type::Never, false),
@@ -1199,9 +1336,9 @@ impl Lowerer<'_> {
                 for p in &mut v.params {
                     p.once = once.contains(&p.name) && self.is_callback(&p.ty, &cx.place);
                 }
-                let mut lets = Vec::new();
+                let mut lets = std::mem::take(&mut v.lets);
                 if let Some(cancel) = &cancel {
-                    lets = cancellable(&mut v, cancel);
+                    lets.extend(cancellable(&mut v, cancel));
                 }
                 let mut o = build(
                     &form,
@@ -1513,6 +1650,18 @@ impl Lowerer<'_> {
         };
         let pnames = self.param_names(params, cx);
         let tags: Vec<Option<String>> = params.iter().map(|p| type_arg_tag(&p.type_ref)).collect();
+        let fills: Vec<LiteralFields> = params
+            .iter()
+            .map(|p| match cx.export {
+                true => Default::default(),
+                false => self.literal_fields(&p.type_ref, &cx.at(sig.scope)),
+            })
+            .collect();
+        let made: Vec<Option<abi::Path>> = params
+            .iter()
+            .zip(&fills)
+            .map(|(p, f)| self.constant_dictionary(&p.type_ref, &f.1, &cx.at(sig.scope)))
+            .collect();
         let unshared: Vec<bool> = params.iter().map(|p| rejects_shared(&p.type_ref)).collect();
         let mut never = None;
         let mut unions = Vec::new();
@@ -1520,13 +1669,19 @@ impl Lowerer<'_> {
             .iter()
             .enumerate()
             .map(|(i, p)| {
-                let pcx = cx.param(&p.name);
+                let pcx = Tcx {
+                    view: !cx.export && p.slice_mode == Some(SliceModeHint::View),
+                    ..cx.param(&p.name)
+                };
+                // A literal the call fills isn't the caller's to give.
+                let filled = (!fills[i].0.is_empty()).then(|| open_args(&p.type_ref, &fills[i].0));
+                let ty = filled.as_ref().unwrap_or(&p.type_ref);
                 let mut raw = Vec::new();
-                self.leaves(&p.type_ref, &pcx, &mut raw);
+                self.leaves(ty, &pcx, &mut raw);
                 if raw.is_empty() {
                     never.get_or_insert(i);
                 }
-                let (mut arms, union) = self.arms(&p.type_ref, &pcx);
+                let (mut arms, union) = self.arms(ty, &pcx);
                 unions.push(union);
                 // An export receives JS `null` as its own absence.
                 if cx.export {
@@ -1639,16 +1794,23 @@ impl Lowerer<'_> {
                     args: Vec::new(),
                     shaped: false,
                     slots: Vec::new(),
+                    lets: Vec::new(),
                 };
                 for (i, arm) in combo.into_iter().enumerate() {
                     let name = &pnames[i];
                     match arm {
+                        Arm::Value(_) if made[i].is_some() => {
+                            v.make(name, made[i].as_ref().unwrap(), fills[i].1.clone());
+                        }
                         Arm::Value(t) => {
                             let view = matches!(t, abi::Type::View { .. });
                             v.push_param(name, t, tags[i].clone());
                             let p = v.params.last_mut().unwrap();
                             p.unshared = view && unshared[i];
                             p.union = unions[i];
+                            if !fills[i].1.is_empty() {
+                                v.fill_last(fills[i].1.clone());
+                            }
                         }
                         Arm::Const(lit) => v.push_const(name, lit),
                         Arm::Undefined => {
@@ -1677,6 +1839,27 @@ impl Lowerer<'_> {
 }
 
 impl Variant {
+    /// Fill the parameter just pushed: the call passes a copy of it with
+    /// `fields` set, made when the parameter is absent.
+    fn fill_last(&mut self, fields: Vec<(String, abi::Expr)>) {
+        let (Some(p), Some(Slot::Param { ty, .. }), Some(arg)) = (
+            self.params.last_mut(),
+            self.slots.last_mut(),
+            self.args.last_mut(),
+        ) else {
+            return;
+        };
+        if !matches!(p.ty, abi::Type::Nullable(_, _)) {
+            p.ty = abi::Type::Nullable(Box::new(p.ty.clone()), false);
+            *ty = p.ty.clone();
+        }
+        *arg = abi::Telem::Fill {
+            param: p.name.clone(),
+            fields,
+        };
+        self.shaped = true;
+    }
+
     fn push_param(&mut self, name: &str, ty: abi::Type, tag: Option<String>) {
         self.slots.push(Slot::Param {
             name: name.into(),
@@ -1686,6 +1869,31 @@ impl Variant {
         });
         self.params.push(param(name, ty));
         self.args.push(abi::Telem::Param(name.into()));
+    }
+
+    /// Pass a `dictionary` the bridge makes, with `fields` set, where the
+    /// caller would have nothing to set on it: no parameter.
+    fn make(&mut self, name: &str, dictionary: &abi::Path, fields: Vec<(String, abi::Expr)>) {
+        let mut new = dictionary.segments.clone();
+        new.push("new".into());
+        self.lets.push(abi::JsEntry::Let(
+            name.into(),
+            abi::Expr::Ref {
+                path: new,
+                call: Some(Vec::new()),
+            },
+        ));
+        if let Some((_, abi::Expr::Lit(value))) = fields.first() {
+            self.slots.push(Slot::Const {
+                name: name.into(),
+                value: value.clone(),
+            });
+        }
+        self.args.push(abi::Telem::Fill {
+            param: name.into(),
+            fields,
+        });
+        self.shaped = true;
     }
 
     fn push_const(&mut self, name: &str, value: abi::Literal) {
@@ -1877,7 +2085,8 @@ fn fold_absent(arms: Vec<Arm>, undefined: bool) -> Vec<Arm> {
         .collect()
 }
 
-/// `{@slice view}`: a zero-copy `*T[]` beside each `T[]` copy (IR.md §11).
+/// `{@slice view}`: a zero-copy `*T[]` beside each `T[]` copy, and a
+/// `*buffer` beside a `buffer` (IR.md §11).
 fn with_views(arms: Vec<Arm>) -> Vec<Arm> {
     let mut out = Vec::new();
     for a in arms {
@@ -1885,6 +2094,10 @@ fn with_views(arms: Vec<Arm>) -> Vec<Arm> {
             Arm::Value(abi::Type::Vec(e)) => Some(abi::Type::View {
                 mutable: false,
                 elem: e.clone(),
+            }),
+            Arm::Value(abi::Type::Buffer) => Some(abi::Type::View {
+                mutable: false,
+                elem: Box::new(abi::Type::Buffer),
             }),
             _ => None,
         };
@@ -1942,6 +2155,90 @@ fn param(name: &str, ty: abi::Type) -> abi::Param {
 }
 
 impl Lowerer<'_> {
+    /// The fields a dictionary parameter's type fixes to one literal: a
+    /// required one typed by a string literal, or by exactly a type
+    /// parameter the reference gives one; beside the type arguments giving
+    /// them, which the caller no longer chooses.
+    fn literal_fields(&self, t: &TypeRef, cx: &Tcx) -> LiteralFields {
+        let t = t.split_empties().map_or_else(|| t.clone(), |(t, _)| t);
+        let TypeRef::Reference {
+            segments,
+            generic_args,
+        } = &t
+        else {
+            return Default::default();
+        };
+        let Some(id) = self.resolve_id(segments, cx) else {
+            return Default::default();
+        };
+        let TypeKind::Interface(i) = &self.gctx.get_type(id).kind else {
+            return Default::default();
+        };
+        if !self.is_dictionary(id, 0) {
+            return Default::default();
+        }
+        let (mut args, mut out) = (Vec::new(), Vec::new());
+        let mut fill = |field: &str, lit: &str| {
+            out.push((
+                field.to_string(),
+                abi::Expr::Lit(abi::Literal::Str(lit.to_string())),
+            ));
+        };
+        for m in &i.members {
+            let Member::Getter(g) = m else { continue };
+            if let (TypeRef::StringLiteral(lit), false) = (&g.type_ref, g.optional) {
+                fill(&g.js_name, lit);
+            }
+            if !self.gctx.literal_fills.contains(&(id, g.js_name.clone())) {
+                continue;
+            }
+            for (at, (tp, arg)) in i.type_params.iter().zip(generic_args).enumerate() {
+                if let (TypeRef::StringLiteral(lit), true) =
+                    (arg, crate::ir::is_type_param(&g.type_ref, &tp.name))
+                {
+                    fill(&g.js_name, lit);
+                    args.push(at);
+                }
+            }
+        }
+        (args, out)
+    }
+
+    /// The dictionary a parameter's type names, when the call fills its
+    /// every field with `fields`: the caller has nothing to set on it.
+    fn constant_dictionary(
+        &mut self,
+        t: &TypeRef,
+        fields: &[(String, abi::Expr)],
+        cx: &Tcx,
+    ) -> Option<abi::Path> {
+        if fields.is_empty() {
+            return None;
+        }
+        let t = t.split_empties().map_or_else(|| t.clone(), |(t, _)| t);
+        let TypeRef::Reference { segments, .. } = &t else {
+            return None;
+        };
+        let id = self.resolve_id(segments, cx)?;
+        let TypeKind::Interface(i) = &self.gctx.get_type(id).kind else {
+            return None;
+        };
+        let filled = |name: &str| fields.iter().any(|(f, _)| f == name);
+        let constant = i.extends.is_empty()
+            && i.members.iter().all(|m| match m {
+                Member::Getter(g) => filled(&g.js_name),
+                Member::Setter(s) => filled(&s.js_name),
+                _ => false,
+            });
+        if !constant {
+            return None;
+        }
+        match self.ty(&t, cx) {
+            abi::Type::Named(r) => Some(r.path),
+            _ => None,
+        }
+    }
+
     fn is_callback(&self, t: &abi::Type, from: &Place) -> bool {
         match t {
             abi::Type::Nullable(t, _) => self.is_callback(t, from),
@@ -2052,11 +2349,17 @@ fn cancellable(v: &mut Variant, cancel: &Cancel) -> Vec<abi::JsEntry> {
         ])]),
     );
     for t in &mut v.args {
-        if matches!(t, abi::Telem::Param(p) if p == param) {
-            *t = abi::Telem::Fill {
-                param: param.to_string(),
-                fields: vec![("signal".into(), joined.clone())],
-            };
+        match t {
+            abi::Telem::Param(p) if p == param => {
+                *t = abi::Telem::Fill {
+                    param: param.to_string(),
+                    fields: vec![("signal".into(), joined.clone())],
+                };
+            }
+            abi::Telem::Fill { param: p, fields } if p == param => {
+                fields.push(("signal".into(), joined.clone()));
+            }
+            _ => {}
         }
     }
     vec![
@@ -2229,10 +2532,13 @@ fn rename_group(overloads: &mut [Overload], group: &[usize]) {
                     (Slot::Param { name, .. }, Some(value)) => {
                         vec![naming::Slot::Const { name, value }]
                     }
+                    // A group shares one key, so no position is retyped
+                    // but a setter's `value`, which names nothing.
                     (Slot::Param { name, ty, rest, .. }, None) => vec![naming::Slot::Param {
                         name,
                         ty,
                         rest: *rest,
+                        dictionary: false,
                     }],
                     (Slot::Const { name, value }, _) => vec![naming::Slot::Const { name, value }],
                 })
@@ -2358,6 +2664,35 @@ fn same_call(a: &Overload, b: &Overload) -> bool {
         && symbol(&a.member) == symbol(&b.member)
         && args(&a.member) == args(&b.member)
         && tags(a) == tags(b)
+}
+
+/// `t` with its type arguments at `args` left open, as `any`.
+fn open_args(t: &TypeRef, args: &[usize]) -> TypeRef {
+    let (inner, empties) = match t.split_empties() {
+        Some((inner, n)) => (inner, Some(n)),
+        None => (t.clone(), None),
+    };
+    let inner = match inner {
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } => TypeRef::Reference {
+            segments,
+            generic_args: generic_args
+                .into_iter()
+                .enumerate()
+                .map(|(i, a)| match args.contains(&i) {
+                    true => TypeRef::Any,
+                    false => a,
+                })
+                .collect(),
+        },
+        other => other,
+    };
+    match empties {
+        Some(n) => inner.with_empties(n),
+        None => inner,
+    }
 }
 
 /// The string literals a parameter type passes as type arguments, which

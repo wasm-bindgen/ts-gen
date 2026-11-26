@@ -88,6 +88,12 @@ impl<'d> Surface<'d> {
         &self.type_names
     }
 
+    /// Every declaration emitted, a namespace's members among them.
+    pub fn emitted(&self) -> HashSet<TypeId> {
+        let kept = |(id, forms): (&TypeId, &Vec<_>)| (!forms.is_empty()).then_some(*id);
+        self.items.iter().filter_map(kept).collect()
+    }
+
     /// The forms `id` is emitted in, empty if it is not emitted.
     pub fn get(&self, id: TypeId) -> &[Cow<'d, TypeDeclaration>] {
         self.items.get(&id).map_or(&[], Vec::as_slice)

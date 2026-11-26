@@ -48,3 +48,38 @@ export declare class Total {
   constructor(...values: number[]);
   readonly value: number;
 }
+
+// A list of a union keeps the union's enum as its element, read or written,
+// so a list can mix its arms. An element admitting `null` reads in `Option`
+// and is written in `Nullable`.
+export declare class Mark {
+  constructor(text: string);
+  readonly text: string;
+}
+export declare function marks(): (Mark | string)[];
+export declare function maybeMarks(): (Mark | string | null)[];
+export declare function describeMarks(values: (Mark | string)[]): string;
+export declare function describeMaybeMarks(values: (Mark | string | null)[]): string;
+export interface MarkOptions {
+  marks?: (Mark | string)[];
+}
+export declare function describeMarkOptions(options: MarkOptions): string;
+// A union's own arm can be a list of a union.
+export interface MarkRoute {
+  to?: Mark | string | (Mark | string)[];
+}
+export declare function route(): MarkRoute;
+export declare function describeRoute(route: MarkRoute): string;
+
+// A list of literals alone takes their enum as its element too, in a
+// getter and the setter matching it.
+export type Mode = "fast" | "slow";
+export declare function modes(values: Mode[]): Mode[];
+export declare function levels(values: (1 | 2)[]): (1 | 2)[];
+export declare function maybeKinds(values: ("x" | "y" | null)[]): ("x" | "y" | null)[];
+export interface ModeOptions {
+  modes?: Mode[];
+  kinds?: ("x" | "y")[];
+  levels?: (1 | 2)[];
+}
+export declare function describeModeOptions(options: ModeOptions): string;

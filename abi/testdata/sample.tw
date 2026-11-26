@@ -42,7 +42,7 @@ class Types {
   pointers(a: *u8[], b: *mut f32[], c: arr<*u8[]>, d: *(u8?)[], e: *mut Uint8Array[]);
   futures(): future<unit>;
   futures2(): future<Response, FetchError> throws FetchError;
-  quoted(a: "node:buffer".Buffer, b: "Str", c: ns."weird-name"<u8>);
+  quoted(a: "node:buffer".Buffer, b: .Str, c: ns."weird-name"<u8>);
 }
 
 export class Counter extends DurableObject {

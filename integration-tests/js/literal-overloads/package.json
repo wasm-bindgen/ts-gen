@@ -1,0 +1,6 @@
+{
+  "name": "literal-overloads",
+  "private": true,
+  "type": "module",
+  "main": "index.js"
+}

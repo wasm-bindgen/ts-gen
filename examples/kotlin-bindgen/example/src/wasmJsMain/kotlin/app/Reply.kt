@@ -25,6 +25,9 @@ fun text(body: String, status: UShort = 200u): Response {
     return Response(body, init)
 }
 
+/** A typed array's bytes, which a `buffer` is written as. */
+fun Uint8Array.bytes(): ByteArray = ByteArray(length.toInt()) { at(it)!!.toInt().toByte() }
+
 /** The bytes of a JS `Uint8Array`, in hex. */
 fun Uint8Array.hex(): String =
     (0 until length.toInt()).joinToString("") { at(it)!!.toString(16).padStart(2, '0') }

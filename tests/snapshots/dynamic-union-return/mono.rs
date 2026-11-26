@@ -12,9 +12,10 @@ extern "C" {
     #[doc = " Mixed primitives + objects — no LUB, becomes a dynamic union."]
     #[wasm_bindgen(method, getter)]
     pub fn content(this: &Erased) -> ErasedContentKind;
-    #[doc = " Inner-erased generic — outer Array stays as `Vec<JsValue>`."]
+    #[doc = " Inner-erased generic — outer Array stays as `Vec<JsValue>`, or takes"]
+    #[doc = " the union's enum as its element under per-monomorphization."]
     #[wasm_bindgen(method, getter)]
-    pub fn tags(this: &Erased) -> Vec<JsValue>;
+    pub fn tags(this: &Erased) -> Vec<FooOrF64>;
 }
 impl Erased {
     #[allow(clippy::new_without_default)]
@@ -93,16 +94,16 @@ pub enum ErasedContentKind {
     Uint8Array(Uint8Array),
 }
 #[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NoErasureVariant {
-    A = "a",
-    B = "b",
-}
-#[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum FooOrF64 {
     F64(f64),
     Foo = "foo",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NoErasureVariant {
+    A = "a",
+    B = "b",
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]

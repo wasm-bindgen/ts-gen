@@ -277,13 +277,13 @@ export extension class GetOptions<Type> on externref {
   setTtl(value: f64): void {
     __GetOptions_ttl2<Type>((this as externref), value);
   }
-  type_: Type {
+  type_: Option<Type> {
     get {
       return __GetOptions_type<Type>((this as externref));
     }
-    set(value) {
-      __GetOptions_type2<Type>((this as externref), value);
-    }
+  }
+  setType_(value: Type): void {
+    __GetOptions_type2<Type>((this as externref), value);
   }
   new() : super(__GetOptions_new<Type>());
 }
@@ -297,17 +297,23 @@ export extension class Store on externref {
     let r0 = __Store_read2((this as externref), key, options);
     return __tw_await<String | null>(r0 as externref);
   }
-  readText(key: String, options: GetOptions<String>): Future<String | null> {
+  readText(key: String, options: GetOptions<externref | null> | null): Future<String | null> {
     let r0 = __Store_readText((this as externref), key, options);
     return __tw_await<String | null>(r0 as externref);
   }
-  readJson<T>(key: String, options: GetOptions<String>): Future<Option<T>> {
+  readJson<T>(key: String, options: GetOptions<externref | null> | null): Future<Option<T>> {
     let r0 = __Store_readJson<T>((this as externref), key, options);
     return __tw_await<Option<T>>(r0);
   }
-  readArrayBuffer(key: String, options: GetOptions<String>): Future<ArrayBuffer | null> {
+  readArrayBuffer(key: String, options: GetOptions<externref | null> | null): Future<ArrayBuffer | null> {
     let r0 = __Store_readArrayBuffer((this as externref), key, options);
     return __tw_await<ArrayBuffer | null>(r0 as externref);
+  }
+  tail(options: GetOptions<externref | null> | null): String {
+    return __Store_tail((this as externref), options);
+  }
+  open(reader: StoreReader | null): String {
+    return __Store_open((this as externref), reader);
   }
   write(key: String, value: String): Future<Option<boolean>> {
     let r0 = __Store_write((this as externref), key, value);
@@ -321,6 +327,36 @@ export extension class Store on externref {
     let r0 = __Store_write3((this as externref), key, value, options);
     return __tw_await<boolean>(r0 as externref);
   }
+  getReader(): String {
+    return __Store_getReader((this as externref));
+  }
+  getReaderByob(): f64 {
+    return __Store_getReaderByob((this as externref));
+  }
+  lock(): String {
+    return __Store_lock((this as externref));
+  }
+}
+
+export extension class StoreReader on externref {
+  mode: String {
+    get {
+      return __StoreReader_mode((this as externref));
+    }
+  }
+  setModeByob(): void {
+    __StoreReader_modeByob((this as externref));
+  }
+  size: Option<f64> {
+    get {
+      let (r0, r1) = __StoreReader_size((this as externref));
+      return (if (r0 != 0) some<f64>(r1) else none);
+    }
+  }
+  setSize(value: f64): void {
+    __StoreReader_size2((this as externref), value);
+  }
+  new() : super(__StoreReader_new());
 }
 
 export extension class StoreOptions on externref {
@@ -345,6 +381,30 @@ export extension class StoreWriteOptions on externref {
     }
   }
   new() : super(__StoreWriteOptions_new());
+}
+
+export extension class StoreGetReaderOptions on externref {
+  mode: String {
+    get {
+      return __StoreGetReaderOptions_mode((this as externref));
+    }
+  }
+  setModeByob(): void {
+    __StoreGetReaderOptions_modeByob((this as externref));
+  }
+  new() : super(__StoreGetReaderOptions_new());
+}
+
+export extension class StoreHow on externref {
+  mode: String {
+    get {
+      return __StoreHow_mode((this as externref));
+    }
+  }
+  setModeExclusive(): void {
+    __StoreHow_modeExclusive((this as externref));
+  }
+  new() : super(__StoreHow_new());
 }
 
 export extension class PartialGetOptionsUndefined on externref {
@@ -436,7 +496,7 @@ declare function __Point_y2(p0: externref, p1: f64): void;
 declare function __GetOptions_new<Type>(): externref;
 
 @external("tw:js/global", "GetOptions#get:type<{Type}>()", "tw")
-declare function __GetOptions_type<Type>(p0: externref): Type;
+declare function __GetOptions_type<Type>(p0: externref): Option<Type>;
 
 @external("tw:js/global", "GetOptions#set:type<{Type}>(Type)", "tw")
 declare function __GetOptions_type2<Type>(p0: externref, p1: Type): void;
@@ -453,14 +513,20 @@ declare function __Store_read(p0: externref, p1: String): externref;
 @external("tw:js/global", "Store#read(str,PartialGetOptionsUndefined)", "tw")
 declare function __Store_read2(p0: externref, p1: String, p2: PartialGetOptionsUndefined): externref;
 
-@external("tw:js/global", "Store#readText(str,GetOptions<Str>)", "tw")
-declare function __Store_readText(p0: externref, p1: String, p2: GetOptions<String>): externref;
+@external("tw:js/global", "Store#readText(str,GetOptions<Any?>?)", "tw")
+declare function __Store_readText(p0: externref, p1: String, p2: GetOptions<externref | null> | null): externref;
 
-@external("tw:js/global", "Store#readJson<{T}>(str,GetOptions<Str>)", "tw")
-declare function __Store_readJson<T>(p0: externref, p1: String, p2: GetOptions<String>): externref;
+@external("tw:js/global", "Store#readJson<{T}>(str,GetOptions<Any?>?)", "tw")
+declare function __Store_readJson<T>(p0: externref, p1: String, p2: GetOptions<externref | null> | null): externref;
 
-@external("tw:js/global", "Store#readArrayBuffer(str,GetOptions<Str>)", "tw")
-declare function __Store_readArrayBuffer(p0: externref, p1: String, p2: GetOptions<String>): externref;
+@external("tw:js/global", "Store#readArrayBuffer(str,GetOptions<Any?>?)", "tw")
+declare function __Store_readArrayBuffer(p0: externref, p1: String, p2: GetOptions<externref | null> | null): externref;
+
+@external("tw:js/global", "Store#tail(GetOptions<Any?>?)", "tw, throws:err")
+declare function __Store_tail(p0: externref, p1: GetOptions<externref | null> | null): String;
+
+@external("tw:js/global", "Store#open(StoreReader?)", "tw, throws:err")
+declare function __Store_open(p0: externref, p1: StoreReader | null): String;
 
 @external("tw:js/global", "Store#write(str,str)", "tw")
 declare function __Store_write(p0: externref, p1: String, p2: String): externref;
@@ -470,6 +536,30 @@ declare function __Store_write2(p0: externref, p1: String, p2: String, p3: Store
 
 @external("tw:js/global", "Store#write(str,str,StoreWriteOptions)", "tw")
 declare function __Store_write3(p0: externref, p1: String, p2: String, p3: StoreWriteOptions): externref;
+
+@external("tw:js/global", "Store#getReader()", "tw, throws:err")
+declare function __Store_getReader(p0: externref): String;
+
+@external("tw:js/global", "Store#getReaderByob()", "tw, throws:err")
+declare function __Store_getReaderByob(p0: externref): f64;
+
+@external("tw:js/global", "Store#lock()", "tw, throws:err")
+declare function __Store_lock(p0: externref): String;
+
+@external("tw:js/global", "StoreReader.new()", "tw")
+declare function __StoreReader_new(): externref;
+
+@external("tw:js/global", "StoreReader#get:mode()", "tw")
+declare function __StoreReader_mode(p0: externref): String;
+
+@external("tw:js/global", "StoreReader#set:modeByob()", "tw")
+declare function __StoreReader_modeByob(p0: externref): void;
+
+@external("tw:js/global", "StoreReader#get:size()", "tw")
+declare function __StoreReader_size(p0: externref): inline (i32, f64);
+
+@external("tw:js/global", "StoreReader#set:size(f64)", "tw")
+declare function __StoreReader_size2(p0: externref, p1: f64): void;
 
 @external("tw:js/global", "StoreOptions.new()", "tw")
 declare function __StoreOptions_new(): externref;
@@ -488,6 +578,24 @@ declare function __StoreWriteOptions_ttl(p0: externref): f64;
 
 @external("tw:js/global", "StoreWriteOptions#set:ttl(f64)", "tw")
 declare function __StoreWriteOptions_ttl2(p0: externref, p1: f64): void;
+
+@external("tw:js/global", "StoreGetReaderOptions.new()", "tw")
+declare function __StoreGetReaderOptions_new(): externref;
+
+@external("tw:js/global", "StoreGetReaderOptions#get:mode()", "tw")
+declare function __StoreGetReaderOptions_mode(p0: externref): String;
+
+@external("tw:js/global", "StoreGetReaderOptions#set:modeByob()", "tw")
+declare function __StoreGetReaderOptions_modeByob(p0: externref): void;
+
+@external("tw:js/global", "StoreHow.new()", "tw")
+declare function __StoreHow_new(): externref;
+
+@external("tw:js/global", "StoreHow#get:mode()", "tw")
+declare function __StoreHow_mode(p0: externref): String;
+
+@external("tw:js/global", "StoreHow#set:modeExclusive()", "tw")
+declare function __StoreHow_modeExclusive(p0: externref): void;
 
 @external("tw:js/global", "PartialGetOptionsUndefined.new()", "tw")
 declare function __PartialGetOptionsUndefined_new(): externref;

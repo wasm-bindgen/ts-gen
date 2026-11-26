@@ -64,6 +64,11 @@ impl BoolOrStringsBuilder {
         self.inner
     }
 }
+impl From<BoolOrStrings> for BoolOrStringsBuilder {
+    fn from(inner: BoolOrStrings) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "mixed-literal-factory", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -122,6 +127,11 @@ impl NumberOrStringsBuilder {
     }
     pub fn build(self) -> NumberOrStrings {
         self.inner
+    }
+}
+impl From<NumberOrStrings> for NumberOrStringsBuilder {
+    fn from(inner: NumberOrStrings) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "mixed-literal-factory", experimental_generic_mono)]
@@ -210,6 +220,11 @@ impl MixedBuilder {
         self.inner
     }
 }
+impl From<Mixed> for MixedBuilder {
+    fn from(inner: Mixed) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "mixed-literal-factory", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -264,6 +279,11 @@ impl LevelBuilder {
         self.inner
     }
 }
+impl From<Level> for LevelBuilder {
+    fn from(inner: Level) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "mixed-literal-factory", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -306,6 +326,11 @@ impl OpenBuilder {
         self.inner
     }
 }
+impl From<Open> for OpenBuilder {
+    fn from(inner: Open) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "mixed-literal-factory", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -341,6 +366,11 @@ impl OptionalBuilder {
     }
     pub fn build(self) -> Optional {
         self.inner
+    }
+}
+impl From<Optional> for OptionalBuilder {
+    fn from(inner: Optional) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]

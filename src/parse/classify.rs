@@ -47,6 +47,96 @@ pub fn classify_interface(members: &[Member]) -> InterfaceClassification {
     }
 }
 
+/// Makes optional the required dictionary fields a parameter fixes to one
+/// string literal through a type argument (`options: GetOptions<"text">`
+/// over `interface GetOptions<Type> { type: Type }`): the call fills the
+/// field, so a caller builds the dictionary without it. A type parameter
+/// bounded by literals has its enums instead.
+pub(crate) fn literal_fields_optional(gctx: &mut GlobalContext) {
+    let mut fixed: HashSet<(TypeId, usize)> = HashSet::new();
+    let mut params = |gctx: &GlobalContext, params: &[Param], scope| {
+        for p in params {
+            let ty = p
+                .type_ref
+                .split_empties()
+                .map_or_else(|| p.type_ref.clone(), |(t, _)| t);
+            let TypeRef::Reference {
+                segments,
+                generic_args,
+            } = &ty
+            else {
+                continue;
+            };
+            if !generic_args
+                .iter()
+                .any(|a| matches!(a, TypeRef::StringLiteral(_)))
+            {
+                continue;
+            }
+            let Some(id) = gctx.resolve_path(scope, &segments.join(".")) else {
+                continue;
+            };
+            for (index, a) in generic_args.iter().enumerate() {
+                if matches!(a, TypeRef::StringLiteral(_)) {
+                    fixed.insert((id, index));
+                }
+            }
+        }
+    };
+    for (_, decl) in gctx.iter_types() {
+        let (members, construct): (&[Member], &[ConstructorMember]) = match &decl.kind {
+            TypeKind::Class(c) => (&c.members, &[]),
+            TypeKind::Interface(i) => (&i.members, &i.construct),
+            TypeKind::Function(f) => {
+                params(gctx, &f.params, f.body_scope);
+                for o in &f.overloads {
+                    params(gctx, &o.params, o.body_scope);
+                }
+                continue;
+            }
+            _ => continue,
+        };
+        for m in members {
+            match m {
+                Member::Method(m) => params(gctx, &m.params, m.body_scope),
+                Member::StaticMethod(m) => params(gctx, &m.params, m.body_scope),
+                Member::Constructor(c) => params(gctx, &c.params, c.scope),
+                _ => {}
+            }
+        }
+        for c in construct {
+            params(gctx, &c.params, c.scope);
+        }
+    }
+    for (id, index) in fixed {
+        let TypeKind::Interface(i) = &mut gctx.get_type_mut(id).kind else {
+            continue;
+        };
+        if !matches!(i.classification, InterfaceClassification::Dictionary) {
+            continue;
+        }
+        let Some(name) = i
+            .type_params
+            .get(index)
+            .filter(|p| p.constraint.is_none())
+            .map(|p| p.name.clone())
+        else {
+            continue;
+        };
+        let mut filled = Vec::new();
+        for m in &mut i.members {
+            if let Member::Getter(g) = m {
+                if is_type_param(&g.type_ref, &name) && !g.optional {
+                    g.optional = true;
+                    filled.push(g.js_name.clone());
+                }
+            }
+        }
+        gctx.literal_fills
+            .extend(filled.into_iter().map(|field| (id, field)));
+    }
+}
+
 /// Reads an interface's optional methods as optional properties of
 /// function type (`element?(e: Element): void` as `element?: (e: Element)
 /// => void`), which TypeScript takes one for the other. Only where the

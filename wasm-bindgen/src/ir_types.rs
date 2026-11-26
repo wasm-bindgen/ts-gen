@@ -35,6 +35,30 @@ pub struct Overload {
     /// literals, or of two or more payload arms, each a primitive or a
     /// non-generic class. Otherwise it expands an overload per arm.
     pub whole: Vec<bool>,
+    /// The literals the call fills dictionary parameters with:
+    /// `(parameter, field, literal)`.
+    pub fills: Vec<(usize, String, String)>,
+    /// The parameters standing for a dictionary the bridge makes and fills
+    /// with constants alone, which a binding's wrapper makes.
+    pub made: Vec<usize>,
+    /// What the IR names the overload beyond its JS name (`Byob` of
+    /// `getReaderByob`), where dropping such a parameter made it collide.
+    pub made_suffix: String,
+}
+
+impl Overload {
+    /// The literals filling parameter `j`, joined as a cohort arm names
+    /// them.
+    pub fn fill_tag(&self, j: usize) -> Option<String> {
+        let mut lits: Vec<&str> = self
+            .fills
+            .iter()
+            .filter(|f| f.0 == j)
+            .map(|f| f.2.as_str())
+            .collect();
+        lits.dedup();
+        (!lits.is_empty()).then(|| lits.join("_"))
+    }
 }
 
 /// What a callable's types resolve against.
@@ -74,6 +98,7 @@ impl Cx<'_> {
             namespace: self.namespace.clone(),
             tparams: self.tparams.clone(),
             assoc: self.assoc.clone(),
+            ..Context::default()
         }
     }
 }
@@ -155,7 +180,45 @@ pub fn overload(cx: &Cx<'_>, m: &abi::Member) -> Option<Overload> {
     };
     cx.tparams.extend(m.tparams.iter().map(|p| p.name.as_str()));
     let cx = &cx;
-    let index = |n: &str| m.params.iter().position(|p| p.name == n);
+    // A dictionary the bridge makes for the call and fills with string
+    // constants alone: its `let` and the class it's made of.
+    let made: Vec<(&str, TypeRef)> = template.map_or(Vec::new(), |t| {
+        t.iter()
+            .filter_map(|e| {
+                let abi::Telem::Fill { param, fields } = e else {
+                    return None;
+                };
+                if !fields
+                    .iter()
+                    .all(|(_, x)| matches!(x, abi::Expr::Lit(abi::Literal::Str(_))))
+                {
+                    return None;
+                }
+                let class = m.meta.attrs.js.iter().find_map(|e| match e {
+                    abi::JsEntry::Let(
+                        n,
+                        abi::Expr::Ref {
+                            path,
+                            call: Some(args),
+                        },
+                    ) if n == param && args.is_empty() => match path.split_last() {
+                        Some((new, class)) if new == "new" && !class.is_empty() => {
+                            Some(abi::Path::new(class.iter().map(String::as_str)))
+                        }
+                        _ => None,
+                    },
+                    _ => None,
+                })?;
+                Some((param.as_str(), named(cx, &class)?))
+            })
+            .collect()
+    });
+    let index = |n: &str| {
+        m.params.iter().position(|p| p.name == n).or_else(|| {
+            let at = made.iter().position(|(name, _)| *name == n)?;
+            Some(m.params.len() + at)
+        })
+    };
     let args = match template {
         None => (0..m.params.len()).map(Arg::Param).collect(),
         // A fill of a `let` is an object the bridge makes, which a
@@ -173,14 +236,29 @@ pub fn overload(cx: &Cx<'_>, m: &abi::Member) -> Option<Overload> {
             })
             .collect::<Option<Vec<_>>>()?,
     };
+    let fills = template.map_or(Vec::new(), |t| {
+        t.iter()
+            .filter_map(|e| match e {
+                abi::Telem::Fill { param, fields } => Some((index(param)?, fields)),
+                _ => None,
+            })
+            .flat_map(|(j, fields)| {
+                fields.iter().filter_map(move |(f, x)| match x {
+                    abi::Expr::Lit(abi::Literal::Str(v)) => Some((j, f.clone(), v.clone())),
+                    _ => None,
+                })
+            })
+            .collect()
+    });
     let spread = |n: &str| {
         template.is_some_and(|t| {
             t.iter()
                 .any(|e| matches!(e, abi::Telem::Spread(s) if s == n))
         })
     };
-    // wasm-bindgen: a filled argument is absent only to fill it with the
-    // `AbortSignal` a binding doesn't pass, so takes its type alone.
+    // wasm-bindgen: a filled argument is absent only to be filled, with
+    // the `AbortSignal` a binding doesn't pass or the literals its wrapper
+    // sets on the caller's, so takes its type alone.
     let filled = |n: &str| {
         template.is_some_and(|t| {
             t.iter()
@@ -220,6 +298,16 @@ pub fn overload(cx: &Cx<'_>, m: &abi::Member) -> Option<Overload> {
                 slice_mode: view.then_some(ts_gen::ir::SliceModeHint::View),
             })
         })
+        .chain(made.iter().map(|(name, t)| {
+            Some(Param {
+                name: ts_gen::util::naming::to_snake_case(name),
+                js_name: None,
+                type_ref: t.clone(),
+                optional: false,
+                variadic: false,
+                slice_mode: None,
+            })
+        }))
         .collect::<Option<Vec<_>>>()?;
     let return_type = ty(cx, &m.result)?;
     // A named throws enum is typed, by the classes it declares; `err` is
@@ -242,18 +330,56 @@ pub fn overload(cx: &Cx<'_>, m: &abi::Member) -> Option<Overload> {
     Some(Overload {
         params,
         args,
+        fills,
         tparams: m.tparams.iter().map(|p| p.name.clone()).collect(),
         defaults: m
             .tparams
             .iter()
-            .map(|p| p.default.as_ref().and_then(|d| ty(cx, d)))
+            .map(|p| {
+                let default = p.default.as_ref().and_then(|d| ty(cx, d));
+                default.or_else(|| bound(cx, p, &m.tparams))
+            })
             .collect(),
         return_type,
         throws,
         doc: m.meta.doc.clone(),
-        members: m.params.iter().map(|p| members(cx, &p.ty)).collect(),
-        whole: m.params.iter().map(|p| whole(cx, &p.ty)).collect(),
+        members: m
+            .params
+            .iter()
+            .map(|p| members(cx, &p.ty))
+            .chain(made.iter().map(|_| None))
+            .collect(),
+        whole: m
+            .params
+            .iter()
+            .map(|p| whole(cx, &p.ty))
+            .chain(made.iter().map(|_| false))
+            .collect(),
+        made: (0..made.len()).map(|at| m.params.len() + at).collect(),
+        made_suffix: match (made.is_empty(), m.kind.name(), js_name(m)) {
+            (false, Some(ours), Some(js)) => ours.strip_prefix(js).unwrap_or_default().to_string(),
+            _ => String::new(),
+        },
     })
+}
+
+/// The class or interface bounding `p`, unless it names the callable's
+/// `own` parameters.
+fn bound(cx: &Cx<'_>, p: &abi::TypeParam, own: &[abi::TypeParam]) -> Option<TypeRef> {
+    let Some(abi::Bound::Subtype(t)) = &p.bound else {
+        return None;
+    };
+    let mut names_own = false;
+    t.walk(&mut |t| {
+        if let abi::Type::Named(r) = t {
+            names_own |=
+                matches!(r.path.segments.as_slice(), [n] if own.iter().any(|o| o.name == *n));
+        }
+    });
+    if names_own {
+        return None;
+    }
+    ty(cx, t)
 }
 
 fn whole(cx: &Cx<'_>, t: &abi::Type) -> bool {
@@ -261,6 +387,9 @@ fn whole(cx: &Cx<'_>, t: &abi::Type) -> bool {
         abi::Type::Nullable(t, _) => t,
         t => t,
     };
+    if *t == abi::Type::Buffer {
+        return true;
+    }
     let abi::Type::Named(r) = t else {
         return false;
     };
@@ -292,6 +421,7 @@ fn whole(cx: &Cx<'_>, t: &abi::Type) -> bool {
                 abi::Type::Scalar(_)
                 | abi::Type::ScalarBox(_)
                 | abi::Type::Str
+                | abi::Type::Buffer
                 | abi::Type::StrBox => true,
                 abi::Type::Named(r) => {
                     r.args.is_empty()
@@ -315,6 +445,10 @@ fn members(cx: &Cx<'_>, t: &abi::Type) -> Option<Vec<TypeRef>> {
             .map(|a| TypeRef::union([a.clone(), TypeRef::Undefined]));
         return Some(arms.iter().cloned().chain(omitted).collect());
     }
+    // Per-monomorphization takes a `buffer` whole.
+    if *t == abi::Type::Buffer {
+        return (!cx.mono).then(|| buffer_arms(cx)).flatten();
+    }
     let abi::Type::Named(r) = t else {
         return None;
     };
@@ -329,17 +463,57 @@ fn members(cx: &Cx<'_>, t: &abi::Type) -> Option<Vec<TypeRef>> {
         },
     )
     .ok()?;
-    flat.arms
+    let arms = flat
+        .arms
         .iter()
         .map(|a| match &a.arm.payload[..] {
-            [] => a.arm.meta.attrs.js.iter().find_map(|e| match e {
+            [] => Some(vec![a.arm.meta.attrs.js.iter().find_map(|e| match e {
                 abi::JsEntry::Literal(s) => Some(TypeRef::StringLiteral(s.clone())),
                 _ => None,
-            }),
-            [p] => ty(cx, p),
+            })?]),
+            [abi::Type::Buffer] if !cx.mono => buffer_arms(cx),
+            [p] => Some(vec![ty(cx, p)?]),
             _ => None,
         })
+        .collect::<Option<Vec<_>>>()?;
+    Some(arms.into_iter().flatten().collect())
+}
+
+/// Whether `t` is the two classes of a `buffer`, in either order.
+pub fn buffer_pair(t: &TypeRef) -> bool {
+    let is = |m: &TypeRef, name: &str| match m {
+        TypeRef::ArrayBufferView => name == "ArrayBufferView",
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } => generic_args.is_empty() && segments.len() == 1 && segments[0] == name,
+        _ => false,
+    };
+    let TypeRef::Union(u) = t else {
+        return false;
+    };
+    matches!(u.members(), [a, b]
+        if is(a, "ArrayBuffer") && is(b, "ArrayBufferView")
+            || is(a, "ArrayBufferView") && is(b, "ArrayBuffer"))
+}
+
+/// The two classes a `buffer` is one of, which Rust takes each as itself.
+fn buffer_handles(cx: &Cx<'_>) -> Option<Vec<TypeRef>> {
+    ts_gen_abi::union::BUFFER_HANDLES
+        .iter()
+        .map(|n| named(cx, &abi::Path::new([*n])))
         .collect()
+}
+
+/// What a `buffer` argument takes without per-monomorphization: either
+/// class, or its bytes as a copy.
+fn buffer_arms(cx: &Cx<'_>) -> Option<Vec<TypeRef>> {
+    let mut arms = buffer_handles(cx)?;
+    arms.push(TypeRef::TypedSlice(
+        ts_gen::ir::TypedArrayElement::U8,
+        ts_gen::ir::SharedMemory::Accepted,
+    ));
+    Some(arms)
 }
 
 /// Whether `p` is a throws enum (IR.md §15): one extending `err`, or one
@@ -447,6 +621,14 @@ fn ty(cx: &Cx<'_>, t: &abi::Type) -> Option<TypeRef> {
         T::Str => TypeRef::String,
         T::Any => TypeRef::Any,
         T::Scalar(s) => scalar(*s)?,
+        T::Buffer => TypeRef::union(buffer_handles(cx)?),
+        T::View {
+            mutable: false,
+            elem,
+        } if **elem == T::Buffer => TypeRef::TypedSlice(
+            ts_gen::ir::TypedArrayElement::U8,
+            ts_gen::ir::SharedMemory::Accepted,
+        ),
         // `any` already holds `null` and `undefined`.
         T::Nullable(inner, _) if **inner == T::Any => TypeRef::Any,
         // A three-state read, `x?: T | null`.

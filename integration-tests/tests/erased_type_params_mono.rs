@@ -19,6 +19,7 @@ async fn erased_type_params_mono_compile(store: &Store) -> Result<(), JsValue> {
     let _: Option<String> = store.get("k").await?;
     let _: Option<JsString> = store.get_js_string("k").await?;
     let result: ListResult = store.list().await?;
+    let _: ListResult<JsString> = store.list_typed::<JsString>().await?;
     let keys: Vec<ListKey> = result.keys();
     for key in &keys {
         let _: String = key.name();

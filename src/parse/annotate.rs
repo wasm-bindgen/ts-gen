@@ -1,4 +1,4 @@
-//! `--annotate`: layer `@tw-abi` and `@throws` tags from a side `.d.ts`
+//! `--annotate`: layer `@tw-abi`, `@throws`, `{@slice}` and `@retype` tags and `readonly` from a side `.d.ts`
 //! onto declarations of the main input, matched by declaration and
 //! member name. Upstream declaration files carry no such tags, and
 //! editing a vendored copy does not survive an upgrade; a side file that
@@ -30,7 +30,7 @@ pub fn apply(
                     gctx,
                     module,
                     &agctx.scopes,
-                    errors_section(adecl.doc.as_deref()),
+                    adecl.doc.as_deref(),
                     f,
                     &mut errors,
                 );
@@ -82,13 +82,15 @@ fn apply_function(
 ) {
     let side: Vec<Overlay<'_>> = std::iter::once(Overlay {
         own: scalar_leaf(&f.return_type),
+        retype: retype(doc, &f.return_type),
         params: &f.params,
         throws: &f.throws,
         nullish: scopes.is_nullish(f.body_scope, &f.js_name),
-        doc,
+        doc: errors_section(doc),
     })
     .chain(f.overloads.iter().map(|o| Overlay {
         own: scalar_leaf(&o.return_type),
+        retype: retype(o.doc.as_deref(), &o.return_type),
         params: &o.params,
         throws: &o.throws,
         nullish: scopes.is_nullish(o.body_scope, &f.js_name),
@@ -129,6 +131,7 @@ fn apply_function(
                 .map(|o| (&mut o.return_type, &mut o.params, &mut o.throws, &mut o.doc)),
         );
         for (ret, params, throws, doc) in targets {
+            overlay.apply_retype(ret);
             match overlay.apply_return(ret) {
                 Some(m) => return_mismatches.push(m),
                 None => returns_ok = true,
@@ -215,6 +218,10 @@ fn find_decl(gctx: &GlobalContext, module: &Module, name: &str) -> Result<TypeId
 
 /// The tags one side-file member carries onto its targets.
 struct Overlay<'a> {
+    /// `@retype`: the side member's own type replaces the property type or
+    /// callable return, for an input type that erases what the API
+    /// produces (`get body(): ReadableStream | null` of bytes).
+    retype: Option<&'a TypeRef>,
     /// `@tw-abi <type>`: the property type or callable return.
     own: Option<AbiScalar>,
     /// Parameters, of which only `@tw-abi`-tagged ones are applied.
@@ -228,14 +235,19 @@ struct Overlay<'a> {
     doc: Option<&'a str>,
 }
 
+/// The side member's own type when its doc carries a `@retype` line (an
+/// unknown tag the renderer passes through).
+fn retype<'a>(doc: Option<&str>, own: &'a TypeRef) -> Option<&'a TypeRef> {
+    doc.is_some_and(|doc| doc.lines().any(|l| l.trim() == "@retype"))
+        .then_some(own)
+}
+
 impl Overlay<'_> {
     fn is_empty(&self) -> bool {
         !self.nullish
             && self.own.is_none()
-            && self
-                .params
-                .iter()
-                .all(|p| scalar_leaf(&p.type_ref).is_none())
+            && self.retype.is_none()
+            && !self.params.iter().any(is_tagged)
             && matches!(self.throws, Throws::None)
             && self.doc.is_none_or(|d| d.trim().is_empty())
     }
@@ -269,23 +281,34 @@ impl Overlay<'_> {
                 tp.type_ref = tp.type_ref.nullish();
             }
         }
-        for ap in self.params {
-            let Some(scalar) = scalar_leaf(&ap.type_ref) else {
-                continue;
-            };
+        for ap in self.params.iter().filter(|p| is_tagged(p)) {
             if let Some(tp) = targets.iter_mut().find(|tp| tp.name == ap.name) {
-                match tp.type_ref.with_abi_scalar(scalar) {
-                    Some(forced) => tp.type_ref = forced,
-                    None => mismatched.push(mismatch(
-                        scalar,
-                        &format!("parameter `{}`", ap.name),
-                        &tp.type_ref,
-                    )),
+                if let Some(scalar) = scalar_leaf(&ap.type_ref) {
+                    match tp.type_ref.with_abi_scalar(scalar) {
+                        Some(forced) => tp.type_ref = forced,
+                        None => mismatched.push(mismatch(
+                            scalar,
+                            &format!("parameter `{}`", ap.name),
+                            &tp.type_ref,
+                        )),
+                    }
+                }
+                if let Some(hint) = ap.slice_mode {
+                    tp.slice_mode = Some(hint);
+                    if let Some(widened) = hint.widen_bare_typed_array(&tp.type_ref) {
+                        tp.type_ref = widened;
+                    }
                 }
                 if !found.contains(&ap.name) {
                     found.push(ap.name.clone());
                 }
             }
+        }
+    }
+
+    fn apply_retype(&self, ty: &mut TypeRef) {
+        if let Some(side) = self.retype {
+            *ty = side.clone();
         }
     }
 
@@ -308,10 +331,15 @@ impl Overlay<'_> {
     fn missing_params(&self, found: &[String]) -> Vec<String> {
         self.params
             .iter()
-            .filter(|p| scalar_leaf(&p.type_ref).is_some() && !found.contains(&p.name))
+            .filter(|p| is_tagged(p) && !found.contains(&p.name))
             .map(|p| p.name.clone())
             .collect()
     }
+}
+
+/// Whether a side parameter carries a `@tw-abi` scalar or a `{@slice}` mode.
+fn is_tagged(p: &Param) -> bool {
+    scalar_leaf(&p.type_ref).is_some() || p.slice_mode.is_some()
 }
 
 /// Which target members a side-file member addresses.
@@ -347,6 +375,7 @@ fn side_member<'a>(m: &'a Member, scopes: &ScopeArena) -> Option<(Key<'a>, Overl
             Key::Property(&g.js_name),
             Overlay {
                 own: scalar_leaf(&g.type_ref),
+                retype: retype(g.doc.as_deref(), &g.type_ref),
                 params: &[],
                 throws: &Throws::None,
                 nullish: nullish(g.scope, &g.js_name),
@@ -357,6 +386,7 @@ fn side_member<'a>(m: &'a Member, scopes: &ScopeArena) -> Option<(Key<'a>, Overl
             Key::StaticProperty(&g.js_name),
             Overlay {
                 own: scalar_leaf(&g.type_ref),
+                retype: retype(g.doc.as_deref(), &g.type_ref),
                 params: &[],
                 throws: &Throws::None,
                 nullish: nullish(g.scope, &g.js_name),
@@ -367,6 +397,7 @@ fn side_member<'a>(m: &'a Member, scopes: &ScopeArena) -> Option<(Key<'a>, Overl
             Key::Method(&m.js_name),
             Overlay {
                 own: scalar_leaf(&m.return_type),
+                retype: retype(m.doc.as_deref(), &m.return_type),
                 params: &m.params,
                 throws: &m.throws,
                 nullish: nullish(m.body_scope, &m.js_name),
@@ -377,6 +408,7 @@ fn side_member<'a>(m: &'a Member, scopes: &ScopeArena) -> Option<(Key<'a>, Overl
             Key::StaticMethod(&m.js_name),
             Overlay {
                 own: scalar_leaf(&m.return_type),
+                retype: retype(m.doc.as_deref(), &m.return_type),
                 params: &m.params,
                 throws: &m.throws,
                 nullish: nullish(m.body_scope, &m.js_name),
@@ -387,6 +419,7 @@ fn side_member<'a>(m: &'a Member, scopes: &ScopeArena) -> Option<(Key<'a>, Overl
             Key::Constructor,
             Overlay {
                 own: None,
+                retype: None,
                 params: &c.params,
                 throws: &c.throws,
                 nullish: nullish(c.scope, "constructor"),
@@ -395,6 +428,21 @@ fn side_member<'a>(m: &'a Member, scopes: &ScopeArena) -> Option<(Key<'a>, Overl
         ),
         Member::Setter(_) | Member::StaticSetter(_) | Member::IndexSignature(_) => return None,
     })
+}
+
+/// A side property with no setter (`readonly x: T`, `get x()`) makes the
+/// input's read-only. Upstream declarations drop `readonly` on runtime
+/// read-only properties, whose setters then throw.
+fn side_readonly(annotated: &[Member], key: &Key<'_>) -> bool {
+    match key {
+        Key::Property(n) => !annotated
+            .iter()
+            .any(|m| matches!(m, Member::Setter(s) if s.js_name == *n)),
+        Key::StaticProperty(n) => !annotated
+            .iter()
+            .any(|m| matches!(m, Member::StaticSetter(s) if s.js_name == *n)),
+        _ => false,
+    }
 }
 
 fn apply_members(
@@ -425,11 +473,19 @@ fn apply_members(
     // appended once per member.
     let mut seen: Vec<Key<'_>> = Vec::new();
     for (key, mut overlay) in annotated.iter().filter_map(|m| side_member(m, scopes)) {
-        if overlay.is_empty() {
+        let readonly = side_readonly(annotated, &key);
+        if overlay.is_empty() && !readonly {
             continue;
         }
         if seen.contains(&key) {
             overlay.doc = None;
+        }
+        if readonly {
+            members.retain(|m| match (m, &key) {
+                (Member::Setter(s), Key::Property(n)) => s.js_name != *n,
+                (Member::StaticSetter(s), Key::StaticProperty(n)) => s.js_name != *n,
+                _ => true,
+            });
         }
         let mut hit = false;
         let (mut found, mut mismatched) = (Vec::new(), Vec::new());
@@ -445,6 +501,7 @@ fn apply_members(
             match (m, &key) {
                 (Member::Getter(t), Key::Property(n)) if t.js_name == *n => {
                     hit = true;
+                    overlay.apply_retype(&mut t.type_ref);
                     mismatched.extend(overlay.apply_return(&mut t.type_ref));
                     overlay.apply_doc(&mut t.doc);
                 }
@@ -453,6 +510,7 @@ fn apply_members(
                 }
                 (Member::StaticGetter(t), Key::StaticProperty(n)) if t.js_name == *n => {
                     hit = true;
+                    overlay.apply_retype(&mut t.type_ref);
                     mismatched.extend(overlay.apply_return(&mut t.type_ref));
                     overlay.apply_doc(&mut t.doc);
                 }
@@ -461,6 +519,7 @@ fn apply_members(
                 }
                 (Member::Method(t), Key::Method(n)) if t.js_name == *n => {
                     hit = true;
+                    overlay.apply_retype(&mut t.return_type);
                     on_return(overlay.apply_return(&mut t.return_type));
                     overlay.apply_params(&mut t.params, &mut found, &mut mismatched);
                     overlay.apply_throws(&mut t.throws);
@@ -468,6 +527,7 @@ fn apply_members(
                 }
                 (Member::StaticMethod(t), Key::StaticMethod(n)) if t.js_name == *n => {
                     hit = true;
+                    overlay.apply_retype(&mut t.return_type);
                     on_return(overlay.apply_return(&mut t.return_type));
                     overlay.apply_params(&mut t.params, &mut found, &mut mismatched);
                     overlay.apply_throws(&mut t.throws);

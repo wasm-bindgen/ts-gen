@@ -13,6 +13,16 @@ extern "C" {
     pub fn status(this: &Response) -> u16;
     #[wasm_bindgen(method, getter)]
     pub fn ok(this: &Response) -> bool;
+    #[wasm_bindgen(method, getter)]
+    pub fn url(this: &Response) -> String;
+    #[wasm_bindgen(method, getter, js_name = "url")]
+    pub fn url_js_string(this: &Response) -> JsString;
+    #[wasm_bindgen(method, getter, js_name = "type")]
+    pub fn type_(this: &Response) -> String;
+    #[wasm_bindgen(method, getter, js_name = "type")]
+    pub fn type__js_string(this: &Response) -> JsString;
+    #[wasm_bindgen(method, getter)]
+    pub fn body(this: &Response) -> Option<ReadableStream<Uint8Array>>;
     #[doc = " Creates a clone of the response."]
     #[doc = ""]
     #[doc = " ## Errors"]
@@ -66,6 +76,34 @@ impl ResponseInitBuilder {
     }
     pub fn build(self) -> ResponseInit {
         self.inner
+    }
+}
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ReadableStream<R = JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn locked<R>(this: &ReadableStream<R>) -> bool;
+}
+impl<R: ::wasm_bindgen::convert::IntoWasmAbi> ReadableStream<R> {
+    #[allow(clippy::new_without_default)]
+    pub fn new_typed() -> ReadableStream<R> {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+impl ReadableStream<JsValue> {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self::new_typed()
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -139,6 +177,48 @@ extern "C" {
     pub type Console;
     #[wasm_bindgen(method, variadic)]
     pub fn log(this: &Console, data: &[JsValue]);
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Bucket;
+    #[wasm_bindgen(method, catch)]
+    pub async fn put(
+        this: &Bucket,
+        key: impl ::wasm_bindgen::JsStringLike,
+        #[wasm_bindgen(slice = "view")] body_bytes: &[u8],
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_promise(
+        this: &Bucket,
+        key: impl ::wasm_bindgen::JsStringLike,
+        #[wasm_bindgen(slice = "view")] body_bytes: &[u8],
+    ) -> Promise<Undefined>;
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    pub async fn put_with_uint8_array(
+        this: &Bucket,
+        key: impl ::wasm_bindgen::JsStringLike,
+        body_bytes: &Uint8Array,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_with_uint8_array_promise(
+        this: &Bucket,
+        key: impl ::wasm_bindgen::JsStringLike,
+        body_bytes: &Uint8Array,
+    ) -> Promise<Undefined>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn upload(
+        this: &Bucket,
+        key: impl ::wasm_bindgen::JsStringLike,
+        #[wasm_bindgen(slice = "view")] data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "upload")]
+    pub fn upload_promise(
+        this: &Bucket,
+        key: impl ::wasm_bindgen::JsStringLike,
+        #[wasm_bindgen(slice = "view")] data: impl ::js_sys::BufferSourceLike,
+    ) -> Promise<Undefined>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -268,18 +348,24 @@ impl<Meta: ::wasm_bindgen::convert::IntoWasmAbi, Cf: ::wasm_bindgen::convert::In
     Request<Meta, Cf>
 {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Request<Meta, Cf> {
+    pub fn new_typed() -> Request<Meta, Cf> {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
         }
     }
 }
+impl Request<JsValue, Incoming> {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+}
 impl<Meta: ::wasm_bindgen::convert::IntoWasmAbi, Cf: ::wasm_bindgen::convert::IntoWasmAbi> Default
     for Request<Meta, Cf>
 {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 #[allow(dead_code)]

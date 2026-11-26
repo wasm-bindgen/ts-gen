@@ -56,7 +56,9 @@ pub(crate) fn apply_slice_hints(
         let Some(hint) = slice_hint(Some(mode), site, diag) else {
             continue;
         };
-        match params.iter_mut().find(|p| p.name == *name) {
+        // IR parameter names are already snake_case; tags use the TS name.
+        let ir_name = to_snake_case(name);
+        match params.iter_mut().find(|p| p.name == ir_name) {
             Some(p) => {
                 p.slice_mode = Some(hint);
                 if let Some(widened) = hint.widen_bare_typed_array(&p.type_ref) {
@@ -379,6 +381,9 @@ pub(crate) fn convert_formal_params_with_synthesis(
     let mut result_params = Vec::new();
 
     for (i, param) in params.items.iter().enumerate() {
+        if let Some(ann) = &param.type_annotation {
+            super::types::note_key_param(&ann.type_annotation, i, scope, ctx.scopes);
+        }
         // Capture the original (un-snake_cased) parameter name first so we
         // can use it as the synthesized type's name segment. The Rust
         // param name still goes through snake_case below.

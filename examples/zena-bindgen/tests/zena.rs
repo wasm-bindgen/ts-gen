@@ -366,6 +366,8 @@ fn check_imports(zena: &(PathBuf, PathBuf), name: &str, ir: &Ir, main: Option<&P
             .iter()
             .flat_map(|c| &c.tparams)
             .chain(&k.member.tparams)
+            // A key parameter is erased with its member, which keeps its key.
+            .filter(|p| !matches!(p.bound, Some(ts_gen_abi::ir::Bound::KeyOf(_))))
             .map(|p| p.name.as_str())
             .collect();
         if tparams.is_empty() {

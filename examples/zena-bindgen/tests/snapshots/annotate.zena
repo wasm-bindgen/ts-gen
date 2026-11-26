@@ -169,6 +169,11 @@ export class TypeErrException extends Error {
 }
 
 export extension class Response on externref {
+  body: ReadableStream<Uint8Array> | null {
+    get {
+      return __Response_body((this as externref));
+    }
+  }
   ok: boolean {
     get {
       return __Response_ok((this as externref));
@@ -177,6 +182,16 @@ export extension class Response on externref {
   status: u16 {
     get {
       return __Response_status((this as externref));
+    }
+  }
+  type_: String {
+    get {
+      return __Response_type((this as externref));
+    }
+  }
+  url: String {
+    get {
+      return __Response_url((this as externref));
     }
   }
   /**
@@ -212,6 +227,15 @@ export extension class ResponseInit on externref {
   new() : super(__ResponseInit_new());
 }
 
+export extension class ReadableStream<R = externref | null> on externref {
+  locked: boolean {
+    get {
+      return __ReadableStream_locked<R>((this as externref));
+    }
+  }
+  new() : super(__ReadableStream_new<R>());
+}
+
 export extension class Cache on externref {
   put(url: String): Future<void> {
     let r0 = __Cache_put((this as externref), url);
@@ -245,6 +269,31 @@ export extension class Storage on externref {
 export extension class Console on externref {
   log(data: FixedArray<externref | null>): void {
     __Console_log((this as externref), data);
+  }
+}
+
+export extension class Bucket on externref {
+  // skipped Bucket#put(str,*u8[]): `*T[]` needs a linear memory
+  // skipped Bucket#upload(str,*buffer): `*buffer` needs a linear memory
+  put(key: String, bodyBytes: Uint8Array): Future<void> {
+    let r0 = __Bucket_put((this as externref), key, bodyBytes);
+    return __tw_await<void>(r0 as externref);
+  }
+  put(key: String, bodyBytes: FixedArray<u8>): Future<void> {
+    let r0 = __Bucket_put2((this as externref), key, bodyBytes);
+    return __tw_await<void>(r0 as externref);
+  }
+  upload(key: String, data: FixedArray<u8>): Future<void> {
+    let r0 = __Bucket_upload((this as externref), key, data);
+    return __tw_await<void>(r0 as externref);
+  }
+  upload(key: String, data: ArrayBuffer): Future<void> {
+    let r0 = __Bucket_upload2((this as externref), key, data);
+    return __tw_await<void>(r0 as externref);
+  }
+  upload(key: String, data: ArrayBufferView): Future<void> {
+    let r0 = __Bucket_upload3((this as externref), key, data);
+    return __tw_await<void>(r0 as externref);
   }
 }
 
@@ -302,11 +351,29 @@ export extension class Lookup on externref {
   }
 }
 
+export extension class Uint8Array on externref {
+}
+
+export extension class ArrayBuffer on externref {
+}
+
+export extension class ArrayBufferView on externref {
+}
+
 @external("tw:js/global", "Response#get:status()", "tw")
 declare function __Response_status(p0: externref): u16;
 
 @external("tw:js/global", "Response#get:ok()", "tw")
 declare function __Response_ok(p0: externref): boolean;
+
+@external("tw:js/global", "Response#get:url()", "tw")
+declare function __Response_url(p0: externref): String;
+
+@external("tw:js/global", "Response#get:type()", "tw")
+declare function __Response_type(p0: externref): String;
+
+@external("tw:js/global", "Response#get:body()", "tw")
+declare function __Response_body(p0: externref): ReadableStream<Uint8Array> | null;
 
 @external("tw:js/global", "Response#clone()", "tw, throws:TypeErr")
 declare function __Response_clone(p0: externref): Response;
@@ -325,6 +392,12 @@ declare function __ResponseInit_statusText(p0: externref): String | null;
 
 @external("tw:js/global", "ResponseInit#set:statusText(str)", "tw")
 declare function __ResponseInit_statusText2(p0: externref, p1: String): void;
+
+@external("tw:js/global", "ReadableStream.new<{R}>()", "tw")
+declare function __ReadableStream_new<R>(): externref;
+
+@external("tw:js/global", "ReadableStream#get:locked<{R}>()", "tw")
+declare function __ReadableStream_locked<R>(p0: externref): boolean;
 
 @external("tw:js/global", "Cache#put(str)", "tw")
 declare function __Cache_put(p0: externref, p1: String): externref;
@@ -346,6 +419,21 @@ declare function __Storage_delete2(p0: externref, p1: array<var externref | null
 
 @external("tw:js/global", "Console#log(arr<Any?>)", "tw")
 declare function __Console_log(p0: externref, p1: FixedArray<externref | null>): void;
+
+@external("tw:js/global", "Bucket#put(str,Uint8Array)", "tw")
+declare function __Bucket_put(p0: externref, p1: String, p2: Uint8Array): externref;
+
+@external("tw:js/global", "Bucket#put(str,u8[])", "tw")
+declare function __Bucket_put2(p0: externref, p1: String, p2: FixedArray<u8>): externref;
+
+@external("tw:js/global", "Bucket#upload(str,buffer)", "tw")
+declare function __Bucket_upload(p0: externref, p1: String, p2: FixedArray<u8>): externref;
+
+@external("tw:js/global", "Bucket#upload(str,ArrayBuffer)", "tw")
+declare function __Bucket_upload2(p0: externref, p1: String, p2: ArrayBuffer): externref;
+
+@external("tw:js/global", "Bucket#upload(str,ArrayBufferView)", "tw")
+declare function __Bucket_upload3(p0: externref, p1: String, p2: ArrayBufferView): externref;
 
 @external("tw:js/global", "Incoming.new()", "tw")
 declare function __Incoming_new(): externref;

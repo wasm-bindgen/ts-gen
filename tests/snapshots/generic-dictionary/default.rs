@@ -53,3 +53,66 @@ impl<T: ::wasm_bindgen::JsGeneric> EvaluationDetailsBuilder<T> {
         self.inner
     }
 }
+impl<T: ::wasm_bindgen::JsGeneric> From<EvaluationDetails<T>> for EvaluationDetailsBuilder<T> {
+    fn from(inner: EvaluationDetails<T>) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type FetchOptions<Cf: ::wasm_bindgen::JsGeneric = JsString>;
+    #[wasm_bindgen(method, getter)]
+    pub fn method<Cf: ::wasm_bindgen::JsGeneric>(this: &FetchOptions<Cf>) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_method<Cf: ::wasm_bindgen::JsGeneric>(this: &FetchOptions<Cf>, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn cf<Cf: ::wasm_bindgen::JsGeneric>(this: &FetchOptions<Cf>) -> Option<Cf>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_cf<Cf: ::wasm_bindgen::JsGeneric>(this: &FetchOptions<Cf>, val: &Cf);
+}
+impl<Cf: ::wasm_bindgen::JsGeneric> FetchOptions<Cf> {
+    pub fn new_typed() -> FetchOptions<Cf> {
+        Self::builder_typed().build()
+    }
+    pub fn builder_typed() -> FetchOptionsBuilder<Cf> {
+        FetchOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl FetchOptions<JsString> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> FetchOptionsBuilder<JsString> {
+        Self::builder_typed()
+    }
+}
+impl<Cf: ::wasm_bindgen::JsGeneric> Default for FetchOptions<Cf> {
+    fn default() -> Self {
+        Self::new_typed()
+    }
+}
+pub struct FetchOptionsBuilder<Cf: ::wasm_bindgen::JsGeneric> {
+    inner: FetchOptions<Cf>,
+}
+impl<Cf: ::wasm_bindgen::JsGeneric> FetchOptionsBuilder<Cf> {
+    pub fn method(self, val: &str) -> Self {
+        self.inner.set_method(val);
+        self
+    }
+    pub fn cf(self, val: &Cf) -> Self {
+        self.inner.set_cf(val);
+        self
+    }
+    pub fn build(self) -> FetchOptions<Cf> {
+        self.inner
+    }
+}
+impl<Cf: ::wasm_bindgen::JsGeneric> From<FetchOptions<Cf>> for FetchOptionsBuilder<Cf> {
+    fn from(inner: FetchOptions<Cf>) -> Self {
+        Self { inner }
+    }
+}

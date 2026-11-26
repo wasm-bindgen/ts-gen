@@ -73,8 +73,17 @@ class Bytes {
   static from<T>(items: Map<str, T>): Bytes;
   at(index: u32): f64;
   at(index: i32): f64;
+  slice(range: str): Bytes;
+  slice(range: SliceOptions): Bytes;
   one(): (str,);
   quad(): (u32, bool, f64, str);
+}
+
+interface SliceOptions {
+  @js(object)
+  new();
+  get start(): u32?;
+  set start(value: u32);
 }
 
 class KVNamespace {

@@ -115,6 +115,32 @@ extern "C" {
     #[wasm_bindgen(method, getter, catch)]
     pub fn value(this: &Gate) -> Result<f64, JsException>;
 }
+#[wasm_bindgen(module = "error-enum-node", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Kinds;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Kinds, crate::CaughtError>;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    fn __iterator(this: &Kinds) -> Iterator<JsString>;
+    #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
+    pub fn iterator(this: &Kinds) -> Result<Iterator<JsString>, crate::CaughtError>;
+}
+impl<'a> ::core::iter::IntoIterator for &'a Kinds {
+    type Item = JsString;
+    type IntoIter = ::core::iter::Scan<
+        ::core::iter::Repeat<()>,
+        Iterator<JsString>,
+        fn(&mut Iterator<JsString>, ()) -> Option<JsString>,
+    >;
+    fn into_iter(self) -> Self::IntoIter {
+        ::core::iter::repeat(()).scan(self.__iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value())
+        })
+    }
+}
 #[doc = " Every JS error class named by a `@throws` in these bindings; `Other` is any other thrown value. `Display` is the error's `message`."]
 #[derive(Debug, Clone)]
 pub enum JsException {

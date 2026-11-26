@@ -1022,6 +1022,12 @@ pub struct TypeParam {
     pub default: Option<TypeRef>,
 }
 
+/// Whether `t` is exactly the type parameter `name`.
+pub fn is_type_param(t: &TypeRef, name: &str) -> bool {
+    matches!(t, TypeRef::Reference { segments, generic_args }
+        if generic_args.is_empty() && matches!(segments.as_slice(), [s] if s == name))
+}
+
 impl TypeParam {
     /// A parameter constrained to a primitive (`Key extends string`, or a
     /// union of literals of one primitive) can only be instantiated with

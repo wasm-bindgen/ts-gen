@@ -765,3 +765,28 @@ fn associated_types_cover_their_bound() {
         "`P` isn't declared",
     );
 }
+
+#[test]
+fn keys_are_of_a_map() {
+    let m = "interface M { get a(): f64; }\n";
+    ok(&format!(
+        "{m}class C {{ f<K in keyof M>(k: K): M[K]; g(): M[\"a\"]; h(k: \"a\"); }}"
+    ));
+    ok("interface R<V> { @js(index) at(key: str): V?; }\nclass C<N: R<f64>> { f<K in keyof N>(k: K): N[K]; }");
+    bad(
+        "class C<N> { f<K in keyof N>(k: K); }",
+        "isn't a class or an interface",
+    );
+    bad(
+        &format!("{m}class C {{ f(k: str): M[str]; }}"),
+        "an index is a literal type or a `keyof` parameter",
+    );
+    bad(
+        &format!("{m}class C {{ g(): M[\"b\"]; }}"),
+        "no such property",
+    );
+    bad(
+        &format!("{m}class C {{ f<K in keyof M = str>(k: K); }}"),
+        "has no default",
+    );
+}

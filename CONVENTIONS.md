@@ -318,7 +318,7 @@ and keeps the exact one):
 The remaining handle positions are ones wasm-bindgen does not accept a
 carrier in yet: `Function<fn(..)>` needs `ErasableGeneric<Repr =
 JsValue>` and `JsCast` on its signature types, slices need
-`VectorRefIntoWasmAbi`, and the js-sys `Array`, `Map` and `Object`
+`RefIntoWasmAbi` on the element, and the js-sys `Array`, `Map` and `Object`
 APIs (and `Promise::resolve`) need `ErasableGeneric<Repr = JsValue>` on
 the element.
 
@@ -339,8 +339,15 @@ admitting both empties, and every name besides their `null` arms:
 | `f(x: string \| null)` (write)            | `f(&str)`, `f_with_null()` | the same                         |
 | `f(x?: string \| null)` (write)           | `f()`, `f_with_x(&str)`    | adds `f_with_null()`             |
 
+[Per-monomorphization](#per-monomorphization) builds on wasm-bindgen's
+unreleased stack, where the carrier of both empties is `Nullable<Option<T>>`
+(`Nullable::Null`, `Nullable::Value(None)` for `undefined`) and
+`Option<Nullable<T>>` no longer crosses, so it nests `T??` that way round
+wherever the default writes `Option<Nullable<T>>`.
+
 The `nullability`, `node-nullable` and `optional-reads` fixtures carry a
-`strict.rs` snapshot beside their `default.rs` and `mono.rs`.
+`strict.rs` and a `mono-strict.rs` snapshot beside their `default.rs` and
+`mono.rs`.
 
 ## Array and slice types
 
@@ -382,6 +389,30 @@ Inside a built-in container (`Promise<Array<T>>`, `Map<K, Array<V>>`,
 both the stable js-sys API and `js_sys_unstable_apis`, where container
 elements are real generics.
 
+A union element with no common supertype erases to `JsValue`. Under
+[per-monomorphization](#per-monomorphization) it takes its
+[dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums)
+instead, read or written, so a list mixes its arms. An element admitting
+`null` reads in `Option` and is written in `Nullable`, which crosses as
+`null`. A union of literals alone takes its enum too, declared or
+anonymous, so a getter reads what its setter writes. Without the flag it
+crosses as its primitive.
+
+```ts
+declare function marks(): (Mark | string)[];
+declare function describe(values: (Mark | string | null)[]): string;
+```
+
+```rust
+pub fn marks() -> Vec<MarkOrStr>;
+pub fn describe(values: &[Nullable<MarkOrStr>]) -> String;
+
+pub enum MarkOrStr {
+    Mark(Mark),
+    String(String),
+}
+```
+
 ### Slice modes
 
 wasm-bindgen's `#[wasm_bindgen(slice = view | array | copy)]` selects
@@ -398,7 +429,9 @@ the copy shape instead:
 * A `T[]` parameter is a plain JS `Array` the callee may keep, so a
   slice of numbers (`&[f64]` or `Option<&[f64]>`)
   gets `slice = "array"`, after resolving aliases, literal unions and
-  numeric enums.
+  numeric enums. Under per-monomorphization a literal union or enum is
+  [the element itself](#array-and-slice-types), a slice of the enum,
+  which takes no mode.
 * Under [per-monomorphization](#in-scope-generic-type-parameters), a
   `T[]` whose element is a type parameter gets `slice = "array"` too:
   wasm-bindgen resolves the mode per instantiation, so `T = f64` reaches
@@ -549,6 +582,75 @@ generic over their buffer (`Uint8Array<ArrayBuffer>`,
 `Float64Array<ArrayBufferLike>`). The js-sys types aren't, so the
 argument is dropped in every position without a warning, and
 `Uint8Array<ArrayBuffer>` lowers exactly like `Uint8Array`.
+
+### Buffers
+
+`ArrayBuffer | ArrayBufferView`, however it's spelled (`BufferSource`
+included) and whatever else the union holds, is how a JS API says
+"bytes": the IR's `buffer` (IR.md §11). Per-monomorphization it is one
+argument, `impl js_sys::BufferSourceLike`, suffixed `_with_buffer` beside
+other alternatives. Bytes (`&[u8]`, `Vec<u8>`) and every buffer class
+(`ArrayBuffer`, each typed array, `DataView`, owned or borrowed) cross
+through the one import, a class as itself:
+
+```ts
+function digest(data: BufferSource): Promise<ArrayBuffer>;
+function put(key: string, value: string | ArrayBuffer | ArrayBufferView): void;
+function join(parts: BufferSource[]): Blob;
+```
+
+```rs
+pub async fn digest(#[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike) -> Result<ArrayBuffer, JsValue>;
+pub fn put(key: impl ::wasm_bindgen::JsStringLike, value: impl ::wasm_bindgen::JsStringLike);
+pub fn put_with_buffer(key: impl ::wasm_bindgen::JsStringLike, #[wasm_bindgen(slice = "copy")] value: impl ::js_sys::BufferSourceLike);
+pub fn join(parts: &[impl ::js_sys::BufferSourceLike]) -> Blob;
+```
+
+```rs
+digest(&bytes[..]);        // a fresh `Uint8Array` of the bytes
+digest(&array_buffer);     // the `ArrayBuffer` itself
+digest(float32_array);     // the typed array itself
+```
+
+`slice = "copy"` makes the bytes a fresh `Uint8Array` the callee owns,
+and is a no-op for the classes. A `{@slice view}` hint, the author
+asserting the callee reads the bytes before it returns, makes them a
+view of linear memory instead (`slice = "view"`). Where `undefined`
+can't be omitted the argument is `Option<impl js_sys::BufferSourceLike>`,
+still taking a class, and a `None` names its type (`None::<&[u8]>`). A
+list's elements arrive as an `Array` of buffers, bytes as `Uint8Array`
+copies.
+
+Without `--experimental-generic-mono` the two classes keep an overload
+each (`_with_array_buffer`, `_with_typed_array`), and a named union its
+enum, since `BufferSourceLike` isn't in a released js-sys. The bytes are
+one more overload after them, `_with_slice`, as beside a
+[typed array](#typed-array-unions):
+
+```rs
+pub fn put_with_array_buffer(key: &str, value: &ArrayBuffer);
+pub fn put_with_typed_array(key: &str, value: &Object);
+pub fn put_with_slice(key: &str, #[wasm_bindgen(slice = "copy")] value: &[u8]);
+```
+
+A `buffer` result reads as its bytes in both modes: a view contributes
+its own window of its `ArrayBuffer`, whatever its element (a
+`Float32Array` of two elements is eight bytes), and an `ArrayBuffer` all
+of it. The handle stays available as a `_js_buffer` twin, the two
+classes:
+
+```ts
+function read(key: string): ArrayBuffer | ArrayBufferView | undefined;
+```
+
+```rs
+pub fn read(key: &str) -> Option<Vec<u8>>;
+pub fn read_js_buffer(key: &str) -> Option<ReadReturnKind>;
+```
+
+This is a function's, method's or getter's own result, under `Option`,
+`Result` and `async`. A `buffer` inside a list, another union's enum or
+a `Promise<T>` handle stays the two classes.
 
 ## Function types
 
@@ -1052,6 +1154,32 @@ impl TransitionOptions {
 impl TransitionOptionsBuilder {
     pub fn direction(self, val: TransitionOptionsDirection) -> Self { /* … */ }
     pub fn build(self) -> TransitionOptions { /* … */ }
+}
+```
+
+### Continuing from an existing dictionary
+
+`build()` consumes the builder and the builder has no getters, so a
+helper that needs to read what was set so far (append to a `headers`
+field, apply a preset) would otherwise have to rebuild the object field
+by field. Every builder therefore implements `From<Dict>`:
+
+```rust
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self { Self { inner } }
+}
+```
+
+The dictionary's generated getters and setters are the read/modify step,
+and `.into()` resumes chaining:
+
+```rust
+fn header(builder: ResponseInitBuilder, name: &str, value: &str) -> ResponseInitBuilder {
+    let init = builder.build();
+    let headers = /* normalize init.headers() */;
+    headers.set(name, value);
+    init.set_headers(&headers);
+    init.into()
 }
 ```
 
@@ -2028,6 +2156,25 @@ The same holds across overloads: `put(key, value, options?)` beside
 options, and `put_with_entries` and `put_with_entries_and_options` for
 the second, which departs from the primary in its parameter names.
 
+A parameter's only dictionary type is the parameter spelled out, so it
+takes the parameter's name, while the other types keep their own:
+
+```ts
+decrypt(algorithm: string | EncryptAlgorithm, data: BufferSource): Promise<ArrayBuffer>;
+addEventListener(type: string, options?: ListenerOptions | boolean): void;
+```
+
+```rust
+pub fn decrypt(this: &Crypto, algorithm: &str, ...);
+pub fn decrypt_with_algorithm(this: &Crypto, algorithm: &EncryptAlgorithm, ...);
+pub fn add_event_listener(this: &Target, type_: &str);
+pub fn add_event_listener_with_options(this: &Target, type_: &str, options: &ListenerOptions);
+pub fn add_event_listener_with_bool(this: &Target, type_: &str, options: bool);
+```
+
+Two dictionaries at one parameter are told apart by their type names, as
+any other two types are.
+
 A base name that already reads `with` (`with`, `set_with`) continues the
 suffix with `_and_`: `with(fields, options?)` gives `with` and
 `with_and_options`, not `with_with_options`.
@@ -2235,6 +2382,7 @@ up with what callers see in the function signature:
 | `symbol`        | `&Symbol`        | `_with_symbol`  |
 | `Array<T>` / `T[]` | `&[T]`        | `_with_slice`   |
 | `Uint8Array`    | `&Uint8Array`    | `_with_uint8_array` |
+| `ArrayBuffer \| ArrayBufferView` (per-monomorphization) | `impl BufferSourceLike` | `_with_buffer` |
 | `Foo` (named)   | `&Foo`           | `_with_foo`     |
 | `A.X` (qualified) | `&a::X`        | `_with_a_x`     |
 | `null`          | (dropped — see [Optional and nullable types](#optional-and-nullable-types)) | – |
@@ -2275,7 +2423,7 @@ pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
 
 The non-`try_` form panics on JS throw; the `try_` form returns `Result`.
 Setters and constructors don't get a `try_` companion (setters never
-catch; constructors always catch).
+catch; constructors catch unless annotated `@throws {never}`).
 
 ### `--fallible` — single `Result` form
 
@@ -2303,8 +2451,8 @@ single catching form; no `try_` name is declared. The error type is
 unchanged: `@throws {T}` → `T`, otherwise `JsValue`, or `js_sys::Error`
 under `--errors-as-error`, so the two flags compose. `@throws {never}`
 keeps a sync binding infallible (no `catch`, plain `T`) and is the only
-way to get one under the flag. Async callables, constructors (always
-catch), setters (never catch) and property getters are not affected
+way to get one under the flag, constructors included. Async callables,
+other constructors (always catch), setters (never catch) and property getters are not affected
 (a getter annotated `@throws {X}` catches under either policy; see
 [`@throws {X}` on getters](#throws-x-on-getters)). An async callable's
 sync `<name>_promise` form (below) catches under the flag like any
@@ -2695,6 +2843,34 @@ still has no argument to infer `T` from, so it hands back the wrapper
 at its default (see [uninferrable type
 parameters](#uninferrable-method-type-parameters)).
 
+## `[Symbol.iterator]()` makes a reference iterable
+
+A declared `[Symbol.iterator]()` binds as `iterator()` with its
+`try_iterator` companion, like the one a synthesized `Iterable<T>`
+wrapper has, and either makes a reference to the type iterable:
+
+```ts
+declare class Headers {
+  [Symbol.iterator](): IterableIterator<[key: string, value: string]>;
+}
+```
+
+```rust
+for (name, value) in &headers {
+    // name: JsString, value: JsString
+}
+```
+
+The item is what the iterator yields: a tuple `[K, V]` as the Rust tuple
+`(K, V)`, any other as itself (`SqlStorageCursor<T>` yields `T`). A
+throwing `[Symbol.iterator]()` or `next()` rethrows, as `for…of` does;
+`try_iterator()` and `Iterator::next()` catch it.
+
+On a generic type the impl bounds each item type that names a parameter
+by `JsGeneric + FromWasmAbi`, which is what js-sys needs to read it out
+of the iterator with and without `js_sys_unstable_apis`. Async iteration
+has no such impl.
+
 ## In-scope generic type parameters
 
 Bare type-parameter references (`T` in `put<T>(value: T)`) survive
@@ -2721,8 +2897,8 @@ per-monomorphization path. Every generated extern block receives
 bare type-parameter arguments are passed by value so each concrete Rust type
 uses its native ABI representation. Each import states the ABI bounds it
 needs, so a generic caller can read them off the declaration: `IntoWasmAbi`
-for an argument (`T: RefIntoWasmAbi` for a borrowed `&T`, and
-`T: VectorRefIntoWasmAbi` for a borrowed `&[T]`), `FromWasmAbi` for a return,
+for an argument (`T: RefIntoWasmAbi` for a borrowed `&T` and for the element
+of a borrowed `&[T]`), `FromWasmAbi` for a return,
 `Option<T>: IntoWasmAbi`/`Option<T>: FromWasmAbi` for an `Option<T>`,
 `NullableIntoWasmAbi` for a written `Nullable<T>` (and
 `NullableFromWasmAbi` for a `T??` read's), and `'static`
@@ -2888,38 +3064,39 @@ same convention (see `js_sys::Array::for_each<T: JsGeneric>`).
 
 ### Uninferrable method type parameters
 
-A callable-level parameter that no argument mentions once lowered has
-to be named at every call. That is worth it only where the turbofish
-is itself the cast — the (awaited) return is exactly `T`, `T |
-undefined` or `T | null` — so the rule, per parameter:
+A callable-level parameter that no argument mentions once lowered would
+have to be named at every call, so it gets two bindings: the plain name
+reads it at its default and needs no annotation, and a `_typed` twin
+keeps it for the caller to name. The rule, per parameter:
 
-1. Mentioned by an argument: kept, inferred at the call. A callback
-   counts as it lowers: its parameters and its return count, but a
+1. Mentioned by an argument: kept, inferred at the call, with no twin. A
+   callback counts as it lowers: its parameters and its return count, but a
    callback with a rest parameter is the untyped `Function` and
    mentions nothing. A variadic rest likewise counts as it lowers: by default
    it is `&[JsValue]` and mentions nothing, while under
    `--experimental-generic-mono` a rest array lowers to a slice, so
    `of<T>(...items: T[]): Row<T>` keeps `T` (`fn of<T>(items: &[T]) ->
-   Row<T>`) where the default erases it (`fn of(items: &[JsValue]) ->
-   Row`).
-2. Not mentioned, return exactly `T` / `T | undefined` / `T | null`
-   (awaited): kept — `storage.get::<JsString>(key)`, `body.json::<Row>()`.
-3. Otherwise erased and removed from the signature. The substitute is
-   the default declared by the generic type `T` instantiates in the
-   return (`Row<T = Record<string, unknown>>` → `Object`), else the
-   method's own default (`list<T = unknown>` → `JsValue`), else `any`.
-   A type's default that names that type's own parameters (`U = Box<T>`)
-   is skipped, since those names are unbound in the method.
-   A parameter the return never mentions is simply dropped.
+   Row<T>`) where the default has `of(items: &[JsValue]) -> Row` and
+   `of_typed::<T>`.
+2. Otherwise the plain name reads it as TypeScript infers it with
+   nothing to go on: the default declared by the generic type `T`
+   instantiates in the return (`Row<T = Record<string, unknown>>` →
+   `Object`), else the method's own default (`list<T = unknown>` →
+   `JsValue`), else its class or interface bound (`pick<T extends
+   Cursor>` → `Cursor`), else `any`. A type's default that names that
+   type's own parameters (`U = Box<T>`) is skipped, since those names
+   are unbound in the method.
+3. The `_typed` twin keeps the parameters the return mentions:
+   `storage.get_typed::<JsString>(key)`, `stmt.all_typed::<Row>()`. One
+   the return never mentions is dropped from both, and a twin whose
+   lowered return is the plain one's is left out.
 
-Callers wanting a typed container `unchecked_into` it
-(`D1Result<JsValue>` → `D1Result<Row>`). `try_` companions follow the
-same signature. Each overload of a method or free function applies the
-rule to its own type parameters, and so does each arm of a
-[literal-keyed overload](#inline-wrappers): workers-types'
-`get(key, "json")` keeps `ExpectedValue` as its whole return
-(`get_json::<Row>(key)`), while `getWithMetadata(key, "json")`
-returns `KVNamespaceGetWithMetadataResult` at its defaults.
+`_typed` closes the binding's name, after any `_with_` suffix and before
+the forms derived from it: `first_with_col_name_typed`,
+`list_typed_promise`, `try_scan_typed`. Each overload of a method or free
+function applies the rule to its own type parameters, and so does each
+arm of a [literal-keyed overload](#inline-wrappers): workers-types'
+`get(key, "json")` is `get_json(key)` beside `get_json_typed::<Row>(key)`.
 
 ```ts
 interface Store {
@@ -2934,14 +3111,85 @@ interface Store {
 
 ```rust
 pub async fn put<T: JsGeneric>(this: &Store, key: &str, value: &T) -> Result<(), JsValue>;
-pub async fn get<T: JsGeneric>(this: &Store, key: &str) -> Result<Option<T>, JsValue>
+pub async fn get(this: &Store, key: &str) -> Result<JsValue, JsValue>;
+pub async fn get_typed<T: JsGeneric>(this: &Store, key: &str) -> Result<Option<T>, JsValue>
 where
     Option<T>: FromWasmAbi;
-pub async fn transaction<T: JsGeneric + FromWasmAbi>(this: &Store, closure: &Function<fn(Store) -> Promise>) -> Result<T, JsValue>;
+pub async fn transaction<T: JsGeneric + FromWasmAbi>(this: &Store, closure: &Function<fn(Store) -> Promise<T>>) -> Result<T, JsValue>;
 pub async fn run(this: &Store) -> Result<Row, JsValue>; // Row<Object>, the default
+pub async fn run_typed<T: JsGeneric>(this: &Store) -> Result<Row<T>, JsValue>;
 pub async fn list(this: &Store) -> Result<Map<JsString, JsValue>, JsValue>;
+pub async fn list_typed<T: JsGeneric>(this: &Store) -> Result<Map<JsString, T>, JsValue>;
 pub fn schedule(this: &Store, callback: &Function, args: &[JsValue]) -> f64;
 ```
+
+### Keyed members
+
+A type parameter bounded by `keyof` a map, where another argument is
+typed by an index of that map, ties a string to a type: the key passed
+picks the property that types the rest of the call. The plain name reads
+it erased, as it always has: the key is a `&str`, and the index is the
+type every key gives. A `_typed` twin states the relation. It takes the
+key as a type argument in place of the string, a marker type that
+implements `MapKey` for the map, and reads each index as that marker's
+`Value`.
+
+```ts
+interface SocketEventMap {
+  message: MessageEvent;
+  close: Event;
+}
+declare class EventTarget<EventMap extends Record<string, Event> = Record<string, Event>> {
+  addEventListener<Type extends keyof EventMap>(type: Type, handler: (event: EventMap[Type]) => void): void;
+}
+declare class Socket extends EventTarget<SocketEventMap> {}
+```
+
+```rust
+pub trait MapKey<M: ?Sized> {
+    type Value: JsGeneric;
+    const KEY: &'static str;
+}
+pub mod socket_event_map {
+    pub struct Message;
+    impl MapKey<SocketEventMap> for Message {
+        type Value = MessageEvent;
+        const KEY: &'static str = "message";
+    }
+    pub struct Close; // Value = Event, KEY = "close"
+}
+impl<EventMap: JsGeneric> EventTarget<EventMap> {
+    pub fn add_event_listener_typed<K: MapKey<EventMap>>(&self, handler: &Function<fn(K::Value) -> Undefined>);
+}
+impl Socket {
+    pub fn add_event_listener_typed<K: MapKey<SocketEventMap>>(&self, handler: &Function<fn(K::Value) -> Undefined>);
+}
+
+socket.add_event_listener_typed::<socket_event_map::Message>(&on_message); // fn(MessageEvent)
+socket.add_event_listener("message", &on_event); // fn(Event), as before
+```
+
+* `MapKey` is emitted once, with a module per declared map a twin can
+  be called with: the map's name in snake case, holding a marker per
+  property in Pascal case. A property whose type isn't a non-generic
+  class or interface has no marker.
+* The twin wraps the plain binding, passing `K::KEY` for the key, so it
+  is the same under `--experimental-generic-mono`. `_typed` closes the
+  name as it does for an
+  [uninferrable parameter](#uninferrable-method-type-parameters):
+  `try_add_event_listener_typed`,
+  `add_event_listener_with_event_listener_object_typed`.
+* A subclass derefs to its parent at the parent's default map, so where
+  the map is the parent's type parameter, each non-generic class that
+  extends the parent at a declared map has the twin over that map
+  (`Socket` above).
+* An open map (`Record<string, Event>`) has no markers, since any
+  string is a key: the plain name is its only reading.
+* A member keeps the plain name alone where the twin couldn't state it:
+  a keyed return, a chained or literal index
+  (`AiModelList[Name]["inputs"]`), a literal-keyed overload, a member
+  of a declared module or namespace, and a callable that already has a
+  `_typed` twin for an uninferrable parameter.
 
 ### Type-level generics propagate to every binding site
 
@@ -2964,9 +3212,7 @@ parameters thread through every site that mentions `Foo`:
   an alias of an erased union) the whole default is `JsValue`, type
   arguments included. Rust accepts defaults only on the type
   definition, so dictionary builders and helper `impl`s keep the plain
-  form and a builder for a defaulted dictionary is named with explicit
-  arguments (`Options::<Box_<JsString>>::builder()`, `Box` being in the
-  prelude).
+  form.
 * Every reference to the type leaves the trailing arguments that equal
   the declared Rust defaults to them, in both modes. `fetch(input:
   RequestInfo)` instantiates `Request<unknown, CfProperties<unknown>>`,
@@ -3005,6 +3251,30 @@ parameters thread through every site that mentions `Foo`:
   ```rust
   pub fn new<C: JsGeneric>(c: &C) -> Result<Chained<JsString, JsString, C>, JsValue>;
   ```
+  A constructor that leaves a parameter at its default also gets a
+  `_typed` twin binding every type-level parameter, for the instance
+  the caller names. wasm-bindgen declares a constructor's type
+  parameters on the type, so that is where they are written:
+  ```rust
+  pub fn new_typed<I: JsGeneric, O: JsGeneric>() -> Result<TransformStream<I, O>, JsValue>;
+  pub fn new_typed<A: JsGeneric, B: JsGeneric, C: JsGeneric>(c: &C) -> Result<Chained<A, B, C>, JsValue>;
+  ```
+  ```rust
+  let plain = TransformStream::new()?;
+  let typed = TransformStream::<Uint8Array, JsString>::new_typed()?;
+  ```
+* A dictionary's `new` and `builder` factories follow the constructor
+  rule: one whose required fields leave a parameter open makes the
+  default instantiation, and `new_typed` / `builder_typed` any other.
+  ```ts
+  interface FetchOptions<Cf = string> { method?: string; cf?: Cf; }
+  ```
+  ```rust
+  let plain: FetchOptions = FetchOptions::builder().method("GET").build();
+  let typed = FetchOptions::<Number>::builder_typed().cf(&cf).build();
+  ```
+  A factory whose arguments mention every parameter stays one generic
+  function (`EvaluationDetails::new(flag_key, &value)`).
 * `extends Foo<X>` lowers to `extends = Foo` — the attribute cannot
   carry generic arguments, and the defaults make the bare head valid.
 * A generic type derives `PartialEq, Eq` like any other imported type.
@@ -3113,8 +3383,9 @@ pub async fn list(this: &KVNamespace) -> Result<KVNamespaceListResult, JsValue>;
 pub fn typed(this: &Env) -> KVNamespace;
 ```
 
-(`list`'s own `Metadata` erases separately, as no argument infers it;
-see [uninferrable type parameters](#uninferrable-method-type-parameters).)
+(`list`'s own `Metadata` reads at its default, as no argument infers it,
+beside `list_typed`; see [uninferrable type
+parameters](#uninferrable-method-type-parameters).)
 
 Method-level parameters follow the same rule
 (`tag<Level extends "info" | "warn">(level: Level)` → `level: &str`).
@@ -3457,8 +3728,11 @@ pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
   `pub async fn foo() -> T`; its `foo_promise` form is plain under
   every policy, as a builtin's, a global's or an `async` callable's is
   [without the annotation](#builtins-globals-and-async-never-throw-synchronously).
-* **Constructors** always catch per JS `new` semantics —
-  `@throws {never}` on a constructor is silently ignored.
+* **Constructors** catch by default (JS `new` can throw); annotated
+  `@throws {never}` the binding drops `catch` and returns the type
+  bare (`pub fn new(name: &str) -> Foo`). wasm-bindgen accepts a
+  non-`catch` constructor; a throw then aborts like any other
+  unguarded import.
 * **`never` returns** contradict the annotation and win: it is ignored
   and the callable keeps only its catching form (see
   [`never` returns](#never-returns-keep-only-the-catching-form)).
@@ -3480,7 +3754,7 @@ is emitted under a private name and a non-extern `pub fn` of the public
 name converts over it. The rule is narrow on purpose: a wrapper is
 never emitted for ergonomics, only where no extern signature can carry
 the type, and the extern form stays reachable (within the module) under
-a `__`-prefixed name (`__<name>`). Three constructs qualify today:
+a `__`-prefixed name (`__<name>`). Four constructs qualify today:
 
 * **`null` arms.** The extern ABI has no type that only admits `null`,
   so `f(x: T | null)`'s `f_with_null()` binds `__f_with_null(x:
@@ -3493,6 +3767,7 @@ a `__`-prefixed name (`__<name>`). Three constructs qualify today:
   `--experimental-generic-mono` the extern takes the alias's trait,
   `impl PlainDateLike`, itself, and needs no wrapper.
 * **Overloads keyed by a string literal**, below.
+* **Literal fields of a dictionary argument**, after it.
 
 **Overloads distinguished only by a string literal.** Rust has no
 literal types, so `get(key, type: "json")` and `get(key, type:
@@ -3607,6 +3882,68 @@ impl KVNamespace {
   setter taking a named union alias is wrapped like any binding
   (`set_relative_to(&self, val: impl Into<ZonedDateTimeLike>)`).
 
+**A literal a dictionary argument's type fixes.** `get(key, options:
+GetOptions<"json">)` and its `"arrayBuffer"` sibling take the same
+dictionary, whose `type: Type` field can hold only the literal. The IR
+states the literal as a constant the call fills (IR.md §7), so each
+overload is a binding of its own, named by the literal and then by the
+parameters it keeps, whose wrapper sets the field on a copy of the
+caller's options:
+
+```ts
+interface GetOptions<Type> { type: Type; cacheTtl?: number }
+interface KVNamespace {
+  get(key: string, options?: GetOptions<"text">): Promise<string | null>;
+  get<T>(key: string, options?: GetOptions<"json">): Promise<T | null>;
+  get(key: string, options?: GetOptions<"arrayBuffer">): Promise<ArrayBuffer | null>;
+}
+```
+
+```rust
+extern "C" {
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_array_buffer_with_options(this: &KVNamespace, key: &str, options: &GetOptions) -> Result<Option<ArrayBuffer>, JsValue>;
+}
+impl KVNamespace {
+    pub async fn get_array_buffer_with_options(&self, key: &str, options: &GetOptions) -> Result<Option<ArrayBuffer>, JsValue> {
+        let options: Object = Object::assign(&Object::new(), options.unchecked_ref());
+        let _ = Reflect::set_str(&options, &"type".into(), &"arrayBuffer".into());
+        self.__get_array_buffer_with_options(key, options.unchecked_ref()).await
+    }
+}
+```
+
+* The field is optional on the dictionary and its type argument is left
+  open, so every arm takes `&GetOptions` and `GetOptions::new()` builds
+  it without the literal. A value the caller sets is overridden, and the
+  caller's object is not written.
+* A single overload fills the same way under its plain name.
+* Only a required field typed by exactly an unbounded type parameter is
+  filled. One the declaration types by a literal (`mode: "byob"`) is set
+  by the dictionary's own factories ([literal-type discriminator
+  collapse](#literal-type-discriminator-collapse)), and a parameter
+  bounded by literals takes its enum.
+* A dictionary whose every field is such a constant, declared literals
+  included, leaves the caller nothing to set: its parameter is dropped
+  and the wrapper makes the object. Where that collides with the
+  overload omitting it, the literal names it.
+
+```ts
+getReader(): ReadableStreamDefaultReader;
+getReader(options: { mode: "byob" }): ReadableStreamBYOBReader;
+```
+
+```rs
+pub fn get_reader(this: &ReadableStream) -> ReadableStreamDefaultReader;
+impl ReadableStream {
+    pub fn get_reader_byob(&self) -> ReadableStreamBYOBReader {
+        let options = Object::new();
+        let _ = Reflect::set_str(&options, &"mode".into(), &"byob".into());
+        self.__get_reader_byob(options.unchecked_ref())
+    }
+}
+```
+
 ## `@tw-abi` JSDoc → Rust scalar
 
 TS `number` lowers to `f64`, which is wrong-shaped for most of the
@@ -3667,7 +4004,7 @@ does not exist.
 ## `--annotate` side files
 
 Upstream declaration files (`@cloudflare/workers-types`,
-`lib.dom.d.ts`) carry no `@tw-abi` or `@throws` tags, and editing a
+`lib.dom.d.ts`) carry no `@tw-abi`, `@throws` or `{@slice}` tags, and editing a
 vendored copy does not survive an upgrade. `--annotate` takes side
 `.d.ts` files that re-declare **only the members they tag**; the tags
 are applied to the input's declarations by declaration name and member
@@ -3692,6 +4029,21 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
 
 * `@tw-abi` applies as if written on the input member; a property's tag
   reaches its setter too. Parameters match by name.
+* A `{@slice}` tag in a side `@param` applies to the input's parameter of
+  that name, whatever type the side file gives it.
+* `@retype` makes the side member's own type replace the input's: a
+  property getter's type, or the return of every overload of a method or
+  function. It is for an input type that erases what the API produces
+  (`get body(): ReadableStream | null`, a stream of bytes), so the side
+  file writes the type it wants:
+  `/** @retype */ readonly body: ReadableStream<Uint8Array> | null;`. A
+  property's setter keeps its own type.
+* A side property with no setter (`readonly url: string`, `get url()`)
+  makes the input's read-only: its setter is not emitted. Upstream drops
+  `readonly` on properties the runtime defines read-only (workers-types'
+  `Response.status`, `WebSocket.url`), whose setters throw a `TypeError`.
+  Such a member counts as tagged; a side file that tags a writable
+  property declares it writable (`/** @tw-abi u16 */ status: number;`).
 * `@throws` replaces the input member's failure mode. Getters are
   infallible, so on a property it contributes only its doc.
 * A side member applies to every overload of the input method or

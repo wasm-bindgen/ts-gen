@@ -144,6 +144,16 @@ fun Bytes.at(index: Int): Double {
     return r0
 }
 
+fun Bytes.slice(range: String): Bytes {
+    val r0 = fixtures.sample.flat.Bytes_slice_str(this, range.toJsString())
+    return r0!!.unsafeCast<Bytes>()
+}
+
+fun Bytes.slice(range: SliceOptions): Bytes {
+    val r0 = fixtures.sample.flat.Bytes_slice_SliceOptions(this, range)
+    return r0!!.unsafeCast<Bytes>()
+}
+
 fun Bytes.one(): Tuple1<String> {
     val r0 = fixtures.sample.flat.Bytes_one(this)
     return Tuple1(r0!!.unsafeCast<JsString>().toString())
@@ -167,6 +177,19 @@ object BytesStatic {
         val r0 = fixtures.sample.flat.Bytes_from_Map_str_T(items)
         return r0!!.unsafeCast<Bytes>()
     }
+}
+
+external interface SliceOptions : JsAny
+
+val SliceOptions.start: UInt?
+    get() {
+        val r0 = fixtures.sample.flat.SliceOptions_get_start(this)
+        val s1 = fixtures.sample.flat.ret_i32()
+        return (if (r0 == 0) null else s1.toUInt())
+    }
+
+fun SliceOptions.setStart(value: UInt) {
+    fixtures.sample.flat.SliceOptions_set_start_u32(this, value.toInt())
 }
 
 external interface KVNamespace : JsAny
@@ -208,6 +231,11 @@ fun Headers(): Headers {
 fun <K : JsAny?, V : JsAny?> Map(): Map<K, V> {
     val r0 = fixtures.sample.flat.Map_new()
     return r0!!.unsafeCast<Map<K, V>>()
+}
+
+fun SliceOptions(): SliceOptions {
+    val r0 = fixtures.sample.flat.SliceOptions_new()
+    return r0!!.unsafeCast<SliceOptions>()
 }
 
 fun atob(data: String): String {

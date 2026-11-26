@@ -881,6 +881,11 @@ pub mod temporal {
             self.inner
         }
     }
+    impl From<DateLikeObject> for DateLikeObjectBuilder {
+        fn from(inner: DateLikeObject) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = DateLikeObject , extends = TimeLikeObject , extends = Object , is_type_of = JsValue :: is_object)]
@@ -975,6 +980,11 @@ pub mod temporal {
         }
         pub fn build(self) -> DateTimeLikeObject {
             self.inner
+        }
+    }
+    impl From<DateTimeLikeObject> for DateTimeLikeObjectBuilder {
+        fn from(inner: DateTimeLikeObject) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -1086,6 +1096,11 @@ pub mod temporal {
             self.inner
         }
     }
+    impl From<DurationLikeObject> for DurationLikeObjectBuilder {
+        fn from(inner: DurationLikeObject) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -1161,6 +1176,11 @@ pub mod temporal {
         }
         pub fn build(self) -> TimeLikeObject {
             self.inner
+        }
+    }
+    impl From<TimeLikeObject> for TimeLikeObjectBuilder {
+        fn from(inner: TimeLikeObject) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -1242,6 +1262,11 @@ pub mod temporal {
         }
         pub fn build(self) -> YearMonthLikeObject {
             self.inner
+        }
+    }
+    impl From<YearMonthLikeObject> for YearMonthLikeObjectBuilder {
+        fn from(inner: YearMonthLikeObject) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -1331,6 +1356,11 @@ pub mod temporal {
             self.inner
         }
     }
+    impl From<ZonedDateTimeLikeObject> for ZonedDateTimeLikeObjectBuilder {
+        fn from(inner: ZonedDateTimeLikeObject) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum DateUnit {
@@ -1415,6 +1445,11 @@ pub mod temporal {
             self.inner
         }
     }
+    impl From<DisambiguationOptions> for DisambiguationOptionsBuilder {
+        fn from(inner: DisambiguationOptions) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -1450,6 +1485,11 @@ pub mod temporal {
         }
         pub fn build(self) -> OverflowOptions {
             self.inner
+        }
+    }
+    impl From<OverflowOptions> for OverflowOptionsBuilder {
+        fn from(inner: OverflowOptions) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -1496,6 +1536,11 @@ pub mod temporal {
             self.inner
         }
     }
+    impl From<TransitionOptions> for TransitionOptionsBuilder {
+        fn from(inner: TransitionOptions) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -1533,20 +1578,28 @@ pub mod temporal {
         );
     }
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits> RoundingOptions<Units> {
-        pub fn new() -> RoundingOptions<Units> {
-            Self::builder().build()
+        pub fn new_typed() -> RoundingOptions<Units> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> RoundingOptionsBuilder<Units> {
+        pub fn builder_typed() -> RoundingOptionsBuilder<Units> {
             RoundingOptionsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl RoundingOptions<DateUnitOrTimeUnit> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> RoundingOptionsBuilder<DateUnitOrTimeUnit> {
+            Self::builder_typed()
         }
     }
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits> Default
         for RoundingOptions<Units>
     {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct RoundingOptionsBuilder<Units> {
@@ -1569,6 +1622,13 @@ pub mod temporal {
         }
         pub fn build(self) -> RoundingOptions<Units> {
             self.inner
+        }
+    }
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits>
+        From<RoundingOptions<Units>> for RoundingOptionsBuilder<Units>
+    {
+        fn from(inner: RoundingOptions<Units>) -> Self {
+            Self { inner }
         }
     }
     pub trait RoundingOptionsUnits {
@@ -1650,6 +1710,13 @@ pub mod temporal {
             self.inner
         }
     }
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits>
+        From<RoundToOptions<Units>> for RoundToOptionsBuilder<Units>
+    {
+        fn from(inner: RoundToOptions<Units>) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , extends = RoundingOptions :: < Units > , no_deref , is_type_of = JsValue :: is_object)]
@@ -1677,20 +1744,28 @@ pub mod temporal {
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsWithLargestUnitUnits>
         RoundingOptionsWithLargestUnit<Units>
     {
-        pub fn new() -> RoundingOptionsWithLargestUnit<Units> {
-            Self::builder().build()
+        pub fn new_typed() -> RoundingOptionsWithLargestUnit<Units> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> RoundingOptionsWithLargestUnitBuilder<Units> {
+        pub fn builder_typed() -> RoundingOptionsWithLargestUnitBuilder<Units> {
             RoundingOptionsWithLargestUnitBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl RoundingOptionsWithLargestUnit<DateUnitOrTimeUnit> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> RoundingOptionsWithLargestUnitBuilder<DateUnitOrTimeUnit> {
+            Self::builder_typed()
         }
     }
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsWithLargestUnitUnits> Default
         for RoundingOptionsWithLargestUnit<Units>
     {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct RoundingOptionsWithLargestUnitBuilder<Units> {
@@ -1717,6 +1792,14 @@ pub mod temporal {
         }
         pub fn build(self) -> RoundingOptionsWithLargestUnit<Units> {
             self.inner
+        }
+    }
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsWithLargestUnitUnits>
+        From<RoundingOptionsWithLargestUnit<Units>>
+        for RoundingOptionsWithLargestUnitBuilder<Units>
+    {
+        fn from(inner: RoundingOptionsWithLargestUnit<Units>) -> Self {
+            Self { inner }
         }
     }
     pub trait RoundingOptionsWithLargestUnitUnits: RoundingOptionsUnits {
@@ -1767,20 +1850,28 @@ pub mod temporal {
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits>
         ToStringRoundingOptions<Units>
     {
-        pub fn new() -> ToStringRoundingOptions<Units> {
-            Self::builder().build()
+        pub fn new_typed() -> ToStringRoundingOptions<Units> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> ToStringRoundingOptionsBuilder<Units> {
+        pub fn builder_typed() -> ToStringRoundingOptionsBuilder<Units> {
             ToStringRoundingOptionsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl ToStringRoundingOptions<DateUnitOrTimeUnit> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> ToStringRoundingOptionsBuilder<DateUnitOrTimeUnit> {
+            Self::builder_typed()
         }
     }
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits> Default
         for ToStringRoundingOptions<Units>
     {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct ToStringRoundingOptionsBuilder<Units> {
@@ -1799,6 +1890,13 @@ pub mod temporal {
         }
         pub fn build(self) -> ToStringRoundingOptions<Units> {
             self.inner
+        }
+    }
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits>
+        From<ToStringRoundingOptions<Units>> for ToStringRoundingOptionsBuilder<Units>
+    {
+        fn from(inner: ToStringRoundingOptions<Units>) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -1830,20 +1928,29 @@ pub mod temporal {
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits>
         ToStringRoundingOptionsWithFractionalSeconds<Units>
     {
-        pub fn new() -> ToStringRoundingOptionsWithFractionalSeconds<Units> {
-            Self::builder().build()
+        pub fn new_typed() -> ToStringRoundingOptionsWithFractionalSeconds<Units> {
+            Self::builder_typed().build()
         }
-        pub fn builder() -> ToStringRoundingOptionsWithFractionalSecondsBuilder<Units> {
+        pub fn builder_typed() -> ToStringRoundingOptionsWithFractionalSecondsBuilder<Units> {
             ToStringRoundingOptionsWithFractionalSecondsBuilder {
                 inner: JsCast::unchecked_into(js_sys::Object::new()),
             }
+        }
+    }
+    impl ToStringRoundingOptionsWithFractionalSeconds<DateUnitOrTimeUnit> {
+        pub fn new() -> Self {
+            Self::new_typed()
+        }
+        pub fn builder() -> ToStringRoundingOptionsWithFractionalSecondsBuilder<DateUnitOrTimeUnit>
+        {
+            Self::builder_typed()
         }
     }
     impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits> Default
         for ToStringRoundingOptionsWithFractionalSeconds<Units>
     {
         fn default() -> Self {
-            Self::new()
+            Self::new_typed()
         }
     }
     pub struct ToStringRoundingOptionsWithFractionalSecondsBuilder<Units> {
@@ -1870,6 +1977,14 @@ pub mod temporal {
         }
         pub fn build(self) -> ToStringRoundingOptionsWithFractionalSeconds<Units> {
             self.inner
+        }
+    }
+    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi + RoundingOptionsUnits>
+        From<ToStringRoundingOptionsWithFractionalSeconds<Units>>
+        for ToStringRoundingOptionsWithFractionalSecondsBuilder<Units>
+    {
+        fn from(inner: ToStringRoundingOptionsWithFractionalSeconds<Units>) -> Self {
+            Self { inner }
         }
     }
     pub mod now {
@@ -1993,6 +2108,11 @@ pub mod temporal {
             self.inner
         }
     }
+    impl From<PlainDateToStringOptions> for PlainDateToStringOptionsBuilder {
+        fn from(inner: PlainDateToStringOptions) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -2028,6 +2148,11 @@ pub mod temporal {
         }
         pub fn build(self) -> PlainDateToZonedDateTimeOptions {
             self.inner
+        }
+    }
+    impl From<PlainDateToZonedDateTimeOptions> for PlainDateToZonedDateTimeOptionsBuilder {
+        fn from(inner: PlainDateToZonedDateTimeOptions) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -2406,6 +2531,11 @@ pub mod temporal {
             self.inner
         }
     }
+    impl From<PlainTimeToStringOptions> for PlainTimeToStringOptionsBuilder {
+        fn from(inner: PlainTimeToStringOptions) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
@@ -2582,7 +2712,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn round_with_round_to_options(
+        pub fn round_with_round_to(
             this: &PlainTime,
             round_to: &RoundToOptions<TimeUnit>,
         ) -> Result<PlainTime, RangeError>;
@@ -2777,6 +2907,11 @@ pub mod temporal {
         }
         pub fn build(self) -> PlainDateTimeToStringOptions {
             self.inner
+        }
+    }
+    impl From<PlainDateTimeToStringOptions> for PlainDateTimeToStringOptionsBuilder {
+        fn from(inner: PlainDateTimeToStringOptions) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -3087,7 +3222,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn round_with_round_to_options(
+        pub fn round_with_round_to(
             this: &PlainDateTime,
             round_to: &RoundToOptions<DayOrTimeUnit>,
         ) -> Result<PlainDateTime, RangeError>;
@@ -3313,6 +3448,11 @@ pub mod temporal {
             self.inner
         }
     }
+    impl From<ZonedDateTimeToStringOptions> for ZonedDateTimeToStringOptionsBuilder {
+        fn from(inner: ZonedDateTimeToStringOptions) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = OverflowOptions , extends = DisambiguationOptions , extends = Object , is_type_of = JsValue :: is_object)]
@@ -3365,6 +3505,11 @@ pub mod temporal {
         }
         pub fn build(self) -> ZonedDateTimeFromOptions {
             self.inner
+        }
+    }
+    impl From<ZonedDateTimeFromOptions> for ZonedDateTimeFromOptionsBuilder {
+        fn from(inner: ZonedDateTimeFromOptions) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -3619,7 +3764,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn round_with_round_to_options(
+        pub fn round_with_round_to(
             this: &ZonedDateTime,
             round_to: &RoundToOptions<DayOrTimeUnit>,
         ) -> Result<ZonedDateTime, RangeError>;
@@ -3754,7 +3899,7 @@ pub mod temporal {
             direction: ZonedDateTimeDirection,
         ) -> Result<Option<ZonedDateTime>, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "getTimeZoneTransition")]
-        pub fn get_time_zone_transition_with_transition_options(
+        pub fn get_time_zone_transition_with_direction(
             this: &ZonedDateTime,
             direction: &TransitionOptions,
         ) -> Result<Option<ZonedDateTime>, JsValue>;
@@ -3818,6 +3963,11 @@ pub mod temporal {
         }
         pub fn build(self) -> DurationRelativeToOptions {
             self.inner
+        }
+    }
+    impl From<DurationRelativeToOptions> for DurationRelativeToOptionsBuilder {
+        fn from(inner: DurationRelativeToOptions) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -3892,6 +4042,11 @@ pub mod temporal {
             self.inner
         }
     }
+    impl From<DurationRoundingOptions> for DurationRoundingOptionsBuilder {
+        fn from(inner: DurationRoundingOptions) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , extends = ToStringRoundingOptionsWithFractionalSeconds :: < ExcludeTimeUnitHourOrMinute > , no_deref , is_type_of = JsValue :: is_object)]
@@ -3945,6 +4100,11 @@ pub mod temporal {
             self.inner
         }
     }
+    impl From<DurationToStringOptions> for DurationToStringOptionsBuilder {
+        fn from(inner: DurationToStringOptions) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = DurationRelativeToOptions , extends = Object , is_type_of = JsValue :: is_object)]
@@ -3979,6 +4139,11 @@ pub mod temporal {
         }
         pub fn build(self) -> DurationTotalOptions {
             self.inner
+        }
+    }
+    impl From<DurationTotalOptions> for DurationTotalOptionsBuilder {
+        fn from(inner: DurationTotalOptions) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(experimental_generic_mono)]
@@ -4200,7 +4365,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if the duration has calendar units and `relativeTo` is not given"]
         #[doc = " * `TypeError` — if `relativeTo` is an object missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "total")]
-        pub fn total_with_duration_total_options(
+        pub fn total_with_total_of(
             this: &Duration,
             total_of: &DurationTotalOptions,
         ) -> Result<f64, Error>;
@@ -4367,6 +4532,11 @@ pub mod temporal {
             self.inner
         }
     }
+    impl From<InstantToStringOptions> for InstantToStringOptionsBuilder {
+        fn from(inner: InstantToStringOptions) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
@@ -4450,7 +4620,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn round_with_round_to_options(
+        pub fn round_with_round_to(
             this: &Instant,
             round_to: &RoundToOptions<TimeUnit>,
         ) -> Result<Instant, RangeError>;
@@ -4966,6 +5136,11 @@ pub mod temporal {
             self.inner
         }
     }
+    impl From<PlainMonthDayToPlainDateOptions> for PlainMonthDayToPlainDateOptionsBuilder {
+        fn from(inner: PlainMonthDayToPlainDateOptions) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
@@ -5249,6 +5424,11 @@ pub mod temporal {
             self.inner
         }
     }
+    impl From<PartialDateLikeObject> for PartialDateLikeObjectBuilder {
+        fn from(inner: PartialDateLikeObject) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum PluralizeTimeUnit {
@@ -5395,6 +5575,11 @@ pub mod temporal {
         }
         pub fn build(self) -> PartialDateTimeLikeObject {
             self.inner
+        }
+    }
+    impl From<PartialDateTimeLikeObject> for PartialDateTimeLikeObjectBuilder {
+        fn from(inner: PartialDateTimeLikeObject) -> Self {
+            Self { inner }
         }
     }
     #[wasm_bindgen(private)]
@@ -5563,6 +5748,11 @@ pub mod temporal {
             self.inner
         }
     }
+    impl From<PartialZonedDateTimeLikeObject> for PartialZonedDateTimeLikeObjectBuilder {
+        fn from(inner: PartialZonedDateTimeLikeObject) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -5637,6 +5827,11 @@ pub mod temporal {
         }
         pub fn build(self) -> PartialYearMonthLikeObject {
             self.inner
+        }
+    }
+    impl From<PartialYearMonthLikeObject> for PartialYearMonthLikeObjectBuilder {
+        fn from(inner: PartialYearMonthLikeObject) -> Self {
+            Self { inner }
         }
     }
 }

@@ -274,6 +274,9 @@ pub struct Repr {
 pub enum Kind {
     /// No result: no wire values.
     Unit,
+    /// A literal type's one value (§13): no wire values; the bridge
+    /// supplies it.
+    Lit(Literal),
     /// A result that never returns normally (`never`): no wire values, and
     /// the bridge throws a `TypeError` if the call returns.
     Never,
@@ -292,6 +295,9 @@ pub enum Kind {
         /// `bigint`, as its `u64` limbs (§10); the host bigint itself under
         /// the `host` carrier.
         bigint: bool,
+        /// `buffer`: JS gives an `ArrayBuffer` or any view, read as its
+        /// bytes.
+        buffer: bool,
     },
     /// `arr<T>`.
     Array {
@@ -819,6 +825,11 @@ impl<'a> Layouts<'a> {
         Ok(match t {
             Type::Unit if nullable => return invalid("`unit?` isn't a type"),
             Type::Unit => Kind::Unit,
+            Type::Lit(l) => Kind::Lit(l.clone()),
+            Type::Index(..) => {
+                let t = crate::keyed::erased(&self.keys.symbols, t, cx);
+                return self.kind(&t, cx, flow, nullable);
+            }
             Type::Never if nullable => return invalid("`never?` isn't a type"),
             Type::Never => Kind::Never,
             Type::Scalar(s) if nullable => Kind::NullScalar(*s, scalar_null(*s)),
@@ -843,14 +854,24 @@ impl<'a> Layouts<'a> {
                     writeback: matches!(t, Type::MutVec(_)),
                     nullable,
                     bigint: false,
+                    buffer: false,
                 }
             }
+            Type::Buffer => Kind::Vec {
+                elem: Scalar::U8,
+                carrier: p.vec,
+                writeback: false,
+                nullable,
+                bigint: false,
+                buffer: true,
+            },
             Type::BigInt => Kind::Vec {
                 elem: Scalar::U64,
                 carrier: p.vec,
                 writeback: false,
                 nullable,
                 bigint: true,
+                buffer: false,
             },
             Type::Array(e) => Kind::Array {
                 elem: Box::new(self.lower(e, cx, flow)?),
@@ -885,6 +906,13 @@ impl<'a> Layouts<'a> {
                 nullable,
             },
             Type::View { mutable, elem } if !nullable => match **elem {
+                Type::Buffer if !*mutable => {
+                    self.width("`*buffer`")?;
+                    Kind::View {
+                        elem: Scalar::U8,
+                        mutable: false,
+                    }
+                }
                 Type::Scalar(s) if is_vec_elem(s) => {
                     self.width("`*T[]`")?;
                     Kind::View {
@@ -1315,7 +1343,7 @@ impl<'a> Layouts<'a> {
 
     fn flatten(&self, r: &Repr, out: &mut Vec<ValType>) -> Result<()> {
         match &r.kind {
-            Kind::Unit | Kind::Never => {}
+            Kind::Unit | Kind::Never | Kind::Lit(_) => {}
             Kind::Scalar(s) | Kind::NullScalar(s, ScalarNull::Niche(_)) => out.push(carrier(*s)),
             Kind::NullScalar(s, ScalarNull::Present) => {
                 out.push(ValType::I32);
@@ -1450,7 +1478,7 @@ impl<'a> Layouts<'a> {
     fn place(&self, r: &Repr, e: &mut Elem) -> Result<()> {
         match &r.kind {
             // A tuple's `unit` element stores nothing.
-            Kind::Unit => {}
+            Kind::Unit | Kind::Lit(_) => {}
             Kind::View { .. } => return invalid("`*T[]` is legal only in import parameters"),
             Kind::Scalar(s) => Self::field(e, native_size(*s), FieldKind::Scalar(*s)),
             Kind::NullScalar(s, _) => {
@@ -1638,7 +1666,8 @@ impl<'a> Layouts<'a> {
             if mono {
                 self.lower(&self.qualify(t, &k.cx, &subst), &global, flow)
             } else {
-                self.lower(&erase_assoc(t, &k.cx), &k.cx, flow)
+                let t = crate::keyed::erased(&self.keys.symbols, &erase_assoc(t, &k.cx), &k.cx);
+                self.lower(&t, &k.cx, flow)
             }
         };
         let owner = match k.owner {
@@ -1743,6 +1772,19 @@ impl<'a> Layouts<'a> {
                 elem: qb(elem),
             },
             Type::Nullable(t, js_null) => Type::Nullable(qb(t), *js_null),
+            // A key a type argument gives picks its property. One left a
+            // value reads the index as its declaration erases it.
+            Type::Index(m, k) => {
+                let global = Context::default();
+                let found = match q(k) {
+                    Type::Lit(l) => crate::keyed::index(&self.keys.symbols, &q(m), &l, &global),
+                    _ => None,
+                };
+                match found {
+                    Some(t) => self.qualify(&t, &global, &HashMap::new()),
+                    None => q(&crate::keyed::erased(&self.keys.symbols, t, cx)),
+                }
+            }
             Type::Named(r) => {
                 if let Some(a) = cx.assoc(&r.path) {
                     let arg = subst.get(a.param.as_str());
@@ -1820,7 +1862,7 @@ impl<'a> Layouts<'a> {
 
     fn result(&self, r: &Repr) -> Result<Vec<Position>> {
         Ok(match r.kind {
-            Kind::Unit => Vec::new(),
+            Kind::Unit | Kind::Lit(_) => Vec::new(),
             _ => vec![self.position(Pos::Result, r.clone())?],
         })
     }

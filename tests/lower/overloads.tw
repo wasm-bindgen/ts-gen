@@ -1,6 +1,6 @@
-// `Store.Options`: the literal type `"text"` widens to `str`
-// `Store.Options`: the literal type `"json"` widens to `str`
-// `Store.Options`: the literal type `"arrayBuffer"` widens to `str`
+// `StoreReader.Mode`: the literal type `"byob"` widens to `str`
+// `StoreGetReaderOptions.Mode`: the literal type `"byob"` widens to `str`
+// `StoreHow.Mode`: the literal type `"exclusive"` widens to `str`
 // `PartialGetOptionsUndefined.type: undefined` holds no value, so it is not lowered
 ir 1;
 
@@ -53,7 +53,7 @@ interface Point {
 interface GetOptions<Type> {
   @js(object)
   new();
-  get type(): Type;
+  get type(): Type?;
   set type(value: Type);
   get ttl(): f64?;
   set ttl(value: f64);
@@ -62,15 +62,34 @@ interface GetOptions<Type> {
 interface Store {
   read(key: str): future<@js(null) str?>;
   read(key: str, options: PartialGetOptionsUndefined): future<@js(null) str?>;
-  @js(name = "read")
-  readText(key: str, options: GetOptions<Str>): future<@js(null) str?>;
-  @js(name = "read")
-  readJson<T = Any?>(key: str, options: GetOptions<Str>): future<@js(null) T?>;
-  @js(name = "read")
-  readArrayBuffer(key: str, options: GetOptions<Str>): future<@js(null) ArrayBuffer?>;
+  @js(name = "read", args = (key, options? { type = "text" }))
+  readText(key: str, options: GetOptions<Any?>?): future<@js(null) str?>;
+  @js(name = "read", args = (key, options? { type = "json" }))
+  readJson<T = Any?>(key: str, options: GetOptions<Any?>?): future<@js(null) T?>;
+  @js(name = "read", args = (key, options? { type = "arrayBuffer" }))
+  readArrayBuffer(key: str, options: GetOptions<Any?>?): future<@js(null) ArrayBuffer?>;
+  @js(args = (options? { type = "lines" }))
+  tail(options: GetOptions<Any?>?): str throws;
+  @js(args = (reader? { mode = "byob" }))
+  open(reader: StoreReader?): str throws;
   write(key: str, value: str): future<@js(null) bool?>;
   write(key: str, value: str, options: StoreOptions): future<@js(null) bool?>;
   write(key: str, value: str, options: StoreWriteOptions): future<bool>;
+  getReader(): str throws;
+  @js(name = "getReader", args = (options? { mode = "byob" }), let options = StoreGetReaderOptions.new())
+  getReaderByob(): f64 throws;
+  @js(args = (how? { mode = "exclusive" }), let how = StoreHow.new())
+  lock(): str throws;
+}
+
+interface StoreReader {
+  @js(object)
+  new();
+  get mode(): str;
+  @js(name = "mode", args = ("byob"))
+  set modeByob();
+  get size(): f64?;
+  set size(value: f64);
 }
 
 interface StoreOptions {
@@ -85,6 +104,22 @@ interface StoreWriteOptions {
   new();
   get ttl(): f64;
   set ttl(value: f64);
+}
+
+interface StoreGetReaderOptions {
+  @js(object)
+  new();
+  get mode(): str;
+  @js(name = "mode", args = ("byob"))
+  set modeByob();
+}
+
+interface StoreHow {
+  @js(object)
+  new();
+  get mode(): str;
+  @js(name = "mode", args = ("exclusive"))
+  set modeExclusive();
 }
 
 interface PartialGetOptionsUndefined {

@@ -186,6 +186,11 @@ pub mod my_module {
             self.inner
         }
     }
+    impl From<WorkResult> for WorkResultBuilder {
+        fn from(inner: WorkResult) -> Self {
+            Self { inner }
+        }
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -278,6 +283,11 @@ impl TreeNodeBuilder {
         self.inner
     }
 }
+impl From<TreeNode> for TreeNodeBuilder {
+    fn from(inner: TreeNode) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -318,6 +328,24 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Iterable;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    pub fn iterator(this: &Iterable) -> Iterator;
+    #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
+    pub fn try_iterator(this: &Iterable) -> Result<Iterator, JsValue>;
+}
+impl<'a> ::core::iter::IntoIterator for &'a Iterable {
+    type Item = JsValue;
+    type IntoIter = ::core::iter::Scan<
+        ::core::iter::Repeat<()>,
+        Iterator,
+        fn(&mut Iterator, ()) -> Option<JsValue>,
+    >;
+    fn into_iter(self) -> Self::IntoIter {
+        ::core::iter::repeat(()).scan(self.iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value())
+        })
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -622,6 +650,11 @@ impl FetchOptionsBuilder {
         self.inner
     }
 }
+impl From<FetchOptions> for FetchOptionsBuilder {
+    fn from(inner: FetchOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -657,6 +690,11 @@ impl SimpleConfigBuilder {
     }
     pub fn build(self) -> SimpleConfig {
         self.inner
+    }
+}
+impl From<SimpleConfig> for SimpleConfigBuilder {
+    fn from(inner: SimpleConfig) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]
@@ -718,6 +756,11 @@ impl NotificationOptionsBuilder {
     }
     pub fn build(self) -> NotificationOptions {
         self.inner
+    }
+}
+impl From<NotificationOptions> for NotificationOptionsBuilder {
+    fn from(inner: NotificationOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]

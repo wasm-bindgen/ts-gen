@@ -78,7 +78,7 @@ extern "C" {
     #[wasm_bindgen(variadic, catch, js_name = "bagOf")]
     pub fn bag_of<T>(items: &[T]) -> Result<Bag<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
@@ -317,6 +317,11 @@ impl LabelOptionsBuilder {
         self.inner
     }
 }
+impl From<LabelOptions> for LabelOptionsBuilder {
+    fn from(inner: LabelOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "describeOptions")]
@@ -342,9 +347,302 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn value(this: &Total) -> f64;
 }
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Mark;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new(text: impl ::wasm_bindgen::JsStringLike) -> Result<Mark, JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &Mark) -> String;
+    #[wasm_bindgen(method, getter, js_name = "text")]
+    pub fn text_js_string(this: &Mark) -> JsString;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn marks() -> Result<Vec<MarkOrStr>, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "maybeMarks")]
+    pub fn maybe_marks() -> Result<Vec<Option<MarkOrStr>>, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeMarks")]
+    pub fn describe_marks(values: &[MarkOrStr]) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeMarks")]
+    pub fn describe_marks_js_string(values: &[MarkOrStr]) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeMaybeMarks")]
+    pub fn describe_maybe_marks(values: &[Nullable<MarkOrStr>]) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeMaybeMarks")]
+    pub fn describe_maybe_marks_js_string(
+        values: &[Nullable<MarkOrStr>],
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type MarkOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn marks(this: &MarkOptions) -> Option<Vec<MarkOrStr>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_marks(this: &MarkOptions, val: &[MarkOrStr]);
+}
+impl MarkOptions {
+    pub fn new() -> MarkOptions {
+        Self::builder().build()
+    }
+    pub fn builder() -> MarkOptionsBuilder {
+        MarkOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for MarkOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct MarkOptionsBuilder {
+    inner: MarkOptions,
+}
+impl MarkOptionsBuilder {
+    pub fn marks(self, val: &[MarkOrStr]) -> Self {
+        self.inner.set_marks(val);
+        self
+    }
+    pub fn build(self) -> MarkOptions {
+        self.inner
+    }
+}
+impl From<MarkOptions> for MarkOptionsBuilder {
+    fn from(inner: MarkOptions) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeMarkOptions")]
+    pub fn describe_mark_options(options: &MarkOptions) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeMarkOptions")]
+    pub fn describe_mark_options_js_string(options: &MarkOptions) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type MarkRoute;
+    #[wasm_bindgen(method, getter)]
+    pub fn to(this: &MarkRoute) -> Option<MarkRouteToKind>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_to(this: &MarkRoute, val: &Mark);
+    #[wasm_bindgen(method, setter, js_name = "to")]
+    pub fn set_to_with_str(this: &MarkRoute, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "to")]
+    pub fn set_to_with_slice(this: &MarkRoute, val: &[MarkOrStr]);
+}
+impl MarkRoute {
+    pub fn new() -> MarkRoute {
+        Self::builder().build()
+    }
+    pub fn builder() -> MarkRouteBuilder {
+        MarkRouteBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for MarkRoute {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct MarkRouteBuilder {
+    inner: MarkRoute,
+}
+impl MarkRouteBuilder {
+    pub fn to(self, val: &Mark) -> Self {
+        self.inner.set_to(val);
+        self
+    }
+    pub fn to_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_to_with_str(val);
+        self
+    }
+    pub fn to_with_slice(self, val: &[MarkOrStr]) -> Self {
+        self.inner.set_to_with_slice(val);
+        self
+    }
+    pub fn build(self) -> MarkRoute {
+        self.inner
+    }
+}
+impl From<MarkRoute> for MarkRouteBuilder {
+    fn from(inner: MarkRoute) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn route() -> Result<MarkRoute, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeRoute")]
+    pub fn describe_route(route: &MarkRoute) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeRoute")]
+    pub fn describe_route_js_string(route: &MarkRoute) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Mode {
+    Fast = "fast",
+    Slow = "slow",
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn modes(values: &[Mode]) -> Result<Vec<Mode>, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn levels(values: &[LevelsReturn]) -> Result<Vec<LevelsReturn>, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "maybeKinds")]
+    pub fn maybe_kinds(
+        values: &[Nullable<MaybeKindsReturn>],
+    ) -> Result<Vec<Option<MaybeKindsReturn>>, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ModeOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn modes(this: &ModeOptions) -> Option<Vec<Mode>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_modes(this: &ModeOptions, val: &[Mode]);
+    #[wasm_bindgen(method, getter)]
+    pub fn kinds(this: &ModeOptions) -> Option<Vec<ModeOptionsKinds>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_kinds(this: &ModeOptions, val: &[ModeOptionsKinds]);
+    #[wasm_bindgen(method, getter)]
+    pub fn levels(this: &ModeOptions) -> Option<Vec<ModeOptionsLevels>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_levels(this: &ModeOptions, val: &[ModeOptionsLevels]);
+}
+impl ModeOptions {
+    pub fn new() -> ModeOptions {
+        Self::builder().build()
+    }
+    pub fn builder() -> ModeOptionsBuilder {
+        ModeOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for ModeOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct ModeOptionsBuilder {
+    inner: ModeOptions,
+}
+impl ModeOptionsBuilder {
+    pub fn modes(self, val: &[Mode]) -> Self {
+        self.inner.set_modes(val);
+        self
+    }
+    pub fn kinds(self, val: &[ModeOptionsKinds]) -> Self {
+        self.inner.set_kinds(val);
+        self
+    }
+    pub fn levels(self, val: &[ModeOptionsLevels]) -> Self {
+        self.inner.set_levels(val);
+        self
+    }
+    pub fn build(self) -> ModeOptions {
+        self.inner
+    }
+}
+impl From<ModeOptions> for ModeOptionsBuilder {
+    fn from(inner: ModeOptions) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeModeOptions")]
+    pub fn describe_mode_options(options: &ModeOptions) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeModeOptions")]
+    pub fn describe_mode_options_js_string(options: &ModeOptions) -> Result<JsString, JsValue>;
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum GetValueKind {
     String(String),
     VecOfBool(Vec<bool>),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum MarkOrStr {
+    Mark(Mark),
+    String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum MarkRouteToKind {
+    Mark(Mark),
+    String(String),
+    VecOfJsValue(Vec<MarkOrStr>),
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LevelsReturn {
+    N1 = 1,
+    N2 = 2,
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MaybeKindsReturn {
+    X = "x",
+    Y = "y",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ModeOptionsKinds {
+    X = "x",
+    Y = "y",
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ModeOptionsLevels {
+    N1 = 1,
+    N2 = 2,
 }

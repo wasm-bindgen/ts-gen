@@ -3,6 +3,9 @@ ir 1;
 class Response {
   get status(): u16;
   get ok(): bool;
+  get url(): str;
+  get type(): str;
+  get body(): @js(null) ReadableStream<Uint8Array>?;
   /// Creates a clone of the response.
   ///
   /// ## Errors
@@ -20,6 +23,12 @@ interface ResponseInit {
   set statusText(value: str);
 }
 
+interface ReadableStream<R = Any?> {
+  @js(object)
+  new();
+  get locked(): bool;
+}
+
 class Cache {
   put(url: str): future<unit>;
   put(url: str, ttl: u32): future<unit>;
@@ -35,6 +44,14 @@ interface Storage {
 interface Console {
   @js(args = (...data))
   log(data: arr<Any?>);
+}
+
+interface Bucket {
+  put(key: str, bodyBytes: Uint8Array): future<unit>;
+  put(key: str, bodyBytes: u8[]): future<unit>;
+  put(key: str, bodyBytes: *u8[]): future<unit>;
+  upload(key: str, data: buffer): future<unit>;
+  upload(key: str, data: *buffer): future<unit>;
 }
 
 get console(): Console;
@@ -80,3 +97,9 @@ enum RequestInfo {
   Request(Request<Any?, Incoming>);
   Str(str);
 }
+
+class Uint8Array {}
+
+class ArrayBuffer {}
+
+interface ArrayBufferView {}

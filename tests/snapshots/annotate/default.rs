@@ -13,6 +13,12 @@ extern "C" {
     pub fn status(this: &Response) -> u16;
     #[wasm_bindgen(method, getter)]
     pub fn ok(this: &Response) -> bool;
+    #[wasm_bindgen(method, getter)]
+    pub fn url(this: &Response) -> String;
+    #[wasm_bindgen(method, getter, js_name = "type")]
+    pub fn type_(this: &Response) -> String;
+    #[wasm_bindgen(method, getter)]
+    pub fn body(this: &Response) -> Option<ReadableStream<Uint8Array>>;
     #[doc = " Creates a clone of the response."]
     #[doc = ""]
     #[doc = " ## Errors"]
@@ -73,6 +79,34 @@ impl ResponseInitBuilder {
         self.inner
     }
 }
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ReadableStream<R: ::wasm_bindgen::JsGeneric = JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn locked<R: ::wasm_bindgen::JsGeneric>(this: &ReadableStream<R>) -> bool;
+}
+impl<R: ::wasm_bindgen::JsGeneric> ReadableStream<R> {
+    #[allow(clippy::new_without_default)]
+    pub fn new_typed() -> ReadableStream<R> {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+impl ReadableStream<JsValue> {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -124,6 +158,64 @@ extern "C" {
     pub type Console;
     #[wasm_bindgen(method, variadic)]
     pub fn log(this: &Console, data: &[JsValue]);
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Bucket;
+    #[wasm_bindgen(method, catch)]
+    pub async fn put(
+        this: &Bucket,
+        key: &str,
+        #[wasm_bindgen(slice = "view")] body_bytes: &[u8],
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_promise(
+        this: &Bucket,
+        key: &str,
+        #[wasm_bindgen(slice = "view")] body_bytes: &[u8],
+    ) -> Promise<Undefined>;
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    pub async fn put_with_uint8_array(
+        this: &Bucket,
+        key: &str,
+        body_bytes: &Uint8Array,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_with_uint8_array_promise(
+        this: &Bucket,
+        key: &str,
+        body_bytes: &Uint8Array,
+    ) -> Promise<Undefined>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn upload(this: &Bucket, key: &str, data: &ArrayBuffer) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "upload")]
+    pub fn upload_promise(this: &Bucket, key: &str, data: &ArrayBuffer) -> Promise<Undefined>;
+    #[wasm_bindgen(method, catch, js_name = "upload")]
+    pub async fn upload_with_typed_array(
+        this: &Bucket,
+        key: &str,
+        data: &Object,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "upload")]
+    pub fn upload_with_typed_array_promise(
+        this: &Bucket,
+        key: &str,
+        data: &Object,
+    ) -> Promise<Undefined>;
+    #[wasm_bindgen(method, catch, js_name = "upload")]
+    pub async fn upload_with_slice(
+        this: &Bucket,
+        key: &str,
+        #[wasm_bindgen(slice = "view")] data: &[u8],
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "upload")]
+    pub fn upload_with_slice_promise(
+        this: &Bucket,
+        key: &str,
+        #[wasm_bindgen(slice = "view")] data: &[u8],
+    ) -> Promise<Undefined>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -258,16 +350,22 @@ extern "C" {
 }
 impl<Meta: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric> Request<Meta, Cf> {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Request<Meta, Cf> {
+    pub fn new_typed() -> Request<Meta, Cf> {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
         }
     }
 }
+impl Request<JsValue, Incoming> {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+}
 impl<Meta: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric> Default for Request<Meta, Cf> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 #[allow(dead_code)]

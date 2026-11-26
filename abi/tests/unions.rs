@@ -121,3 +121,42 @@ fn invalid() {
         Vec::<String>::new()
     );
 }
+
+#[test]
+fn buffer_variants() {
+    let ir = parse(
+        "class ArrayBuffer {}\ninterface ArrayBufferView {}\nenum Data { Text(str); Buffer(buffer); }\nclass C {\n  put(k: str, v: buffer?): u32;\n  send(d: union Data): u32;\n  view(v: *buffer);\n}\n",
+    );
+    let keys = Keys::new(&ir);
+    let all = |name: &str| {
+        let k = keys
+            .members()
+            .into_iter()
+            .find(|k| k.key.contains(name))
+            .unwrap();
+        union::variants(&keys, &k)
+            .into_iter()
+            .map(|(k, _)| k)
+            .collect::<Vec<_>>()
+    };
+    // A `buffer` is also written as either class it's one of.
+    assert_eq!(
+        all("#put("),
+        ["C#put(str,ArrayBuffer?)", "C#put(str,ArrayBufferView?)"]
+    );
+    assert_eq!(
+        all("#send("),
+        [
+            "C#send(str)",
+            "C#send(buffer)",
+            "C#send(ArrayBuffer)",
+            "C#send(ArrayBufferView)"
+        ]
+    );
+    assert_eq!(all("#view("), Vec::<String>::new());
+    assert!(validate::validate(&ir).is_ok());
+    assert_eq!(
+        errors("class Box<T> {}\nf(b: Box<buffer>);"),
+        ["3:3: `buffer` has no box, so it isn't a type argument"]
+    );
+}

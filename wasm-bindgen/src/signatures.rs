@@ -81,7 +81,8 @@ impl SignatureKind {
         !matches!(self, Self::Constructor | Self::Setter | Self::StaticSetter)
     }
 
-    /// Whether the binding always requires `catch` (constructors do).
+    /// Whether the binding catches by default, without `--fallible`
+    /// (constructors do; `@throws {never}` still opts out).
     pub fn always_catches(self) -> bool {
         matches!(self, Self::Constructor)
     }
@@ -227,6 +228,12 @@ pub struct ExpandedSignature {
     /// [`FunctionSignature::literal`]); the literal positions render as
     /// `&str` in `params`.
     pub literal_arms: Vec<LiteralArm>,
+    /// The literals the binding fills dictionary parameters with, where it
+    /// has no cohort: `(position, field, literal)`.
+    pub fills: Vec<(usize, String, String)>,
+    /// The positions of dictionary parameters the binding makes itself,
+    /// filled with constants alone: its wrapper drops them.
+    pub made: Vec<usize>,
 }
 
 /// One value assignment for the string-literal parameters of an
@@ -235,6 +242,14 @@ pub struct ExpandedSignature {
 pub struct LiteralArm {
     pub values: Vec<(usize, String)>,
     pub overload: usize,
+    /// The literals are type arguments of the parameters at the positions
+    /// (`options: GetOptions<"json">`) rather than the parameters
+    /// themselves: each arm is a binding of its own, keyed by name and
+    /// return, which keeps the parameter.
+    pub in_type_arg: bool,
+    /// The fields of those parameters the literals are values of, which
+    /// the arm's binding fills: `(position, field, literal)`.
+    pub fills: Vec<(usize, String, String)>,
 }
 
 /// A literal-keyed cohort attached to an extern binding: the binding takes
@@ -255,6 +270,13 @@ pub struct LiteralSpec {
     /// Declared once the callable's other private names are claimed (see
     /// [`build_signatures`]).
     pub binding: String,
+    /// The dictionary field each of `positions` names, when the literals
+    /// fill the parameters there rather than replace them: the wrapper
+    /// keeps the parameter and passes a copy of it with the fields set.
+    pub fields: Vec<String>,
+    /// Those of `positions` whose parameter the wrapper drops, passing an
+    /// object it makes with the fields set.
+    pub made: Vec<usize>,
 }
 
 impl LiteralSpec {
@@ -264,7 +286,25 @@ impl LiteralSpec {
             arms,
             stem,
             binding: String::new(),
+            fields: Vec::new(),
+            made: Vec::new(),
         }
+    }
+
+    /// The spec of a binding `name` filling `fills`, if any.
+    fn filling(fills: &[(usize, String, String)], made: &[usize], name: &str) -> Option<Self> {
+        (!fills.is_empty()).then(|| Self {
+            fields: fills.iter().map(|f| f.1.clone()).collect(),
+            made: made.to_vec(),
+            ..Self::new(
+                fills.iter().map(|f| f.0).collect(),
+                vec![(
+                    fills.iter().map(|f| f.2.clone()).collect(),
+                    name.to_string(),
+                )],
+                name.to_string(),
+            )
+        })
     }
 
     /// The spec of a derived form (`try_`, `_promise`, `_js_string`): `f`
@@ -276,7 +316,11 @@ impl LiteralSpec {
             .iter()
             .map(|(lits, name)| (lits.clone(), names.declare(&f(name), Suffix::Snake)))
             .collect();
-        Self::new(self.positions.clone(), arms, f(&self.stem))
+        Self {
+            fields: self.fields.clone(),
+            made: self.made.clone(),
+            ..Self::new(self.positions.clone(), arms, f(&self.stem))
+        }
     }
 }
 
@@ -589,16 +633,40 @@ pub fn expand_signatures(
         .filter(|(_, s)| s.is_none())
         .map(|(sig, _)| sig.clone())
         .collect();
-    let mut plain_suffixes = compute_suffixes(&plain).into_iter();
-    let keyed_suffixes = suffixes_among(&plain, stripped.iter().flatten());
+    // A setter's parameter has no name of its own to give an arm.
+    let scope = overloads.first().map(|o| o.body_scope);
+    let is_dictionary = |ty: &TypeRef| match (cgctx, scope) {
+        (Some(c), Some(scope)) if !setter => is_dictionary_type(ty, c, scope),
+        _ => false,
+    };
+    let dictionary: Dictionaries<'_> = &is_dictionary;
+    let mut plain_suffixes = compute_suffixes(&plain, dictionary).into_iter();
+    let keyed_suffixes = suffixes_among(&plain, stripped.iter().flatten(), dictionary);
     let mut keyed_suffixes = keyed_suffixes.into_iter();
     let suffixes: Vec<String> = stripped
         .iter()
-        .map(|s| match s {
-            None => plain_suffixes.next(),
-            Some(_) => keyed_suffixes.next(),
+        .zip(&deduped)
+        .zip(&arms)
+        .map(|((s, sig), arms)| {
+            let suffix = match s {
+                None => plain_suffixes.next(),
+                Some(_) => keyed_suffixes.next(),
+            }
+            .unwrap_or_default();
+            if s.is_none() || !arms[0].in_type_arg {
+                return suffix;
+            }
+            // A type-argument cohort keeps its parameters, so it names
+            // them: `get_json_with_options`, `get_json_with_slice_and_options`.
+            arms[0].values.iter().fold(suffix, |acc, &(i, _)| {
+                let name = to_snake_case(&sig[i].name);
+                if acc.is_empty() {
+                    format!("_with_{name}")
+                } else {
+                    format!("{acc}_and_{name}")
+                }
+            })
         })
-        .map(Option::unwrap_or_default)
         .collect();
     suffixes
         .into_iter()
@@ -615,7 +683,7 @@ pub fn expand_signatures(
                 && !params.is_empty()
                 && params.iter().all(|p| p.type_ref == TypeRef::Null)
             {
-                name_suffix = compute_suffixes(&[Vec::new(), params.clone()])
+                name_suffix = compute_suffixes(&[Vec::new(), params.clone()], dictionary)
                     .pop()
                     .unwrap_or_default();
             }
@@ -624,6 +692,8 @@ pub fn expand_signatures(
                 name_suffix,
                 params: leading(&params, overload),
                 literal_arms,
+                fills: Vec::new(),
+                made: Vec::new(),
             }
         })
         .collect()
@@ -686,15 +756,16 @@ fn takes_undefined_as_none(alt: &TypeRef) -> bool {
 fn suffixes_among<'a>(
     cohort: &[Vec<ConcreteParam>],
     extras: impl Iterator<Item = &'a Vec<ConcreteParam>> + Clone,
+    dictionary: Dictionaries<'_>,
 ) -> Vec<String> {
-    let cohort_suffixes = compute_suffixes(cohort);
+    let cohort_suffixes = compute_suffixes(cohort, dictionary);
     let mut all = cohort.to_vec();
     for extra in extras.clone() {
         if !all.iter().any(|s| concrete_params_eq(s, extra)) {
             all.push(extra.clone());
         }
     }
-    let all_suffixes = compute_suffixes(&all);
+    let all_suffixes = compute_suffixes(&all, dictionary);
     extras
         .map(|extra| {
             if let Some(pos) = cohort.iter().position(|s| concrete_params_eq(s, extra)) {
@@ -715,8 +786,9 @@ fn suffixes_among<'a>(
 }
 
 /// `candidate` as a literal arm of `kept`: both carry string literals at
-/// the same positions and agree everywhere else. `None` when `kept` has
-/// no literal parameter or the shapes differ.
+/// the same positions, as parameters or as type arguments of a parameter
+/// (not both), and agree everywhere else. `None` when `kept` has no literal
+/// or the shapes differ.
 fn literal_arm(
     kept: &[ConcreteParam],
     candidate: &[ConcreteParam],
@@ -726,19 +798,66 @@ fn literal_arm(
         return None;
     }
     let mut values = Vec::new();
+    let mut type_args = Vec::new();
     for (i, (k, c)) in kept.iter().zip(candidate).enumerate() {
+        if k.name != c.name || k.variadic != c.variadic {
+            return None;
+        }
         match (&k.type_ref, &c.type_ref) {
-            (TypeRef::StringLiteral(_), TypeRef::StringLiteral(lit)) if k.name == c.name => {
+            (TypeRef::StringLiteral(_), TypeRef::StringLiteral(lit)) => {
                 values.push((i, lit.clone()));
             }
-            _ if k.name == c.name && k.type_ref == c.type_ref && k.variadic == c.variadic => {}
+            (
+                TypeRef::Reference {
+                    segments: ks,
+                    generic_args: ka,
+                },
+                TypeRef::Reference {
+                    segments: cs,
+                    generic_args: ca,
+                },
+            ) if has_literal_arg(ka) => {
+                if ks != cs || ka.len() != ca.len() {
+                    return None;
+                }
+                let mut lits = Vec::new();
+                for (ka, ca) in ka.iter().zip(ca) {
+                    match (ka, ca) {
+                        (TypeRef::StringLiteral(_), TypeRef::StringLiteral(lit)) => {
+                            lits.push(lit.clone());
+                        }
+                        _ if ka == ca => {}
+                        _ => return None,
+                    }
+                }
+                if lits.is_empty() {
+                    return None;
+                }
+                type_args.push((i, lits.join("_")));
+            }
+            _ if k.type_ref == c.type_ref => {}
             _ => return None,
         }
     }
-    (!values.is_empty()).then_some(LiteralArm {
-        values,
-        overload: index,
-    })
+    match (values.is_empty(), type_args.is_empty()) {
+        (false, true) => Some(LiteralArm {
+            values,
+            overload: index,
+            in_type_arg: false,
+            fills: Vec::new(),
+        }),
+        (true, false) => Some(LiteralArm {
+            values: type_args,
+            overload: index,
+            in_type_arg: true,
+            fills: Vec::new(),
+        }),
+        _ => None,
+    }
+}
+
+fn has_literal_arg(args: &[TypeRef]) -> bool {
+    args.iter().any(|a| matches!(a, TypeRef::StringLiteral(_)))
 }
 
 /// Index of the expansion that owns the unsuffixed name; see the Phase 3
@@ -777,8 +896,8 @@ pub struct Overload<'a> {
     ///   error).
     /// * `Throws::Never` → caller declares the callable never throws.
     ///   Sync callables get *no* `try_` companion; a promise-returning
-    ///   one drops `catch` and returns `T` or `Promise<T>`. Constructors
-    ///   ignore this and still catch (per JS `new` semantics).
+    ///   one drops `catch` and returns `T` or `Promise<T>`. A constructor
+    ///   returns the type bare.
     pub throws: &'a Throws,
     /// Declared `async`: see [`CallableSpec::call_never_throws`].
     pub async_modifier: bool,
@@ -835,12 +954,12 @@ impl CallableSpec<'_> {
 ///     promise.
 /// * **`try_` companion**: for sync, non-setter, non-constructor callables,
 ///   each primary `name` gets a fallible `try_name` sibling.
-/// * **Constructor catches always**: per JS semantics; the primary signature
-///   is `catch: true` and there's no `try_` variant.
+/// * **Constructors catch by default**: `new` can throw in JS; the primary
+///   signature is `catch: true` and there's no `try_` variant.
 /// * **`Throws::Never`**: the caller declared the callable never throws
 ///   (`@throws {never}`). Sync callables get *no* `try_` companion, and a
 ///   promise-returning one drops `catch` and returns `T` or `Promise<T>`.
-///   Constructors ignore this — they always catch per JS `new` semantics.
+///   Constructors drop `catch` and return the type bare.
 /// * **`never` returns**: a callable returning `never` (or `Promise<never>`)
 ///   never completes normally, so only its catching form is emitted, typed
 ///   `()`: the primary itself catches, under every policy, with no `try_`
@@ -866,6 +985,19 @@ pub(crate) fn build_signatures_from(
     names: &mut LocalScope,
     cgctx: Option<&CodegenContext<'_>>,
 ) -> Vec<FunctionSignature> {
+    build_signatures_postfixed(spec, expansions, "", names, cgctx)
+}
+
+/// [`build_signatures_from`] with `postfix` closing every primary name,
+/// which the derived forms then build on (`list_typed`,
+/// `list_typed_promise`, `try_list_typed`).
+pub(crate) fn build_signatures_postfixed(
+    spec: &CallableSpec<'_>,
+    expansions: Vec<ExpandedSignature>,
+    postfix: &str,
+    names: &mut LocalScope,
+    cgctx: Option<&CodegenContext<'_>>,
+) -> Vec<FunctionSignature> {
     let base = spec
         .rust_name
         .map_or_else(|| base_rust_name(spec.js_name, spec.kind), ident_chars);
@@ -887,13 +1019,37 @@ pub(crate) fn build_signatures_from(
     }
     let mut units: Vec<Unit> = Vec::new();
     for exp in expansions {
+        if exp.literal_arms.len() >= 2 && exp.literal_arms[0].in_type_arg {
+            for arm in &exp.literal_arms {
+                let tag = arm
+                    .values
+                    .iter()
+                    .map(|(_, v)| to_snake_case(v))
+                    .collect::<Vec<_>>()
+                    .join("_");
+                let candidate =
+                    public_rust_name(&format!("{base}_{tag}{}{postfix}", exp.name_suffix));
+                let name = names.declare(&candidate, Suffix::Snake);
+                units.push(Unit {
+                    params: exp.params.clone(),
+                    overload: arm.overload,
+                    literal: LiteralSpec::filling(&arm.fills, &[], &name),
+                    primary_name: name,
+                });
+            }
+            continue;
+        }
         if exp.literal_arms.len() < 2 {
-            let primary_candidate = public_rust_name(&join_suffix(&base, &exp.name_suffix));
+            let primary_candidate = public_rust_name(&format!(
+                "{}{postfix}",
+                join_suffix(&base, &exp.name_suffix)
+            ));
+            let name = names.declare(&primary_candidate, Suffix::Snake);
             units.push(Unit {
                 params: exp.params,
                 overload: exp.overload,
-                primary_name: names.declare(&primary_candidate, Suffix::Snake),
-                literal: None,
+                literal: LiteralSpec::filling(&exp.fills, &exp.made, &name),
+                primary_name: name,
             });
             continue;
         }
@@ -912,7 +1068,7 @@ pub(crate) fn build_signatures_from(
                 .map(|l| to_snake_case(l))
                 .collect::<Vec<_>>()
                 .join("_");
-            let candidate = public_rust_name(&format!("{base}_{tag}{}", exp.name_suffix));
+            let candidate = public_rust_name(&format!("{base}_{tag}{}{postfix}", exp.name_suffix));
             let name = names.declare(&candidate, Suffix::Snake);
             match groups.iter_mut().find(|(r, _, _)| *r == ret) {
                 Some((_, _, arms)) => arms.push((literals, name)),
@@ -922,7 +1078,10 @@ pub(crate) fn build_signatures_from(
         let shared = groups.len() == 1;
         for (_, overload, arms) in groups {
             let stem = if shared {
-                public_rust_name(&join_suffix(&base, &exp.name_suffix))
+                public_rust_name(&format!(
+                    "{}{postfix}",
+                    join_suffix(&base, &exp.name_suffix)
+                ))
             } else {
                 arms[0].1.clone()
             };
@@ -965,10 +1124,11 @@ pub(crate) fn build_signatures_from(
             (None, true) => TypeRef::Void,
             _ => overload.return_type.clone(),
         };
-        // `Throws::Never` suppresses every fallible form — except for
-        // constructors, which always catch (`new` can always throw in JS),
-        // and for a `never` return, which contradicts it and wins.
-        let nothrow = overload.throws.is_never() && !spec.kind.always_catches() && !never_returns;
+        // `Throws::Never` suppresses every fallible form, constructors
+        // included: `new` can throw in JS, so the default is to catch, but a
+        // declaration saying it does not is honored like any other member.
+        // A `never` return contradicts it and wins.
+        let nothrow = overload.throws.is_never() && !never_returns;
         // A sync callable that can throw gets a catching form: as the
         // `try_` companion by default, or as the primary itself under
         // `--fallible` or when it returns `never`.
@@ -988,11 +1148,10 @@ pub(crate) fn build_signatures_from(
         let primary_literal = literal.clone();
 
         // Primary variant catches when:
-        // * the kind always catches (constructors), OR
-        // * it returns a promise — *unless* `Throws::Never` opts out, OR
+        // * the kind catches by default (constructors), OR
+        // * it returns a promise — *unless* `Throws::Never` opts out of either, OR
         // * it's sync and can throw, under `--fallible` or returning `never`.
-        let primary_catches = spec.kind.always_catches()
-            || (promise && !nothrow)
+        let primary_catches = (!nothrow && (spec.kind.always_catches() || promise))
             || (sync_fallible && primary_is_catching);
         let primary = FunctionSignature {
             rust_name: primary_name.clone(),
@@ -1188,14 +1347,52 @@ fn push_with_js_string_return(
 /// Public alias of [`compute_suffixes`] for callers in sibling modules
 /// that build their own concrete signature lists.
 pub fn compute_suffixes_pub(expansions: &[Vec<ConcreteParam>]) -> Vec<String> {
-    compute_suffixes(expansions)
+    compute_suffixes(expansions, &|_| false)
 }
 
-fn compute_suffixes(expansions: &[Vec<ConcreteParam>]) -> Vec<String> {
+/// [`compute_suffixes_pub`] for a callable's own parameters, whose
+/// dictionary arms are named by parameter (see [`compute_rust_names`]).
+pub(crate) fn compute_suffixes_in(
+    expansions: &[Vec<ConcreteParam>],
+    cgctx: &CodegenContext<'_>,
+    scope: ScopeId,
+) -> Vec<String> {
+    compute_suffixes(expansions, &|ty| is_dictionary_type(ty, cgctx, scope))
+}
+
+/// Whether a type is a dictionary, for [`compute_rust_names`].
+type Dictionaries<'a> = &'a dyn Fn(&TypeRef) -> bool;
+
+/// A reference to a dictionary interface (an options bag).
+fn is_dictionary_type(ty: &TypeRef, cgctx: &CodegenContext<'_>, scope: ScopeId) -> bool {
+    let core = ty.split_empties().map(|(core, _)| core);
+    let TypeRef::Reference { segments, .. } = core.as_ref().unwrap_or(ty) else {
+        return false;
+    };
+    let [name] = segments.as_slice() else {
+        return false;
+    };
+    cgctx
+        .gctx
+        .scopes
+        .resolve(scope, name)
+        .is_some_and(|id| match &cgctx.gctx.get_type(id).kind {
+            ts_gen::ir::TypeKind::Interface(i) => {
+                i.classification == ts_gen::ir::InterfaceClassification::Dictionary
+            }
+            ts_gen::ir::TypeKind::DiscriminatedUnion(_) => true,
+            _ => false,
+        })
+}
+
+fn compute_suffixes(
+    expansions: &[Vec<ConcreteParam>],
+    dictionary: Dictionaries<'_>,
+) -> Vec<String> {
     // Use a placeholder base — `BASE` is just a prefix that won't appear in
     // any param name, so we can safely strip it back off.
     const BASE: &str = "BASE";
-    compute_rust_names(BASE, expansions)
+    compute_rust_names(BASE, expansions, dictionary)
         .into_iter()
         .map(|name| {
             // `compute_rust_names` returns either `BASE` (primary, no suffix)
@@ -1450,6 +1647,10 @@ fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId
     let mut out: Vec<TypeRef> = Vec::new();
     if flatten_into(ty, cgctx, scope, true, &mut out) {
         pair_typed_array_slice(&mut out, cgctx, scope);
+        match CodegenContext::generic_mono(cgctx) {
+            true => out = group_buffers(out, cgctx, scope),
+            false => add_buffer_bytes(&mut out, cgctx, scope),
+        }
         return split_null_arm(out);
     }
     if let Some(c) = cgctx {
@@ -1475,6 +1676,126 @@ pub(crate) fn union_alias_alternatives(
 ) -> Option<Vec<TypeRef>> {
     let mut out = Vec::new();
     flatten_into(target, Some(cgctx), scope, false, &mut out).then_some(out)
+}
+
+/// `ArrayBuffer | ArrayBufferView`, the IR's `buffer`.
+pub(crate) fn buffer_union() -> TypeRef {
+    TypeRef::union([TypeRef::ident("ArrayBuffer"), TypeRef::ArrayBufferView])
+}
+
+pub(crate) fn is_buffer(ty: &TypeRef) -> bool {
+    *ty == buffer_union()
+}
+
+/// Whether `ty` is the two classes of a `buffer`, or an alias of them.
+pub(crate) fn names_buffer(
+    ty: &TypeRef,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> bool {
+    let (mut t, mut at) = (ty.clone(), scope);
+    for _ in 0..8 {
+        if super::ir_types::buffer_pair(&t) {
+            return true;
+        }
+        let TypeRef::Reference {
+            segments,
+            generic_args,
+        } = &t
+        else {
+            return false;
+        };
+        if !generic_args.is_empty() {
+            return false;
+        }
+        let Some((target, s)) = cgctx.and_then(|c| c.resolve_alias(&segments.join("."), at)) else {
+            return false;
+        };
+        (t, at) = (target.into_owned(), s);
+    }
+    false
+}
+
+/// Per-monomorphization, the two classes of a `buffer` are one alternative,
+/// at the first one's place, which lowers to `impl js_sys::BufferSourceLike`:
+/// bytes and every buffer class cross through the one import. A list of
+/// them groups alike.
+fn group_buffers(
+    alts: Vec<TypeRef>,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> Vec<TypeRef> {
+    fn peel(t: &TypeRef) -> (TypeRef, Option<Nullability>) {
+        match t.split_empties() {
+            Some((core, n)) => (core, Some(n)),
+            None => (t.clone(), None),
+        }
+    }
+    let with = |t: TypeRef, n: Option<Nullability>| match n {
+        Some(n) => t.with_empties(n),
+        None => t,
+    };
+    let mut alts: Vec<TypeRef> = alts
+        .into_iter()
+        .map(|t| {
+            let (core, n) = peel(&t);
+            match &core {
+                c if names_buffer(c, cgctx, scope) => with(buffer_union(), n),
+                TypeRef::Array(e) if names_buffer(e, cgctx, scope) => {
+                    with(TypeRef::Array(Box::new(buffer_union())), n)
+                }
+                _ => t,
+            }
+        })
+        .collect();
+    let buffer = alts
+        .iter()
+        .position(|t| peel(t).0.as_ident() == Some("ArrayBuffer"));
+    let view = alts
+        .iter()
+        .position(|t| matches!(peel(t).0, TypeRef::ArrayBufferView));
+    if let (Some(buffer), Some(view)) = (buffer, view) {
+        let n = peel(&alts[buffer]).1;
+        if n == peel(&alts[view]).1 {
+            alts[buffer.min(view)] = with(buffer_union(), n);
+            alts.remove(buffer.max(view));
+        }
+    }
+    alts
+}
+
+/// Without per-monomorphization a `buffer` keeps an alternative per class
+/// and takes its bytes as one more after them, a copy like the slice
+/// beside a typed array.
+fn add_buffer_bytes(alts: &mut Vec<TypeRef>, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId) {
+    let peel = |t: &TypeRef| match t.split_empties() {
+        Some((core, n)) => (core, Some(n)),
+        None => (t.clone(), None),
+    };
+    if alts
+        .iter()
+        .any(|t| matches!(peel(t).0, TypeRef::TypedSlice(..)))
+    {
+        return;
+    }
+    let find = |is: &dyn Fn(&TypeRef) -> bool| alts.iter().position(|t| is(&peel(t).0));
+    let last = match find(&|t| names_buffer(t, cgctx, scope)) {
+        Some(whole) => whole,
+        None => {
+            let buffer = find(&|t| t.as_ident() == Some("ArrayBuffer"));
+            let view = find(&|t| matches!(t, TypeRef::ArrayBufferView));
+            match (buffer, view) {
+                (Some(b), Some(v)) if peel(&alts[b]).1 == peel(&alts[v]).1 => b.max(v),
+                _ => return,
+            }
+        }
+    };
+    let bytes = TypeRef::TypedSlice(ts_gen::ir::TypedArrayElement::U8, SharedMemory::Accepted);
+    let bytes = match peel(&alts[last]).1 {
+        Some(n) => bytes.with_empties(n),
+        None => bytes,
+    };
+    alts.insert(last + 1, bytes);
 }
 
 /// A written `null` is an ordinary union arm: each alternative is taken
@@ -1759,7 +2080,11 @@ fn flatten_collapse_to_lub(
 ///
 /// These are candidate names — the caller declares them in the block's `LocalScope` for
 /// final uniqueness within the extern block.
-fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec<String> {
+fn compute_rust_names(
+    base_name: &str,
+    signatures: &[Vec<ConcreteParam>],
+    dictionary: Dictionaries<'_>,
+) -> Vec<String> {
     if signatures.len() == 1 {
         return vec![base_name.to_string()];
     }
@@ -1796,6 +2121,16 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
     names.push(base_name.to_string());
     used.claim(base_name);
 
+    // A parameter's only dictionary arm is the parameter spelled out, so
+    // it takes the parameter's name; two dictionaries are told apart by type.
+    let sole_dictionary = |abs_idx: usize, param: &ConcreteParam| {
+        dictionary(&param.type_ref)
+            && signatures
+                .iter()
+                .filter_map(|sig| sig.get(abs_idx))
+                .filter(|p| p.name == param.name && dictionary(&p.type_ref))
+                .all(|p| p.type_ref == param.type_ref)
+    };
     let plan = |sig_idx: usize, sig: &[ConcreteParam]| -> (Vec<SuffixPart>, Vec<SuffixPart>) {
         // Compute per-position suffix parts, each tagged with whether
         // the suffix used the type-name (which is collision-prone) or
@@ -1859,6 +2194,8 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
                 (format!("{param_snake}_null"), false)
             } else if is_null(param) {
                 ("null".to_string(), false)
+            } else if any_same_name_different_type && sole_dictionary(abs_idx, param) {
+                (param_snake.clone(), false)
             } else if any_same_name_different_type {
                 (type_snake_name(&param.type_ref), true)
             } else {
@@ -2098,6 +2435,7 @@ fn type_snake_name(ty: &TypeRef) -> String {
         TypeRef::Any | TypeRef::Unknown => "js_value".to_string(),
         TypeRef::Object => "object".to_string(),
         TypeRef::ArrayBufferView => "typed_array".to_string(),
+        ty if is_buffer(ty) => "buffer".to_string(),
         TypeRef::Union(_) if let Some((core, _)) = ty.split_empties() => type_snake_name(&core),
         TypeRef::Union(_) | TypeRef::PropertyKey => "js_value".to_string(),
         // Snake-case every segment of a named reference, so `A.X` is
@@ -2317,17 +2655,27 @@ pub(crate) fn render_param_type(
 }
 
 /// Per-monomorphization argument bounds: a string becomes `impl
-/// JsStringLike`. Each occurrence is an independent anonymous type
-/// parameter, so a string inside a carrier stays `&str`: a caller passing
-/// `None` would have nothing to infer it from.
+/// JsStringLike`, and a `buffer` `impl BufferSourceLike`. Each occurrence
+/// is an independent anonymous type parameter, so inside a carrier a
+/// string stays `&str`: a caller passing `None` would have nothing to
+/// infer it from. A `buffer` keeps its bound there, since its handles
+/// have no one borrowed form, and its `None` names a type
+/// (`None::<&[u8]>`).
 fn mono_argument_type(ty: &TypeRef) -> Option<TokenStream> {
     if let Some((core, n)) = ty.split_empties() {
-        return mono_argument_type(&core).map(|_| typemap::nullable_carrier(quote! { &str }, n));
+        let inner = match &core {
+            TypeRef::String | TypeRef::StringLiteral(_) => quote! { &str },
+            core if is_buffer(core) => quote! { impl ::js_sys::BufferSourceLike },
+            _ => return None,
+        };
+        return Some(typemap::nullable_carrier(inner, n, true));
     }
     match ty {
         TypeRef::String | TypeRef::StringLiteral(_) => {
             Some(quote! { impl ::wasm_bindgen::JsStringLike })
         }
+        ty if is_buffer(ty) => Some(quote! { impl ::js_sys::BufferSourceLike }),
+        TypeRef::Array(e) if is_buffer(e) => Some(quote! { &[impl ::js_sys::BufferSourceLike] }),
         _ => None,
     }
 }
@@ -2440,8 +2788,8 @@ pub fn generate_dictionary_params_in(
 
 /// Under per-monomorphization a type parameter crosses the ABI as itself,
 /// so a generic import states the ABI traits it needs in a `where` clause:
-/// `IntoWasmAbi` for an argument (`RefIntoWasmAbi` for a borrowed `&T`,
-/// `VectorRefIntoWasmAbi` on the element of a borrowed `&[T]`),
+/// `IntoWasmAbi` for an argument (`RefIntoWasmAbi` for a borrowed `&T` and
+/// on the element of a borrowed `&[T]`),
 /// `FromWasmAbi` for a return, and `'static` for an awaited one. An
 /// imported type implements its ABI for any arguments, so it is bounded
 /// only by `'static`; bare parameters and std containers of them are
@@ -2570,7 +2918,10 @@ fn mentioned_params(
     }
 }
 
-fn mentions_param(tokens: TokenStream, params: &std::collections::HashSet<String>) -> bool {
+pub(crate) fn mentions_param(
+    tokens: TokenStream,
+    params: &std::collections::HashSet<String>,
+) -> bool {
     tokens.into_iter().any(|t| match t {
         proc_macro2::TokenTree::Ident(i) => params.contains(&i.to_string()),
         proc_macro2::TokenTree::Group(g) => mentions_param(g.stream(), params),
@@ -2629,8 +2980,8 @@ fn state_fn_abi_bounds(f: &mut syn::ForeignItemFn, awaits_promise: bool) {
         }
         match &*arg.ty {
             // wasm-bindgen marshals a borrowed type parameter through
-            // `RefIntoWasmAbi` and a borrowed slice through its element's
-            // `VectorRefIntoWasmAbi`; other referents through `&X` itself.
+            // `RefIntoWasmAbi` and a borrowed slice through its element's;
+            // other referents through `&X` itself.
             syn::Type::Reference(r) => match &*r.elem {
                 syn::Type::Path(p) if p.qself.is_none() && is_bare_param(&p.path, &params) => {
                     bound(
@@ -2642,7 +2993,7 @@ fn state_fn_abi_bounds(f: &mut syn::ForeignItemFn, awaits_promise: bool) {
                     let elem = &slice.elem;
                     bound(
                         quote! { #elem },
-                        quote! { ::wasm_bindgen::convert::VectorRefIntoWasmAbi },
+                        quote! { ::wasm_bindgen::convert::RefIntoWasmAbi },
                     );
                 }
                 elem => {
@@ -2713,7 +3064,8 @@ fn is_bare_param(path: &syn::Path, params: &std::collections::HashSet<String>) -
 }
 
 /// The bare type parameter `T` of an `Option<T>`, `Nullable<T>` or
-/// `Option<Nullable<T>>`, with the carrier whose ABI trait bounds it.
+/// `Option<Nullable<T>>` (`Nullable<Option<T>>`), with the carrier whose ABI
+/// trait bounds it.
 fn carrier_param<'t>(
     ty: &'t syn::Type,
     params: &std::collections::HashSet<String>,
@@ -2733,8 +3085,10 @@ fn carrier_param<'t>(
     let Some(syn::GenericArgument::Type(inner)) = args.args.first() else {
         return None;
     };
-    if let Some((param, "Nullable")) = carrier_param(inner, params) {
-        return Some((param, "Nullable"));
+    match carrier_param(inner, params) {
+        Some((param, "Nullable")) => return Some((param, "Nullable")),
+        Some((param, "Option")) if carrier == "Nullable" => return Some((param, "Nullable")),
+        _ => {}
     }
     let syn::Type::Path(inner) = inner else {
         return None;
@@ -3533,7 +3887,7 @@ mod tests {
             &None,
             &mut used,
         );
-        // Constructor: only 1 signature, always catch, no try_ variant
+        // Constructor: only 1 signature, catches by default, no try_ variant
         assert_eq!(sigs.len(), 1);
         assert_eq!(sigs[0].rust_name, "new");
         assert!(sigs[0].catch);
@@ -4028,10 +4382,7 @@ mod tests {
     }
 
     #[test]
-    fn test_throws_never_constructor_still_catches() {
-        // Constructors always catch per JS `new` semantics — `@throws
-        // {never}` is silently ignored on them. The resulting signature
-        // is the same as for any other constructor.
+    fn test_throws_never_constructor_is_plain() {
         let mut used = no_used();
         let sigs = expand_throws(
             "Foo",
@@ -4044,7 +4395,8 @@ mod tests {
         );
         assert_eq!(sigs.len(), 1);
         assert_eq!(sigs[0].rust_name, "new");
-        assert!(sigs[0].catch, "constructors always catch even with nothrow");
+        assert!(!sigs[0].catch);
+        assert!(sigs[0].error_type.is_none());
         assert!(!sigs[0].is_async());
     }
 

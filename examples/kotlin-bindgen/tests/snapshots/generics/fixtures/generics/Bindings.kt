@@ -209,6 +209,212 @@ val <T : JsAny?> Cell<T>.value: T
         return (r0 as T)
     }
 
+external interface Event : JsAny
+
+external interface MessageEvent : Event
+
+val MessageEvent.data: String
+    get() {
+        val r0 = fixtures.generics.flat.MessageEvent_get_data(this)
+        return r0!!.unsafeCast<JsString>().toString()
+    }
+
+external interface CloseEvent : Event
+
+val CloseEvent.code: Double
+    get() {
+        val r0 = fixtures.generics.flat.CloseEvent_get_code(this)
+        return r0
+    }
+
+external interface EventListenerObject<E : JsAny?> : JsAny
+
+fun <E : JsAny?> EventListenerObject<E>.handleEvent(event: E) {
+    try { fixtures.generics.flat.EventListenerObject_handleEvent_E(this, event) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+external interface WebSocketEventMap : JsAny
+
+var WebSocketEventMap.message: MessageEvent
+    get() {
+        val r0 = fixtures.generics.flat.WebSocketEventMap_get_message(this)
+        return r0!!.unsafeCast<MessageEvent>()
+    }
+    set(value) {
+        fixtures.generics.flat.WebSocketEventMap_set_message_MessageEvent(this, value)
+    }
+
+var WebSocketEventMap.close: CloseEvent
+    get() {
+        val r0 = fixtures.generics.flat.WebSocketEventMap_get_close(this)
+        return r0!!.unsafeCast<CloseEvent>()
+    }
+    set(value) {
+        fixtures.generics.flat.WebSocketEventMap_set_close_CloseEvent(this, value)
+    }
+
+external interface EventTarget<EventMap : JsAny?> : JsAny
+
+fun <EventMap : JsAny?> EventTarget<EventMap>.addEventListener(type: String, handler: (Event) -> Unit) {
+    try { fixtures.generics.flat.EventTarget_addEventListener_Type_fn_EventMap_Type(this, type.toJsString(), handler.toJsReference()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+fun <EventMap : JsAny?> EventTarget<EventMap>.addEventListener(type: String, handler: EventListenerObject<out Event>) {
+    try { fixtures.generics.flat.EventTarget_addEventListener_Type_EventListenerObject_EventMap_Type(this, type.toJsString(), handler) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+fun <EventMap : JsAny?> EventTarget<EventMap>.dispatchEvent(event: Event): Boolean {
+    val r0 = try { fixtures.generics.flat.EventTarget_dispatchEvent_Event(this, event) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return (r0 != 0)
+}
+
+external interface WebSocket : EventTarget<WebSocketEventMap>
+
+external interface TextModel : JsAny
+
+var TextModel.inputs: TextModelInputs
+    get() {
+        val r0 = fixtures.generics.flat.TextModel_get_inputs(this)
+        return r0!!.unsafeCast<TextModelInputs>()
+    }
+    set(value) {
+        fixtures.generics.flat.TextModel_set_inputs_TextModelInputs(this, value)
+    }
+
+var TextModel.postProcessedOutputs: TextModelPostProcessedOutputs
+    get() {
+        val r0 = fixtures.generics.flat.TextModel_get_postProcessedOutputs(this)
+        return r0!!.unsafeCast<TextModelPostProcessedOutputs>()
+    }
+    set(value) {
+        fixtures.generics.flat.TextModel_set_postProcessedOutputs_TextModelPostProcessedOutputs(this, value)
+    }
+
+external interface ImageModel : JsAny
+
+var ImageModel.inputs: ImageModelInputs
+    get() {
+        val r0 = fixtures.generics.flat.ImageModel_get_inputs(this)
+        return r0!!.unsafeCast<ImageModelInputs>()
+    }
+    set(value) {
+        fixtures.generics.flat.ImageModel_set_inputs_ImageModelInputs(this, value)
+    }
+
+var ImageModel.postProcessedOutputs: ImageModelPostProcessedOutputs
+    get() {
+        val r0 = fixtures.generics.flat.ImageModel_get_postProcessedOutputs(this)
+        return r0!!.unsafeCast<ImageModelPostProcessedOutputs>()
+    }
+    set(value) {
+        fixtures.generics.flat.ImageModel_set_postProcessedOutputs_ImageModelPostProcessedOutputs(this, value)
+    }
+
+external interface AiModelList : JsAny
+
+var AiModelList.text_model: TextModel
+    get() {
+        val r0 = fixtures.generics.flat.AiModelList_get_text_model(this)
+        return r0!!.unsafeCast<TextModel>()
+    }
+    set(value) {
+        fixtures.generics.flat.AiModelList_set_text_model_TextModel(this, value)
+    }
+
+var AiModelList.image_model: ImageModel
+    get() {
+        val r0 = fixtures.generics.flat.AiModelList_get_image_model(this)
+        return r0!!.unsafeCast<ImageModel>()
+    }
+    set(value) {
+        fixtures.generics.flat.AiModelList_set_image_model_ImageModel(this, value)
+    }
+
+external interface Sizes : JsAny
+
+var Sizes.width: Double
+    get() {
+        val r0 = fixtures.generics.flat.Sizes_get_width(this)
+        return r0
+    }
+    set(value) {
+        fixtures.generics.flat.Sizes_set_width_f64(this, value)
+    }
+
+var Sizes.label: String
+    get() {
+        val r0 = fixtures.generics.flat.Sizes_get_label(this)
+        return r0!!.unsafeCast<JsString>().toString()
+    }
+    set(value) {
+        fixtures.generics.flat.Sizes_set_label_str(this, value.toJsString())
+    }
+
+external interface Ai : JsAny
+
+fun Ai.run(model: String, inputs: JsAny?): tsgen.runtime.Future<JsAny?> {
+    val r0 = fixtures.generics.flat.Ai_run_Name_AiModelList_Name_inputs(this, model.toJsString(), inputs)
+    return tsgen.runtime.Future<JsAny?>(r0!!, { f -> val r1 = fixtures.generics.flat.take_Any(f); r1 }, { f -> futureErrorErr(f) })
+}
+
+fun Ai.size(key: String): F64OrStr {
+    val r0 = try { fixtures.generics.flat.Ai_size_K(this, key.toJsString()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    val s1 = fixtures.generics.flat.ret_f64()
+    val s2 = fixtures.generics.flat.ret_externref()
+    return decodeF64OrStr(r0, s1, s2)!!
+}
+
+fun Ai.sizes(): F64OrStr {
+    val r0 = try { fixtures.generics.flat.Ai_sizes(this) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    val s1 = fixtures.generics.flat.ret_f64()
+    val s2 = fixtures.generics.flat.ret_externref()
+    return decodeF64OrStr(r0, s1, s2)!!
+}
+
+external interface TextModelInputs : JsAny
+
+var TextModelInputs.prompt: String
+    get() {
+        val r0 = fixtures.generics.flat.TextModelInputs_get_prompt(this)
+        return r0!!.unsafeCast<JsString>().toString()
+    }
+    set(value) {
+        fixtures.generics.flat.TextModelInputs_set_prompt_str(this, value.toJsString())
+    }
+
+external interface TextModelPostProcessedOutputs : JsAny
+
+var TextModelPostProcessedOutputs.text: String
+    get() {
+        val r0 = fixtures.generics.flat.TextModelPostProcessedOutputs_get_text(this)
+        return r0!!.unsafeCast<JsString>().toString()
+    }
+    set(value) {
+        fixtures.generics.flat.TextModelPostProcessedOutputs_set_text_str(this, value.toJsString())
+    }
+
+external interface ImageModelInputs : JsAny
+
+var ImageModelInputs.image: List<Double>
+    get() {
+        val r0 = fixtures.generics.flat.ImageModelInputs_get_image(this)
+        return r0!!.unsafeCast<JsArray<JsNumber>>().let { a -> a.toList().map { it.toDouble() } }
+    }
+    set(value) {
+        fixtures.generics.flat.ImageModelInputs_set_image_arr_f64(this, value.map { it.toJsNumber() }.toJsArray())
+    }
+
+external interface ImageModelPostProcessedOutputs : JsAny
+
+var ImageModelPostProcessedOutputs.label: String
+    get() {
+        val r0 = fixtures.generics.flat.ImageModelPostProcessedOutputs_get_label(this)
+        return r0!!.unsafeCast<JsString>().toString()
+    }
+    set(value) {
+        fixtures.generics.flat.ImageModelPostProcessedOutputs_set_label_str(this, value.toJsString())
+    }
+
 external interface Record<V : JsAny?> : JsAny
 
 fun <V : JsAny?> Record<V>.at(key: String): V? {
@@ -353,7 +559,7 @@ fun SignalMap(): SignalMap {
 }
 
 fun listen(type: String, handler: (SignalOrHalt) -> Unit) {
-    try { fixtures.generics.flat.listen_str_fn_SignalOrHalt(type.toJsString(), handler.toJsReference()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    try { fixtures.generics.flat.listen_K_fn_SignalMap_K(type.toJsString(), handler.toJsReference()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
 fun <T : JsAny?> first(items: T): T {
@@ -364,6 +570,69 @@ fun <T : JsAny?> first(items: T): T {
 fun <T : JsAny?> Cell(value: T): Cell<T> {
     val r0 = try { fixtures.generics.flat.Cell_new_T(value) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
     return r0!!.unsafeCast<Cell<T>>()
+}
+
+fun WebSocketEventMap(): WebSocketEventMap {
+    val r0 = fixtures.generics.flat.WebSocketEventMap_new()
+    return r0!!.unsafeCast<WebSocketEventMap>()
+}
+
+fun <EventMap : JsAny?> EventTarget(): EventTarget<EventMap> {
+    val r0 = try { fixtures.generics.flat.EventTarget_new() } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0!!.unsafeCast<EventTarget<EventMap>>()
+}
+
+fun WebSocket(url: String): WebSocket {
+    val r0 = try { fixtures.generics.flat.WebSocket_new_str(url.toJsString()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0!!.unsafeCast<WebSocket>()
+}
+
+fun addEventListener(type: String, handler: (MessageEventOrCloseEvent) -> Unit) {
+    try { fixtures.generics.flat.addEventListener_Type_fn_WebSocketEventMap_Type(type.toJsString(), handler.toJsReference()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+fun addEventListener(type: String, handler: EventListenerObject<*>) {
+    try { fixtures.generics.flat.addEventListener_Type_EventListenerObject_WebSocketEventMap_Type(type.toJsString(), handler) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+fun TextModel(): TextModel {
+    val r0 = fixtures.generics.flat.TextModel_new()
+    return r0!!.unsafeCast<TextModel>()
+}
+
+fun ImageModel(): ImageModel {
+    val r0 = fixtures.generics.flat.ImageModel_new()
+    return r0!!.unsafeCast<ImageModel>()
+}
+
+fun AiModelList(): AiModelList {
+    val r0 = fixtures.generics.flat.AiModelList_new()
+    return r0!!.unsafeCast<AiModelList>()
+}
+
+fun Sizes(): Sizes {
+    val r0 = fixtures.generics.flat.Sizes_new()
+    return r0!!.unsafeCast<Sizes>()
+}
+
+fun TextModelInputs(): TextModelInputs {
+    val r0 = fixtures.generics.flat.TextModelInputs_new()
+    return r0!!.unsafeCast<TextModelInputs>()
+}
+
+fun TextModelPostProcessedOutputs(): TextModelPostProcessedOutputs {
+    val r0 = fixtures.generics.flat.TextModelPostProcessedOutputs_new()
+    return r0!!.unsafeCast<TextModelPostProcessedOutputs>()
+}
+
+fun ImageModelInputs(): ImageModelInputs {
+    val r0 = fixtures.generics.flat.ImageModelInputs_new()
+    return r0!!.unsafeCast<ImageModelInputs>()
+}
+
+fun ImageModelPostProcessedOutputs(): ImageModelPostProcessedOutputs {
+    val r0 = fixtures.generics.flat.ImageModelPostProcessedOutputs_new()
+    return r0!!.unsafeCast<ImageModelPostProcessedOutputs>()
 }
 
 /** `DateUnit` as its box: its arm's JS value. */
@@ -522,6 +791,59 @@ fun JsAny.toSignalOrHalt(): SignalOrHalt {
     val r1 = fixtures.generics.flat.unbox_SignalOrHalt(this)
     val s2 = fixtures.generics.flat.ret_externref()
     return decodeSignalOrHalt(r1, s2)!!
+}
+
+/** `EventListenerOrEventListenerObject` as its box: its arm's JS value. */
+fun EventListenerOrEventListenerObject.toJs(): JsAny {
+    val w0 = encodeEventListenerOrEventListenerObject(this)
+    return fixtures.generics.flat.box_EventListenerOrEventListenerObject(w0.arm, w0.s0)!!
+}
+
+/** The `EventListenerOrEventListenerObject` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toEventListenerOrEventListenerObject(): EventListenerOrEventListenerObject {
+    val r1 = fixtures.generics.flat.unbox_EventListenerOrEventListenerObject(this)
+    val s2 = fixtures.generics.flat.ret_externref()
+    return decodeEventListenerOrEventListenerObject(r1, s2)!!
+}
+
+/** `MessageEventOrCloseEvent` as its box: its arm's JS value. */
+fun MessageEventOrCloseEvent.toJs(): JsAny {
+    val w0 = encodeMessageEventOrCloseEvent(this)
+    return fixtures.generics.flat.box_MessageEventOrCloseEvent(w0.arm, w0.s0)!!
+}
+
+/** The `MessageEventOrCloseEvent` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toMessageEventOrCloseEvent(): MessageEventOrCloseEvent {
+    val r1 = fixtures.generics.flat.unbox_MessageEventOrCloseEvent(this)
+    val s2 = fixtures.generics.flat.ret_externref()
+    return decodeMessageEventOrCloseEvent(r1, s2)!!
+}
+
+/** `EventListenerOrEventListenerObjectMessageEventOrCloseEvent` as its box: its arm's JS value. */
+fun EventListenerOrEventListenerObjectMessageEventOrCloseEvent.toJs(): JsAny {
+    val w0 = encodeEventListenerOrEventListenerObjectMessageEventOrCloseEvent(this)
+    return fixtures.generics.flat.box_EventListenerOrEventListenerObjectMessageEventOrCloseEvent(w0.arm, w0.s0)!!
+}
+
+/** The `EventListenerOrEventListenerObjectMessageEventOrCloseEvent` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toEventListenerOrEventListenerObjectMessageEventOrCloseEvent(): EventListenerOrEventListenerObjectMessageEventOrCloseEvent {
+    val r1 = fixtures.generics.flat.unbox_EventListenerOrEventListenerObjectMessageEventOrCloseEvent(this)
+    val s2 = fixtures.generics.flat.ret_externref()
+    return decodeEventListenerOrEventListenerObjectMessageEventOrCloseEvent(r1, s2)!!
+}
+
+/** `F64OrStr` as its box: its arm's JS value. */
+fun F64OrStr.toJs(): JsAny {
+    val w0 = encodeF64OrStr(this)
+    return fixtures.generics.flat.box_F64OrStr(w0.arm, w0.s0, w0.s1)!!
+}
+
+/** The `F64OrStr` a box holds; a `JsException` unless it's one of its arms. */
+fun JsAny.toF64OrStr(): F64OrStr {
+    val r1 = fixtures.generics.flat.unbox_F64OrStr(this)
+    val s2 = fixtures.generics.flat.ret_f64()
+    val s3 = fixtures.generics.flat.ret_externref()
+    return decodeF64OrStr(r1, s2, s3)!!
 }
 
 /** `PluralExcludeTimeUnitHour` as its box: its arm's JS value. */
@@ -990,6 +1312,86 @@ fun decodeSignalOrHalt(arm: Int, s0: JsAny?): SignalOrHalt? = when (arm) {
     else -> throw IllegalStateException("SignalOrHalt: arm $arm")
 }
 
+sealed interface EventListenerOrEventListenerObject {
+    data class EventListener(val value: (fixtures.generics.Event) -> Unit) : EventListenerOrEventListenerObject
+    data class EventListenerObject(val value: fixtures.generics.EventListenerObject<out fixtures.generics.Event>) : EventListenerOrEventListenerObject
+}
+
+class EventListenerOrEventListenerObjectWire(val arm: Int, val s0: JsAny?)
+
+fun encodeEventListenerOrEventListenerObject(v: EventListenerOrEventListenerObject?): EventListenerOrEventListenerObjectWire = when (v) {
+    null -> EventListenerOrEventListenerObjectWire(0, null)
+    is EventListenerOrEventListenerObject.EventListener -> throw UnsupportedOperationException("a JS function passed back to JS")
+    is EventListenerOrEventListenerObject.EventListenerObject -> EventListenerOrEventListenerObjectWire(2, v.value)
+}
+
+fun decodeEventListenerOrEventListenerObject(arm: Int, s0: JsAny?): EventListenerOrEventListenerObject? = when (arm) {
+    0 -> null
+    1 -> EventListenerOrEventListenerObject.EventListener(s0!!.let { f -> { a0: Event -> fixtures.generics.flat.call_fn_Event(f, a0) } })
+    2 -> EventListenerOrEventListenerObject.EventListenerObject(s0!!.unsafeCast<EventListenerObject<Event>>())
+    else -> throw IllegalStateException("EventListenerOrEventListenerObject: arm $arm")
+}
+
+sealed interface MessageEventOrCloseEvent {
+    data class MessageEvent(val value: fixtures.generics.MessageEvent) : MessageEventOrCloseEvent
+    data class CloseEvent(val value: fixtures.generics.CloseEvent) : MessageEventOrCloseEvent
+}
+
+class MessageEventOrCloseEventWire(val arm: Int, val s0: JsAny?)
+
+fun encodeMessageEventOrCloseEvent(v: MessageEventOrCloseEvent?): MessageEventOrCloseEventWire = when (v) {
+    null -> MessageEventOrCloseEventWire(0, null)
+    is MessageEventOrCloseEvent.MessageEvent -> MessageEventOrCloseEventWire(1, v.value)
+    is MessageEventOrCloseEvent.CloseEvent -> MessageEventOrCloseEventWire(2, v.value)
+}
+
+fun decodeMessageEventOrCloseEvent(arm: Int, s0: JsAny?): MessageEventOrCloseEvent? = when (arm) {
+    0 -> null
+    1 -> MessageEventOrCloseEvent.MessageEvent(s0!!.unsafeCast<MessageEvent>())
+    2 -> MessageEventOrCloseEvent.CloseEvent(s0!!.unsafeCast<CloseEvent>())
+    else -> throw IllegalStateException("MessageEventOrCloseEvent: arm $arm")
+}
+
+sealed interface EventListenerOrEventListenerObjectMessageEventOrCloseEvent {
+    data class EventListener(val value: (fixtures.generics.MessageEventOrCloseEvent) -> Unit) : EventListenerOrEventListenerObjectMessageEventOrCloseEvent
+    data class EventListenerObject(val value: fixtures.generics.EventListenerObject<*>) : EventListenerOrEventListenerObjectMessageEventOrCloseEvent
+}
+
+class EventListenerOrEventListenerObjectMessageEventOrCloseEventWire(val arm: Int, val s0: JsAny?)
+
+fun encodeEventListenerOrEventListenerObjectMessageEventOrCloseEvent(v: EventListenerOrEventListenerObjectMessageEventOrCloseEvent?): EventListenerOrEventListenerObjectMessageEventOrCloseEventWire = when (v) {
+    null -> EventListenerOrEventListenerObjectMessageEventOrCloseEventWire(0, null)
+    is EventListenerOrEventListenerObjectMessageEventOrCloseEvent.EventListener -> throw UnsupportedOperationException("a JS function passed back to JS")
+    is EventListenerOrEventListenerObjectMessageEventOrCloseEvent.EventListenerObject -> EventListenerOrEventListenerObjectMessageEventOrCloseEventWire(2, v.value)
+}
+
+fun decodeEventListenerOrEventListenerObjectMessageEventOrCloseEvent(arm: Int, s0: JsAny?): EventListenerOrEventListenerObjectMessageEventOrCloseEvent? = when (arm) {
+    0 -> null
+    1 -> EventListenerOrEventListenerObjectMessageEventOrCloseEvent.EventListener(s0!!.let { f -> { a0: MessageEventOrCloseEvent -> val w0 = encodeMessageEventOrCloseEvent(a0); fixtures.generics.flat.call_fn_MessageEventOrCloseEvent(f, w0.arm, w0.s0) } })
+    2 -> EventListenerOrEventListenerObjectMessageEventOrCloseEvent.EventListenerObject(s0!!.unsafeCast<EventListenerObject<JsAny?>>())
+    else -> throw IllegalStateException("EventListenerOrEventListenerObjectMessageEventOrCloseEvent: arm $arm")
+}
+
+sealed interface F64OrStr {
+    data class F64(val value: Double) : F64OrStr
+    data class Str(val value: String) : F64OrStr
+}
+
+class F64OrStrWire(val arm: Int, val s0: Double, val s1: JsAny?)
+
+fun encodeF64OrStr(v: F64OrStr?): F64OrStrWire = when (v) {
+    null -> F64OrStrWire(0, 0.0, null)
+    is F64OrStr.F64 -> F64OrStrWire(1, v.value, null)
+    is F64OrStr.Str -> F64OrStrWire(2, 0.0, v.value.toJsString())
+}
+
+fun decodeF64OrStr(arm: Int, s0: Double, s1: JsAny?): F64OrStr? = when (arm) {
+    0 -> null
+    1 -> F64OrStr.F64(s0)
+    2 -> F64OrStr.Str(s1!!.unsafeCast<JsString>().toString())
+    else -> throw IllegalStateException("F64OrStr: arm $arm")
+}
+
 enum class PluralExcludeTimeUnitHour(val index: Int) {
     Minutes(1),
     Seconds(2);
@@ -1335,5 +1737,11 @@ fun raiseErr(e: kotlin.js.JsException): ErrException {
     val r0 = fixtures.generics.flat.err_err(e.thrownValue)
     val s1 = fixtures.generics.flat.ret_externref()
     return ErrException(decodeErr(r0, s1)!!)
+}
+
+fun futureErrorErr(f: JsAny): ErrException {
+    val r2 = fixtures.generics.flat.error_err(f)
+    val s3 = fixtures.generics.flat.ret_externref()
+    return ErrException(decodeErr(r2, s3)!!)
 }
 

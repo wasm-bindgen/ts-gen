@@ -44,6 +44,7 @@ async fn rust_tag_mono_signatures_compile(
 
     let init = ResponseInit::builder().status(204).build();
     let _: Option<u16> = init.status();
+    let _: ResponseInit = ResponseInitBuilder::from(init).status(404).build();
     let _: i32 = set_timeout(callback);
     let _: i32 = set_timeout_with_ms(callback, 10u32);
 }

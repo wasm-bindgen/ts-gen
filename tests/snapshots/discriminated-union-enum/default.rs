@@ -62,6 +62,11 @@ impl AttachmentBuilder {
         self.inner
     }
 }
+impl From<Attachment> for AttachmentBuilder {
+    fn from(inner: Attachment) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "discriminated-union-enum")]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -120,6 +125,11 @@ impl ReplyBuilder {
         self.inner
     }
 }
+impl From<Reply> for ReplyBuilder {
+    fn from(inner: Reply) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "discriminated-union-enum")]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -170,6 +180,11 @@ impl PayloadBuilder {
     }
     pub fn build(self) -> Payload {
         self.inner
+    }
+}
+impl From<Payload> for PayloadBuilder {
+    fn from(inner: Payload) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "discriminated-union-enum")]

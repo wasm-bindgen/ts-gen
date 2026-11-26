@@ -47,6 +47,13 @@ interface Store {
   read(key: string, options?: GetOptions<"text">): Promise<string | null>;
   read<T = unknown>(key: string, options?: GetOptions<"json">): Promise<T | null>;
   read(key: string, options?: GetOptions<"arrayBuffer">): Promise<ArrayBuffer | null>;
+  tail(options: GetOptions<"lines">): string;
+  open(reader: { mode: "byob"; size?: number }): string;
   write(key: string, value: string, options?: { onlyIf: string }): Promise<boolean | null>;
   write(key: string, value: string, options?: { ttl: number }): Promise<boolean>;
+  // A dictionary whose every field is such a constant is the call's to
+  // make, so its parameter is dropped.
+  getReader(): string;
+  getReader(options: { mode: "byob" }): number;
+  lock(how: { mode: "exclusive" }): string;
 }

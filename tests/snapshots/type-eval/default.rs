@@ -126,6 +126,11 @@ impl SizedBuilder {
         self.inner
     }
 }
+impl From<Sized_> for SizedBuilder {
+    fn from(inner: Sized_) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Minute {
@@ -218,6 +223,11 @@ impl MixedBuilder {
         self.inner
     }
 }
+impl From<Mixed> for MixedBuilder {
+    fn from(inner: Mixed) -> Self {
+        Self { inner }
+    }
+}
 #[allow(dead_code)]
 pub type Patch = JsValue;
 #[wasm_bindgen(module = "type-eval")]
@@ -293,18 +303,26 @@ extern "C" {
     pub fn set_largest_unit<U: ::wasm_bindgen::JsGeneric>(this: &Rounding<U>, val: LargestUnitUnit);
 }
 impl<U: ::wasm_bindgen::JsGeneric> Rounding<U> {
-    pub fn new() -> Rounding<U> {
-        Self::builder().build()
+    pub fn new_typed() -> Rounding<U> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> RoundingBuilder<U> {
+    pub fn builder_typed() -> RoundingBuilder<U> {
         RoundingBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl Rounding<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> RoundingBuilder<JsValue> {
+        Self::builder_typed()
+    }
+}
 impl<U: ::wasm_bindgen::JsGeneric> Default for Rounding<U> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct RoundingBuilder<U: ::wasm_bindgen::JsGeneric> {
@@ -321,6 +339,11 @@ impl<U: ::wasm_bindgen::JsGeneric> RoundingBuilder<U> {
     }
     pub fn build(self) -> Rounding<U> {
         self.inner
+    }
+}
+impl<U: ::wasm_bindgen::JsGeneric> From<Rounding<U>> for RoundingBuilder<U> {
+    fn from(inner: Rounding<U>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "type-eval")]
@@ -454,6 +477,11 @@ pub mod scoped {
             self.inner
         }
     }
+    impl From<Settings> for SettingsBuilder {
+        fn from(inner: Settings) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(module = "type-eval")]
     extern "C" {
         #[wasm_bindgen(js_namespace = "Scoped")]
@@ -507,6 +535,11 @@ pub mod scoped {
         }
         pub fn build(self) -> PartialSettings {
             self.inner
+        }
+    }
+    impl From<PartialSettings> for PartialSettingsBuilder {
+        fn from(inner: PartialSettings) -> Self {
+            Self { inner }
         }
     }
 }
@@ -676,6 +709,11 @@ impl PickOptionsNameOrSizeBuilder {
         self.inner
     }
 }
+impl From<PickOptionsNameOrSize> for PickOptionsNameOrSizeBuilder {
+    fn from(inner: PickOptionsNameOrSize) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "type-eval")]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -711,6 +749,11 @@ impl PickOptionsSizeBuilder {
     }
     pub fn build(self) -> PickOptionsSize {
         self.inner
+    }
+}
+impl From<PickOptionsSize> for PickOptionsSizeBuilder {
+    fn from(inner: PickOptionsSize) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "type-eval")]
@@ -750,6 +793,11 @@ impl PickOptionsExcludeOptionKeyFixedBuilder {
     }
     pub fn build(self) -> PickOptionsExcludeOptionKeyFixed {
         self.inner
+    }
+}
+impl From<PickOptionsExcludeOptionKeyFixed> for PickOptionsExcludeOptionKeyFixedBuilder {
+    fn from(inner: PickOptionsExcludeOptionKeyFixed) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "type-eval")]
@@ -885,18 +933,26 @@ extern "C" {
     pub fn set_label<T: ::wasm_bindgen::JsGeneric>(this: &PartialBox<T>, val: &str);
 }
 impl<T: ::wasm_bindgen::JsGeneric> PartialBox<T> {
-    pub fn new() -> PartialBox<T> {
-        Self::builder().build()
+    pub fn new_typed() -> PartialBox<T> {
+        Self::builder_typed().build()
     }
-    pub fn builder() -> PartialBoxBuilder<T> {
+    pub fn builder_typed() -> PartialBoxBuilder<T> {
         PartialBoxBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
+impl PartialBox<JsValue> {
+    pub fn new() -> Self {
+        Self::new_typed()
+    }
+    pub fn builder() -> PartialBoxBuilder<JsValue> {
+        Self::builder_typed()
+    }
+}
 impl<T: ::wasm_bindgen::JsGeneric> Default for PartialBox<T> {
     fn default() -> Self {
-        Self::new()
+        Self::new_typed()
     }
 }
 pub struct PartialBoxBuilder<T: ::wasm_bindgen::JsGeneric> {
@@ -913,6 +969,11 @@ impl<T: ::wasm_bindgen::JsGeneric> PartialBoxBuilder<T> {
     }
     pub fn build(self) -> PartialBox<T> {
         self.inner
+    }
+}
+impl<T: ::wasm_bindgen::JsGeneric> From<PartialBox<T>> for PartialBoxBuilder<T> {
+    fn from(inner: PartialBox<T>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]

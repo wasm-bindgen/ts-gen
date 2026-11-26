@@ -40,8 +40,8 @@ async fn enum_positions_mono_compile(
     let _: Option<Level> = probe.next_level().await?;
     let _: Mode = probe.next_details().await?.value();
 
-    let _: Vec<f64> = probe.levels(&[Level::Low as u32 as f64]);
-    let _: Vec<String> = probe.modes(&["fast".to_string()]);
+    let _: Vec<Level> = probe.levels(&[Level::Low]);
+    let _: Vec<Mode> = probe.modes(&[Mode::Fast]);
     let _: Array<JsString> = probe.mode_array(modes);
     probe.on_mode(callback);
 

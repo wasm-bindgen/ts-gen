@@ -8,6 +8,12 @@
 declare abstract class Response {
   readonly status: number;
   readonly ok: boolean;
+  // Writable here, read-only at runtime: the side file's `readonly` drops
+  // the setter.
+  url: string;
+  type: string;
+  // Erases what the stream carries; the side file's `@retype` supplies it.
+  readonly body: ReadableStream | null;
   /** Creates a clone of the response. */
   clone(): Response;
 }
@@ -15,6 +21,10 @@ declare abstract class Response {
 interface ResponseInit {
   status?: number;
   statusText?: string;
+}
+
+interface ReadableStream<R = any> {
+  readonly locked: boolean;
 }
 
 declare abstract class Cache {
@@ -29,6 +39,11 @@ interface Storage {
 
 interface Console {
   log(...data: any[]): void;
+}
+
+interface Bucket {
+  put(key: string, bodyBytes: Uint8Array): Promise<void>;
+  upload(key: string, data: ArrayBuffer | ArrayBufferView): Promise<void>;
 }
 
 declare const console: Console;

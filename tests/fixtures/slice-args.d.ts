@@ -62,3 +62,33 @@ export declare class Bag<T> {
   take(values: T[]): string;
 }
 export declare function mixedGeneric<T>(values: T[], weights: number[], data: Float64Array | number[]): string;
+
+// `ArrayBuffer | ArrayBufferView` (`BufferSource`) is one `buffer`, however
+// it's spelled and whatever else the union holds: either class is written
+// as itself. `{@slice view}` adds the bytes as a view of linear memory.
+export type BufferSource = ArrayBufferView | ArrayBuffer;
+export declare function hash(data: BufferSource): string;
+export declare function store(key: string, value: string | ArrayBuffer | ArrayBufferView): string;
+export declare function echo(data: ArrayBuffer | ArrayBufferView): ArrayBuffer | ArrayBufferView;
+/** @param data {@slice view} read before the call returns */
+export declare function peek(data: BufferSource): string;
+export declare function concat(parts: BufferSource[]): string;
+// Whether the callee received bytes it owns, rather than a view of linear
+// memory.
+export declare function owned(data: BufferSource): boolean;
+/** @param data {@slice view} read before the call returns */
+export declare function ownedView(data: BufferSource): boolean;
+// The view beside a second parameter of several types.
+/** @param data {@slice view} read before the call returns */
+export declare function peekAs(label: string | Item, data: BufferSource): string;
+
+export declare function slab(kind: string): ArrayBuffer | ArrayBufferView;
+export declare function maybeSlab(kind?: string): BufferSource | undefined;
+export declare function slabLater(kind: string): Promise<BufferSource>;
+export declare class Slab {
+  constructor(kind: string);
+  readonly data: BufferSource;
+  bytes(): BufferSource;
+  static of(kind: string): BufferSource;
+}
+export declare function decode(input?: BufferSource, label?: string): string;

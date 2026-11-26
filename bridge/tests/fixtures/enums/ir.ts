@@ -27,6 +27,10 @@ enum Body {
   Bytes(u8[]);
   Stream(ReadableStream);
 }
+enum Data {
+  Text(str);
+  Buffer(buffer);
+}
 enum Value {
   Num(f64);
   Flag(bool);
@@ -73,6 +77,7 @@ class Probe {
   small(v: Small): Small;
   body(v: Body): Body;
   optBody(v: Body?): Body?;
+  data(v: Data): Data;
   value(v: Value): Value;
   strict(v: Strict): Strict;
   arg(): Arg;

@@ -35,9 +35,9 @@ impl fmt::Display for Span {
 /// name.
 pub const BUILTIN_TYPE_NAMES: &[&str] = &[
     "unit", "bool", "i8", "u8", "i16", "u16", "i32", "u32", "i53", "u53", "i64", "u64", "f16",
-    "f32", "f64", "str", "arr", "future", "fn", "Any", "err", "Bool", "I8", "U8", "I16", "U16",
-    "I32", "U32", "I53", "U53", "I64", "U64", "F16", "F32", "F64", "Str", "Unit", "Vec", "Arr",
-    "Tuple",
+    "f32", "f64", "str", "buffer", "arr", "future", "fn", "Any", "err", "Bool", "I8", "U8", "I16",
+    "U16", "I32", "U32", "I53", "U53", "I64", "U64", "F16", "F32", "F64", "Str", "Unit", "Vec",
+    "Arr", "Tuple",
 ];
 
 /// A name a lexical path can't start with, which reads as a built-in type
@@ -181,6 +181,10 @@ impl Type {
                 fun.result.walk(f);
             }
             Type::Named(r) => r.args.iter().for_each(|t| t.walk(f)),
+            Type::Index(m, k) => {
+                m.walk(f);
+                k.walk(f);
+            }
             _ => {}
         }
     }
@@ -190,7 +194,19 @@ impl Type {
     /// `self` with each named type that `f` maps replaced, innermost
     /// last: a replacement isn't mapped again.
     pub fn map_named(&self, f: &impl Fn(&TypeRef) -> Option<Type>) -> Type {
-        let m = |t: &Type| t.map_named(f);
+        self.map(&|t| match t {
+            Type::Named(r) => f(r),
+            _ => None,
+        })
+    }
+
+    /// `self` with each type that `f` maps replaced, outermost first: a
+    /// replacement isn't mapped again.
+    pub fn map(&self, f: &impl Fn(&Type) -> Option<Type>) -> Type {
+        if let Some(t) = f(self) {
+            return t;
+        }
+        let m = |t: &Type| t.map(f);
         let mb = |t: &Type| Box::new(m(t));
         match self {
             Type::Vec(t) => Type::Vec(mb(t)),
@@ -212,12 +228,11 @@ impl Type {
                 result: m(&fun.result),
                 throws: fun.throws.clone(),
             })),
-            Type::Named(r) => f(r).unwrap_or_else(|| {
-                Type::Named(TypeRef {
-                    path: r.path.clone(),
-                    args: r.args.iter().map(m).collect(),
-                })
+            Type::Named(r) => Type::Named(TypeRef {
+                path: r.path.clone(),
+                args: r.args.iter().map(m).collect(),
             }),
+            Type::Index(t, k) => Type::Index(mb(t), mb(k)),
             t => t.clone(),
         }
     }
@@ -245,6 +260,8 @@ pub enum Bound {
     Subtype(Type),
     /// `T in (A, B)`.
     In(Vec<Type>),
+    /// `K in keyof M`: the literal types of `M`'s property names (§13).
+    KeyOf(Type),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -512,6 +529,8 @@ pub enum Type {
     BigInt,
     /// `BigInt`, the box of `bigint`: the host bigint.
     BigIntBox,
+    /// `buffer`: an `ArrayBuffer` or any view of one, as its bytes.
+    Buffer,
     /// `Unit`, the box of `unit`.
     UnitBox,
     /// `T[]`, the typed array.
@@ -540,6 +559,11 @@ pub enum Type {
     /// A class, interface, enum or type parameter, resolved by
     /// [`crate::resolve`].
     Named(TypeRef),
+    /// `"text"`, `1`, `true`: the type of that one value, which never
+    /// crosses (§13).
+    Lit(Literal),
+    /// `M[K]`: the type of `M`'s property `K` (§13).
+    Index(Box<Type>, Box<Type>),
 }
 
 impl Type {
@@ -656,7 +680,7 @@ pub struct ClassPred {
     pub props: Vec<(String, Literal)>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Literal {
     Str(String),
     Int(i64),

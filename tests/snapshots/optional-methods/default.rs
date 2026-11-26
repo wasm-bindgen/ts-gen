@@ -75,6 +75,11 @@ impl HandlersBuilder {
         self.inner
     }
 }
+impl From<Handlers> for HandlersBuilder {
+    fn from(inner: Handlers) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
