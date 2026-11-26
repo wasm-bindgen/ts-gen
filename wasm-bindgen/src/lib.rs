@@ -1,7 +1,9 @@
-//! Code generation: IR → Rust source code.
+//! `ts-gen-wasm-bindgen`: generate `wasm-bindgen` Rust bindings from
+//! TypeScript `.d.ts` files.
 //!
 //! The main entry point is [`generate`], which takes a parsed IR [`Module`]
-//! and produces formatted Rust source code as a string.
+//! (from [`ts_gen::parse`] or [`ts_gen::parse_source`]) and produces
+//! formatted Rust source code as a string.
 
 pub mod classes;
 pub mod discriminated_unions;
@@ -26,8 +28,8 @@ use std::path::PathBuf;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::ir::{InterfaceClassification, Module, TypeDeclaration, TypeKind, TypeRef};
-use crate::parse::scope::ScopeId;
+use ts_gen::ir::{InterfaceClassification, Module, TypeDeclaration, TypeKind, TypeRef};
+use ts_gen::parse::scope::ScopeId;
 
 use typemap::CodegenContext;
 
@@ -238,14 +240,14 @@ pub enum ExportSpec {
 /// Generate Rust source code from a parsed IR module + global context.
 ///
 /// Returns the formatted source as a string, ready to be written to a file.
-pub fn generate(module: &Module, gctx: &crate::context::GlobalContext) -> anyhow::Result<String> {
+pub fn generate(module: &Module, gctx: &ts_gen::context::GlobalContext) -> anyhow::Result<String> {
     generate_with_options(module, gctx, &GenerateOptions::default())
 }
 
 /// Generate Rust source code with explicit options.
 pub fn generate_with_options(
     module: &Module,
-    gctx: &crate::context::GlobalContext,
+    gctx: &ts_gen::context::GlobalContext,
     options: &GenerateOptions,
 ) -> anyhow::Result<String> {
     let tokens = generate_tokens(module, gctx, options)?;
@@ -375,12 +377,10 @@ fn rustfmt(code: &str) -> anyhow::Result<String> {
     }
 }
 
-/// `std/std.ir`, the JS standard library as a lib IR.
+/// `std/std.tw`, the JS standard library as a lib IR.
 fn std_ir() -> &'static ts_gen_abi::ir::Ir {
     static STD: std::sync::OnceLock<ts_gen_abi::ir::Ir> = std::sync::OnceLock::new();
-    STD.get_or_init(|| {
-        ts_gen_abi::text::parse(include_str!("../../std/std.ir")).expect("std/std.ir parses")
-    })
+    STD.get_or_init(|| ts_gen_abi::text::parse(ts_gen::STD_IR).expect("std/std.tw parses"))
 }
 
 /// Generate the token stream for a full module.
@@ -391,19 +391,19 @@ fn std_ir() -> &'static ts_gen_abi::ir::Ir {
 /// so callers get `.await` for free without anything generated here.
 fn generate_tokens(
     module: &Module,
-    gctx: &crate::context::GlobalContext,
+    gctx: &ts_gen::context::GlobalContext,
     options: &GenerateOptions,
 ) -> anyhow::Result<TokenStream> {
     let surface = surface::Surface::build(module, gctx, options);
     let mut cgctx = CodegenContext::from_module_full(module, gctx, options, Some(&surface))?;
     if !options.legacy_codegen {
         // The input's lib types resolve against std (`with std`).
-        let opts = crate::lower::Options {
+        let opts = ts_gen::lower::Options {
             with: vec![std_ir().clone()],
             strict_nullable: options.strict_nullable,
             ..Default::default()
         };
-        let mut ir = from_ir::IrDecls::new(crate::lower::lower_with(module, gctx, &opts));
+        let mut ir = from_ir::IrDecls::new(ts_gen::lower::lower_with(module, gctx, &opts));
         if options.experimental_generic_mono {
             ir.monomorphize();
         }
@@ -425,11 +425,11 @@ fn generate_tokens(
     // the partial mapping.
     let mut module_groups: std::collections::BTreeMap<
         std::rc::Rc<str>,
-        Vec<crate::context::TypeId>,
+        Vec<ts_gen::context::TypeId>,
     > = std::collections::BTreeMap::new();
     for &type_id in &module.types {
         let decl = gctx.get_type(type_id);
-        if let crate::ir::ModuleContext::Module(m) = &decl.module_context {
+        if let ts_gen::ir::ModuleContext::Module(m) = &decl.module_context {
             module_groups.entry(m.clone()).or_default().push(type_id);
         }
     }
@@ -492,7 +492,7 @@ fn generate_tokens(
         .iter()
         .map(|(.., union)| {
             let name = typemap::make_ident(union.instance.as_deref().unwrap_or_default());
-            generate_union_alias_enum(&name, union, &cgctx, &crate::ir::ModuleContext::Global)
+            generate_union_alias_enum(&name, union, &cgctx, &ts_gen::ir::ModuleContext::Global)
         })
         .collect();
 
@@ -523,7 +523,7 @@ fn generate_tokens(
 /// type via the regular return-position path, resolved from the
 /// scope and module of the union's first use site.
 fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
-    use crate::ir::TypeRef as T;
+    use ts_gen::ir::TypeRef as T;
     let registry = cgctx.dynamic_unions.borrow();
     if registry.by_key.is_empty() {
         return quote! {};
@@ -594,16 +594,16 @@ fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
 /// Variant names for the members of a synthesised dynamic union, in member
 /// order. A name already taken in the enum (a `string` arm next to a
 /// `"String"` literal) is numbered, first-seen wins.
-pub(crate) fn dynamic_union_variant_names(members: &[crate::ir::TypeRef]) -> Vec<String> {
-    use crate::ir::TypeRef as T;
+pub(crate) fn dynamic_union_variant_names(members: &[ts_gen::ir::TypeRef]) -> Vec<String> {
+    use ts_gen::ir::TypeRef as T;
     let mut used = std::collections::HashSet::new();
     members
         .iter()
         .map(|m| {
             let base = match m {
-                T::StringLiteral(s) => crate::util::naming::to_pascal_case(s),
+                T::StringLiteral(s) => ts_gen::util::naming::to_pascal_case(s),
                 T::NumberLiteral(n) if n.fract() == 0.0 => {
-                    crate::util::naming::number_literal_pascal(*n)
+                    ts_gen::util::naming::number_literal_pascal(*n)
                 }
                 _ => dynamic_union_variant_name(m),
             };
@@ -646,8 +646,8 @@ pub(crate) fn dynamic_union_variant_names(members: &[crate::ir::TypeRef]) -> Vec
 /// | `ArrayBufferView` | `Uint8Array`    | `Uint8Array`    |
 /// | `Foo` (named)     | `Foo`           | `Foo`           |
 fn dynamic_union_variant_name(ty: &TypeRef) -> String {
-    use crate::ir::TypeRef as T;
-    use crate::util::naming::to_pascal_case;
+    use ts_gen::ir::TypeRef as T;
+    use ts_gen::util::naming::to_pascal_case;
     match ty {
         T::Boolean | T::BooleanLiteral(_) => "Bool".to_string(),
         T::Number | T::NumberLiteral(_) => "F64".to_string(),
@@ -687,7 +687,7 @@ fn dynamic_union_variant_name(ty: &TypeRef) -> String {
 /// The unit enum `id` from the IR, when there is one.
 fn ir_unit_enum(
     cgctx: &CodegenContext,
-    id: crate::context::TypeId,
+    id: ts_gen::context::TypeId,
     name: &str,
     js_namespace: &[String],
 ) -> Option<TokenStream> {
@@ -696,7 +696,7 @@ fn ir_unit_enum(
 
 /// Generate tokens for a single declaration.
 fn generate_declaration(
-    id: crate::context::TypeId,
+    id: ts_gen::context::TypeId,
     decl: &TypeDeclaration,
     cgctx: &CodegenContext,
     value_names: &mut functions::ValueNames,
@@ -776,10 +776,10 @@ fn generate_declaration(
 /// - Local alias: `pub type WritableStream = Writable;`
 /// - External re-export: `pub use external_crate::Foo;`
 fn generate_type_alias(
-    alias: &crate::ir::TypeAliasDecl,
+    alias: &ts_gen::ir::TypeAliasDecl,
     cgctx: &CodegenContext,
     scope: ScopeId,
-    from_module: &crate::ir::ModuleContext,
+    from_module: &ts_gen::ir::ModuleContext,
 ) -> TokenStream {
     if let Some(ref module) = alias.from_module {
         // External re-export: resolve through external map. The
@@ -817,7 +817,7 @@ fn generate_type_alias(
                 .gctx
                 .scopes
                 .resolve_binding(alias.body_scope, target_name),
-            Some(crate::parse::scope::Binding::TypeParam)
+            Some(ts_gen::parse::scope::Binding::TypeParam)
         );
         let resolves_local = cgctx
             .gctx
@@ -826,7 +826,7 @@ fn generate_type_alias(
             .is_some_and(|id| cgctx.local_type_ids.contains(&id));
         if !is_type_param
             && !resolves_local
-            && !crate::codegen::typemap::JS_SYS_RESERVED.contains(&target_name)
+            && !ts_gen::external_map::JS_SYS_RESERVED.contains(&target_name)
         {
             cgctx.warn(format!(
                 "Type alias `{}` targets unknown type `{target_name}`, skipping",
@@ -865,7 +865,7 @@ fn generate_type_alias(
     // unexported member), so those stay.
     let union_alias = cgctx
         .resolve_alias(&alias.name, scope)
-        .is_some_and(|(target, _)| matches!(target.as_ref(), crate::ir::TypeRef::Union(_)));
+        .is_some_and(|(target, _)| matches!(target.as_ref(), ts_gen::ir::TypeRef::Union(_)));
     if union_alias
         && renamed.is_none()
         && alias.type_params.is_empty()
@@ -931,9 +931,9 @@ fn generate_union_alias_enum(
     name: &syn::Ident,
     union: &typemap::UnionAlias,
     cgctx: &CodegenContext,
-    from_module: &crate::ir::ModuleContext,
+    from_module: &ts_gen::ir::ModuleContext,
 ) -> TokenStream {
-    use crate::ir::TypeRef;
+    use ts_gen::ir::TypeRef;
     let enum_name = union
         .kind
         .as_deref()
@@ -954,7 +954,7 @@ fn generate_union_alias_enum(
         // A view is written as the `Object` an argument takes, from any
         // typed array or `DataView`.
         let views = (arm == &TypeRef::ArrayBufferView).then(|| {
-            crate::ir::TypedArrayElement::typed_arrays()
+            ts_gen::ir::TypedArrayElement::typed_arrays()
                 .chain(["DataView"])
                 .map(|n| {
                     let n = typemap::make_ident(n);
@@ -1120,7 +1120,7 @@ struct ModTree<'d> {
 
 enum ModEntry<'d> {
     /// A declaration and the JS path of the namespaces enclosing it.
-    Item(crate::context::TypeId, &'d TypeDeclaration, Vec<String>),
+    Item(ts_gen::context::TypeId, &'d TypeDeclaration, Vec<String>),
     /// A child `pub mod`, at the position of its first declaration.
     Mod(String),
 }
@@ -1142,7 +1142,7 @@ impl<'d> ModTree<'d> {
     /// members that are in the surface, under the name it binds by in JS.
     fn insert(
         &mut self,
-        id: crate::context::TypeId,
+        id: ts_gen::context::TypeId,
         decl: &'d TypeDeclaration,
         mut js_namespace: Vec<String>,
         surface: &'d surface::Surface<'d>,
@@ -1152,7 +1152,7 @@ impl<'d> ModTree<'d> {
                 let name = surface.mod_name(id, &ns.name);
                 let aliases = self.aliases.entry(name.clone()).or_default();
                 for public in surface.names(id).iter().filter(|&p| p != "default") {
-                    let alias = crate::util::naming::to_snake_case(public);
+                    let alias = ts_gen::util::naming::to_snake_case(public);
                     if alias != name && !aliases.contains(&alias) {
                         aliases.push(alias);
                     }
@@ -1232,7 +1232,7 @@ impl<'d> ModTree<'d> {
 /// Adds `js_namespace` attribute to extern blocks so wasm_bindgen emits
 /// the correct JS access (e.g., `WebAssembly.Module`).
 fn generate_ns_declaration(
-    id: crate::context::TypeId,
+    id: ts_gen::context::TypeId,
     decl: &TypeDeclaration,
     js_namespace: &[String],
     cgctx: &CodegenContext,

@@ -2,7 +2,7 @@
 
 A tour of the Workers API from Kotlin/Wasm: a Cloudflare Worker over
 `tests/fixtures/workers-types.d.ts` and the JS standard library
-(`std/std.ir`), bound through the v2 IR under the profile
+(`std/std.tw`), bound through the v2 IR under the profile
 `all-host, results = single, throws = js`. Each route does one thing and
 replies in plain text; `/` lists them.
 
@@ -61,16 +61,16 @@ The declarations beside the app:
 
 `run.sh`:
 
-1. `ts-gen --ir`, with `--annotate annotate.d.ts`, `--with std.ir` and
+1. `ts-gen --ir`, with `--annotate annotate.d.ts`, `--with std.tw` and
    `--provides provides.d.ts`: the IR.
-2. `ts-gen-abi lower --profile "all-host, results = single, throws = js"`,
-   then `kotlin-bindgen`, for `std.ir` and for the worker: the bindings
+2. `ts-gen --json --profile "all-host, results = single, throws = js"`,
+   then `kotlin-bindgen`, for `std.tw` and for the worker: the bindings
    (`build/std/` with `tsgen.runtime`, and `build/bindings/` over them
    with `--lib std=std`), each with a `links.tsv`.
 3. Gradle: the Kotlin/Wasm module, from the bindings and the app.
 4. `kotlin-bindgen link`: Kotlin imports every `@JsFun` from `js_code` under
    its qualified name; the link step renames the ones the `links.tsv`
-   files list to their tw keys. `ts-gen-bridge generate` then writes the
+   files list to their tw keys. `ts-gen --bridge` then writes the
    bridge for the linked module.
 
 `loader.js` instantiates the linked module through the bridge's

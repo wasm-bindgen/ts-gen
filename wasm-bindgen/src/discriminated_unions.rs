@@ -1,4 +1,4 @@
-//! Codegen for [`crate::ir::DiscriminatedUnionDecl`].
+//! Codegen for [`ts_gen::ir::DiscriminatedUnionDecl`].
 //!
 //! A discriminated union is rendered very similarly to a dictionary
 //! interface: a single `pub type Foo;` with getter/setter bindings for
@@ -32,8 +32,8 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::ir::{DiscriminatedUnionDecl, GetterMember, Member, ModuleContext};
-use crate::parse::scope::ScopeId;
+use ts_gen::ir::{DiscriminatedUnionDecl, GetterMember, Member, ModuleContext};
+use ts_gen::parse::scope::ScopeId;
 
 use super::classes::{generate_dictionary_factory_with_passes, generate_extern_block, ClassConfig};
 use super::typemap::CodegenContext;

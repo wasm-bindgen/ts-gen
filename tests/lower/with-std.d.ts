@@ -1,6 +1,6 @@
-//! @ts-gen --with std/std.ir
+//! @ts-gen --with std/std.tw
 
-// `--with std/std.ir` resolves lib types against the `std` lib IR (§5)
+// `--with std/std.tw` resolves lib types against the `std` lib IR (§5)
 // instead of stubbing them: `with std;`, and no declarations of its own
 // for `Date`, `Map` or `Uint8Array`. A lib type `std` doesn't declare is
 // still stubbed, and the input's own declarations come first.

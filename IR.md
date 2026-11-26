@@ -425,7 +425,7 @@ interface Event {
   from TypeScript's `lib.*.d.ts`.
 * `with name;` resolves the IR's paths against the lib `name` too. The IR's
   own declarations come first, then each `with` lib's, in order. Tools are
-  handed the lib IRs (`--with std.ir`). A `with` that no supplied lib
+  handed the lib IRs (`--with std.tw`). A `with` that no supplied lib
   satisfies is a validation error.
 * A lib's declarations keep their own location, import module and keys. A
   reference to a lib type adds no imports to the referencing IR: the lib's

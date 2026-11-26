@@ -1,6 +1,6 @@
 //! IR members in the generator's signature model.
 //!
-//! The Rust signature pipeline renders [`crate::ir`] types. A callable read
+//! The Rust signature pipeline renders [`ts_gen::ir`] types. A callable read
 //! from the IR keeps its IR overloads, already expanded by the producer,
 //! and states each type in that model. A type the model reads differently
 //! from the IR (a synthesized enum the parse never saw, a name that resolves
@@ -12,9 +12,9 @@ use std::collections::HashMap;
 use ts_gen_abi::ir as abi;
 use ts_gen_abi::resolve::{Context, Location, Symbols, Target, TypeDecl};
 
-use crate::context::{GlobalContext, TypeId};
-use crate::ir::{AbiScalar, FunctionSig, Param, Throws, TypeKind, TypeRef};
-use crate::parse::scope::ScopeId;
+use ts_gen::context::{GlobalContext, TypeId, DECLARED};
+use ts_gen::ir::{AbiScalar, FunctionSig, Param, Throws, TypeKind, TypeRef};
+use ts_gen::parse::scope::ScopeId;
 
 /// One IR overload, stated in the signature model.
 pub struct Overload {
@@ -202,14 +202,14 @@ pub fn overload(cx: &Cx<'_>, m: &abi::Member) -> Option<Overload> {
                 TypeRef::TypedSlice(e, _) if view => TypeRef::TypedSlice(
                     e,
                     match p.unshared {
-                        true => crate::ir::SharedMemory::Rejected,
-                        false => crate::ir::SharedMemory::Accepted,
+                        true => ts_gen::ir::SharedMemory::Rejected,
+                        false => ts_gen::ir::SharedMemory::Accepted,
                     },
                 ),
                 t => t,
             };
             Some(Param {
-                name: crate::util::naming::to_snake_case(&p.name),
+                name: ts_gen::util::naming::to_snake_case(&p.name),
                 js_name: None,
                 type_ref: match filled(&p.name) {
                     true => t.without_undefined(),
@@ -217,7 +217,7 @@ pub fn overload(cx: &Cx<'_>, m: &abi::Member) -> Option<Overload> {
                 },
                 optional: false,
                 variadic: spread(&p.name),
-                slice_mode: view.then_some(crate::ir::SliceModeHint::View),
+                slice_mode: view.then_some(ts_gen::ir::SliceModeHint::View),
             })
         })
         .collect::<Option<Vec<_>>>()?;
@@ -479,7 +479,7 @@ fn ty(cx: &Cx<'_>, t: &abi::Type) -> Option<TypeRef> {
             elem: e,
         } => match **e {
             T::Scalar(s) => {
-                use crate::ir::TypedArrayElement as E;
+                use ts_gen::ir::TypedArrayElement as E;
                 let element = match s {
                     abi::Scalar::I8 => E::I8,
                     abi::Scalar::U8 => E::U8,
@@ -493,7 +493,7 @@ fn ty(cx: &Cx<'_>, t: &abi::Type) -> Option<TypeRef> {
                     abi::Scalar::U64 => E::U64,
                     _ => return None,
                 };
-                TypeRef::TypedSlice(element, crate::ir::SharedMemory::Accepted)
+                TypeRef::TypedSlice(element, ts_gen::ir::SharedMemory::Accepted)
             }
             _ => return None,
         },
@@ -660,12 +660,7 @@ fn literals(cx: &Cx<'_>, t: &abi::Type) -> Option<TypeRef> {
 /// synthesised as, which no TS name can be: the parse reads its union.
 pub const SYNTHESISED: &str = "#enum";
 
-/// The segment that names a declaration by its id, `#decl.<id>`, where
-/// the IR's path names it otherwise than the parse does in scope: in
-/// another module, or shadowed. The parse's name for it restates it.
-pub const DECLARED: &str = "#decl";
-
-fn declared_ref(id: crate::context::TypeId) -> TypeRef {
+fn declared_ref(id: ts_gen::context::TypeId) -> TypeRef {
     TypeRef::Reference {
         segments: vec![DECLARED.into(), id.index().to_string()],
         generic_args: Vec::new(),
@@ -743,7 +738,7 @@ fn named(cx: &Cx<'_>, path: &abi::Path) -> Option<TypeRef> {
             let binds = |scope| {
                 matches!(
                     cx.gctx.scopes.resolve_binding(scope, &segments[0]),
-                    Some(crate::parse::scope::Binding::TypeParam)
+                    Some(ts_gen::parse::scope::Binding::TypeParam)
                 )
             };
             if !binds(cx.scope) && !cx.bound.iter().copied().any(binds) {

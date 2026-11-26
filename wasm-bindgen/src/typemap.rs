@@ -18,13 +18,14 @@ use std::collections::{HashMap, HashSet};
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::codegen::signatures::PromiseForm;
-use crate::codegen::GenerateOptions;
-use crate::context::{GlobalContext, TypeId};
-use crate::ir::{self, ModuleContext, Throws, TypeKind, TypeRef};
-use crate::parse::scope::ScopeId;
-use crate::util::diagnostics::DiagnosticCollector;
-use crate::util::naming::{LocalScope, Suffix};
+use crate::signatures::PromiseForm;
+use crate::GenerateOptions;
+use ts_gen::context::{GlobalContext, TypeId};
+use ts_gen::external_map::JS_SYS_RESERVED;
+use ts_gen::ir::{self, ModuleContext, Throws, TypeKind, TypeRef};
+use ts_gen::parse::scope::ScopeId;
+use ts_gen::util::diagnostics::DiagnosticCollector;
+use ts_gen::util::naming::{LocalScope, Suffix};
 
 /// Heads [`lower_reference`] maps to `js_sys` containers rather than to
 /// a declaration of the same name.
@@ -44,61 +45,6 @@ const DEDICATED_HEADS: &[&str] = &[
     "AsyncIterable",
     "Array",
     "ReadonlyArray",
-];
-
-/// js_sys type names reserved by the `use js_sys::*` glob import.
-/// User-defined types that collide with these will be renamed.
-pub const JS_SYS_RESERVED: &[&str] = &[
-    "AggregateError",
-    "Array",
-    "ArrayBuffer",
-    "ArrayTuple",
-    "AsyncGenerator",
-    "AsyncIterator",
-    "BigInt",
-    "BigInt64Array",
-    "BigUint64Array",
-    "Boolean",
-    "DataView",
-    "Date",
-    "Error",
-    "EvalError",
-    "Float32Array",
-    "Float64Array",
-    "Function",
-    "Generator",
-    "Global",
-    "Int16Array",
-    "Int32Array",
-    "Int8Array",
-    "Iterator",
-    "IteratorNext",
-    "JsNullable",
-    "JsOption",
-    "JsString",
-    "Map",
-    "Nullable",
-    "Number",
-    "Object",
-    "Promise",
-    "Proxy",
-    "RangeError",
-    "ReferenceError",
-    "RegExp",
-    "Set",
-    "SharedArrayBuffer",
-    "Symbol",
-    "SyntaxError",
-    "TypeError",
-    "Uint16Array",
-    "Uint32Array",
-    "Uint8Array",
-    "Uint8ClampedArray",
-    "Undefined",
-    "UriError",
-    "WeakMap",
-    "WeakRef",
-    "WeakSet",
 ];
 
 /// Prelude names the generated code spells bare, so a declaration with one
@@ -224,7 +170,7 @@ pub struct CodegenContext<'a> {
     /// Local types that collide with js_sys reserved names — maps original name → renamed name.
     pub renamed_locals: HashMap<String, String>,
     /// Types the surface emits under another name than their own (see
-    /// [`crate::codegen::surface::Surface::type_names`]).
+    /// [`crate::surface::Surface::type_names`]).
     renamed_types: HashMap<TypeId, String>,
     /// Types a constructor-shaped variable already binds `new` on, which
     /// a second such variable would redefine.
@@ -241,11 +187,11 @@ pub struct CodegenContext<'a> {
     /// but is emitted at the top level.
     pub emit_path: RefCell<Vec<String>>,
     /// The lowered IR, for the declaration kinds emitted from it.
-    pub ir: Option<crate::codegen::from_ir::IrDecls>,
+    pub ir: Option<crate::from_ir::IrDecls>,
     /// The readings the IR zip takes from the parse, when they're asked for.
-    pub zip: Option<crate::codegen::ir_callables::Zip>,
+    pub zip: Option<crate::ir_callables::Zip>,
     /// The type declaration being emitted.
-    pub current_decl: std::cell::Cell<Option<crate::context::TypeId>>,
+    pub current_decl: std::cell::Cell<Option<ts_gen::context::TypeId>>,
     /// The statics the module being emitted sees, which a parameter or
     /// local can't shadow (E0530).
     pub statics_in_scope: RefCell<HashSet<String>>,
@@ -281,18 +227,18 @@ pub struct CodegenContext<'a> {
     naming_module: RefCell<ModuleContext>,
     /// Default error type for fallible bindings without `@throws`;
     /// `None` is `JsValue`. See
-    /// [`crate::codegen::GenerateOptions::error_type`].
+    /// [`crate::GenerateOptions::error_type`].
     pub error_type: Option<syn::Type>,
     /// Whether sync callables emit one catching `Result` form under the
     /// primary name instead of a trapping primary plus `try_<name>`. See
-    /// [`crate::codegen::GenerateOptions::fallible`].
+    /// [`crate::GenerateOptions::fallible`].
     pub fallible: bool,
     /// How promise returns are bound. See
-    /// [`crate::codegen::GenerateOptions::promise_returns`].
-    pub promise_returns: crate::codegen::PromiseReturns,
+    /// [`crate::GenerateOptions::promise_returns`].
+    pub promise_returns: crate::PromiseReturns,
     /// Name of the generated `@throws` enum; every `@throws`-typed
     /// binding returns it. See
-    /// [`crate::codegen::GenerateOptions::error_enum`].
+    /// [`crate::GenerateOptions::error_enum`].
     pub error_enum: Option<String>,
     /// Whether generic imports use wasm-bindgen's experimental
     /// per-monomorphization codegen rather than type erasure.
@@ -562,7 +508,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
 /// What a name binds in a scope.
 #[derive(Clone, Copy, PartialEq)]
 enum Bound {
-    Type(crate::context::TypeId),
+    Type(ts_gen::context::TypeId),
     Namespace(ScopeId),
 }
 
@@ -688,10 +634,10 @@ pub(crate) fn externalised_modules(module: &ir::Module, gctx: &GlobalContext) ->
     for &type_id in &module.types {
         let decl = gctx.get_type(type_id);
         if let ModuleContext::Module(m) = &decl.module_context {
-            let name = type_decl_name(&decl.kind);
-            if let Some(name) = name {
-                module_groups.entry(m.as_ref()).or_default().push(name);
-            }
+            module_groups
+                .entry(m.as_ref())
+                .or_default()
+                .push(decl.kind.name());
         }
     }
     let mut externalised_modules = HashSet::new();
@@ -1142,7 +1088,7 @@ impl<'a> CodegenContext<'a> {
         module: &ir::Module,
         gctx: &'a GlobalContext,
         options: &GenerateOptions,
-        surface: Option<&crate::codegen::surface::Surface<'_>>,
+        surface: Option<&crate::surface::Surface<'_>>,
     ) -> anyhow::Result<Self> {
         let error_type = options
             .error_type
@@ -1473,7 +1419,7 @@ impl<'a> CodegenContext<'a> {
         &self,
         type_name: &str,
         from_module: &str,
-    ) -> Option<crate::external_map::RustPath> {
+    ) -> Option<ts_gen::external_map::RustPath> {
         self.gctx.external_map.resolve(type_name, from_module)
     }
 
@@ -1593,7 +1539,7 @@ impl<'a> CodegenContext<'a> {
         if let [name] = segments.as_slice() {
             if matches!(
                 self.gctx.scopes.resolve_binding(scope, name),
-                Some(crate::parse::scope::Binding::TypeParam)
+                Some(ts_gen::parse::scope::Binding::TypeParam)
             ) {
                 return None;
             }
@@ -1680,8 +1626,7 @@ impl<'a> CodegenContext<'a> {
     }
 
     fn compute_union(&self, target: &TypeRef, scope: ScopeId, name: &str) -> Option<UnionAlias> {
-        let alternatives =
-            crate::codegen::signatures::union_alias_alternatives(target, self, scope)?;
+        let alternatives = crate::signatures::union_alias_alternatives(target, self, scope)?;
         let mut arms: Vec<TypeRef> = Vec::new();
         let mut nullability: Option<ir::Nullability> = None;
         let mut admit = |n: ir::Nullability| {
@@ -2127,7 +2072,7 @@ impl<'a> CodegenContext<'a> {
         &mut self,
         type_id: TypeId,
         mod_path: &[String],
-        surface: Option<&crate::codegen::surface::Surface<'_>>,
+        surface: Option<&crate::surface::Surface<'_>>,
     ) {
         let gctx = self.gctx;
         let decl = gctx.get_type(type_id);
@@ -2143,7 +2088,7 @@ impl<'a> CodegenContext<'a> {
                 let mut path = mod_path.to_vec();
                 path.push(match surface {
                     Some(surface) => surface.mod_name(type_id, &ns.name),
-                    None => crate::util::naming::to_snake_case(&ns.name),
+                    None => ts_gen::util::naming::to_snake_case(&ns.name),
                 });
                 for &member in &ns.declarations {
                     self.collect_declaration(member, &path, surface);
@@ -2172,7 +2117,7 @@ impl<'a> CodegenContext<'a> {
         if self.lib_name.as_deref() == Some(specifier) {
             return Vec::new();
         }
-        crate::util::naming::module_path(specifier)
+        ts_gen::util::naming::module_path(specifier)
     }
 
     /// The path from the `pub mod` being emitted into to the one `target`
@@ -2221,35 +2166,17 @@ impl<'a> CodegenContext<'a> {
     pub(crate) fn external_module_unresolved(
         &self,
         spec: &str,
-        type_ids: &[crate::context::TypeId],
+        type_ids: &[ts_gen::context::TypeId],
     ) -> Vec<String> {
         let mut unresolved = Vec::new();
         for &type_id in type_ids {
             let decl = self.gctx.get_type(type_id);
-            if let Some(name) = type_decl_name(&decl.kind) {
-                if self.gctx.external_map.resolve(name, spec).is_none() {
-                    unresolved.push(name.to_string());
-                }
+            let name = decl.kind.name();
+            if self.gctx.external_map.resolve(name, spec).is_none() {
+                unresolved.push(name.to_string());
             }
         }
         unresolved
-    }
-}
-
-/// Helper: get the public name of a declaration kind, if it has one.
-/// Mirrors the `kind` arms in `populate_builtin_scope::declaration_name`.
-pub(crate) fn type_decl_name(kind: &ir::TypeKind) -> Option<&str> {
-    match kind {
-        ir::TypeKind::Class(c) => Some(&c.name),
-        ir::TypeKind::Interface(i) => Some(&i.name),
-        ir::TypeKind::DiscriminatedUnion(d) => Some(&d.name),
-        ir::TypeKind::TypeAlias(a) => Some(&a.name),
-        ir::TypeKind::StringEnum(e) => Some(&e.name),
-        ir::TypeKind::NumericEnum(e) => Some(&e.name),
-        ir::TypeKind::TsEnum(e) => Some(&e.name),
-        ir::TypeKind::Function(f) => Some(&f.name),
-        ir::TypeKind::Variable(v) => Some(&v.name),
-        ir::TypeKind::Namespace(n) => Some(&n.name),
     }
 }
 
@@ -2455,7 +2382,7 @@ pub fn to_syn_type(
             // Single source of truth for union LUB — handles literal
             // widening, named-type ancestor walking, and the JsValue
             // fallback diagnostic uniformly. See `subtyping::lub_union`.
-            if let Some(lub) = crate::codegen::subtyping::lub_union(u.members(), ctx, scope) {
+            if let Some(lub) = crate::subtyping::lub_union(u.members(), ctx, scope) {
                 return to_syn_type(&lub, pos, ctx, scope, from_module);
             }
             // Shapes have no runtime class to tell them apart, so the
@@ -2482,7 +2409,7 @@ pub fn to_syn_type(
             maybe_ref(quote! { JsValue }, borrow)
         }
         TypeRef::Intersection(members) => {
-            if let Some(bound) = crate::codegen::subtyping::glb_intersection(members, ctx, scope) {
+            if let Some(bound) = crate::subtyping::glb_intersection(members, ctx, scope) {
                 return to_syn_type(&bound, pos, ctx, scope, from_module);
             }
             if let Some(c) = ctx {
@@ -2619,7 +2546,7 @@ pub fn to_syn_type(
                 if c.experimental_generic_mono
                     && matches!(
                         c.gctx.scopes.resolve_binding(scope, param),
-                        Some(crate::parse::scope::Binding::TypeParam),
+                        Some(ts_gen::parse::scope::Binding::TypeParam),
                     )
                 {
                     let (param, assoc) = (make_ident(param), make_ident(assoc));
@@ -2631,7 +2558,7 @@ pub fn to_syn_type(
                     if c.experimental_generic_mono
                         && matches!(
                             c.gctx.scopes.resolve_binding(scope, &segments[0]),
-                            Some(crate::parse::scope::Binding::TypeParam),
+                            Some(ts_gen::parse::scope::Binding::TypeParam),
                         )
                     {
                         return lower_reference(
@@ -2746,7 +2673,7 @@ fn is_type_param(ty: &TypeRef, ctx: Option<&CodegenContext<'_>>, scope: ScopeId)
     match (ty.as_ident(), ctx) {
         (Some(name), Some(c)) => matches!(
             c.gctx.scopes.resolve_binding(scope, name),
-            Some(crate::parse::scope::Binding::TypeParam)
+            Some(ts_gen::parse::scope::Binding::TypeParam)
         ),
         _ => false,
     }
@@ -3017,8 +2944,7 @@ fn emit_type_name(name: &str, use_scope: ScopeId, ctx: &CodegenContext<'_>) -> T
             .renamed_types
             .get(&type_id)
             .map(String::as_str)
-            .or_else(|| type_decl_name(&ctx.gctx.get_type(type_id).kind))
-            .unwrap_or(ident_name);
+            .unwrap_or_else(|| ctx.gctx.get_type(type_id).kind.name());
         let rust_name = ctx
             .renamed_locals
             .get(declared)
@@ -3214,7 +3140,7 @@ fn lower_reference(
         if let Some(c) = ctx {
             if matches!(
                 c.gctx.scopes.resolve_binding(scope, head),
-                Some(crate::parse::scope::Binding::TypeParam),
+                Some(ts_gen::parse::scope::Binding::TypeParam),
             ) {
                 if let Some(arg) = c.param_arg(scope, head) {
                     return arg;
@@ -3309,7 +3235,7 @@ fn with_generic_args(
 /// (`Stepped<"hour">`), as their enum, named for them as the IR names it.
 fn family_literal_arg(
     c: &CodegenContext<'_>,
-    id: crate::context::TypeId,
+    id: ts_gen::context::TypeId,
     index: usize,
     arg: &TypeRef,
     scope: ScopeId,
@@ -3337,7 +3263,7 @@ fn family_literal_arg(
         .collect::<Option<_>>()?;
     let name: String = literals
         .iter()
-        .map(|l| crate::util::naming::to_pascal_case(l))
+        .map(|l| ts_gen::util::naming::to_pascal_case(l))
         .collect::<Vec<_>>()
         .join("Or");
     let name = c.synthesise_literal_enum(&name, members, false, scope, from_module)?;
@@ -3394,8 +3320,8 @@ pub(crate) fn make_ident(name: &str) -> syn::Ident {
     // Value names arrive snake-cased, already spelled out by `to_snake_case`,
     // so a name with nothing left here is a type declaration or reference.
     let sanitized = if !sanitized.chars().any(char::is_alphanumeric) {
-        match crate::util::naming::symbol_words(name) {
-            Some(_) => crate::util::naming::to_pascal_case(name),
+        match ts_gen::util::naming::symbol_words(name) {
+            Some(_) => ts_gen::util::naming::to_pascal_case(name),
             None => "__unknown__".to_string(),
         }
     } else if sanitized.starts_with(|c: char| c.is_ascii_digit()) {
@@ -3614,7 +3540,7 @@ fn is_generic_rust_list(ty: &TypeRef, ctx: &CodegenContext<'_>, scope: ScopeId) 
         return false;
     };
     let mut names = Vec::new();
-    crate::codegen::signatures::collect_type_params(element, ctx, scope, &mut names);
+    crate::signatures::collect_type_params(element, ctx, scope, &mut names);
     !names.is_empty()
 }
 
@@ -3655,7 +3581,7 @@ pub(crate) fn peel_mono<'t>(
             // A union admitting an empty stops here, for the walker to
             // take its carrier.
             TypeRef::Union(u) if u.nullability().is_none() => {
-                crate::codegen::subtyping::lub_union(u.members(), Some(ctx), scope)
+                crate::subtyping::lub_union(u.members(), Some(ctx), scope)
                     .filter(|lub| !matches!(lub, TypeRef::Union(_)))
                     .map(|lub| (lub, scope))
             }
@@ -3917,7 +3843,7 @@ fn to_mono_js_string_return_type_impl(
 /// `@throws` annotation: `JsValue` unless
 /// [`GenerateOptions::error_type`][1] names a path.
 ///
-/// [1]: crate::codegen::GenerateOptions::error_type
+/// [1]: crate::GenerateOptions::error_type
 fn default_error_type(ctx: Option<&CodegenContext<'_>>) -> TokenStream {
     match ctx.and_then(|c| c.error_type.as_ref()) {
         Some(ty) => quote! { #ty },
@@ -4084,7 +4010,7 @@ impl<'a> ReturnAnchor<'a> {
                 .collect(),
             false => self.base.to_string(),
         };
-        let pc = crate::util::naming::to_pascal_case(&base);
+        let pc = ts_gen::util::naming::to_pascal_case(&base);
         match self.kind {
             ReturnAnchorKind::Getter => pc,
             ReturnAnchorKind::Callable => format!("{pc}Return"),
@@ -4236,7 +4162,7 @@ pub(crate) fn setter_enum(
     let members = &arms.members;
     let integer_enum = is_integer_literal_union(members);
     let has_string = members.contains(&TypeRef::String);
-    let variant_names = crate::codegen::dynamic_union_variant_names(members);
+    let variant_names = crate::dynamic_union_variant_names(members);
     let variants: Vec<(TypeRef, String)> = members
         .iter()
         .zip(variant_names)
@@ -4329,7 +4255,7 @@ fn dynamic_union_members(
     let has_literal = widened
         .iter()
         .any(|m| matches!(m, TypeRef::StringLiteral(_)));
-    if !has_literal && crate::codegen::subtyping::lub_union(&widened, ctx, scope).is_some() {
+    if !has_literal && crate::subtyping::lub_union(&widened, ctx, scope).is_some() {
         return None;
     }
     let arms = discriminable_arms(widened, ctx, scope, from_module);
@@ -4459,7 +4385,7 @@ pub enum SliceMode {
     /// greppable in generated code.
     View,
     /// [`Self::View`] of a typed array whose callee rejects a view of shared
-    /// memory ([`crate::ir::SharedMemory::Rejected`]). Atomics builds use
+    /// memory ([`ts_gen::ir::SharedMemory::Rejected`]). Atomics builds use
     /// shared memory, so the function is emitted twice: a view without
     /// `target_feature = "atomics"` and a copy with it.
     UnsharedView,
@@ -4481,7 +4407,7 @@ pub enum SliceMode {
 /// the function: a fn-level mode is inherited by every slice parameter,
 /// which would also turn a `TypedSlice`'s typed copy into a plain `Array`.
 pub fn param_slice_mode(
-    p: &crate::codegen::signatures::ConcreteParam,
+    p: &crate::signatures::ConcreteParam,
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> Option<SliceMode> {
@@ -4507,17 +4433,17 @@ pub fn param_slice_mode(
     // typed-array handle overload) aren't slices.
     match (p.slice_mode, inferred) {
         (Some(hint), Some(_)) => Some(match hint {
-            crate::ir::SliceModeHint::View
+            ts_gen::ir::SliceModeHint::View
                 if matches!(
                     ty,
-                    TypeRef::TypedSlice(_, crate::ir::SharedMemory::Rejected)
+                    TypeRef::TypedSlice(_, ts_gen::ir::SharedMemory::Rejected)
                 ) =>
             {
                 SliceMode::UnsharedView
             }
-            crate::ir::SliceModeHint::View => SliceMode::View,
-            crate::ir::SliceModeHint::Array => SliceMode::Array,
-            crate::ir::SliceModeHint::Copy => SliceMode::Copy,
+            ts_gen::ir::SliceModeHint::View => SliceMode::View,
+            ts_gen::ir::SliceModeHint::Array => SliceMode::Array,
+            ts_gen::ir::SliceModeHint::Copy => SliceMode::Copy,
         }),
         (_, inferred) => inferred,
     }
@@ -4539,7 +4465,7 @@ fn is_mono_type_param(ty: &TypeRef, ctx: Option<&CodegenContext<'_>>, scope: Sco
                 && generic_args.is_empty()
                 && matches!(
                     c.gctx.scopes.resolve_binding(scope, &segments[0]),
-                    Some(crate::parse::scope::Binding::TypeParam),
+                    Some(ts_gen::parse::scope::Binding::TypeParam),
                 )
     )
 }
@@ -4701,8 +4627,8 @@ fn native_array_leaf<'t>(
 mod tests {
     use super::*;
 
-    use crate::ir::Nullability;
-    use crate::parse::scope::ScopeId;
+    use ts_gen::ir::Nullability;
+    use ts_gen::parse::scope::ScopeId;
 
     #[test]
     fn setter_enum_goes_first_and_widens_the_literals_it_absorbs() {
@@ -4748,7 +4674,7 @@ mod tests {
             ty,
             TypePosition::ARGUMENT,
             None,
-            ScopeId(0),
+            ScopeId::DUMMY,
             &ModuleContext::Global,
         )
         .to_string()
@@ -4759,7 +4685,7 @@ mod tests {
             ty,
             TypePosition::RETURN,
             None,
-            ScopeId(0),
+            ScopeId::DUMMY,
             &ModuleContext::Global,
         )
         .to_string()
@@ -4793,7 +4719,7 @@ mod tests {
             ],
             target: TypeRef::union([ident("U"), ident("V"), ident("W")]),
             from_module: None,
-            body_scope: ScopeId(0),
+            body_scope: ScopeId::DUMMY,
         };
         assert_eq!(
             *alias_target_with_defaults(&alias),
@@ -4828,7 +4754,7 @@ mod tests {
             ty,
             TypePosition::RETURN.to_inner(),
             None,
-            ScopeId(0),
+            ScopeId::DUMMY,
             &ModuleContext::Global,
         )
         .to_string()
@@ -5006,8 +4932,8 @@ mod tests {
         assert_eq!(inner_type(&ty), "Array < Number >");
     }
 
-    fn cp(name: &str, ty: TypeRef) -> crate::codegen::signatures::ConcreteParam {
-        crate::codegen::signatures::ConcreteParam {
+    fn cp(name: &str, ty: TypeRef) -> crate::signatures::ConcreteParam {
+        crate::signatures::ConcreteParam {
             name: name.to_string(),
             type_ref: ty,
             variadic: false,
@@ -5052,7 +4978,7 @@ mod tests {
     #[test]
     fn mono_type_param_slices_take_array_mode() {
         let src = "declare class Holder<T> { constructor(value: T); }";
-        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, None).unwrap();
         let scope = *module.file_scopes.first().expect("file scope");
         let TypeKind::Class(holder) = &gctx
             .get_type(gctx.resolve_path(scope, "Holder").unwrap())
@@ -5084,13 +5010,11 @@ mod tests {
 
     #[test]
     fn slice_mode_param_shapes() {
-        use crate::ir::TypedArrayElement as E;
+        use ts_gen::ir::TypedArrayElement as E;
         with_mono_ctx(MONO_SRC, |ctx, scope| {
-            let mode = |p: &crate::codegen::signatures::ConcreteParam| {
-                param_slice_mode(p, Some(ctx), scope)
-            };
+            let mode = |p: &crate::signatures::ConcreteParam| param_slice_mode(p, Some(ctx), scope);
             let numbers = || TypeRef::Array(Box::new(TypeRef::Number));
-            let typed = || TypeRef::TypedSlice(E::U8, crate::ir::SharedMemory::Accepted);
+            let typed = || TypeRef::TypedSlice(E::U8, ts_gen::ir::SharedMemory::Accepted);
             assert_eq!(
                 mode(&cp("xs", numbers().with_empties(Nullability::Undefined))),
                 Some(SliceMode::Array)
@@ -5119,14 +5043,14 @@ mod tests {
 
             // A `{@slice mode}` hint overrides where the lowering is
             // slice-shaped, and is dropped by shape otherwise.
-            use crate::ir::SliceModeHint as H;
+            use ts_gen::ir::SliceModeHint as H;
             let hinted = |ty: TypeRef, h: H| {
                 let mut p = cp("xs", ty);
                 p.slice_mode = Some(h);
                 p
             };
             assert_eq!(mode(&hinted(typed(), H::View)), Some(SliceMode::View));
-            let unshared = TypeRef::TypedSlice(E::U8, crate::ir::SharedMemory::Rejected);
+            let unshared = TypeRef::TypedSlice(E::U8, ts_gen::ir::SharedMemory::Rejected);
             assert_eq!(
                 mode(&hinted(unshared.clone(), H::View)),
                 Some(SliceMode::UnsharedView)
@@ -5266,7 +5190,7 @@ mod tests {
                 false,
                 None,
                 None,
-                ScopeId(0),
+                ScopeId::DUMMY,
                 &ModuleContext::Global,
                 ReturnAnchor {
                     base: "test",
@@ -5350,7 +5274,7 @@ mod tests {
     #[test]
     fn test_local_type_overrides_web_sys() {
         let (module, gctx) =
-            crate::parse_source("interface Response { ok: boolean; }", None).unwrap();
+            ts_gen::parse_source("interface Response { ok: boolean; }", None).unwrap();
         let ctx = CodegenContext::from_module(&module, &gctx);
         let (tokens, uses) = lower_name(
             &ctx,
@@ -5366,15 +5290,15 @@ mod tests {
     fn test_union_alias_resolves_to_jsvalue() {
         // A type alias to a union resolves through the scope and erases to JsValue.
         let (mut gctx, scope) = test_gctx();
-        let alias_id = gctx.insert_type(crate::ir::TypeDeclaration {
-            kind: crate::ir::TypeKind::TypeAlias(crate::ir::TypeAliasDecl {
+        let alias_id = gctx.insert_type(ts_gen::ir::TypeDeclaration {
+            kind: ts_gen::ir::TypeKind::TypeAlias(ts_gen::ir::TypeAliasDecl {
                 name: "BodyInit".to_string(),
                 type_params: vec![],
                 target: TypeRef::union([TypeRef::String, TypeRef::ident("ArrayBuffer")]),
                 from_module: None,
                 body_scope: scope,
             }),
-            module_context: crate::ir::ModuleContext::Global,
+            module_context: ts_gen::ir::ModuleContext::Global,
             doc: None,
             scope_id: scope,
         });
@@ -5440,7 +5364,8 @@ mod tests {
 
     #[test]
     fn test_local_type_in_promise() {
-        let (module, gctx) = crate::parse_source("interface MyThing { a: number; }", None).unwrap();
+        let (module, gctx) =
+            ts_gen::parse_source("interface MyThing { a: number; }", None).unwrap();
         let ctx = CodegenContext::from_module(&module, &gctx);
         let ty = TypeRef::generic("Promise", vec![TypeRef::ident("MyThing")]);
         let result = to_syn_type(
@@ -5461,7 +5386,7 @@ mod tests {
         tag: &str,
         files: &[(&str, &str)],
         lib_name: Option<&str>,
-    ) -> (crate::ir::Module, GlobalContext) {
+    ) -> (ts_gen::ir::Module, GlobalContext) {
         let dir = std::env::temp_dir().join(format!("ts-gen-{tag}-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let paths: Vec<_> = files
@@ -5472,7 +5397,7 @@ mod tests {
                 path
             })
             .collect();
-        let result = crate::parse::parse_dts_files(&paths, lib_name);
+        let result = ts_gen::parse::parse_dts_files(&paths, lib_name);
         std::fs::remove_dir_all(&dir).unwrap();
         result.unwrap()
     }
@@ -5513,7 +5438,7 @@ mod tests {
     #[test]
     fn test_global_to_global_is_bare() {
         let (module, gctx) =
-            crate::parse_source("interface EmailSendResult { id: string; }", None).unwrap();
+            ts_gen::parse_source("interface EmailSendResult { id: string; }", None).unwrap();
         let ctx = CodegenContext::from_module(&module, &gctx);
         let (tokens, uses) = lower_name(
             &ctx,
@@ -5562,7 +5487,7 @@ mod tests {
                 export interface Exported { c: number; }
             }
         "#;
-        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, None).unwrap();
         let ctx = CodegenContext::from_module(&module, &gctx);
         assert_unresolved(&ctx, "Secret", body_scope(&gctx, "InA"));
         assert_unresolved(&ctx, "Secret", body_scope(&gctx, "InB"));
@@ -5658,21 +5583,35 @@ mod tests {
         let ty = TypeRef::String;
         let g = &ModuleContext::Global;
         assert_eq!(
-            to_syn_type(&ty, TypePosition::ARGUMENT, None, ScopeId(0), g).to_string(),
+            to_syn_type(&ty, TypePosition::ARGUMENT, None, ScopeId::DUMMY, g).to_string(),
             "& str"
         );
         assert_eq!(
-            to_syn_type(&ty, TypePosition::RETURN, None, ScopeId(0), g).to_string(),
+            to_syn_type(&ty, TypePosition::RETURN, None, ScopeId::DUMMY, g).to_string(),
             "String"
         );
         // to_inner() → inner:true, so should give JsString
         assert_eq!(
-            to_syn_type(&ty, TypePosition::RETURN.to_inner(), None, ScopeId(0), g).to_string(),
+            to_syn_type(
+                &ty,
+                TypePosition::RETURN.to_inner(),
+                None,
+                ScopeId::DUMMY,
+                g
+            )
+            .to_string(),
             "JsString"
         );
         // Argument inner also gives JsString (inner overrides borrowing)
         assert_eq!(
-            to_syn_type(&ty, TypePosition::ARGUMENT.to_inner(), None, ScopeId(0), g).to_string(),
+            to_syn_type(
+                &ty,
+                TypePosition::ARGUMENT.to_inner(),
+                None,
+                ScopeId::DUMMY,
+                g
+            )
+            .to_string(),
             "JsString"
         );
     }
@@ -5680,7 +5619,7 @@ mod tests {
     /// Parse `src` and run `f` against a per-monomorphization context scoped
     /// to the source file, so aliases and local generics resolve.
     fn with_mono_ctx(src: &str, f: impl FnOnce(&CodegenContext<'_>, ScopeId)) {
-        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, None).unwrap();
         let options = GenerateOptions::new().experimental_generic_mono(true);
         let ctx = CodegenContext::from_module_full(&module, &gctx, &options, None).unwrap();
         let scope = *module.file_scopes.first().expect("file scope");
@@ -5825,7 +5764,7 @@ mod tests {
 
     #[test]
     fn resolve_alias_follows_a_reexport_under_the_target_name() {
-        let (module, gctx) = crate::parse_source(REEXPORT_SRC, Some("lib")).unwrap();
+        let (module, gctx) = ts_gen::parse_source(REEXPORT_SRC, Some("lib")).unwrap();
         let ctx = CodegenContext::from_module(&module, &gctx);
         let file = *module.file_scopes.first().expect("file scope");
         // The namespace's body, where the re-export binds `Position`.
@@ -5850,7 +5789,7 @@ mod tests {
         // a namespace's own `Intl` shadows it.
         let src = "declare namespace Intl { interface Mine {} }\n\
                    declare namespace Outer { namespace Intl { interface X {} } }";
-        let (module, mut gctx) = crate::parse_source(src, None).unwrap();
+        let (module, mut gctx) = ts_gen::parse_source(src, None).unwrap();
         let file = *module.file_scopes.first().expect("file scope");
         let intl = |name: &str| TypeRef::Reference {
             segments: vec!["Intl".to_string(), name.to_string()],
@@ -6006,7 +5945,7 @@ mod tests {
                 scope
             ));
             assert!(is_mono_string_list_return(
-                &list(TypeRef::String).with_empties(crate::ir::Nullability::Null),
+                &list(TypeRef::String).with_empties(ts_gen::ir::Nullability::Null),
                 ctx,
                 scope
             ));
@@ -6192,7 +6131,8 @@ mod tests {
             Boolean, BooleanLiteral as B, Number, NumberLiteral as N, StringLiteral as S,
         };
         let members = |ms: &[TypeRef]| {
-            dynamic_union_members(ms, None, ScopeId(0), &ModuleContext::Global).map(|a| a.members)
+            dynamic_union_members(ms, None, ScopeId::DUMMY, &ModuleContext::Global)
+                .map(|a| a.members)
         };
         let ab = || TypeRef::ident("ArrayBuffer");
 
@@ -6231,7 +6171,7 @@ mod tests {
     #[test]
     fn absent_getters_keep_their_option_around_js_value() {
         let src = "declare class Foo {} declare class Bar {} type Anything = unknown;";
-        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, None).unwrap();
         let scope = *module.file_scopes.first().expect("file scope");
         let anchor = ReturnAnchor {
             base: "x",
@@ -6287,7 +6227,7 @@ mod tests {
             type Fields = DayFields | WeekFields;
             type Errors = TypeError | RangeError;
         "#;
-        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, None).unwrap();
         let scope = *module.file_scopes.first().expect("file scope");
         let id = TypeRef::ident;
         let tokens = |t: TokenStream| t.to_string();
@@ -6357,7 +6297,7 @@ mod tests {
                 type DayLike = Day | string;
             }
         "#;
-        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, None).unwrap();
         let file = *module.file_scopes.first().expect("file scope");
         let ns = gctx.scopes.resolve_namespace(file, "Ns").unwrap();
         let options = GenerateOptions::new().experimental_generic_mono(true);
@@ -6392,7 +6332,7 @@ mod tests {
             type Id = string;
             type Recur = string | Recur[];
         "#;
-        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, None).unwrap();
         let ctx = CodegenContext::from_module_full(&module, &gctx, &GenerateOptions::new(), None)
             .unwrap();
         let scope = *module.file_scopes.first().expect("file scope");
@@ -6478,7 +6418,7 @@ mod tests {
             declare enum Level { Low = 1 }
             declare namespace Codes { type Region = "eu" | "us"; }
         "#;
-        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, None).unwrap();
         let ctx = CodegenContext::from_module_full(&module, &gctx, &GenerateOptions::new(), None)
             .unwrap();
         let scope = *module.file_scopes.first().expect("file scope");
@@ -6537,7 +6477,7 @@ mod tests {
                 namespace Inner { type Deep = "a" | "b"; }
             }
         "#;
-        let (module, gctx) = crate::parse_source(src, Some("m")).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, Some("m")).unwrap();
         let ctx = CodegenContext::from_module_full(&module, &gctx, &GenerateOptions::new(), None)
             .unwrap();
         let scope = *module.file_scopes.first().expect("file scope");
@@ -6573,7 +6513,7 @@ mod tests {
                 namespace Inner { interface Handle {} }
             }
         "#;
-        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let (module, gctx) = ts_gen::parse_source(src, None).unwrap();
         let ctx = CodegenContext::from_module_full(&module, &gctx, &GenerateOptions::new(), None)
             .unwrap();
         let file = module.file_scopes[0];
@@ -6611,7 +6551,7 @@ mod tests {
     #[test]
     fn error_type_option_is_validated() {
         let (module, gctx) =
-            crate::parse_source("declare function f(): Promise<void>;", None).unwrap();
+            ts_gen::parse_source("declare function f(): Promise<void>;", None).unwrap();
         let bad = GenerateOptions::new().error_type("not a type");
         let err = CodegenContext::from_module_full(&module, &gctx, &bad, None)
             .err()

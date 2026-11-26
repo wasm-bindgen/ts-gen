@@ -1,4 +1,4 @@
-//! `std/std.ir`, the JS standard library as a lib IR (IR.md §5), is
+//! `std/std.tw`, the JS standard library as a lib IR (IR.md §5), is
 //! produced from TypeScript's lib files in `std/typescript-<version>/` and
 //! the ABI choices in `std/annotate.d.ts`. It's checked in, pinned to that
 //! TypeScript version. To regenerate it:
@@ -76,7 +76,7 @@ fn root() -> PathBuf {
 }
 
 fn std_ir() -> ts_gen_abi::ir::Ir {
-    let src = std::fs::read_to_string(root().join("std/std.ir")).unwrap();
+    let src = std::fs::read_to_string(root().join("std/std.tw")).unwrap();
     ts_gen_abi::text::parse(&src).unwrap()
 }
 
@@ -118,7 +118,7 @@ fn std_ir_is_current() {
         text.push_str(&format!("// {d}\n"));
     }
     text.push_str(&ts_gen_abi::text::print(&lowered.ir));
-    let path = root().join("std/std.ir");
+    let path = root().join("std/std.tw");
     if std::env::var_os("BLESS").is_some() {
         std::fs::write(&path, &text).unwrap();
         return;
@@ -126,7 +126,7 @@ fn std_ir_is_current() {
     let current = std::fs::read_to_string(&path).unwrap_or_default();
     assert!(
         current == text,
-        "std/std.ir is stale; regenerate it with BLESS=1 cargo test --test std"
+        "std/std.tw is stale; regenerate it with BLESS=1 cargo test --test std"
     );
     assert_eq!(std_ir(), lowered.ir);
 }

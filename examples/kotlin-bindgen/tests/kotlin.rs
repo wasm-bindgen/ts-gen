@@ -112,7 +112,7 @@ fn parse(path: &Path, libs: &[Ir]) -> Ir {
 /// The fixtures, libs first: `std` is generated as its own package, which
 /// the fixtures that resolve against it depend on.
 fn fixtures() -> Vec<Fixture> {
-    let std = parse(&root().join("std/std.ir"), &[]);
+    let std = parse(&root().join("std/std.tw"), &[]);
     let mut out = vec![
         Fixture {
             name: "std".into(),
@@ -121,7 +121,7 @@ fn fixtures() -> Vec<Fixture> {
         },
         Fixture {
             name: "sample".into(),
-            ir: parse(&root().join("abi/tests/json/sample.ir"), &[]),
+            ir: parse(&root().join("abi/tests/json/sample.tw"), &[]),
             snapshot: true,
         },
     ];
@@ -129,7 +129,7 @@ fn fixtures() -> Vec<Fixture> {
     let mut lower: Vec<PathBuf> = std::fs::read_dir(root().join("tests/lower"))
         .unwrap()
         .map(|e| e.unwrap().path())
-        .filter(|p| p.extension().is_some_and(|e| e == "ir"))
+        .filter(|p| p.extension().is_some_and(|e| e == "tw"))
         .collect();
     lower.sort();
     for p in lower {

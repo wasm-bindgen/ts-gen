@@ -181,8 +181,8 @@ pub(crate) fn create_interface_body_scope(
 /// resolves to a [`crate::parse::scope::Binding::TypeParam`] in the
 /// given scope chain, in source-appearance order, deduped.
 ///
-/// Mirror of `codegen::signatures::collect_type_params` but operating
-/// on the parse-time scope arena. Used by iterable-wrapper synthesis
+/// Mirror of the Rust generator's `signatures::collect_type_params` but
+/// operating on the parse-time scope arena. Used by iterable-wrapper synthesis
 /// to figure out which type parameters need to bubble up onto the
 /// synthesized wrapper.
 fn collect_in_scope_type_params(

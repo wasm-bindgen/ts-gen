@@ -13,8 +13,8 @@
 
 use std::collections::HashMap;
 
-use crate::ir::{Member, Param, TypeParam, TypeRef};
-use crate::parse::scope::{Binding, ScopeId};
+use ts_gen::ir::{Member, Param, TypeParam, TypeRef};
+use ts_gen::parse::scope::{Binding, ScopeId};
 
 use super::typemap::{variadic_spreads_list, CodegenContext};
 
@@ -117,8 +117,8 @@ fn owning_type_default(
                 let id = cgctx.gctx.resolve_path(scope, &segments.join("."))?;
                 let decl = cgctx.gctx.get_type(id);
                 let type_params = match &decl.kind {
-                    crate::ir::TypeKind::Interface(i) => &i.type_params,
-                    crate::ir::TypeKind::Class(c) => &c.type_params,
+                    ts_gen::ir::TypeKind::Interface(i) => &i.type_params,
+                    ts_gen::ir::TypeKind::Class(c) => &c.type_params,
                     _ => return None,
                 };
                 let default = type_params.get(pos)?.default.clone()?;

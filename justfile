@@ -21,7 +21,7 @@ clippy:
 
 # Run the unit, snapshot and runtime tests (Node 26; TSGEN_SKIP_KOTLIN / TSGEN_SKIP_ZENA skip those toolchains)
 test *ARGS="":
-    RUST_BACKTRACE=1 cargo +stable test -p ts-gen -p ts-gen-abi -p ts-gen-bridge -p zena-bindgen {{ARGS}}
+    RUST_BACKTRACE=1 cargo +stable test -p ts-gen -p ts-gen-wasm-bindgen -p ts-gen-abi -p ts-gen-bridge -p zena-bindgen {{ARGS}}
 
 # Run the bridge microbenchmarks (Node 26; BENCH=<dir> filters) and print a ns/op table
 bench:
@@ -41,7 +41,7 @@ test-zena *ARGS="":
 zip-diffs:
     #!/usr/bin/env bash
     set -euo pipefail
-    cargo +stable build -q -p ts-gen
+    cargo +stable build -q -p ts-gen-wasm-bindgen
     out={{justfile_directory()}}/target/zip-diffs
     rm -rf "$out"
     for f in {{justfile_directory()}}/tests/fixtures/*.d.ts; do
@@ -49,7 +49,7 @@ zip-diffs:
         args=$(sed -n 's|^//! @ts-gen ||p' "$f" | tr '\n' ' ')
         for config in "default:" "mono:--experimental-generic-mono --fallible"; do
             mkdir -p "$out/$name"
-            {{justfile_directory()}}/target/debug/ts-gen --input "$f" --output /dev/null $args ${config#*:} --zip-diffs 2>&1 \
+            {{justfile_directory()}}/target/debug/ts-gen-wasm-bindgen --input "$f" --output /dev/null $args ${config#*:} --zip-diffs 2>&1 \
                 | sed -n 's|^\[ts-gen info\]: zip: ||p' > "$out/$name/${config%%:*}.zip" || true
         done
     done
@@ -58,7 +58,7 @@ zip-diffs:
 
 # Re-bless all snapshots
 test-overwrite:
-    RUST_BACKTRACE=1 BLESS=1 cargo +stable test -p ts-gen -p zena-bindgen
+    RUST_BACKTRACE=1 BLESS=1 cargo +stable test -p ts-gen -p ts-gen-wasm-bindgen -p zena-bindgen
 
 # Run wasm-bindgen integration tests (requires wasm32-unknown-unknown target + Node)
 # package.json must live alongside the crate's Cargo.toml: wasm-bindgen-test-runner

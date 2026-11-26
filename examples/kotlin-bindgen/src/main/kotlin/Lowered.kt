@@ -1,7 +1,7 @@
 package tsgen.kotlin
 
 /**
- * The lowered IR (`ts-gen-abi lower`, format `ts-gen-abi/lowered` v1):
+ * The lowered IR (`ts-gen --json`, format `ts-gen-abi/lowered` v1):
  * declarations, and members with their keys and layouts.
  */
 class Lowered(

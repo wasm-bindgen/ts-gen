@@ -1,4 +1,4 @@
-// The app behind tests/fixtures/results.ir's exports.
+// The app behind tests/fixtures/results.tw's exports.
 import { Shape, ShapeLabel, ShapeRadius } from './results.zena';
 
 export function half(n: f64): Option<f64> {

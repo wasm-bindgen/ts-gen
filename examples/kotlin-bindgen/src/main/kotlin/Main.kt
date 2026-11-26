@@ -6,7 +6,7 @@ import kotlin.system.exitProcess
 const val USAGE = """usage: kotlin-bindgen <lowered.json> <out-dir> [--package <pkg>] [--app-package <pkg>] [--lib <name>=<pkg>]... [--runtime] [--scaffold <file>]
        kotlin-bindgen link <in.wasm> <links.tsv>... -o <out.wasm>
 
-Writes Kotlin/Wasm bindings for a lowered IR (`ts-gen-abi lower --profile
+Writes Kotlin/Wasm bindings for a lowered IR (`ts-gen --json --profile
 "all-host, results = single, throws = js"`):
   <out-dir>/<pkg>/flat/Flat.kt  one external or export per member, by wire
   <out-dir>/<pkg>/Bindings.kt   the typed API (default package: workers)

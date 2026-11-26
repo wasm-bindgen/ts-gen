@@ -1,13 +1,13 @@
 # kotlin-bindgen
 
 An example language generator over the ts-gen IR, written in Kotlin. It
-reads `ts-gen-abi lower`'s JSON under the profile `all-host, results =
+reads `ts-gen --json`'s output under the profile `all-host, results =
 single, throws = js` and writes Kotlin/Wasm externals. Kotlin/Wasm names
 its own imports, so it also writes a `links.tsv`, and its `link` command
 renames the compiled module's imports to the keys the bridge reads.
 
 It is an example of a language project built on ts-gen, not a language
-target of ts-gen: the lowered JSON is all it reads, and `ts-gen-bridge`
+target of ts-gen: the lowered JSON is all it reads, and `ts-gen --bridge`
 supplies the JS side of the module it binds.
 
 ```sh

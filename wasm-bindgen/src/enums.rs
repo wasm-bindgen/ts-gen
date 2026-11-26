@@ -48,7 +48,7 @@ use quote::quote;
 use std::collections::HashMap;
 use std::hash::Hash;
 
-use crate::ir::{NumericEnumDecl, StringEnumDecl};
+use ts_gen::ir::{NumericEnumDecl, StringEnumDecl};
 
 /// Split members into the variants (first member per value) and the aliases
 /// (later members, paired with the variant they repeat).
@@ -188,7 +188,7 @@ pub fn generate_numeric_enum(decl: &NumericEnumDecl, js_namespace: &[String]) ->
         .iter()
         .map(|v| {
             let rust_name = super::typemap::make_ident(&v.rust_name);
-            let doc = crate::codegen::doc_tokens(&v.doc);
+            let doc = crate::doc_tokens(&v.doc);
             if has_negative {
                 let value = i32::try_from(v.value).unwrap_or({
                     // Value out of i32 range — truncation is lossy but we
@@ -212,7 +212,7 @@ pub fn generate_numeric_enum(decl: &NumericEnumDecl, js_namespace: &[String]) ->
         &name,
         aliases.into_iter().map(|(alias, target)| {
             (
-                crate::codegen::doc_tokens(&alias.doc),
+                crate::doc_tokens(&alias.doc),
                 super::typemap::make_ident(&alias.rust_name),
                 super::typemap::make_ident(&target.rust_name),
             )

@@ -9,6 +9,11 @@ use crate::ir::TypeDeclaration;
 use crate::parse::scope::{PendingImport, ScopeArena, ScopeId};
 use crate::util::diagnostics::DiagnosticCollector;
 
+/// The segment that names a declaration by its id, `#decl.<id>`, where
+/// the IR's path names it otherwise than the parse does in scope: in
+/// another module, or shadowed. The parse's name for it restates it.
+pub const DECLARED: &str = "#decl";
+
 /// Well-typed index into the type arena.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct TypeId(u32);
@@ -333,6 +338,12 @@ impl GlobalContext {
         }
     }
 
+    /// Whether `id` is a generic alias type-level evaluation instantiates
+    /// at every use, so that no use names the alias itself.
+    pub fn is_type_level_only(&self, id: TypeId) -> bool {
+        self.type_level_only.contains(&id)
+    }
+
     /// Read-only access to the full type arena slice.
     pub fn type_arena(&self) -> &[TypeDeclaration] {
         &self.types
@@ -343,11 +354,12 @@ impl GlobalContext {
     /// The first namespace resolves from `scope` up the chain; each later
     /// segment must be declared directly in the namespace before it.
     ///
-    /// `#decl.<index>` is a declaration the IR names by its id, where its
-    /// name resolves to another from the use site (see
-    /// [`crate::codegen::ir_types::DECLARED`]).
+    /// `#decl.<index>` is a declaration named by its id ([`DECLARED`]).
     pub fn resolve_path(&self, scope: ScopeId, path: &str) -> Option<TypeId> {
-        if let Some(index) = path.strip_prefix("#decl.") {
+        let by_id = path
+            .strip_prefix(DECLARED)
+            .and_then(|rest| rest.strip_prefix('.'));
+        if let Some(index) = by_id {
             let index: u32 = index.parse().ok()?;
             return ((index as usize) < self.types.len()).then_some(TypeId(index));
         }

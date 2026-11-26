@@ -27,20 +27,20 @@ use quote::quote;
 
 use std::collections::HashMap;
 
-use crate::codegen::signatures::PromiseForm;
-use crate::codegen::signatures::{
+use crate::signatures::PromiseForm;
+use crate::signatures::{
     build_signatures, generate_callable_params, generate_dictionary_params, is_void_return,
     public_rust_name, render_generic_bounds, CallableSpec, ConcreteParam, DictionaryParams,
     FunctionSignature, Overload, SignatureKind,
 };
-use crate::codegen::typemap::{to_return_type, CodegenContext, TypePosition};
-use crate::ir::{
+use crate::typemap::{to_return_type, CodegenContext, TypePosition};
+use ts_gen::ir::{
     ClassDecl, GetterMember, InterfaceClassification, InterfaceDecl, Member, MethodMember,
     ModuleContext, SetterMember, StaticGetterMember, StaticMethodMember, StaticSetterMember,
     TypeKind, TypeRef,
 };
-use crate::parse::scope::ScopeId;
-use crate::util::naming::{naming_priority, to_snake_case, LocalScope, Suffix};
+use ts_gen::parse::scope::ScopeId;
+use ts_gen::util::naming::{naming_priority, to_snake_case, LocalScope, Suffix};
 
 /// Configuration for generating a class-like extern block.
 pub(crate) struct ClassConfig<'a> {
@@ -70,7 +70,7 @@ pub(crate) struct ClassConfig<'a> {
     /// Rendered as `<T: JsGeneric, …>` on the `pub type` decl and
     /// propagated to every `this: &Type<T, …>` reference inside the
     /// extern block.
-    type_params: Vec<crate::ir::TypeParam>,
+    type_params: Vec<ts_gen::ir::TypeParam>,
     /// Codegen context for type resolution.
     cgctx: Option<&'a CodegenContext<'a>>,
     /// Scope for type reference resolution. For class-like configs
@@ -328,12 +328,12 @@ impl ClassConfig<'_> {
         &self,
         js_name: &str,
         ty: &TypeRef,
-        slice_mode: Option<crate::ir::SliceModeHint>,
+        slice_mode: Option<ts_gen::ir::SliceModeHint>,
         scope: ScopeId,
-    ) -> crate::ir::Param {
+    ) -> ts_gen::ir::Param {
         // A property retains its value, which a view wouldn't outlive.
         let slice_mode = slice_mode.map(|m| match m {
-            crate::ir::SliceModeHint::View => crate::ir::SliceModeHint::Copy,
+            ts_gen::ir::SliceModeHint::View => ts_gen::ir::SliceModeHint::Copy,
             m => m,
         });
         let mut type_ref = match self.setter_enum(js_name, ty, scope) {
@@ -343,7 +343,7 @@ impl ClassConfig<'_> {
         if let Some(widened) = slice_mode.and_then(|m| m.widen_bare_typed_array(&type_ref)) {
             type_ref = widened;
         }
-        crate::ir::Param {
+        ts_gen::ir::Param {
             name: "val".to_string(),
             js_name: None,
             type_ref,
@@ -454,7 +454,7 @@ impl<'a> ClassConfig<'a> {
     /// information is passed alongside through
     /// [`generate_dictionary_factory_with_passes`] in the caller.
     pub(crate) fn from_discriminated_union(
-        decl: &crate::ir::DiscriminatedUnionDecl,
+        decl: &ts_gen::ir::DiscriminatedUnionDecl,
         ctx: &ModuleContext,
         cgctx: Option<&'a CodegenContext>,
         _enclosing_scope: ScopeId,
@@ -782,7 +782,7 @@ impl<'a> ClassConfig<'a> {
 
     /// Lowering of a type parameter's default in generic-argument
     /// position; see [`super::typemap::type_param_default_tokens`].
-    fn type_param_default_tokens(&self, tp: &crate::ir::TypeParam) -> TokenStream {
+    fn type_param_default_tokens(&self, tp: &ts_gen::ir::TypeParam) -> TokenStream {
         super::typemap::type_param_default_tokens(
             tp.default.as_ref(),
             self.cgctx,
@@ -796,7 +796,7 @@ impl<'a> ClassConfig<'a> {
     /// replaced by the arguments `chosen` for them.
     fn type_param_default_ref(
         &self,
-        tp: &crate::ir::TypeParam,
+        tp: &ts_gen::ir::TypeParam,
         chosen: &HashMap<&str, TypeRef>,
     ) -> TypeRef {
         tp.default
@@ -1076,7 +1076,7 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
 /// runtime-permissive view callers can always tweak.
 pub(crate) fn generate_dictionary_factory_with_passes(
     config: &ClassConfig,
-    factory_required_overrides: Option<Vec<Vec<&crate::ir::GetterMember>>>,
+    factory_required_overrides: Option<Vec<Vec<&ts_gen::ir::GetterMember>>>,
 ) -> TokenStream {
     let rust_type_ident = super::typemap::make_ident(&config.effective_rust_name());
     let builder_name_ident = super::typemap::make_ident(&format!("{}Builder", config.rust_name));
@@ -1093,7 +1093,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     // If any getter lacks a corresponding setter the type has readonly
     // properties, which means it is not constructible via setters — skip
     // the builder entirely and only emit a bare `new()`.
-    let setter_types: std::collections::HashMap<&str, &crate::ir::TypeRef> = config
+    let setter_types: std::collections::HashMap<&str, &ts_gen::ir::TypeRef> = config
         .members
         .iter()
         .filter_map(|m| {
@@ -1137,7 +1137,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     }
 
     // Collect getter properties for builder methods
-    let getters: Vec<&crate::ir::GetterMember> = config
+    let getters: Vec<&ts_gen::ir::GetterMember> = config
         .members
         .iter()
         .filter_map(|m| {
@@ -1153,8 +1153,8 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     // partition drives the wrapper's fluent setters (optional set) and
     // is the default required-field pass when no per-branch override is
     // supplied.
-    let mut required_getters: Vec<&crate::ir::GetterMember> = Vec::new();
-    let mut optional_getters: Vec<&crate::ir::GetterMember> = Vec::new();
+    let mut required_getters: Vec<&ts_gen::ir::GetterMember> = Vec::new();
+    let mut optional_getters: Vec<&ts_gen::ir::GetterMember> = Vec::new();
     for g in &getters {
         if g.optional {
             optional_getters.push(g);
@@ -1170,7 +1170,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     // branch's required fields surface as positional args in its own
     // `new_<discriminator>(...)` variant — see
     // [`generate_dictionary_factory_with_passes`].
-    let required_passes: Vec<Vec<&crate::ir::GetterMember>> =
+    let required_passes: Vec<Vec<&ts_gen::ir::GetterMember>> =
         factory_required_overrides.unwrap_or_else(|| vec![required_getters.clone()]);
 
     // When every property is required, the builder type is dead weight: it
@@ -1201,12 +1201,12 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     // type, not the getter's: a discriminated-union branch narrows its getter
     // (`disposition: "inline"`), while the setter keeps the merged type
     // (`"inline" | "attachment"`) and with it the enum a literal is passed as.
-    let assigned_type = |g: &crate::ir::GetterMember| -> crate::ir::TypeRef {
+    let assigned_type = |g: &ts_gen::ir::GetterMember| -> ts_gen::ir::TypeRef {
         setter_types
             .get(g.js_name.as_str())
             .map_or_else(|| g.type_ref.clone(), |t| (*t).clone())
     };
-    let resolve_setter_sigs = |g: &crate::ir::GetterMember| -> Vec<FunctionSignature> {
+    let resolve_setter_sigs = |g: &ts_gen::ir::GetterMember| -> Vec<FunctionSignature> {
         let slice_mode = slice_mode_of(&g.js_name);
         let Some(ty) = setter_type(
             config,
@@ -1220,7 +1220,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         };
         let setter_param = config.setter_param(&g.js_name, &ty, slice_mode, g.scope);
         let mut setter_used = LocalScope::default();
-        let void = crate::ir::TypeRef::Void;
+        let void = ts_gen::ir::TypeRef::Void;
         // An inherited member's associated type reads through this type's
         // parameter.
         let body_scope = match config.reads_assoc(&ty) {
@@ -1231,7 +1231,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             params: &[setter_param],
             return_type: &void,
             body_scope,
-            throws: &crate::ir::Throws::None,
+            throws: &ts_gen::ir::Throws::None,
             async_modifier: false,
             doc: &None,
         }];
@@ -1290,14 +1290,14 @@ pub(crate) fn generate_dictionary_factory_with_passes(
 
     // Decompose a getter's `type_ref` into union members + ABI
     // fan-out flavors.
-    let split_union = |ty: &crate::ir::TypeRef, scope: ScopeId| -> Vec<crate::ir::TypeRef> {
-        crate::codegen::signatures::flatten_dictionary_field(ty, config.cgctx, scope)
+    let split_union = |ty: &ts_gen::ir::TypeRef, scope: ScopeId| -> Vec<ts_gen::ir::TypeRef> {
+        crate::signatures::flatten_dictionary_field(ty, config.cgctx, scope)
     };
 
     // Helper that turns one required-getter list into a list of
     // `FieldDim`s — the cartesian product axes for that pass — or the
     // name of a field without a setter, which no factory can set.
-    let build_field_dims = |required: &[&crate::ir::GetterMember]| -> Result<_, String> {
+    let build_field_dims = |required: &[&ts_gen::ir::GetterMember]| -> Result<_, String> {
         let mut field_dims: Vec<FieldDim> = Vec::new();
         for g in required {
             let param_name = config.member_base(MemberKind::Property, &g.js_name);
@@ -1329,7 +1329,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             let named_enum = match (&setters[..], config.cgctx) {
                 ([sig], Some(cgctx)) => sig.params.first().and_then(|p| {
                     let path = p.type_ref.without_undefined();
-                    let crate::ir::TypeRef::Reference { segments, .. } = &path else {
+                    let ts_gen::ir::TypeRef::Reference { segments, .. } = &path else {
                         return None;
                     };
                     let id = cgctx.gctx.resolve_path(g.scope, &segments.join("."))?;
@@ -1340,7 +1340,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                         .variants
                         .iter()
                         .map(|v| {
-                            let literal = crate::ir::TypeRef::StringLiteral(v.js_value.clone());
+                            let literal = ts_gen::ir::TypeRef::StringLiteral(v.js_value.clone());
                             (literal, v.rust_name.clone())
                         })
                         .collect::<Vec<_>>();
@@ -1355,19 +1355,19 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             let any_literal = members.iter().any(|m| {
                 matches!(
                     m,
-                    crate::ir::TypeRef::StringLiteral(_)
-                        | crate::ir::TypeRef::NumberLiteral(_)
-                        | crate::ir::TypeRef::BooleanLiteral(_)
+                    ts_gen::ir::TypeRef::StringLiteral(_)
+                        | ts_gen::ir::TypeRef::NumberLiteral(_)
+                        | ts_gen::ir::TypeRef::BooleanLiteral(_)
                 )
             });
-            let value_members: Vec<&crate::ir::TypeRef> = members
+            let value_members: Vec<&ts_gen::ir::TypeRef> = members
                 .iter()
                 .filter(|m| {
                     !matches!(
                         m,
-                        crate::ir::TypeRef::StringLiteral(_)
-                            | crate::ir::TypeRef::NumberLiteral(_)
-                            | crate::ir::TypeRef::BooleanLiteral(_)
+                        ts_gen::ir::TypeRef::StringLiteral(_)
+                            | ts_gen::ir::TypeRef::NumberLiteral(_)
+                            | ts_gen::ir::TypeRef::BooleanLiteral(_)
                     )
                 })
                 .collect();
@@ -1375,16 +1375,16 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             // Setter expansion dedups by rendered Rust type, keeping only the
             // first member of each (`"x" | "y"` leaves one setter typed
             // `"x"`), so match on the rendered type rather than the IR.
-            fn param_type(sig: &FunctionSignature) -> Option<&crate::ir::TypeRef> {
+            fn param_type(sig: &FunctionSignature) -> Option<&ts_gen::ir::TypeRef> {
                 sig.params.first().map(|p| &p.type_ref)
             }
-            let find_setter = |target: &crate::ir::TypeRef| -> Option<&FunctionSignature> {
+            let find_setter = |target: &ts_gen::ir::TypeRef| -> Option<&FunctionSignature> {
                 let render = |param: &ConcreteParam| {
                     super::signatures::render_param_type(
                         param,
                         config.cgctx,
                         g.scope,
-                        &crate::ir::ModuleContext::Global,
+                        &ts_gen::ir::ModuleContext::Global,
                     )
                     .to_string()
                 };
@@ -1404,7 +1404,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     })
                     .or_else(|| setters.iter().find(|sig| param_type(sig) == Some(target)))
             };
-            let pick_setter = |target: &crate::ir::TypeRef| -> Option<syn::Ident> {
+            let pick_setter = |target: &ts_gen::ir::TypeRef| -> Option<syn::Ident> {
                 find_setter(target).map(|sig| super::typemap::make_ident(&sig.rust_name))
             };
             // Fallback for fields without per-member setter granularity:
@@ -1414,7 +1414,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
 
             // A literal the setter routes through its enum is passed as
             // that enum's variant.
-            let enum_literal = |m: &crate::ir::TypeRef| {
+            let enum_literal = |m: &ts_gen::ir::TypeRef| {
                 if let Some((path, variants)) = &named_enum {
                     let (_, v) = variants.iter().find(|(l, _)| l == m)?;
                     let variant = super::typemap::make_ident(v);
@@ -1430,12 +1430,12 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 let e = setter_enum.as_ref()?;
                 let variant = super::typemap::make_ident(e.variant(m)?);
                 let enum_ident = super::typemap::make_ident(&e.name);
-                let setter_ident = pick_setter(&crate::ir::TypeRef::ident(e.name.clone()))?;
+                let setter_ident = pick_setter(&ts_gen::ir::TypeRef::ident(e.name.clone()))?;
                 Some((setter_ident, quote! { #enum_ident::#variant }))
             };
             for m in &members {
                 match m {
-                    crate::ir::TypeRef::StringLiteral(s) => {
+                    ts_gen::ir::TypeRef::StringLiteral(s) => {
                         let (setter_ident, literal_expr) = enum_literal(m).unwrap_or_else(|| {
                             let setter = pick_setter(m).unwrap_or_else(|| default_setter.clone());
                             (setter, quote! { #s })
@@ -1449,7 +1449,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                             literal_expr,
                         });
                     }
-                    crate::ir::TypeRef::NumberLiteral(n) => {
+                    ts_gen::ir::TypeRef::NumberLiteral(n) => {
                         let (setter_ident, literal_expr) = enum_literal(m).unwrap_or_else(|| {
                             let setter = pick_setter(m).unwrap_or_else(|| default_setter.clone());
                             let lit = proc_macro2::Literal::f64_unsuffixed(n.abs());
@@ -1460,12 +1460,12 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                             field_js_name: g.js_name.clone(),
                             field_doc: g.doc.clone(),
                             literal_display: n.to_string(),
-                            suffix: format!("_{}", crate::util::naming::number_literal_snake(*n)),
+                            suffix: format!("_{}", ts_gen::util::naming::number_literal_snake(*n)),
                             setter_ident,
                             literal_expr,
                         });
                     }
-                    crate::ir::TypeRef::BooleanLiteral(b) => {
+                    ts_gen::ir::TypeRef::BooleanLiteral(b) => {
                         let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
                         options.push(FieldOption::Literal {
                             field_js_name: g.js_name.clone(),
@@ -1485,7 +1485,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             // `new_inline()` plus a catch-all `new(disposition: &str)`).
             // For purely non-literal unions we emit one value option
             // per member.
-            let value_targets: Vec<&crate::ir::TypeRef> = if any_literal {
+            let value_targets: Vec<&ts_gen::ir::TypeRef> = if any_literal {
                 value_members
             } else {
                 members.iter().collect()
@@ -1494,7 +1494,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             // which the parse's may render apart from: the IR can read
             // `WorkflowDelayDuration | number` as the one alias holding both.
             let lone = (setters.len() == 1).then(|| &setters[0]);
-            let mut assigned_types: Vec<crate::ir::TypeRef> = Vec::new();
+            let mut assigned_types: Vec<ts_gen::ir::TypeRef> = Vec::new();
             for m in value_targets {
                 let unwrap = m.admits_undefined();
                 let target = m.without_undefined();
@@ -1507,9 +1507,9 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     continue;
                 }
                 assigned_types.push(assigned.clone());
-                let takes_value = assigned != crate::ir::TypeRef::Null;
+                let takes_value = assigned != ts_gen::ir::TypeRef::Null;
                 let type_ref = if unwrap {
-                    assigned.with_empties(crate::ir::Nullability::Undefined)
+                    assigned.with_empties(ts_gen::ir::Nullability::Undefined)
                 } else {
                     assigned
                 };
@@ -1735,7 +1735,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                         scope,
                         setter_ident,
                         ..
-                    } if matches!(param.type_ref, crate::ir::TypeRef::Null) => {
+                    } if matches!(param.type_ref, ts_gen::ir::TypeRef::Null) => {
                         init_calls.push(quote! { inner.#setter_ident(); });
                         value_params.push(param.clone());
                         value_scopes.push(*scope);
@@ -1812,7 +1812,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 .iter()
                 .map(|&i| plans[i].value_params.clone())
                 .collect();
-            let group_suffixes = crate::codegen::signatures::compute_suffixes_pub(&group_params);
+            let group_suffixes = crate::signatures::compute_suffixes_pub(&group_params);
             for (suffix, &i) in group_suffixes.iter().zip(indices) {
                 value_suffixes[i] = suffix.clone();
             }
@@ -1980,7 +1980,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     // (Empty when `!emit_builder`, since there's nothing to chain.)
     let mut builder_methods: Vec<TokenStream> = Vec::new();
     let kept_builder = !emit_builder && !builder_variants.is_empty();
-    let builder_fields: Vec<&crate::ir::GetterMember> = if kept_builder {
+    let builder_fields: Vec<&ts_gen::ir::GetterMember> = if kept_builder {
         getters
             .iter()
             .copied()
@@ -2108,8 +2108,8 @@ fn unreserve_base(names: &mut LocalScope, base: &str) {
 /// Each name — including `try_` variants — is declared in that scope, which
 /// guarantees uniqueness by appending numeric suffixes on collision.
 pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
-    use crate::ir::{ConstructorMember, MethodMember, StaticMethodMember};
     use std::collections::HashMap;
+    use ts_gen::ir::{ConstructorMember, MethodMember, StaticMethodMember};
 
     let mut items = Vec::new();
     let mut names = config.reserved_names();
@@ -2580,7 +2580,7 @@ pub(super) fn widen_async_return_param(
     };
     if !matches!(
         cgctx.gctx.scopes.resolve_binding(sig.body_scope, name),
-        Some(crate::parse::scope::Binding::TypeParam)
+        Some(ts_gen::parse::scope::Binding::TypeParam)
     ) {
         return bounds;
     }
@@ -2936,7 +2936,7 @@ fn generate_getter(
 /// What a getter throws, from the IR where it declares the getter.
 fn getter_error_type(
     config: &ClassConfig,
-    (js_name, throws, scope): (&str, &crate::ir::Throws, ScopeId),
+    (js_name, throws, scope): (&str, &ts_gen::ir::Throws, ScopeId),
     form: super::ir_callables::Form,
 ) -> Option<TokenStream> {
     let ir = config
@@ -2988,7 +2988,7 @@ fn setter_type(
     config: &ClassConfig,
     js_name: &str,
     ty: &TypeRef,
-    slice_mode: Option<crate::ir::SliceModeHint>,
+    slice_mode: Option<ts_gen::ir::SliceModeHint>,
     scope: ScopeId,
     form: super::ir_callables::Form,
 ) -> Option<TypeRef> {
@@ -3045,7 +3045,7 @@ fn generate_setter(
     ) else {
         return Vec::new();
     };
-    if let (Some(crate::ir::SliceModeHint::View), Some(c)) = (setter.slice_mode, config.cgctx) {
+    if let (Some(ts_gen::ir::SliceModeHint::View), Some(c)) = (setter.slice_mode, config.cgctx) {
         c.warn(format!(
             "`{}.{}`: `{{@slice view}}` on a property reads as a copy, as the property retains its value",
             config.js_name, setter.js_name
@@ -3053,12 +3053,12 @@ fn generate_setter(
     }
     let param = config.setter_param(&setter.js_name, &ty, setter.slice_mode, setter.scope);
 
-    let void = crate::ir::TypeRef::Void;
+    let void = ts_gen::ir::TypeRef::Void;
     let overloads = [Overload {
         params: &[param],
         return_type: &void,
         body_scope: setter.scope,
-        throws: &crate::ir::Throws::None,
+        throws: &ts_gen::ir::Throws::None,
         async_modifier: false,
         doc: &doc,
     }];
@@ -3237,12 +3237,12 @@ fn generate_static_setter(
     };
     let param = config.setter_param(&setter.js_name, &ty, None, setter.scope);
 
-    let void = crate::ir::TypeRef::Void;
+    let void = ts_gen::ir::TypeRef::Void;
     let overloads = [Overload {
         params: &[param],
         return_type: &void,
         body_scope: setter.scope,
-        throws: &crate::ir::Throws::None,
+        throws: &ts_gen::ir::Throws::None,
         async_modifier: false,
         doc: &doc,
     }];
@@ -3308,7 +3308,7 @@ fn generate_static_setter(
 /// read admits `undefined` whatever its type says.
 fn read_type(ty: &TypeRef, optional: bool) -> TypeRef {
     if optional {
-        ty.clone().with_empties(crate::ir::Nullability::Undefined)
+        ty.clone().with_empties(ts_gen::ir::Nullability::Undefined)
     } else {
         ty.clone()
     }
@@ -3329,7 +3329,7 @@ pub(crate) fn effective_classification(
     let inherited = inherited_members(&decl.extends, cgctx);
     let members = inherit_into(inherited.first_chain, &inherited.beyond_first);
     let members = inherit_into(members, &decl.members);
-    crate::parse::classify::classify_interface(&members)
+    ts_gen::parse::classify::classify_interface(&members)
 }
 
 /// Members a type inherits through `extends`, with the parents' type
@@ -3345,7 +3345,7 @@ struct Inherited {
 }
 
 fn inherited_members(
-    extends: &[crate::ir::Heritage],
+    extends: &[ts_gen::ir::Heritage],
     cgctx: Option<&CodegenContext<'_>>,
 ) -> Inherited {
     let mut out = Inherited {
@@ -3389,11 +3389,11 @@ fn inherited_members(
 /// Append the members of `later` whose key no earlier sibling parent
 /// already provides: siblings in `extends` order, first wins.
 fn extend_missing(members: &mut Vec<Member>, later: Vec<Member>) {
-    let present: HashSet<_> = members.iter().map(crate::parse::member_key).collect();
+    let present: HashSet<_> = members.iter().map(ts_gen::parse::member_key).collect();
     members.extend(
         later
             .into_iter()
-            .filter(|m| !present.contains(&crate::parse::member_key(m))),
+            .filter(|m| !present.contains(&ts_gen::parse::member_key(m))),
     );
 }
 
@@ -3401,10 +3401,10 @@ fn extend_missing(members: &mut Vec<Member>, later: Vec<Member>) {
 /// redeclares. Overloads share a key, so `own` is appended whole rather
 /// than merged entry by entry.
 fn inherit_into(inherited: Vec<Member>, own: &[Member]) -> Vec<Member> {
-    let own_keys: HashSet<_> = own.iter().map(crate::parse::member_key).collect();
+    let own_keys: HashSet<_> = own.iter().map(ts_gen::parse::member_key).collect();
     let mut members: Vec<Member> = inherited
         .into_iter()
-        .filter(|m| !own_keys.contains(&crate::parse::member_key(m)))
+        .filter(|m| !own_keys.contains(&ts_gen::parse::member_key(m)))
         .collect();
     members.extend(own.iter().cloned());
     members
@@ -3415,7 +3415,7 @@ fn collect_parent_members(
     c: &CodegenContext<'_>,
     scope: ScopeId,
     out: &mut Vec<Member>,
-    visited: &mut HashSet<crate::context::TypeId>,
+    visited: &mut HashSet<ts_gen::context::TypeId>,
 ) {
     let TypeRef::Reference {
         segments,
@@ -3529,11 +3529,11 @@ fn project_member(
         TypeRef::union(out)
     };
     match m {
-        Member::Getter(g) => Member::Getter(crate::ir::GetterMember {
+        Member::Getter(g) => Member::Getter(ts_gen::ir::GetterMember {
             type_ref: project(&g.type_ref),
             ..g.clone()
         }),
-        Member::Setter(st) => Member::Setter(crate::ir::SetterMember {
+        Member::Setter(st) => Member::Setter(ts_gen::ir::SetterMember {
             type_ref: project(&st.type_ref),
             ..st.clone()
         }),
@@ -3581,12 +3581,12 @@ fn string_literals(
 /// makes the `Deref` target. `Object` closes the list when nothing else
 /// does.
 fn extends_list(
-    parents: &[crate::ir::Heritage],
+    parents: &[ts_gen::ir::Heritage],
     cgctx: Option<&CodegenContext<'_>>,
     from_module: &ModuleContext,
 ) -> Vec<TokenStream> {
     let mut out: Vec<TokenStream> = Vec::new();
-    for crate::ir::Heritage {
+    for ts_gen::ir::Heritage {
         type_ref: parent,
         scope,
     } in parents

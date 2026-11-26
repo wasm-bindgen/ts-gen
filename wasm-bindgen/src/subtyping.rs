@@ -25,9 +25,9 @@
 //! a multi-parent LUB on the user side is rare in `.d.ts` files and would
 //! complicate the algorithm without much benefit.
 
-use crate::codegen::typemap::CodegenContext;
-use crate::ir::{TypeKind, TypeRef};
-use crate::parse::scope::ScopeId;
+use crate::typemap::CodegenContext;
+use ts_gen::ir::{TypeKind, TypeRef};
+use ts_gen::parse::scope::ScopeId;
 
 /// Built-in JS/TS supertype chains, deepest immediate parent first, ending
 /// at `Object`. The chain implicitly extends to `Object` even when not
@@ -321,8 +321,8 @@ fn widen_literal_family(types: &[TypeRef]) -> Option<TypeRef> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::codegen::typemap::CodegenContext;
-    use crate::context::GlobalContext;
+    use crate::typemap::CodegenContext;
+    use ts_gen::context::GlobalContext;
 
     fn ctx() -> (GlobalContext, ScopeId) {
         let mut gctx = GlobalContext::new();

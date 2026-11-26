@@ -1,4 +1,4 @@
-//! The lowered JSON: golden output of `tests/json/sample.ir` under the
+//! The lowered JSON: golden output of `tests/json/sample.tw` under the
 //! Kotlin and GC profiles (`tests/json/sample.<profile>.json`, rewritten
 //! with `BLESS=1`), and well-formedness.
 
@@ -9,7 +9,7 @@ use ts_gen_abi::profile::Profile;
 use ts_gen_abi::{text, validate};
 
 fn sample() -> ts_gen_abi::ir::Ir {
-    let src = std::fs::read_to_string(dir().join("sample.ir")).unwrap();
+    let src = std::fs::read_to_string(dir().join("sample.tw")).unwrap();
     let ir = text::parse(&src).unwrap();
     validate::validate(&ir).unwrap();
     ir

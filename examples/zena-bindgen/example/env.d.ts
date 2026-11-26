@@ -31,7 +31,7 @@ interface Visit {
   path: string;
 }
 
-// JS globals the tour uses that neither workers-types nor std.ir declares.
+// JS globals the tour uses that neither workers-types nor std.tw declares.
 interface Json {
   parse(text: string): any;
   stringify(value: any): string;

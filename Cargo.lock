@@ -1124,12 +1124,9 @@ dependencies = [
  "oxc_parser",
  "oxc_resolver",
  "oxc_span",
- "prettyplease",
- "proc-macro2",
- "quote",
  "similar",
- "syn 2.0.117",
  "ts-gen-abi",
+ "ts-gen-bridge",
  "walkdir",
  "wasmparser",
  "wat",
@@ -1155,9 +1152,26 @@ version = "0.0.0"
 dependencies = [
  "js-sys",
  "ts-gen",
+ "ts-gen-wasm-bindgen",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "wasm-bindgen-test",
+]
+
+[[package]]
+name = "ts-gen-wasm-bindgen"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "indexmap",
+ "prettyplease",
+ "proc-macro2",
+ "quote",
+ "similar",
+ "syn 2.0.117",
+ "ts-gen",
+ "ts-gen-abi",
 ]
 
 [[package]]

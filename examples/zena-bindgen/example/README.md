@@ -65,7 +65,7 @@ The declarations beside workers-types:
 
 `run.sh`:
 
-1. `ts-gen --provides provides.d.ts --with std.ir --ir`: the IR, against
+1. `ts-gen --provides provides.d.ts --with std.tw --ir`: the IR, against
    the JS standard library's.
 2. `zena-bindgen --entry`: the bindings (`build/bindings.zena`, and
    `build/std.zena` for the library, whose `ErrException` and tw loop
@@ -74,7 +74,7 @@ The declarations beside workers-types:
    members under their IR keys with `@export`, over `app.zena`.
 3. `zena build -t js`: the module. Generic members import per
    instantiation under their templated keys.
-4. `ts-gen-bridge generate`: the bridge for the module. No link step is
+4. `ts-gen --bridge`: the bridge for the module. No link step is
    needed, as Zena names every import and export itself.
 
 `loader.js` instantiates the module through the bridge's `instantiate`,

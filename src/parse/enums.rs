@@ -487,7 +487,7 @@ mod tests {
     fn find<'k>(kinds: &'k [TypeKind], name: &str) -> &'k TypeKind {
         kinds
             .iter()
-            .find(|k| crate::codegen::typemap::type_decl_name(k) == Some(name))
+            .find(|k| k.name() == name)
             .unwrap_or_else(|| panic!("no enum `{name}`"))
     }
 

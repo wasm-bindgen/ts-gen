@@ -1,6 +1,6 @@
 //! Tests for `zena-bindgen`.
 //!
-//! Every `.ir` in `tests/fixtures/` here and in ts-gen's `tests/lower/`
+//! Every `.tw` in `tests/fixtures/` here and in ts-gen's `tests/lower/`
 //! (the producer's snapshots) generates bindings compared against
 //! `tests/snapshots/<name>.zena`.
 //!
@@ -61,7 +61,7 @@ fn fixtures() -> Vec<(String, PathBuf)> {
         let mut paths: Vec<PathBuf> = std::fs::read_dir(&dir)
             .unwrap()
             .map(|e| e.unwrap().path())
-            .filter(|p| p.extension().is_some_and(|e| e == "ir"))
+            .filter(|p| p.extension().is_some_and(|e| e == "tw"))
             .collect();
         paths.sort();
         for p in paths {
@@ -78,7 +78,7 @@ fn libs(ir: &Ir) -> Vec<Ir> {
         .iter()
         .map(|name| {
             assert_eq!(name, "std", "no lib `{name}`");
-            read_ir(&repo_root().join("std/std.ir"))
+            read_ir(&repo_root().join("std/std.tw"))
         })
         .collect()
 }
@@ -177,7 +177,7 @@ fn snapshots() {
 /// as its handle, through a trampoline, and JS's as a wrapper that calls it.
 #[test]
 fn fn_payloads() {
-    let ir = read_ir(&crate_root().join("tests/fixtures/fn-payloads.ir"));
+    let ir = read_ir(&crate_root().join("tests/fixtures/fn-payloads.tw"));
     let out = generate(&ir, &[], &zena_bindgen::Options::default());
     assert_eq!(out.skipped, [], "fn-payloads skips members");
     assert!(out
@@ -189,7 +189,7 @@ fn fn_payloads() {
 /// parameters is its handle class, never the `externref` of `Any`.
 #[test]
 fn type_arguments_are_typed() {
-    let ir = read_ir(&crate_root().join("tests/fixtures/type-args.ir"));
+    let ir = read_ir(&crate_root().join("tests/fixtures/type-args.tw"));
     let out = generate(&ir, &[], &zena_bindgen::Options::default());
     assert_eq!(out.skipped, [], "type-args skips members");
     for member in [
@@ -208,7 +208,7 @@ fn type_arguments_are_typed() {
 /// bindings over it import them: a module has one of each.
 #[test]
 fn lib_runtime() {
-    let ir = read_ir(&repo_root().join("tests/lower/with-std.ir"));
+    let ir = read_ir(&repo_root().join("tests/lower/with-std.tw"));
     let libs = libs(&ir);
     let std = zena_bindgen::generate(&libs[0], &zena_bindgen::Options::default()).unwrap();
     let out = generate(&ir, &libs, &zena_bindgen::Options::default());
@@ -821,12 +821,12 @@ fn skipped_trampoline_skips_each_member() {
     );
 }
 
-/// Builds `tests/fixtures/<name>.ir` with its app, through the entry
+/// Builds `tests/fixtures/<name>.tw` with its app, through the entry
 /// module and the bridge, and runs `<name>.run.mjs` over them in node with
 /// `args`: what it prints.
 fn run_fixture(zena: &(PathBuf, PathBuf), name: &str, args: &[&str]) -> String {
     let fixtures = crate_root().join("tests/fixtures");
-    let ir = read_ir(&fixtures.join(format!("{name}.ir")));
+    let ir = read_ir(&fixtures.join(format!("{name}.tw")));
     let dir = TempDir::new(&format!("{name}-run-{}", args.join("-")));
     let out = generate(
         &ir,
@@ -898,7 +898,7 @@ fn undeclared_error_after_await() {
 /// compiles, with its imports' types the IR's.
 #[test]
 fn std_lib() {
-    let ir = read_ir(&repo_root().join("std/std.ir"));
+    let ir = read_ir(&repo_root().join("std/std.tw"));
     let out = zena_bindgen::generate(&ir, &zena_bindgen::Options::default()).unwrap();
     let skipped: Vec<&str> = out.skipped.iter().map(|s| s.key.as_str()).collect();
     assert_eq!(

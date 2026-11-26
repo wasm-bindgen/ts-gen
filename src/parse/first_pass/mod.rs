@@ -63,7 +63,7 @@ pub fn file_context(program: &ast::Program<'_>, lib_name: Option<&str>) -> ir::M
 
 /// The Rust name of the binding `local` exported as `public`. A default
 /// export has no name of its own, so it keeps the local one.
-pub(crate) fn rust_name<'n>(local: &'n str, public: &'n str) -> &'n str {
+pub fn rust_name<'n>(local: &'n str, public: &'n str) -> &'n str {
     if public == "default" {
         local
     } else {

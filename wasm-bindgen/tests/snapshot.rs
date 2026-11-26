@@ -1,7 +1,8 @@
 //! Snapshot tests for ts-gen code generation.
 //!
+//! The fixtures and snapshots are the repository's, in `tests/` at its root.
 //! Every `.d.ts` file in `tests/fixtures/` is automatically discovered and run
-//! through the `ts-gen` CLI binary once per entry in [`CONFIGS`], plus once
+//! through the `ts-gen-wasm-bindgen` binary once per entry in [`CONFIGS`], plus once
 //! per entry in [`FEATURE_CONFIGS`] naming the fixture, then each generated
 //! Rust output is compared against a blessed snapshot in
 //! `tests/snapshots/<name>/<config>.rs`. Keeping the configurations side by
@@ -20,7 +21,7 @@
 //! To update snapshots after intentional changes:
 //!
 //! ```sh
-//! BLESS=1 cargo test -p ts-gen
+//! BLESS=1 cargo test -p ts-gen-wasm-bindgen
 //! ```
 
 use std::path::{Path, PathBuf};
@@ -88,18 +89,19 @@ fn configs_for(fixture_stem: &str) -> Vec<(&'static str, &'static [&'static str]
         .collect()
 }
 
-/// Root of the ts-gen crate (where Cargo.toml lives).
+/// Root of the repository, which holds the fixtures and snapshots.
 fn crate_root() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).to_path_buf()
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap()
+        .to_path_buf()
 }
 
-/// Path to the compiled `ts-gen` binary.
+/// Path to the compiled `ts-gen-wasm-bindgen` binary.
 ///
 /// `cargo test` compiles the binary into the same target directory.
 fn ts_gen_bin() -> PathBuf {
-    // env!("CARGO_BIN_EXE_ts-gen") is set by cargo for integration tests
-    // when the crate defines a [[bin]] target.
-    PathBuf::from(env!("CARGO_BIN_EXE_ts-gen"))
+    PathBuf::from(env!("CARGO_BIN_EXE_ts-gen-wasm-bindgen"))
 }
 
 /// A fresh output directory for one CLI run. The name includes the process
@@ -165,7 +167,7 @@ fn assert_snapshot(snap_path: &Path, actual: &str) {
     let expected = std::fs::read_to_string(snap_path).unwrap_or_else(|e| {
         panic!(
             "Snapshot file not found: {}\n\
-             Run `BLESS=1 cargo test -p ts-gen` to create it.\n\
+             Run `BLESS=1 cargo test -p ts-gen-wasm-bindgen` to create it.\n\
              Error: {e}",
             snap_path.display()
         )
@@ -204,7 +206,7 @@ fn assert_snapshot(snap_path: &Path, actual: &str) {
 
     panic!(
         "Snapshot mismatch for {}\n\
-         Run `BLESS=1 cargo test -p ts-gen` to update.\n\
+         Run `BLESS=1 cargo test -p ts-gen-wasm-bindgen` to update.\n\
          {diff_output}",
         snap_path.display()
     );
@@ -238,8 +240,9 @@ fn snapshot_test(fixture_name: &str) -> Vec<String> {
     for (config_name, config_args) in &configs {
         let out_file = out_dir.0.join(format!("{config_name}.rs"));
 
-        // Invoke the CLI binary: ts-gen --input <fixture> --output <out_file> [extra_args...]
+        // A directive's paths are relative to the repository root.
         let output = Command::new(ts_gen_bin())
+            .current_dir(&root)
             .arg("--input")
             .arg(&fixture)
             .arg("--output")
@@ -526,38 +529,18 @@ fn ambient_module_imports_resolve_independently_of_cwd() {
     assert_eq!(actual, expected);
 }
 
-/// The README's library example, `parse_source` then `codegen::generate`,
-/// gives the CLI's output.
+/// The README's library example, `parse_source` then `generate`, gives
+/// the CLI's output.
 #[test]
 fn library_api_matches_the_cli() {
     let source =
         std::fs::read_to_string(crate_root().join("tests/fixtures/inline-return.d.ts")).unwrap();
     let (module, gctx) = ts_gen::parse_source(&source, None).unwrap();
-    let actual = ts_gen::codegen::generate(&module, &gctx).unwrap();
+    let actual = ts_gen_wasm_bindgen::generate(&module, &gctx).unwrap();
     let snapshot = "tests/snapshots/inline-return/default.rs";
     let expected = std::fs::read_to_string(crate_root().join(snapshot)).unwrap();
     assert!(
         actual == expected,
         "the library's output differs from {snapshot}"
     );
-}
-
-/// With both `--ir` and `--output`, each parse diagnostic is reported once.
-#[test]
-fn ir_and_output_report_a_warning_once() {
-    let fixture = crate_root().join("tests/fixtures/duplicate-identifiers.d.ts");
-    let out_dir = TempDir::new("ir-and-output");
-    let output = Command::new(ts_gen_bin())
-        .arg("--input")
-        .arg(&fixture)
-        .arg("--ir")
-        .arg(out_dir.0.join("bindings.ir"))
-        .arg("--output")
-        .arg(out_dir.0.join("bindings.rs"))
-        .output()
-        .expect("Failed to execute ts-gen binary");
-    let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(output.status.success(), "{stderr}");
-    let warning = "duplicate-identifiers.d.ts:11:11: Duplicate identifier `Dup`";
-    assert_eq!(stderr.matches(warning).count(), 1, "{stderr}");
 }
