@@ -2609,6 +2609,13 @@ struct DisplayToString {
     impl_: TokenStream,
 }
 
+/// The `IntoIterator` impl of a class, with the private binding it calls
+/// when the class has no public one that doesn't catch.
+struct IterableImpl {
+    binding: Option<TokenStream>,
+    impl_: TokenStream,
+}
+
 /// A parameterless `toString(): string` is the type's `Display`: an
 /// inherent `to_string(&self) -> String` would shadow the blanket
 /// `ToString` (clippy's `inherent_to_string`), so it is replaced by
@@ -2621,13 +2628,6 @@ struct DisplayToString {
 /// form can't take `to_string` either, so it keeps the `try_` name the
 /// default policy gives it. Under `@throws {never}` there is no catching
 /// form, and `fmt` calls a private `__to_string` extern instead.
-/// The `IntoIterator` impl of a class, with the private binding it calls
-/// when the class has no public one that doesn't catch.
-struct IterableImpl {
-    binding: Option<TokenStream>,
-    impl_: TokenStream,
-}
-
 fn display_to_string(
     config: &ClassConfig,
     sigs: &mut Vec<FunctionSignature>,
@@ -2692,14 +2692,6 @@ fn display_to_string(
     Some(DisplayToString { binding, impl_ })
 }
 
-/// A `[Symbol.iterator]()` makes `&Type` iterable (`for (k, v) in &headers`)
-/// over what its bound `iterator()` returns: an `ArrayTuple<(K, V)>` item
-/// as the tuple, any other as itself. A throwing `[Symbol.iterator]()` or
-/// `next()` rethrows, as `for…of` does.
-///
-/// The adapter calls only what js-sys has both with and without
-/// `js_sys_unstable_apis`, where its own iteration of an `Iterator<T>`
-/// differs.
 /// The `_typed` twins of the plain bindings `sigs` of a keyed method
 /// ([`super::keyed`]), each in an `impl` of the class.
 fn keyed_twins(
@@ -2748,6 +2740,14 @@ fn keyed_twins(
     }]
 }
 
+/// A `[Symbol.iterator]()` makes `&Type` iterable (`for (k, v) in &headers`)
+/// over what its bound `iterator()` returns: an `ArrayTuple<(K, V)>` item
+/// as the tuple, any other as itself. A throwing `[Symbol.iterator]()` or
+/// `next()` rethrows, as `for…of` does.
+///
+/// The adapter calls only what js-sys has both with and without
+/// `js_sys_unstable_apis`, where its own iteration of an `Iterator<T>`
+/// differs.
 fn into_iterator(
     config: &ClassConfig,
     sigs: &[FunctionSignature],

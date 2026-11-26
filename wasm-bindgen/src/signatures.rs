@@ -2657,8 +2657,10 @@ pub(crate) fn render_param_type(
 /// Per-monomorphization argument bounds: a string becomes `impl
 /// JsStringLike`, and a `buffer` `impl BufferSourceLike`. Each occurrence
 /// is an independent anonymous type parameter, so inside a carrier a
-/// string stays `&str` and a `buffer` its bytes: a caller passing `None`
-/// would have nothing to infer it from.
+/// string stays `&str`: a caller passing `None` would have nothing to
+/// infer it from. A `buffer` keeps its bound there, since its handles
+/// have no one borrowed form, and its `None` names a type
+/// (`None::<&[u8]>`).
 fn mono_argument_type(ty: &TypeRef) -> Option<TokenStream> {
     if let Some((core, n)) = ty.split_empties() {
         let inner = match &core {
