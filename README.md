@@ -64,9 +64,9 @@ real compilers.
 | Zena | `all-gc` with host strings | [examples/zena-bindgen](examples/zena-bindgen) | imports, monomorphized generics |
 
 **Kotlin**: `kotlin-bindgen <lowered.json> <out-dir> [--package <pkg>]
-[--runtime]` writes Kotlin externals from `ts-gen-abi lower`'s JSON. It also
-writes a `links.tsv` for `ts-gen-bridge link`, since Kotlin names its own
-imports. Build the generator with `./gradlew installDist` in
+[--runtime]` writes Kotlin externals from `ts-gen-abi lower`'s JSON. Kotlin
+names its own imports, so it also writes a `links.tsv`, and `kotlin-bindgen
+link` renames the compiled module's imports to their keys. Build the generator with `./gradlew installDist` in
 `examples/kotlin-bindgen` (JDK 21). [examples/kotlin-bindgen/example](examples/kotlin-bindgen/example)
 runs a Worker end to end.
 

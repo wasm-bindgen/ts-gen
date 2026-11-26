@@ -1132,6 +1132,7 @@ dependencies = [
  "ts-gen-abi",
  "walkdir",
  "wasmparser",
+ "wat",
 ]
 
 [[package]]
@@ -1144,7 +1145,6 @@ version = "0.1.0"
 dependencies = [
  "similar",
  "ts-gen-abi",
- "wasm-encoder",
  "wasmparser",
  "wat",
 ]

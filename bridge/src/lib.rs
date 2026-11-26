@@ -13,7 +13,6 @@
 mod entry;
 mod form;
 mod js;
-pub mod link;
 mod module;
 mod plan;
 mod runtime;

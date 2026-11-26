@@ -1,4 +1,4 @@
-//! The `ts-gen-bridge` binary: `link`, then `generate`, on files.
+//! The `ts-gen-bridge` binary: `generate`, on files.
 
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -24,31 +24,21 @@ fn run(c: &mut Command) -> Result<(), String> {
 }
 
 #[test]
-fn links_then_generates() {
+fn generates() {
     let d = scratch("cli");
     std::fs::write(d.join("api.ir"), "ir 1;\nclass C { f(): (u32, str); }\n").unwrap();
-    // A language that can only import from `js_code` under its own names.
     std::fs::write(
         d.join("lang.wat"),
         r#"(module
-  (import "js_code" "app.f" (func (param externref) (result i32)))
+  (import "tw:js/global" "C#f()" (func (param externref) (result i32)))
   (import "tw:ret" "externref" (func (result externref))))"#,
     )
     .unwrap();
-    std::fs::write(d.join("links.tsv"), "js_code\tapp.f\ttw:js/global\tC#f()\n").unwrap();
     let p = |f: &str| d.join(f).to_str().unwrap().to_string();
-    run(bin().args([
-        "link",
-        &p("lang.wat"),
-        &p("links.tsv"),
-        "-o",
-        &p("linked.wasm"),
-    ]))
-    .unwrap();
     run(bin().args([
         "generate",
         &p("api.ir"),
-        &p("linked.wasm"),
+        &p("lang.wat"),
         "-o",
         &p("out"),
         "--profile",
@@ -62,7 +52,7 @@ fn links_then_generates() {
     let js = std::fs::read_to_string(d.join("out/bridge.js")).unwrap();
     assert!(js.contains("\"C#f()\""), "{js}");
 
-    // Unlinked, the profile mismatch is reported with the import.
+    // A profile mismatch is reported with the import.
     let e = run(bin().args([
         "generate",
         &p("api.ir"),
@@ -73,7 +63,10 @@ fn links_then_generates() {
         "all-host",
     ]))
     .unwrap_err();
-    assert!(e.contains("the spill needs `results = single`"), "{e}");
+    assert!(
+        e.contains("(\"tw:js/global\", \"C#f()\"): the language declares (i32)"),
+        "{e}"
+    );
     let e = run(bin().args(["generate", &p("api.ir")])).unwrap_err();
     assert!(e.contains("usage:"), "{e}");
 }

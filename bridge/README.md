@@ -18,7 +18,6 @@ layouts and the `tw` protocol. This crate implements §11–§19 of it.
 ## CLI
 
 ```text
-ts-gen-bridge link <in.wasm> <links.tsv>... -o <out.wasm>
 ts-gen-bridge generate <file.ir> <language.wasm> -o <dir> [--profile <profile>] [--with <lib.ir>]... [--wat] [--factory]
 ```
 
@@ -31,13 +30,8 @@ The settings are IR.md §12's; `strict-null = on`, for example, makes a
 `--with` supplies the lib IRs the IR's `with` names. `--factory` shapes
 `bridge.js` as a factory (below).
 
-`link` is for languages that can't choose an import's `(module, name)`.
-Kotlin/Wasm, for example, imports every `@JsFun` from `js_code` under the
-function's qualified name. Their generator lists each such import with the
-key it stands for in `links.tsv`, and `link` renames the imports to match.
-Only the names change.
-
-A Rust or Zena module generates directly:
+The language module imports each IR member under its `tw` key. A Rust or
+Zena module does so directly:
 
 ```sh
 ts-gen --input worker.d.ts --ir worker.ir
@@ -45,10 +39,13 @@ ts-gen --input worker.d.ts --ir worker.ir
 ts-gen-bridge generate worker.ir worker.wasm --profile all-gc -o out
 ```
 
-A Kotlin module links first ([examples/kotlin-bindgen/example](../examples/kotlin-bindgen/example)):
+A language that can't choose an import's `(module, name)` renames its
+imports to their keys first. Kotlin/Wasm imports every `@JsFun` from
+`js_code` under the function's qualified name, so its generator does this
+itself ([examples/kotlin-bindgen/example](../examples/kotlin-bindgen/example)):
 
 ```sh
-ts-gen-bridge link worker.wasm bindings/links.tsv -o out/worker.wasm
+kotlin-bindgen link worker.wasm bindings/links.tsv -o out/worker.wasm
 ts-gen-bridge generate worker.ir out/worker.wasm \
   --profile "all-host, results = single, throws = js" -o out
 ```

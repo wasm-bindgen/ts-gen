@@ -68,7 +68,7 @@ The declarations beside the app:
    (`build/std/` with `tsgen.runtime`, and `build/bindings/` over them
    with `--lib std=std`), each with a `links.tsv`.
 3. Gradle: the Kotlin/Wasm module, from the bindings and the app.
-4. `ts-gen-bridge link`: Kotlin imports every `@JsFun` from `js_code` under
+4. `kotlin-bindgen link`: Kotlin imports every `@JsFun` from `js_code` under
    its qualified name; the link step renames the ones the `links.tsv`
    files list to their tw keys. `ts-gen-bridge generate` then writes the
    bridge for the linked module.

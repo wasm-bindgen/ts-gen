@@ -9,7 +9,6 @@ repository = "https://github.com/wasm-bindgen/ts-gen"
 [dependencies]
 ts-gen-abi = { path = "../abi" }
 wasmparser = "0.263"
-wasm-encoder = { version = "0.263", features = ["wasmparser"] }
 wat = "1.263"
 
 [dev-dependencies]

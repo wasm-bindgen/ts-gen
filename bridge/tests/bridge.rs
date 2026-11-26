@@ -747,6 +747,35 @@ fixtures! {
 }
 
 #[test]
+fn ignores_embedder_imports_it_cannot_type() {
+    // Kotlin's own js_code imports take its GC structs.
+    let lang = wat::parse_str(
+        r#"(module
+  (import "js_code" "kotlin.internal" (func (param structref)))
+  (import "tw:js/global" "f()" (func))
+)"#,
+    )
+    .unwrap();
+    let ir = ts_gen_abi::text::parse("ir 1;\nf();\n").unwrap();
+    let p = ts_gen_abi::profile::Profile::all_host();
+    ts_gen_bridge::generate(&ir, &p, &lang).unwrap();
+    let bad = wat::parse_str(
+        r#"(module
+  (import "tw:js/global" "f()" (func (param structref)))
+)"#,
+    )
+    .unwrap();
+    let e = ts_gen_bridge::generate(&ir, &p, &bad)
+        .err()
+        .unwrap()
+        .to_string();
+    assert!(
+        e.contains("(\"tw:js/global\", \"f()\"): language module: the heap type"),
+        "{e}"
+    );
+}
+
+#[test]
 fn termination_flag_needs_its_global() {
     let ir = text::parse("ir 1;\nclass C { f(): u32; }").unwrap();
     let lang = |global: &str| {
