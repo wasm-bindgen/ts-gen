@@ -56,6 +56,16 @@
   (func (export "app.kept()") (result i32 i32)
     (global.get $kept) (global.get $keptn))
 
+  ;; A table range is the language's too, cleared before it's freed.
+  (func (export "app.pick(arr<Target>,u32)") (param $base i32) (param $n i32) (param $i i32) (result externref)
+    (local $t externref)
+    (local.set $t (table.get $tab (i32.add (local.get $base) (local.get $i))))
+    (if (local.get $n)
+      (then
+        (table.fill $tab (local.get $base) (ref.null extern) (local.get $n))
+        (call $tfree (local.get $base) (local.get $n))))
+    (local.get $t))
+
   (func (export "app.terminate()")
     (i32.store8 (i32.const 8) (i32.const 1)))
 )

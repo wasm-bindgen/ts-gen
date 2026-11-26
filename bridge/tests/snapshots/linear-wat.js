@@ -53,6 +53,11 @@ function $isObject(v) {
   return (typeof v === "object" && v !== null) || typeof v === "function";
 }
 
+function $array(v, what) {
+  if (!Array.isArray(v)) $fail(what, v);
+  return v;
+}
+
 // A memory and its externref table, as the glue reads and writes them.
 // The language's space allocates through its exports and registers each
 // allocation on the call's cleanup list; the scratch space is the
@@ -488,6 +493,19 @@ function $h1(env) {
   });
 }
 
+function $h3(v, cx) {
+  $array(v, "Target[]");
+  const n = v.length;
+  const x0 = n ? $L.talloc(n * 1, cx) : 0;
+  for (let i = 0; i < n; i++) {
+    const e = v[i];
+    const t1 = $instance(e, $cls0, "Target");
+    const x = x0 + i * 1;
+    $L.table.set(x + 0, t1);
+  }
+  return [x0, n];
+}
+
 // ("tw:js/global", "Target#on(fn(u32)->u32)")
 function $f0(w0_0, w1_0) {
   const t1 = $h1(w1_0);
@@ -597,10 +615,30 @@ const $N0 = {
       throw $outgoing(e);
     }
   },
+  pick(...a) {
+    if (a.length >= 2) {
+      $checkLive();
+      const cx = $cx;
+      const cxm = cx.n;
+      try {
+        const t1 = a[0];
+        const t2 = $h3(t1, cx);
+        const t3 = a[1];
+        const t4 = $int(t3, 0, 4294967295, "u32");
+        cx.n = cxm;
+        const r = $E[6](t2[0], t2[1], t4);
+        return r;
+      } catch (e) {
+        $release(cx, cxm);
+        throw $outgoing(e);
+      }
+    }
+    throw new TypeError("`pick` doesn't match its arguments");
+  },
   terminate(...a) {
     $checkLive();
     try {
-      $E[6]();
+      $E[7]();
     } catch (e) {
       throw $outgoing(e);
     }
@@ -635,7 +673,8 @@ export function instantiate(language, bridge, imports = {}) {
   $E[3] = $X["app.guarded(Target,str)"];
   $E[4] = $X["app.keep(str,Target)"];
   $E[5] = $X["app.kept()"];
-  $E[6] = $X["app.terminate()"];
+  $E[6] = $X["app.pick(arr<Target>,u32)"];
+  $E[7] = $X["app.terminate()"];
   $L = new $Lang(instance.exports, { memory: "memory", table: "tw:table", realloc: "tw:realloc", free: "tw:free", talloc: "tw:table/alloc", tfree: "tw:table/free" }, false);
   $checkLive = () => {
     if ($L.u8()[Number(instance.exports["tw:terminated"].value)] !== 0) {

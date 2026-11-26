@@ -55,6 +55,13 @@ assert.deepEqual(L.live(), start);
 // Only a call that's never entered leaves them to the bridge.
 L.balanced(() => L.throwsType(() => app.keep("x", {}), /Target/));
 
+// A table range is the language's as well, cleared as it's freed: a freed
+// slot roots nothing.
+const picked = [new Target(), new Target()];
+assert.equal(L.balanced(() => app.pick(picked, 1)), picked[1]);
+const tab = L.ex["tw:table"];
+for (let i = L.ex["tw:table/heap_base"].value; i < tab.length; i++) assert.equal(tab.get(i), null);
+
 // Termination: entries refuse, and finalizers skip their drops.
 app.listen(t, 1);
 app.terminate();

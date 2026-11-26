@@ -1253,6 +1253,9 @@ The language exports allocation in Rust's model (the Component Model's
 
 The externref table has the hooks `tw:table/alloc(n) -> base` and
 `tw:table/free(base, n)` (wasm-bindgen's `__externref_table_alloc` pattern).
+A freed range's slots hold their values until they're reused, and root
+them until then, so whichever side frees a range clears it to null first:
+the bridge does, and so does the language for a range it owns.
 The language defines and exports both the memory and the externref table,
 by default as `memory` and `tw:table`. Both names are configurable, so a
 bridge can share them with another binary. The table's index ranges are in
