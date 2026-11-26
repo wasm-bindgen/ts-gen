@@ -707,6 +707,7 @@ fixtures! {
     all_gc => "all-gc",
     gc_wtf16 => "gc-wtf16",
     renames => "renames",
+    js_names => "js-names",
     host_str => "host-str",
     handles => "handles",
     handles_gc => "handles-gc",

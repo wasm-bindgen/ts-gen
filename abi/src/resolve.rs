@@ -103,6 +103,9 @@ impl<'a> Context<'a> {
 
 pub struct Symbols<'a> {
     types: HashMap<Location, (Location, TypeDecl<'a>)>,
+    /// The `@js(name)` of each declaration that has one, namespaces
+    /// included.
+    renames: HashMap<Location, &'a str>,
     modules: HashSet<&'a str>,
 }
 
@@ -134,6 +137,7 @@ impl<'a> Symbols<'a> {
     pub fn with_libs(ir: &'a Ir, libs: &[&'a Ir]) -> Symbols<'a> {
         let mut s = Symbols {
             types: HashMap::new(),
+            renames: HashMap::new(),
             modules: HashSet::new(),
         };
         s.collect(None, &mut Vec::new(), &ir.items);
@@ -145,9 +149,17 @@ impl<'a> Symbols<'a> {
 
     fn collect(&mut self, module: Option<&'a str>, ns: &mut Vec<String>, items: &'a [Decl]) {
         for d in items {
+            let rename = d.meta().attrs.js.rename();
             let decl = match d {
                 Decl::Namespace(n) => {
                     ns.push(n.name.clone());
+                    if let Some(js) = rename {
+                        let loc = Location {
+                            module: module.map(Into::into),
+                            path: ns.clone(),
+                        };
+                        self.renames.entry(loc).or_insert(js);
+                    }
                     self.collect(module, ns, &n.items);
                     ns.pop();
                     continue;
@@ -168,8 +180,28 @@ impl<'a> Symbols<'a> {
                 module: module.map(Into::into),
                 path,
             };
+            if let Some(js) = rename {
+                self.renames.entry(loc.clone()).or_insert(js);
+            }
             self.types.entry(loc.clone()).or_insert((loc, decl.1));
         }
+    }
+
+    /// A declaration path in JS names (§4): each segment's `@js(name)`,
+    /// or else its IR name.
+    pub fn js_path(&self, module: Option<&str>, path: &[String]) -> Vec<String> {
+        (1..=path.len())
+            .map(|n| {
+                let loc = Location {
+                    module: module.map(Into::into),
+                    path: path[..n].to_vec(),
+                };
+                match self.renames.get(&loc) {
+                    Some(js) => js.to_string(),
+                    None => path[n - 1].clone(),
+                }
+            })
+            .collect()
     }
 
     pub fn is_module(&self, spec: &str) -> bool {
