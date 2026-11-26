@@ -68,16 +68,19 @@ const c = new Api();
 const called = cb(c);
 c.resolvers[0](2);
 assert.equal(await called, 42);
-// And keeps its environment while it's parked, though JS has let the
-// function go.
-const envs = instance.exports["test:envs"];
-const dropped = envs();
+// Its environment is the language's: JS holds one reference, which the
+// collected function's drop releases while the call is parked, and the
+// call holds its own, so the environment is there once it resumes and is
+// freed once.
+const drops = instance.exports["test:drops"];
+const freed = instance.exports["test:freed"];
 const c2 = new Api();
 const parked = app.plus(1)(c2);
 await collect();
-assert.equal(envs(), dropped);
+assert.deepEqual([drops(), freed()], [1, 0]);
 c2.resolvers[0](2);
 assert.equal(await parked, 3);
+assert.deepEqual([drops(), freed()], [1, 1]);
 
 // A suspended call's arguments are its own: the language reads them once
 // resumed, and frees them.
@@ -90,18 +93,16 @@ e.resolvers[0](1);
 assert.equal(await echoed, 66);
 assert.equal(live(), before);
 
-// And its receiver: a collected `Task` would drop the handle `run` still
-// uses. This runs optimized (`node` holds `--no-liftoff`), where a
+// The same for its receiver, whose `Task` JS lets go while `run` is
+// parked. This runs optimized (`node` holds `--no-liftoff`), where a
 // suspended frame doesn't keep the values it no longer reads.
-const drops = instance.exports["test:drops"];
 const t = new Api();
 const ran = new Task(t).run();
 await collect();
-assert.equal(drops(), 0);
+assert.deepEqual([drops(), freed()], [2, 1]);
 t.resolvers[0](5);
 assert.equal(await ran, 5);
-await collect();
-assert.equal(drops(), 1);
+assert.deepEqual([drops(), freed()], [2, 2]);
 
 assert.deepEqual(scratchUse(), empty);
 console.log("ok");

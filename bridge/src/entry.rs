@@ -101,25 +101,11 @@ impl<'a, 'b> Glue<'a, 'b> {
         }
         b.open("try {");
         let mut wire = Vec::new();
-        let mut keep = Vec::new();
         for (p, a) in sig.params.iter().zip(args) {
             match a {
-                Arg::Raw(e) => {
-                    // A callback's environment lives as long as its JS
-                    // function, `f`.
-                    let owner = match p.role {
-                        Pos::This | Pos::Handle => Some("this"),
-                        Pos::Env => Some("f"),
-                        _ => None,
-                    };
-                    if let Some(o) = owner.filter(|o| !keep.iter().any(|k| k == o)) {
-                        keep.push(o.to_string());
-                    }
-                    wire.push(e.clone());
-                }
+                Arg::Raw(e) => wire.push(e.clone()),
                 Arg::Js(v) => {
                     let v = b.bind(v.clone());
-                    keep.push(v.clone());
                     let m = self.mode();
                     wire.extend(self.lower(b, &p.repr, &v, m)?);
                 }
@@ -135,12 +121,6 @@ impl<'a, 'b> Glue<'a, 'b> {
             None => b.line(format!("{call};")),
             Some(r) => {
                 b.line(format!("const r = {call};"));
-                // A promising call returns at its first suspension, while
-                // the language may still use its receiver and arguments
-                // (§16): they stay reachable until its future settles.
-                if promising(self.l, sig) && !keep.is_empty() {
-                    b.line(format!("$keep(r, [{}]);", keep.join(", ")));
-                }
                 let n = self.f.jsw(&r.repr)?.len();
                 let ws: Vec<String> = if n == 1 {
                     vec!["r".into()]

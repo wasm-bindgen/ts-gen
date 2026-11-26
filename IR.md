@@ -1800,6 +1800,13 @@ and `ref.null` in GC.
   language object are collected by the same GC: no finalizer, no drop
   export.
   * For exported classes, finalizers are a profile option.
+  * The drop releases JS's reference to the handle, and no more: the
+    language owns the handle. JS holds its reference for as long as the
+    wrapper lives, so a call may use the handles it's passed while its JS
+    frame is on the stack. Past that (a call parked under JSPI, an async
+    method that has returned its future, [§16](#16-async)) the wrapper can
+    be collected and its drop run, so the language takes its own reference
+    to a handle it uses there. The bridge keeps nothing alive for it.
 * **Language-side end of life:** the language calls `("tw:destroy", F)` or
   `("tw:destroy", C)`, of type `(handle)`. The bridge then:
   1. marks the wrapper dead, so later calls throw `TypeError` without
@@ -2119,10 +2126,12 @@ Promising calls:
   `WebAssembly.promising`. The JS result is the promise of the call's own
   future, and an error escaping the call rejects it.
 * Such a call returns to JS at its first suspension. Its arguments are
-  the language's own (§11), so they outlive that return. The bridge keeps
-  the call's receiver and JS arguments reachable until its future settles,
-  so a finalizer doesn't drop a handle the call still uses
-  (`await new Foo().run()`).
+  the language's own (§11), so they outlive that return. A linear handle
+  it was passed (its receiver, a callback's environment, an exported-class
+  argument) doesn't: with the JS frame gone, the wrapper can be collected
+  and its drop run while the call is parked (`await new Foo().run()`). A
+  call that uses a handle past a suspension takes its own reference to it
+  first (§14).
 * It enters the language through a root in the bridge module, which
   records the scratch base: a suspension moves what's live above it out of
   scratch while it's parked, and puts it back once resumed. The root also
@@ -2360,8 +2369,9 @@ export class Counter extends DurableObject {
 
 * **Every instance export, including `new` (called after `super`),
   receives `(this: externref, handle, args…)`.**
-  * `this` is borrowed for the call. An async method holds it until its
-    future settles.
+  * `this` and the handle are borrowed for the call. An async method that
+    uses the handle once the call has returned, or past a suspension,
+    takes its own reference to it (§14).
   * In linear, the language must not store `this`. It would sit in the
     externref table (a GC root), and the instance would never be finalized.
   * GC languages may cache `this`, since that cycle lives in one heap.

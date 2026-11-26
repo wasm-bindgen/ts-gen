@@ -996,13 +996,6 @@ function $promising(f) {
   };
 }
 
-// Keeps `vs` reachable until future `f` settles, so their finalizers don't
-// drop the handles a suspended call still uses (§16).
-function $keep(f, vs) {
-  const keep = () => vs;
-  f.promise.then(keep, keep);
-}
-
 function $promise(v) {
   return v instanceof $Future ? v.promise : v;
 }

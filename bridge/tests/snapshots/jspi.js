@@ -625,13 +625,6 @@ function $promising(f) {
   };
 }
 
-// Keeps `vs` reachable until future `f` settles, so their finalizers don't
-// drop the handles a suspended call still uses (§16).
-function $keep(f, vs) {
-  const keep = () => vs;
-  f.promise.then(keep, keep);
-}
-
 function $promise(v) {
   return v instanceof $Future ? v.promise : v;
 }
@@ -708,7 +701,6 @@ function $h4(f, h, a0) {
     try {
       const t1 = $instance(a0, $cls0, "Api");
       const r = $E[10](env, t1);
-      $keep(r, [f, a0]);
       return $promise(r);
     } catch (e) {
       throw $outgoing(e);
@@ -811,7 +803,6 @@ class $C0 {
     try {
       try {
         const r = $E[1](this, $HC.unwrap(this, $C0, "Task"));
-        $keep(r, [this]);
         return $promise(r);
       } catch (e) {
         throw $outgoing(e);
@@ -830,7 +821,6 @@ const $N0 = {
           const t1 = a[0];
           const t2 = $instance(t1, $cls0, "Api");
           const r = $E[2](t2);
-          $keep(r, [t1]);
           return $promise(r);
         } catch (e) {
           throw $outgoing(e);
@@ -855,7 +845,6 @@ const $N0 = {
           const t6 = t4[1];
           cx.n = cxm;
           const r = $E[3](t2, t5, t6);
-          $keep(r, [t1, t3]);
           return $promise(r);
         } catch (e) {
           $release(cx, cxm);
@@ -899,7 +888,6 @@ const $N0 = {
           const t1 = a[0];
           const t2 = $instance(t1, $cls0, "Api");
           const r = $E[6](t2);
-          $keep(r, [t1]);
           return $promise(r);
         } catch (e) {
           throw $outgoing(e);
@@ -917,7 +905,6 @@ const $N0 = {
           const t1 = a[0];
           const t2 = $instance(t1, $cls0, "Api");
           const r = $E[7](t2);
-          $keep(r, [t1]);
           return $promise(r);
         } catch (e) {
           throw $outgoing(e);
