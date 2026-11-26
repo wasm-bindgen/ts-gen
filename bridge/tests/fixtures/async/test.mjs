@@ -41,13 +41,17 @@ const tick = () => new Promise((r) => setTimeout(r, 0));
 const later = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const wakes = [];
+let onWake = null;
 const ticks = [];
 let tickResults = [];
 let sleeps = [];
 let runs = [];
 let L;
 const impl = {
-  "tw:future/wake": (w) => wakes.push(w),
+  "tw:future/wake": (w) => {
+    wakes.push(w);
+    onWake?.(w);
+  },
   "tw:loop/tick": (loop, max) => {
     ticks.push([loop, max]);
     return tickResults.shift() ?? 0;
@@ -246,6 +250,69 @@ assert.equal(state(f), 2);
   rs[7](0);
   await tick();
   assert.deepEqual(wakes, [20, 21, 30]);
+
+  // A wake can take off a listener that has yet to fire for the same
+  // settlement, a race included.
+  {
+    const at = rs.length;
+    const [h, k] = pending(2);
+    wakes.length = 0;
+    listen(h, 50);
+    listen(h, 51);
+    listenList([h, k], 52);
+    onWake = (w) => {
+      if (w !== 50) return;
+      L.call("future:remove_listener", h, 51);
+      unlistenList([h, k], 52);
+    };
+    rs[at](0);
+    await tick();
+    onWake = null;
+    assert.deepEqual(wakes, [50], "removed during the settlement, not woken");
+    rs[at + 1](0);
+    await tick();
+    assert.deepEqual(wakes, [50]);
+  }
+
+  // A wake that throws doesn't keep the rest from waking.
+  {
+    const at = rs.length;
+    const [h] = pending(1);
+    wakes.length = 0;
+    listen(h, 60);
+    listen(h, 61);
+    listenList([h], 62);
+    onWake = (w) => {
+      if (w === 60) throw new Error("wake");
+    };
+    let unhandled;
+    process.once("unhandledRejection", (e) => (unhandled = e));
+    rs[at](0);
+    await tick();
+    onWake = null;
+    assert.deepEqual(wakes, [60, 61, 62]);
+    assert.equal(unhandled?.message, "wake", "the first error still surfaces");
+  }
+
+  // A waker added singly to a member of its race, or taken off one, leaves
+  // the race on the others.
+  {
+    const at = rs.length;
+    const hs = pending(3);
+    wakes.length = 0;
+    listenList(hs, 70);
+    listen(hs[0], 70);
+    L.call("future:remove_listener", hs[1], 70);
+    rs[at + 2](0);
+    await tick();
+    assert.deepEqual(wakes, [70], "the race");
+    rs[at + 1](0);
+    await tick();
+    assert.deepEqual(wakes, [70], "taken off this member");
+    rs[at](0);
+    await tick();
+    assert.deepEqual(wakes, [70, 70], "the member's own listener");
+  }
 }
 
 // A cancel signal joins the caller's: the caller's own aborts the call,

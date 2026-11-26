@@ -2213,7 +2213,12 @@ into the language only where it's read.
   replaces its earlier listener there. It lets it go when it settles.
   `remove_listener` takes it off sooner, for an await that's abandoned:
   without it the waker stays for as long as the future is pending.
-  Removing one that isn't there does nothing.
+  Removing one that isn't there does nothing. A removal holds from the
+  call on, within a wake of the same settlement too: a waker taken off
+  there before its own wake isn't woken.
+* A wake that throws doesn't keep the future's other listeners, or the
+  suspensions parked on it, from running. The first such error surfaces
+  once they have.
 * A wake says only that a future the waker listened to has settled. The
   language reads the state to learn which, and how.
 * **The option is its own flag**, not `T?`: its none is "no value yet", not

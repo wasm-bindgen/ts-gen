@@ -372,8 +372,22 @@ class $Future {
     this.value = value;
     this.cancel = null;
     const ls = this.listeners;
+    if (!ls) return;
+    // Each is taken off as it fires, so a wake can still remove one that
+    // hasn't, and one that throws doesn't keep the rest from firing.
+    let failed = false;
+    let error;
+    for (const [w, l] of ls) {
+      ls.delete(w);
+      try {
+        l === true ? $wake(w) : l.fire(this);
+      } catch (e) {
+        if (!failed) error = e;
+        failed = true;
+      }
+    }
     this.listeners = null;
-    if (ls) for (const [w, l] of ls) l === true ? $wake(w) : l.fire(this);
+    if (failed) throw error;
   }
 }
 
