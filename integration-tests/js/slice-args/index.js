@@ -53,6 +53,8 @@ export const peek = describeBuffer;
 export const concat = (parts) => parts.map(describeBuffer).join("+");
 export const owned = (data) => data.buffer.byteLength === data.byteLength;
 export const ownedView = owned;
+export const peekAs = (label, data) =>
+  `${typeof label === "string" ? label : label.name}:${describeBuffer(data)}`;
 const slabs = {
   buffer: () => new Uint8Array([1, 2, 3]).buffer,
   bytes: () => new Uint8Array([1, 2, 3, 4]).subarray(1, 3),

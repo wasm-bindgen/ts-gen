@@ -809,6 +809,42 @@ extern "C" {
 }
 #[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
 extern "C" {
+    #[doc = " * `data` - read before the call returns"]
+    #[wasm_bindgen(catch, js_name = "peekAs")]
+    pub fn peek_as(
+        label: impl ::wasm_bindgen::JsStringLike,
+        #[wasm_bindgen(slice = "view")] data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
+extern "C" {
+    #[doc = " * `data` - read before the call returns"]
+    #[wasm_bindgen(catch, js_name = "peekAs")]
+    pub fn peek_as_js_string(
+        label: impl ::wasm_bindgen::JsStringLike,
+        #[wasm_bindgen(slice = "view")] data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
+extern "C" {
+    #[doc = " * `data` - read before the call returns"]
+    #[wasm_bindgen(catch, js_name = "peekAs")]
+    pub fn peek_as_with_item(
+        label: &Item,
+        #[wasm_bindgen(slice = "view")] data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
+extern "C" {
+    #[doc = " * `data` - read before the call returns"]
+    #[wasm_bindgen(catch, js_name = "peekAs")]
+    pub fn peek_as_with_item_js_string(
+        label: &Item,
+        #[wasm_bindgen(slice = "view")] data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
+extern "C" {
     #[wasm_bindgen(catch, js_name = "slab")]
     pub fn slab_js_buffer(
         kind: impl ::wasm_bindgen::JsStringLike,

@@ -7538,6 +7538,8 @@ extern "C" {
     ) -> Result<(), JsValue>
     where
         This: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    fn __iterator(this: &FormData) -> Iterator<ArrayTuple<(JsString, JsValue)>>;
     #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
     pub fn iterator(this: &FormData) -> Result<Iterator<ArrayTuple<(JsString, JsValue)>>, JsValue>;
 }
@@ -7549,14 +7551,10 @@ impl<'a> ::core::iter::IntoIterator for &'a FormData {
         fn(&mut Iterator<ArrayTuple<(JsString, JsValue)>>, ()) -> Option<(JsString, JsValue)>,
     >;
     fn into_iter(self) -> Self::IntoIter {
-        ::core::iter::repeat(()).scan(
-            self.iterator()
-                .unwrap_or_else(|e| ::wasm_bindgen::throw_val(e)),
-            |iter, ()| {
-                let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
-                (!next.done()).then(|| next.value().into_tuple())
-            },
-        )
+        ::core::iter::repeat(()).scan(self.__iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value().into_tuple())
+        })
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -8409,6 +8407,8 @@ extern "C" {
     pub fn keys(this: &Headers) -> Result<Iterator<JsString>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn values(this: &Headers) -> Result<Iterator<JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    fn __iterator(this: &Headers) -> Iterator<ArrayTuple<(JsString, JsString)>>;
     #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
     pub fn iterator(this: &Headers) -> Result<Iterator<ArrayTuple<(JsString, JsString)>>, JsValue>;
 }
@@ -8420,14 +8420,10 @@ impl<'a> ::core::iter::IntoIterator for &'a Headers {
         fn(&mut Iterator<ArrayTuple<(JsString, JsString)>>, ()) -> Option<(JsString, JsString)>,
     >;
     fn into_iter(self) -> Self::IntoIter {
-        ::core::iter::repeat(()).scan(
-            self.iterator()
-                .unwrap_or_else(|e| ::wasm_bindgen::throw_val(e)),
-            |iter, ()| {
-                let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
-                (!next.done()).then(|| next.value().into_tuple())
-            },
-        )
+        ::core::iter::repeat(()).scan(self.__iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value().into_tuple())
+        })
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -16483,6 +16479,8 @@ extern "C" {
     pub fn try_to_string(this: &URLSearchParams) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "toString")]
     pub fn to_string_js_string(this: &URLSearchParams) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    fn __iterator(this: &URLSearchParams) -> Iterator<ArrayTuple<(JsString, JsString)>>;
     #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
     pub fn iterator(
         this: &URLSearchParams,
@@ -16501,14 +16499,10 @@ impl<'a> ::core::iter::IntoIterator for &'a URLSearchParams {
         fn(&mut Iterator<ArrayTuple<(JsString, JsString)>>, ()) -> Option<(JsString, JsString)>,
     >;
     fn into_iter(self) -> Self::IntoIter {
-        ::core::iter::repeat(()).scan(
-            self.iterator()
-                .unwrap_or_else(|e| ::wasm_bindgen::throw_val(e)),
-            |iter, ()| {
-                let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
-                (!next.done()).then(|| next.value().into_tuple())
-            },
-        )
+        ::core::iter::repeat(()).scan(self.__iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value().into_tuple())
+        })
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -17375,6 +17369,8 @@ extern "C" {
     pub fn rows_read<T>(this: &SqlStorageCursor<T>) -> f64;
     #[wasm_bindgen(method, getter, js_name = "rowsWritten")]
     pub fn rows_written<T>(this: &SqlStorageCursor<T>) -> f64;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    fn __iterator<T>(this: &SqlStorageCursor<T>) -> Iterator<T>;
     #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
     pub fn iterator<T>(this: &SqlStorageCursor<T>) -> Result<Iterator<T>, JsValue>;
 }
@@ -17389,14 +17385,10 @@ where
         fn(&mut Iterator<T>, ()) -> Option<T>,
     >;
     fn into_iter(self) -> Self::IntoIter {
-        ::core::iter::repeat(()).scan(
-            self.iterator()
-                .unwrap_or_else(|e| ::wasm_bindgen::throw_val(e)),
-            |iter, ()| {
-                let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
-                (!next.done()).then(|| next.value())
-            },
-        )
+        ::core::iter::repeat(()).scan(self.__iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value())
+        })
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -18084,6 +18076,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SyncKvStorageList<T = JsValue>;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    fn __iterator<T>(this: &SyncKvStorageList<T>) -> Iterator<ArrayTuple<(JsString, T)>>;
     #[doc = " Conformance to the JS iteration protocol — returns the underlying iterator."]
     #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
     pub fn iterator<T>(
@@ -18101,14 +18095,10 @@ where
         fn(&mut Iterator<ArrayTuple<(JsString, T)>>, ()) -> Option<(JsString, T)>,
     >;
     fn into_iter(self) -> Self::IntoIter {
-        ::core::iter::repeat(()).scan(
-            self.iterator()
-                .unwrap_or_else(|e| ::wasm_bindgen::throw_val(e)),
-            |iter, ()| {
-                let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
-                (!next.done()).then(|| next.value().into_tuple())
-            },
-        )
+        ::core::iter::repeat(()).scan(self.__iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value().into_tuple())
+        })
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

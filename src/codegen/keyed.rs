@@ -6,6 +6,7 @@
 //! marker's key and its arguments as the types the plain binding takes.
 
 use std::cell::RefCell;
+use std::collections::HashSet;
 
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
@@ -14,6 +15,7 @@ use ts_gen_abi::keyed::{self, Map};
 use ts_gen_abi::resolve::{Context, Symbols, Target, TypeDecl};
 
 use super::typemap::{to_syn_type, CodegenContext, TypePosition};
+use crate::context::TypeId;
 use crate::ir::{ModuleContext, TypeRef};
 use crate::parse::scope::ScopeId;
 
@@ -21,6 +23,8 @@ use crate::parse::scope::ScopeId;
 pub struct Keyed {
     ir: abi::Ir,
     libs: Vec<&'static abi::Ir>,
+    /// The declarations of the input the output emits.
+    emitted: HashSet<TypeId>,
     /// The key modules emitted, by map.
     modules: RefCell<Vec<(String, TokenStream)>>,
     /// The twins of a class over its map parameter, again for each class
@@ -46,10 +50,11 @@ pub(crate) struct At<'a> {
 }
 
 impl Keyed {
-    pub fn new(ir: abi::Ir, libs: Vec<&'static abi::Ir>) -> Keyed {
+    pub fn new(ir: abi::Ir, libs: Vec<&'static abi::Ir>, emitted: HashSet<TypeId>) -> Keyed {
         Keyed {
             ir,
             libs,
+            emitted,
             modules: RefCell::default(),
             forwards: RefCell::default(),
         }
@@ -259,6 +264,9 @@ impl Keyed {
             if !sub.tparams.is_empty() || loc.module.is_some() || !arg.args.is_empty() {
                 continue;
             }
+            if !self.emitted(std::slice::from_ref(&sub.name), at) || !self.emitted(&loc.path, at) {
+                continue;
+            }
             let this = self.named(std::slice::from_ref(&sub.name), at);
             let body = replace_ident(twin.clone(), param, &self.named(&loc.path, at));
             let mut forwards = self.forwards.borrow_mut();
@@ -339,11 +347,21 @@ impl Keyed {
                 let name = super::typemap::make_ident(&r.path.segments[0]);
                 Some(quote! { #name })
             }
-            Target::Decl(loc, TypeDecl::Class(_)) if loc.module.is_none() && r.args.is_empty() => {
+            Target::Decl(loc, TypeDecl::Class(_))
+                if loc.module.is_none() && r.args.is_empty() && self.emitted(&loc.path, at) =>
+            {
                 Some(self.named(&loc.path, at))
             }
             _ => None,
         }
+    }
+
+    /// Whether `path` names something the output has: anything but a
+    /// declaration of the input that `--export` leaves out.
+    fn emitted(&self, path: &[String], at: At<'_>) -> bool {
+        let gctx = at.cgctx.gctx;
+        gctx.resolve_path(at.scope, &path.join("."))
+            .is_none_or(|id| self.emitted.contains(&id) || gctx.builtin_type_ids.contains(&id))
     }
 
     fn named(&self, path: &[String], at: At<'_>) -> TokenStream {
@@ -422,7 +440,7 @@ impl Keyed {
             let ([name], None, true) = (&loc.path[..], &loc.module, r.args.is_empty()) else {
                 continue;
             };
-            if self.modules.borrow().iter().any(|m| m.0 == *name) {
+            if !self.emitted(&loc.path, at) || self.modules.borrow().iter().any(|m| m.0 == *name) {
                 continue;
             }
             let Some(Map::Closed(props)) = keyed::map(sym, &map, &cx) else {
@@ -437,7 +455,7 @@ impl Keyed {
                 let Some(Target::Decl(vloc, TypeDecl::Class(_))) = sym.resolve(&v.path, &cx) else {
                     continue;
                 };
-                if vloc.module.is_some() || !v.args.is_empty() {
+                if vloc.module.is_some() || !v.args.is_empty() || !self.emitted(&vloc.path, at) {
                     continue;
                 }
                 let mut marker = ts_gen_abi::naming::pascal(&key);

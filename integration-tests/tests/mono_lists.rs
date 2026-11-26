@@ -142,6 +142,14 @@ fn union_lists_keep_the_enum_as_their_element() {
         "Array(string:o,object:Mark(w))"
     );
     assert_eq!(options.marks().map(|marks| marks.len()), Some(2));
+
+    // A list of a union is an arm of a union.
+    let Some(MarkRouteToKind::VecOfJsValue(to)) = route().to() else {
+        panic!("expected the list arm");
+    };
+    assert!(matches!(&to[0], MarkOrStr::Mark(m) if m.text() == "m"));
+    let route = MarkRoute::builder().to_with_slice(&to).build();
+    assert_eq!(describe_route(&route), "Array(object:Mark(m),string:s)");
 }
 
 #[wasm_bindgen_test]

@@ -93,4 +93,7 @@ fn buffer_bytes_are_a_copy_unless_viewed() {
     assert!(owned(&[1u8, 2][..]));
     assert!(!owned_view(&[1u8, 2][..]));
     assert_eq!(peek(&[5u8, 6][..]), "Uint8Array(5,6)");
+    assert_eq!(peek_as("a", &[5u8][..]), "a:Uint8Array(5)");
+    let item = Item::new("i").unwrap();
+    assert_eq!(peek_as_with_item(&item, &[6u8][..]), "i:Uint8Array(6)");
 }

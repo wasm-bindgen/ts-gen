@@ -65,6 +65,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KeyValueStoreList<T = JsValue>;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    fn __iterator<T>(this: &KeyValueStoreList<T>) -> Iterator<ArrayTuple<(JsString, T)>>;
     #[doc = " Conformance to the JS iteration protocol — returns the underlying iterator."]
     #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
     pub fn iterator<T>(
@@ -82,14 +84,10 @@ where
         fn(&mut Iterator<ArrayTuple<(JsString, T)>>, ()) -> Option<(JsString, T)>,
     >;
     fn into_iter(self) -> Self::IntoIter {
-        ::core::iter::repeat(()).scan(
-            self.iterator()
-                .unwrap_or_else(|e| ::wasm_bindgen::throw_val(e)),
-            |iter, ()| {
-                let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
-                (!next.done()).then(|| next.value().into_tuple())
-            },
-        )
+        ::core::iter::repeat(()).scan(self.__iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value().into_tuple())
+        })
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -118,6 +116,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CursorWalk<T = JsValue>;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    fn __iterator<T>(this: &CursorWalk<T>) -> Iterator<T>;
     #[doc = " Conformance to the JS iteration protocol — returns the underlying iterator."]
     #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
     pub fn iterator<T>(this: &CursorWalk<T>) -> Result<Iterator<T>, JsValue>;
@@ -133,14 +133,10 @@ where
         fn(&mut Iterator<T>, ()) -> Option<T>,
     >;
     fn into_iter(self) -> Self::IntoIter {
-        ::core::iter::repeat(()).scan(
-            self.iterator()
-                .unwrap_or_else(|e| ::wasm_bindgen::throw_val(e)),
-            |iter, ()| {
-                let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
-                (!next.done()).then(|| next.value())
-            },
-        )
+        ::core::iter::repeat(()).scan(self.__iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value())
+        })
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -156,6 +152,8 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
         value: f64,
     ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    fn __iterator(this: &Pairs) -> Iterator<ArrayTuple<(JsString, Number)>>;
     #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
     pub fn iterator(this: &Pairs) -> Result<Iterator<ArrayTuple<(JsString, Number)>>, JsValue>;
 }
@@ -167,14 +165,10 @@ impl<'a> ::core::iter::IntoIterator for &'a Pairs {
         fn(&mut Iterator<ArrayTuple<(JsString, Number)>>, ()) -> Option<(JsString, Number)>,
     >;
     fn into_iter(self) -> Self::IntoIter {
-        ::core::iter::repeat(()).scan(
-            self.iterator()
-                .unwrap_or_else(|e| ::wasm_bindgen::throw_val(e)),
-            |iter, ()| {
-                let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
-                (!next.done()).then(|| next.value().into_tuple())
-            },
-        )
+        ::core::iter::repeat(()).scan(self.__iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value().into_tuple())
+        })
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -186,6 +180,8 @@ extern "C" {
     pub fn new<T>(first: T, second: T) -> Result<Rows<T>, JsValue>
     where
         T: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    fn __iterator<T>(this: &Rows<T>) -> Iterator<T>;
     #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
     pub fn iterator<T>(this: &Rows<T>) -> Result<Iterator<T>, JsValue>;
 }
@@ -200,14 +196,10 @@ where
         fn(&mut Iterator<T>, ()) -> Option<T>,
     >;
     fn into_iter(self) -> Self::IntoIter {
-        ::core::iter::repeat(()).scan(
-            self.iterator()
-                .unwrap_or_else(|e| ::wasm_bindgen::throw_val(e)),
-            |iter, ()| {
-                let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
-                (!next.done()).then(|| next.value())
-            },
-        )
+        ::core::iter::repeat(()).scan(self.__iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value())
+        })
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -215,6 +207,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Lines;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    fn __iterator(this: &Lines) -> Iterator<JsString>;
     #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
     pub fn iterator(this: &Lines) -> Result<Iterator<JsString>, JsValue>;
 }
@@ -226,14 +220,10 @@ impl<'a> ::core::iter::IntoIterator for &'a Lines {
         fn(&mut Iterator<JsString>, ()) -> Option<JsString>,
     >;
     fn into_iter(self) -> Self::IntoIter {
-        ::core::iter::repeat(()).scan(
-            self.iterator()
-                .unwrap_or_else(|e| ::wasm_bindgen::throw_val(e)),
-            |iter, ()| {
-                let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
-                (!next.done()).then(|| next.value())
-            },
-        )
+        ::core::iter::repeat(()).scan(self.__iterator(), |iter, ()| {
+            let next = iter.next().unwrap_or_else(|e| ::wasm_bindgen::throw_val(e));
+            (!next.done()).then(|| next.value())
+        })
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

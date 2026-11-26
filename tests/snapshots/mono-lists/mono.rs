@@ -443,6 +443,75 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "describeMarkOptions")]
     pub fn describe_mark_options_js_string(options: &MarkOptions) -> Result<JsString, JsValue>;
 }
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type MarkRoute;
+    #[wasm_bindgen(method, getter)]
+    pub fn to(this: &MarkRoute) -> Option<MarkRouteToKind>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_to(this: &MarkRoute, val: &Mark);
+    #[wasm_bindgen(method, setter, js_name = "to")]
+    pub fn set_to_with_str(this: &MarkRoute, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, setter, js_name = "to")]
+    pub fn set_to_with_slice(this: &MarkRoute, val: &[MarkOrStr]);
+}
+impl MarkRoute {
+    pub fn new() -> MarkRoute {
+        Self::builder().build()
+    }
+    pub fn builder() -> MarkRouteBuilder {
+        MarkRouteBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for MarkRoute {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct MarkRouteBuilder {
+    inner: MarkRoute,
+}
+impl MarkRouteBuilder {
+    pub fn to(self, val: &Mark) -> Self {
+        self.inner.set_to(val);
+        self
+    }
+    pub fn to_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_to_with_str(val);
+        self
+    }
+    pub fn to_with_slice(self, val: &[MarkOrStr]) -> Self {
+        self.inner.set_to_with_slice(val);
+        self
+    }
+    pub fn build(self) -> MarkRoute {
+        self.inner
+    }
+}
+impl From<MarkRoute> for MarkRouteBuilder {
+    fn from(inner: MarkRoute) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn route() -> Result<MarkRoute, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeRoute")]
+    pub fn describe_route(route: &MarkRoute) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "describeRoute")]
+    pub fn describe_route_js_string(route: &MarkRoute) -> Result<JsString, JsValue>;
+}
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Mode {
@@ -545,6 +614,13 @@ pub enum GetValueKind {
 pub enum MarkOrStr {
     Mark(Mark),
     String(String),
+}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum MarkRouteToKind {
+    Mark(Mark),
+    String(String),
+    VecOfJsValue(Vec<MarkOrStr>),
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

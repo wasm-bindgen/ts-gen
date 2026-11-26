@@ -416,7 +416,7 @@ fn generate_tokens(
             ..Default::default()
         };
         let keyed = crate::lower::lower_with(module, gctx, &opts).ir;
-        cgctx.keyed = Some(keyed::Keyed::new(keyed, vec![std_ir()]));
+        cgctx.keyed = Some(keyed::Keyed::new(keyed, vec![std_ir()], surface.emitted()));
     }
     let cgctx = cgctx;
 
@@ -535,13 +535,14 @@ fn generate_tokens(
 /// scope and module of the union's first use site.
 fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
     use crate::ir::TypeRef as T;
-    let registry = cgctx.dynamic_unions.borrow();
-    if registry.by_key.is_empty() {
-        return quote! {};
-    }
-    let enums: Vec<TokenStream> = registry
-        .by_key
-        .values()
+    // Lowering a payload can register a further union (a list of a union as
+    // an arm), so each entry is cloned out and the registry re-read by index.
+    let entry = |i: usize| {
+        let registry = cgctx.dynamic_unions.borrow();
+        registry.by_key.get_index(i).map(|(_, info)| info.clone())
+    };
+    let enums: Vec<TokenStream> = (0..)
+        .map_while(entry)
         .map(|info| {
             let enum_ident = typemap::make_ident(&info.rust_name);
             if info.merged_shapes.len() > 1 {

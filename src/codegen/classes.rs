@@ -2490,7 +2490,10 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     items.extend(display.binding);
                     impls.push(display.impl_);
                 }
-                impls.extend(into_iterator(config, &sigs));
+                if let Some(iterable) = into_iterator(config, &sigs, &mut names) {
+                    items.extend(iterable.binding);
+                    impls.push(iterable.impl_);
+                }
                 if twins.is_empty() {
                     let receiver = super::keyed::Receiver::Method;
                     impls.extend(keyed_twins(config, receiver, &sigs));
@@ -2618,6 +2621,13 @@ struct DisplayToString {
 /// form can't take `to_string` either, so it keeps the `try_` name the
 /// default policy gives it. Under `@throws {never}` there is no catching
 /// form, and `fmt` calls a private `__to_string` extern instead.
+/// The `IntoIterator` impl of a class, with the private binding it calls
+/// when the class has no public one that doesn't catch.
+struct IterableImpl {
+    binding: Option<TokenStream>,
+    impl_: TokenStream,
+}
+
 fn display_to_string(
     config: &ClassConfig,
     sigs: &mut Vec<FunctionSignature>,
@@ -2738,7 +2748,11 @@ fn keyed_twins(
     }]
 }
 
-fn into_iterator(config: &ClassConfig, sigs: &[FunctionSignature]) -> Option<TokenStream> {
+fn into_iterator(
+    config: &ClassConfig,
+    sigs: &[FunctionSignature],
+    names: &mut LocalScope,
+) -> Option<IterableImpl> {
     let sig = sigs
         .iter()
         .filter(|sig| {
@@ -2748,14 +2762,24 @@ fn into_iterator(config: &ClassConfig, sigs: &[FunctionSignature]) -> Option<Tok
                 && sig.literal.is_none()
         })
         .min_by_key(|sig| sig.catch)?;
-    let binding: syn::ForeignItemFn = syn::parse2(generate_expanded_method(config, sig)).ok()?;
+    // `into_iter` has no `Result` to return and a caught error may not
+    // convert back to the thrown value (`--error-type` asks only for
+    // `From<JsValue>`), so a private binding that doesn't catch stands in
+    // where every public one does.
+    let private = sig.catch.then(|| FunctionSignature {
+        rust_name: names.declare("__iterator", Suffix::Snake),
+        catch: false,
+        error_type: None,
+        doc: None,
+        ..sig.clone()
+    });
+    let sig = private.as_ref().unwrap_or(sig);
+    let mut binding: syn::ForeignItemFn =
+        syn::parse2(generate_expanded_method(config, sig)).ok()?;
     let syn::ReturnType::Type(_, returned) = &binding.sig.output else {
         return None;
     };
-    let iter = match sig.catch {
-        true => type_args(returned, "Result")?.first().copied()?,
-        false => returned,
-    };
+    let iter = &**returned;
     // A bare `Iterator` yields `JsValue`.
     let any: syn::Type = syn::parse_quote!(JsValue);
     let elem = type_args(iter, "Iterator")?
@@ -2804,11 +2828,10 @@ fn into_iterator(config: &ClassConfig, sigs: &[FunctionSignature]) -> Option<Tok
     let item = tuple.map_or_else(|| quote! { #elem }, |t| quote! { #t });
     let into_item = tuple.map(|_| quote! { .into_tuple() });
     let rethrow = quote! { .unwrap_or_else(|e| ::wasm_bindgen::throw_val(e)) };
-    let opened = sig.catch.then_some(&rethrow);
     let method = &binding.sig.ident;
     let rust_type = super::typemap::make_ident(&config.effective_rust_name());
     let type_args = config.type_generics_args();
-    Some(quote! {
+    let impl_ = quote! {
         impl<'a, #(#params),*> ::core::iter::IntoIterator for &'a #rust_type #type_args #where_clause {
             type Item = #item;
             type IntoIter = ::core::iter::Scan<
@@ -2817,13 +2840,18 @@ fn into_iterator(config: &ClassConfig, sigs: &[FunctionSignature]) -> Option<Tok
                 fn(&mut #iter, ()) -> Option<#item>,
             >;
             fn into_iter(self) -> Self::IntoIter {
-                ::core::iter::repeat(()).scan(self.#method() #opened, |iter, ()| {
+                ::core::iter::repeat(()).scan(self.#method(), |iter, ()| {
                     let next = iter.next() #rethrow;
                     (!next.done()).then(|| next.value() #into_item)
                 })
             }
         }
-    })
+    };
+    let binding = private.is_some().then(|| {
+        binding.vis = syn::Visibility::Inherited;
+        quote! { #binding }
+    });
+    Some(IterableImpl { binding, impl_ })
 }
 
 /// The type arguments of `ty` when its head is `head`.

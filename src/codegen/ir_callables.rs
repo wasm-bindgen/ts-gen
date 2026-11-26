@@ -250,6 +250,12 @@ fn restated(
                 .collect()
         })
         .collect();
+    // Each overload's parameter types as the IR states them: matching an
+    // expansion rewrites those of the overload it binds.
+    let stated: Vec<Vec<TypeRef>> = overloads
+        .iter()
+        .map(|o| o.params.iter().map(|p| p.type_ref.clone()).collect())
+        .collect();
     let mut used = vec![false; overloads.len()];
     let mut scopes = vec![(scope, first.async_modifier); overloads.len()];
     let mut covered = Vec::new();
@@ -656,17 +662,22 @@ fn restated(
     }
     // The IR pairs each typed array with its copy (`u8[]`), which the
     // parse binds only beside an element array.
-    let copy = |o: &super::ir_types::Overload, k: &super::ir_types::Overload| {
-        o.params.len() == k.params.len()
-            && o.params.iter().zip(&k.params).all(|(a, b)| {
-                a.name == b.name
-                    && (a.type_ref == b.type_ref
-                        || matches!((&a.type_ref, &b.type_ref), (
-                            TypeRef::TypedSlice(e, _),
-                            TypeRef::Reference { segments, .. },
-                        ) if segments.len() == 1
-                            && crate::ir::TypedArrayElement::of_typed_array(&segments[0]) == Some(*e)))
-            })
+    let copy = |i: usize, k: usize| {
+        let (o, of) = (&overloads[i], &overloads[k]);
+        o.params.len() == of.params.len()
+            && o.params
+                .iter()
+                .zip(&of.params)
+                .zip(&stated[k])
+                .all(|((a, b), b_ty)| {
+                    a.name == b.name
+                        && (a.type_ref == *b_ty
+                            || matches!((&a.type_ref, b_ty), (
+                                TypeRef::TypedSlice(e, _),
+                                TypeRef::Reference { segments, .. },
+                            ) if segments.len() == 1
+                                && crate::ir::TypedArrayElement::of_typed_array(&segments[0]) == Some(*e)))
+                })
     };
     // And a `buffer` with its view (`*buffer`), which the parse doesn't
     // bind.
@@ -679,15 +690,13 @@ fn restated(
                 .enumerate()
                 .all(|(j, (a, b))| {
                     a.name == b.name
-                        && (a.type_ref == b.type_ref
+                        && (a.type_ref == stated[k][j]
                             || buffers[k][j]
                                 && a.slice_mode == Some(crate::ir::SliceModeHint::View)
                                 && matches!(a.type_ref, TypeRef::TypedSlice(..)))
                 })
     };
-    let unbound = |i: usize| {
-        (0..overloads.len()).any(|k| used[k] && (copy(&overloads[i], &overloads[k]) || view(i, k)))
-    };
+    let unbound = |i: usize| (0..overloads.len()).any(|k| used[k] && (copy(i, k) || view(i, k)));
     if (0..overloads.len()).any(|i| !used[i] && !unbound(i) && !covered.contains(&i)) {
         return None;
     }
