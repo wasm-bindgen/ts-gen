@@ -689,7 +689,8 @@ impl<'a, 'b> Glue<'a, 'b> {
                 .collect();
             let src = self.class_src(ci, &members)?;
             let _ = writeln!(out, "{src}\n");
-            let (ns, name) = loc.path.split_at(loc.path.len() - 1);
+            let path = self.l.keys.symbols.js_path(None, &loc.path);
+            let (ns, name) = path.split_at(path.len() - 1);
             tree.at(ns)
                 .entries
                 .push((name[0].clone(), Entry::Value(var)));
@@ -710,6 +711,7 @@ impl<'a, 'b> Glue<'a, 'b> {
         }
         for (ns, js, kind, arms) in groups {
             let src = self.export_fn(&js, &kind, &arms, ns.is_empty())?;
+            let ns = self.l.keys.symbols.js_path(None, &ns);
             tree.at(&ns).entries.push((js, Entry::Member(src)));
         }
         // Namespace objects, innermost first, then the ESM export list.
@@ -806,10 +808,11 @@ impl<'a, 'b> Glue<'a, 'b> {
         let (var, canonical, cname, through_js) = {
             let c = &self.export_classes[ci];
             let through_js = self.l.imported_base(&c.loc);
+            let js = self.l.keys.symbols.js_path(None, &c.loc.path);
             (
                 c.var.clone(),
                 location(&c.loc),
-                c.class.name.clone(),
+                js.last().cloned().unwrap_or_default(),
                 through_js,
             )
         };

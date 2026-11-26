@@ -439,3 +439,35 @@ module "m" {
         ]
     );
 }
+
+#[test]
+fn js_paths() {
+    let ir = text::parse(
+        r#"ir 1;
+@js(name = "Any")
+namespace Any_ {
+  namespace plain {
+    @js(name = "Str")
+    class Str_ {}
+  }
+}
+module "m" {
+  @js(name = "Vec")
+  namespace Vec_ {
+    class C {}
+  }
+}
+"#,
+    )
+    .unwrap();
+    let symbols = ts_gen_abi::resolve::Symbols::new(&ir);
+    let path = |module, segs: &[&str]| {
+        let segs: Vec<String> = segs.iter().map(|s| s.to_string()).collect();
+        symbols.js_path(module, &segs).join(".")
+    };
+    assert_eq!(path(None, &["Any_", "plain", "Str_"]), "Any.plain.Str");
+    assert_eq!(path(Some("m"), &["Vec_", "C"]), "Vec.C");
+    // A module's names are its own, and an undeclared path is as written.
+    assert_eq!(path(None, &["Vec_", "C"]), "Vec_.C");
+    assert_eq!(path(Some("m"), &["Any_"]), "Any_");
+}

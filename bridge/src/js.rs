@@ -356,7 +356,18 @@ impl<'a, 'b> Glue<'a, 'b> {
     /// The JS value of a declaration (§5): a member get on `globalThis`, or
     /// on the module's namespace through an export naming the declaration.
     pub(crate) fn decl_value(&mut self, loc: &Location) -> Result<String> {
-        self.path_value(loc.module.as_deref(), &loc.path)
+        self.decl_expr(loc, prop)
+    }
+
+    /// [`Self::path_expr`] of a declaration: its path in JS names (§4). A
+    /// module's head stays the name the export list has.
+    fn decl_expr(&mut self, loc: &Location, member: fn(&str, &str) -> String) -> Result<String> {
+        let module = loc.module.as_deref();
+        let mut path = self.l.keys.symbols.js_path(module, &loc.path);
+        if module.is_some() {
+            path[0].clone_from(&loc.path[0]);
+        }
+        self.path_expr(module, &path, member)
     }
 
     fn module_exports(&self, spec: &str) -> Vec<ExportName> {
@@ -420,7 +431,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 )))
             }
         };
-        let v = self.path_expr(loc.module.as_deref(), &loc.path, opt_prop)?;
+        let v = self.decl_expr(&loc, opt_prop)?;
         let i = match self.classes.iter().position(|c| *c == v) {
             Some(i) => i,
             None => {
@@ -2502,7 +2513,10 @@ impl<'a, 'b> Glue<'a, 'b> {
                         Some(_) => String::new(),
                     }
                 } else {
-                    self.path_value(k.cx.module, &ns)?
+                    self.decl_value(&Location {
+                        module: k.cx.module.map(Into::into),
+                        path: ns,
+                    })?
                 }
             }
         };
