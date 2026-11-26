@@ -7,10 +7,14 @@ class Api {
   later() {
     return new Promise((r) => this.resolvers.push(r));
   }
+  see(job, me) {
+    this.seen = [job, me];
+  }
 }
-globalThis.Api = Api;
+class Base {}
+Object.assign(globalThis, { Api, Base });
 
-const { instantiate, app, Task, scratchUse } = await import("./bridge.js");
+const { instantiate, app, Task, Job, scratchUse } = await import("./bridge.js");
 const fs = await import("node:fs");
 const compile = (f) => new WebAssembly.Module(fs.readFileSync(f));
 const instance = instantiate(compile("lang.wasm"), compile("bridge.wasm"));
@@ -103,6 +107,23 @@ assert.deepEqual([drops(), freed()], [2, 1]);
 t.resolvers[0](5);
 assert.equal(await ran, 5);
 assert.deepEqual([drops(), freed()], [2, 2]);
+
+// A class with an imported base: its wrapper can't be re-made, so a
+// method parked past its caller's reference holds `this`. The wrapper
+// isn't collected, and the handle still crosses to JS as it.
+const j = new Api();
+let job = new Job(j);
+job.tag = 1;
+const held = job.run();
+job = null;
+await collect();
+assert.deepEqual([drops(), freed()], [2, 2]);
+j.resolvers[0](5);
+assert.equal(await held, 5);
+assert.ok(j.seen[0] instanceof Job && j.seen[0] === j.seen[1] && j.seen[0].tag === 1);
+j.seen = null;
+await collect();
+assert.deepEqual([drops(), freed()], [3, 3]);
 
 assert.deepEqual(scratchUse(), empty);
 console.log("ok");

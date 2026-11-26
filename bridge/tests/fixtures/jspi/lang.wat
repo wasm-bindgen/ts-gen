@@ -3,6 +3,7 @@
 ;; `suspend_list`, and returns futures of its own.
 (module
   (import "tw:js/global" "Api#later()" (func $later (param externref) (result externref)))
+  (import "tw:js/global" "Api#see(Job,Any)" (func $see (param externref i32 externref)))
   (import "tw:future" "suspend" (func $suspend (param externref) (result i32)))
   (import "tw:future" "suspend_list" (func $race (param i32 i32) (result i32)))
   (import "tw:future" "get<u32>" (func $get (param externref) (result i32 i32)))
@@ -136,6 +137,23 @@
     (local.set $v (call $await (call $later (table.get $tab (i32.load offset=4 (local.get $h))))))
     ;; Freed under the call, the block would read as poison here.
     (if (ref.is_null (table.get $tab (i32.load offset=4 (local.get $h)))) (then unreachable))
+    (global.set $freed (i32.add (global.get $freed) (call $release (local.get $h))))
+    (call $ready (local.get $v)))
+
+  ;; A `Job` extends an imported class, so its wrapper can't be re-made. Its
+  ;; own count keeps the instance, and only `this` keeps the wrapper: `run`
+  ;; holds it past the suspension.
+  (func (export "Job.new(Api)") (param $self externref) (param $api externref) (result i32)
+    (local $slot i32)
+    (local.set $slot (call $talloc (i32.const 1)))
+    (table.set $tab (local.get $slot) (local.get $api))
+    (call $handle (local.get $slot)))
+  (func (export "tw:drop:Job") (param $h i32) (call $drop (local.get $h)))
+  (func (export "Job#run()") (param $self externref) (param $h i32) (result externref)
+    (local $v i32)
+    (call $retain (local.get $h))
+    (local.set $v (call $await (call $later (table.get $tab (i32.load offset=4 (local.get $h))))))
+    (call $see (table.get $tab (i32.load offset=4 (local.get $h))) (local.get $h) (local.get $self))
     (global.set $freed (i32.add (global.get $freed) (call $release (local.get $h))))
     (call $ready (local.get $v)))
 )

@@ -1,7 +1,10 @@
 ir 1;
 
+class Base {}
+
 class Api {
   later(): future<u32>;
+  see(job: Job, me: Any);
 }
 
 export namespace app {
@@ -16,6 +19,11 @@ export namespace app {
 }
 
 export class Task {
+  new(api: Api);
+  run(): future<u32>;
+}
+
+export class Job extends Base {
   new(api: Api);
   run(): future<u32>;
 }

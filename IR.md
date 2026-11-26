@@ -2134,7 +2134,8 @@ Promising calls:
   argument) doesn't: with the JS frame gone, the wrapper can be collected
   and its drop run while the call is parked (`await new Foo().run()`). A
   call that uses a handle past a suspension takes its own reference to it
-  first (§14).
+  first (§14), and holds the wrapper too where it can't be re-made (a
+  class with an imported base, §17).
 * It enters the language through a root in the bridge module, which
   records the scratch base: a suspension moves what's live above it out of
   scratch while it's parked, and puts it back once resumed. The root also
@@ -2375,8 +2376,9 @@ export class Counter extends DurableObject {
   * `this` and the handle are borrowed for the call. An async method that
     uses the handle once the call has returned, or past a suspension,
     takes its own reference to it (§14).
-  * In linear, the language must not store `this`. It would sit in the
-    externref table (a GC root), and the instance would never be finalized.
+  * In linear, the language must not keep `this` once the call is done. It
+    would sit in the externref table (a GC root), and the instance would
+    never be finalized.
   * GC languages may cache `this`, since that cycle lives in one heap.
   * `new` returns the handle.
 * `super` arguments pass through by default. `@js(super = (...))` overrides
@@ -2422,6 +2424,13 @@ export class Counter extends DurableObject {
   * In linear, a language that keeps an instance past JS's interest pins its
     wrapper: it takes it with `("tw:box", C)`, keeps it (in the externref
     table, say), and releases it when the language drops the instance.
+  * A call that outlives its JS frame ([§16](#16-async)) is such a keeper
+    while it runs. Its own reference to the handle keeps the instance but
+    not the wrapper, and with the wrapper collected the handle no longer
+    crosses. A method parked under JSPI holds its `this` until it's done.
+    One that has returned its future, or a call passed the instance as an
+    argument, takes the wrapper with `("tw:box", C)` on entry, while it's
+    still live, and holds that.
   * In GC, pairing is a `WeakMap` keyed by the handle, so the wrapper lives
     as long as either side holds it, and nothing is pinned.
 

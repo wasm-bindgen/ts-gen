@@ -334,6 +334,9 @@ class $Handles {
   }
 }
 
+// The constructor `tw:new` names, read by the next exported constructor.
+let $newArm;
+
 // A language error as its JS error class (§15).
 function $construct(C, msg, props) {
   const e = C === globalThis.DOMException ? new C(msg, props.name) : new C(msg);
@@ -700,7 +703,7 @@ function $h4(f, h, a0) {
     const env = f[$flagged] === undefined ? h : $H1.call(f);
     try {
       const t1 = $instance(a0, $cls0, "Api");
-      const r = $E[10](env, t1);
+      const r = $E[12](env, t1);
       return $promise(r);
     } catch (e) {
       throw $outgoing(e);
@@ -736,18 +739,24 @@ function $f0(w0_0) {
   }
 }
 
+// ("tw:js/global", "Api#see(Job,Any)")
+function $f1(w0_0, w1_0, w2_0) {
+  const t1 = $HC.paired(w1_0, "`Job`");
+  w0_0.see(t1, w2_0);
+}
+
 // ("tw:future", "suspend")
-function $f1(f) {
+function $f2(f) {
   return $suspend(f);
 }
 
 // ("tw:future", "suspend_list")
-function $f2(w0_0, w0_1) {
+function $f3(w0_0, w0_1) {
   return $suspendList($h1(w0_0, w0_1));
 }
 
 // ("tw:future", "get<u32>")
-function $f3(w0_0) {
+function $f4(w0_0) {
   const f = $isFuture(w0_0);
   try {
     const r = $option(f, false);
@@ -769,12 +778,12 @@ function $f3(w0_0) {
 }
 
 // ("tw:future", "new")
-function $f4() {
+function $f5() {
   return $newFuture();
 }
 
 // ("tw:future", "resolve<u32>")
-function $f5(w0_0, w1_0) {
+function $f6(w0_0, w1_0) {
   $resolver(w0_0).resolve((w1_0 >>> 0));
 }
 
@@ -813,6 +822,37 @@ class $C0 {
   }
 }
 
+class $C1 extends globalThis.Base {
+  constructor(...a) {
+    $newArm = undefined;
+    if (a.length >= 1) {
+      super(...a);
+      try {
+        const t1 = a[0];
+        const t2 = $instance(t1, $cls0, "Api");
+        const r = $E[2](this, t2);
+        $HC.pair(this, r, "tw:drop:Job");
+      } catch (e) {
+        throw $outgoing(e);
+      }
+      return;
+    }
+    throw new TypeError("`new Job` doesn't match its arguments");
+  }
+  run(...a) {
+    try {
+      try {
+        const r = $E[3](this, $HC.unwrap(this, $C1, "Job"));
+        return $promise(r);
+      } catch (e) {
+        throw $outgoing(e);
+      }
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+}
+
 const $N0 = {
   run(...a) {
     try {
@@ -820,7 +860,7 @@ const $N0 = {
         try {
           const t1 = a[0];
           const t2 = $instance(t1, $cls0, "Api");
-          const r = $E[2](t2);
+          const r = $E[4](t2);
           return $promise(r);
         } catch (e) {
           throw $outgoing(e);
@@ -844,7 +884,7 @@ const $N0 = {
           const t5 = t4[0];
           const t6 = t4[1];
           cx.n = cxm;
-          const r = $E[3](t2, t5, t6);
+          const r = $E[5](t2, t5, t6);
           return $promise(r);
         } catch (e) {
           $release(cx, cxm);
@@ -861,7 +901,7 @@ const $N0 = {
       try {
         const t1 = a[0];
         const t2 = $instance(t1, $cls0, "Api");
-        const r = $E[4](t2);
+        const r = $E[6](t2);
         return (r >>> 0);
       } catch (e) {
         throw $outgoing(e);
@@ -872,7 +912,7 @@ const $N0 = {
   peek(...a) {
     try {
       try {
-        const r = $E[5]();
+        const r = $E[7]();
         return $promise(r);
       } catch (e) {
         throw $outgoing(e);
@@ -887,7 +927,7 @@ const $N0 = {
         try {
           const t1 = a[0];
           const t2 = $instance(t1, $cls0, "Api");
-          const r = $E[6](t2);
+          const r = $E[8](t2);
           return $promise(r);
         } catch (e) {
           throw $outgoing(e);
@@ -904,7 +944,7 @@ const $N0 = {
         try {
           const t1 = a[0];
           const t2 = $instance(t1, $cls0, "Api");
-          const r = $E[7](t2);
+          const r = $E[9](t2);
           return $promise(r);
         } catch (e) {
           throw $outgoing(e);
@@ -918,7 +958,7 @@ const $N0 = {
   empty(...a) {
     try {
       try {
-        const r = $E[8]();
+        const r = $E[10]();
         return $promise(r);
       } catch (e) {
         throw $outgoing(e);
@@ -932,7 +972,7 @@ const $N0 = {
       try {
         const t1 = a[0];
         const t2 = $int(t1, 0, 4294967295, "u32");
-        const r = $E[9](t2);
+        const r = $E[11](t2);
         return $h3(r);
       } catch (e) {
         throw $outgoing(e);
@@ -942,26 +982,27 @@ const $N0 = {
   },
 };
 
-export { $C0 as Task, $N0 as app };
+export { $C0 as Task, $C1 as Job, $N0 as app };
 
 export function instantiate(language, bridge, imports = {}) {
   if ($B) throw new Error("this bridge is already instantiated");
   $cls0 = $class(globalThis.Api);
   $B = new WebAssembly.Instance(bridge, {
-    "tw:glue": { g1: $f1, g2: $f2, r3: $f3, wait: new WebAssembly.Suspending($wait), stash: $stash, unstash: $unstash },
+    "tw:glue": { g2: $f2, g3: $f3, r4: $f4, wait: new WebAssembly.Suspending($wait), stash: $stash, unstash: $unstash },
   }).exports;
   $S = new $Scratch($B);
   const instance = new WebAssembly.Instance(language, {
     ...imports,
     "tw:js/global": {
       "Api#later()": $f0,
+      "Api#see(Job,Any)": $f1,
     },
     "tw:future": {
-      "suspend": $B.s1,
-      "suspend_list": $B.s2,
-      "get<u32>": $B.f3,
-      "new": $f4,
-      "resolve<u32>": $f5,
+      "suspend": $B.s2,
+      "suspend_list": $B.s3,
+      "get<u32>": $B.f4,
+      "new": $f5,
+      "resolve<u32>": $f6,
     },
   });
   $X = instance.exports;
@@ -969,22 +1010,25 @@ export function instantiate(language, bridge, imports = {}) {
   $E[0] = $X["Task.new(Api)"];
   $B.entries.set(0, $X["Task#run()"]);
   $E[1] = $promising($B.p0);
-  $B.entries.set(1, $X["app.run(Api)"]);
-  $E[2] = $promising($B.p1);
-  $B.entries.set(2, $X["app.echo(Api,str)"]);
-  $E[3] = $promising($B.p2);
-  $E[4] = $X["app.share(Api)"];
-  $B.entries.set(3, $X["app.peek()"]);
+  $E[2] = $X["Job.new(Api)"];
+  $B.entries.set(1, $X["Job#run()"]);
+  $E[3] = $promising($B.p1);
+  $B.entries.set(2, $X["app.run(Api)"]);
+  $E[4] = $promising($B.p2);
+  $B.entries.set(3, $X["app.echo(Api,str)"]);
   $E[5] = $promising($B.p3);
-  $B.entries.set(4, $X["app.race(Api)"]);
-  $E[6] = $promising($B.p4);
-  $B.entries.set(5, $X["app.lowest(Api)"]);
-  $E[7] = $promising($B.p5);
-  $B.entries.set(6, $X["app.empty()"]);
-  $E[8] = $promising($B.p6);
-  $E[9] = $X["app.plus(u32)"];
-  $B.entries.set(7, $X["tw:call:fn(Api)->future<u32>"]);
+  $E[6] = $X["app.share(Api)"];
+  $B.entries.set(4, $X["app.peek()"]);
+  $E[7] = $promising($B.p4);
+  $B.entries.set(5, $X["app.race(Api)"]);
+  $E[8] = $promising($B.p5);
+  $B.entries.set(6, $X["app.lowest(Api)"]);
+  $E[9] = $promising($B.p6);
+  $B.entries.set(7, $X["app.empty()"]);
   $E[10] = $promising($B.p7);
+  $E[11] = $X["app.plus(u32)"];
+  $B.entries.set(8, $X["tw:call:fn(Api)->future<u32>"]);
+  $E[12] = $promising($B.p8);
   $L = new $Lang(instance.exports, { memory: "memory", table: "tw:table", realloc: "tw:realloc", free: "tw:free", talloc: "tw:table/alloc", tfree: "tw:table/free" }, false);
   return instance;
 }
