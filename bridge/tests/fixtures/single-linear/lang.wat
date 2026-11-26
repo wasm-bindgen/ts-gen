@@ -1,0 +1,27 @@
+;; A linear language under `results = single` that can leave the spill
+;; unread. The bridge defines the table, so the allocator is its own.
+(module
+  (import "tw:js/global" "P#two()" (func $two (param externref) (result i32)))
+  (import "tw:ret" "push:i32" (func $push (param i32)))
+  (memory (export "memory") 1)
+  (global $bump (mut i32) (i32.const 16))
+  (global $live (mut i32) (i32.const 0))
+  (func (export "tw:realloc") (param $old i32) (param $osize i32) (param $align i32) (param $size i32) (result i32)
+    (local $p i32)
+    (local.set $p (global.get $bump))
+    (global.set $bump (i32.add (local.get $p) (local.get $size)))
+    (if (i32.eqz (local.get $old))
+      (then (global.set $live (i32.add (global.get $live) (i32.const 1))))
+      (else (memory.copy (local.get $p) (local.get $old) (local.get $osize))))
+    (local.get $p))
+  (func $free (export "tw:free") (param i32 i32 i32)
+    (global.set $live (i32.sub (global.get $live) (i32.const 1))))
+  (func (export "test:live") (result i32) (global.get $live))
+
+  (func (export "dirty") (param $p externref)
+    (drop (call $two (local.get $p))))
+  (func (export "app.pair(str)") (param $p i32) (param $n i32) (result i32)
+    (if (local.get $n) (then (call $free (local.get $p) (local.get $n) (i32.const 1))))
+    (call $push (local.get $n))
+    (local.get $n))
+)

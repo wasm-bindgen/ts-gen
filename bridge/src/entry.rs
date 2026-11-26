@@ -14,7 +14,7 @@ use std::rc::Rc;
 use ts_gen_abi::ir::*;
 use ts_gen_abi::key::{location, Keyed, Role};
 use ts_gen_abi::layout::{native_size, EnumLayout, Host, Kind, Pos, Repr, Signature};
-use ts_gen_abi::profile::{Carrier, Encoding, StrCarrier};
+use ts_gen_abi::profile::{Carrier, Encoding, Results, StrCarrier};
 use ts_gen_abi::protocol;
 use ts_gen_abi::resolve::{Context, Location, Target, TypeDecl};
 
@@ -103,6 +103,9 @@ impl<'a, 'b> Glue<'a, 'b> {
         let mut wire = Vec::new();
         for (p, a) in sig.params.iter().zip(args) {
             match a {
+                // A receiver check throws, so it runs before the arguments
+                // are handed over.
+                Arg::Raw(e) if e.contains('(') => wire.push(b.bind(e.clone())),
                 Arg::Raw(e) => wire.push(e.clone()),
                 Arg::Js(v) => {
                     let v = b.bind(v.clone());
@@ -112,8 +115,12 @@ impl<'a, 'b> Glue<'a, 'b> {
             }
         }
         // Entered, the language owns its arguments (§11): the records left
-        // are only those of a call that isn't made.
+        // are only those of a call that isn't made, so what can fail before
+        // the language runs is checked first.
         if alloc {
+            if self.l.profile.results == Results::Single {
+                b.line("$spillCheck();");
+            }
             b.line("cx.n = cxm;");
         }
         let call = format!("$E[{idx}]({})", wire.join(", "));

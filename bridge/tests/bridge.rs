@@ -730,6 +730,7 @@ fixtures! {
     single_gc => "single-gc",
     mono_exports => "mono-exports",
     single_faults => "single-faults",
+    single_linear => "single-linear",
     linear_wtf16 => "linear-wtf16",
     nested_enums => "nested-enums",
     absent_classes => "absent-classes",

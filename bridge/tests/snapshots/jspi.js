@@ -811,7 +811,8 @@ class $C0 {
   run(...a) {
     try {
       try {
-        const r = $E[1](this, $HC.unwrap(this, $C0, "Task"));
+        const t1 = $HC.unwrap(this, $C0, "Task");
+        const r = $E[1](this, t1);
         return $promise(r);
       } catch (e) {
         throw $outgoing(e);
@@ -842,7 +843,8 @@ class $C1 extends globalThis.Base {
   run(...a) {
     try {
       try {
-        const r = $E[3](this, $HC.unwrap(this, $C1, "Job"));
+        const t1 = $HC.unwrap(this, $C1, "Job");
+        const r = $E[3](this, t1);
         return $promise(r);
       } catch (e) {
         throw $outgoing(e);

@@ -247,6 +247,14 @@ L.throwsType(() => L.call("unbox:fn(u32)->str", () => {}), /fn\(u32\)->str/);
 // tw:tryUnbox: the handle, or none (0) when not a live wrapper.
 assert.equal(L.call("tryUnbox:fn(u32)->str", cb), 200);
 assert.equal(L.call("tryUnbox:fn(u32)->str", () => {}), 0);
+// A receiver that isn't a live instance fails before the arguments are the
+// language's, so the bridge frees them.
+L.balanced(() => L.throwsType(() => Counter.prototype.label.call({}, "n="), /Counter/));
+{
+  const gone = new Counter(1);
+  L.call("destroy:Counter", handleOf(gone));
+  L.balanced(() => L.throwsType(() => gone.label("n="), /destroyed/));
+}
 assert.equal(L.call("tryUnbox:Counter", c), handleOf(c));
 assert.equal(L.call("tryUnbox:Counter", {}), 0);
 assert.equal(L.call("tryUnbox:Counter", s), 0, "a wrapper of another class");

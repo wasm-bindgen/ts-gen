@@ -398,9 +398,10 @@ class $C0 {
     if (a.length >= 1) {
       $checkLive();
       try {
-        const t1 = a[0];
-        const t2 = $int(t1, 0, 4294967295, "u32");
-        const r = $E[2](this, $HC.unwrap(this, $C0, "Counter"), t2);
+        const t1 = $HC.unwrap(this, $C0, "Counter");
+        const t2 = a[0];
+        const t3 = $int(t2, 0, 4294967295, "u32");
+        const r = $E[2](this, t1, t3);
         return (r >>> 0);
       } catch (e) {
         throw $outgoing(e);
@@ -411,13 +412,14 @@ class $C0 {
   label(...a) {
     $checkLive();
     try {
-      const r = $E[3](this, $HC.unwrap(this, $C0, "Counter"));
-      const t1 = r[0];
-      const t2 = r[1];
+      const t1 = $HC.unwrap(this, $C0, "Counter");
+      const r = $E[3](this, t1);
+      const t2 = r[0];
+      const t3 = r[1];
       try {
-        return $liftUtf8($L, Number(t1), Number(t2));
+        return $liftUtf8($L, Number(t2), Number(t3));
       } finally {
-        if (Number(t2) !== 0) $L.free(Number(t1), Number(t2) * 1, 1);
+        if (Number(t3) !== 0) $L.free(Number(t2), Number(t3) * 1, 1);
       }
     } catch (e) {
       throw $outgoing(e);

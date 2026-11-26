@@ -1277,8 +1277,9 @@ bridge can share them with another binary. The table's index ranges are in
     they're the language's from the moment the call is entered. It frees
     them, nested allocations included (an `arr<str>`'s strings), whether it
     returns or unwinds, and may keep them past the call.
-  * The bridge frees them itself only when the call is never made, because
-    a later argument failed to convert ([§15](#15-exceptions)).
+  * The bridge frees them itself only when the call is never made: an
+    argument failed to convert, the receiver isn't a live instance, or the
+    spill wasn't empty ([§15](#15-exceptions)).
 * `mut T[]`, an import parameter only: the bridge copies the language's
   storage into a typed array, calls, then copies back into the same
   storage. The length is fixed.
@@ -2030,8 +2031,10 @@ validation failures.
     throwing getter or Proxy trap) releases everything allocated so far,
     including nested strings and slots, before the error propagates.
   * Ownership of a result passes to the language only on success, and of
-    an export's arguments only once every one has converted and the call
-    is entered.
+    an export's arguments only once the call is entered. Handing them over
+    is the last thing the bridge does before it: every argument has
+    converted, the receiver is a live instance, and the spill is empty
+    (`results = single`).
   * A call that fails before the language runs (the stack exhausted at
     the call itself, or memory in the bridge module's GC entry) can't be
     told from one that failed inside it. Its arguments are already the

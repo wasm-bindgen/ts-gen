@@ -841,7 +841,8 @@ class $C0 {
   get value() {
     const a = [];
     try {
-      const r = $E[3](this, $HC.unwrap(this, $C0, "Counter"));
+      const t1 = $HC.unwrap(this, $C0, "Counter");
+      const r = $E[3](this, t1);
       return (r >>> 0);
     } catch (e) {
       throw $outgoing(e);
@@ -851,9 +852,10 @@ class $C0 {
     const a = [v];
     if (a.length >= 1) {
       try {
-        const t1 = a[0];
-        const t2 = $int(t1, 0, 4294967295, "u32");
-        $E[4](this, $HC.unwrap(this, $C0, "Counter"), t2);
+        const t1 = $HC.unwrap(this, $C0, "Counter");
+        const t2 = a[0];
+        const t3 = $int(t2, 0, 4294967295, "u32");
+        $E[4](this, t1, t3);
       } catch (e) {
         throw $outgoing(e);
       }
@@ -864,9 +866,10 @@ class $C0 {
   inc(...a) {
     if (a.length >= 1) {
       try {
-        const t1 = a[0];
-        const t2 = $int(t1, 0, 4294967295, "u32");
-        const r = $E[5](this, $HC.unwrap(this, $C0, "Counter"), t2);
+        const t1 = $HC.unwrap(this, $C0, "Counter");
+        const t2 = a[0];
+        const t3 = $int(t2, 0, 4294967295, "u32");
+        const r = $E[5](this, t1, t3);
         return (r >>> 0);
       } catch (e) {
         throw $outgoing(e);
@@ -879,18 +882,19 @@ class $C0 {
       const cx = $cx;
       const cxm = cx.n;
       try {
-        const t1 = a[0];
-        const t2 = $lowerUtf8($L, $str(t1), cx);
-        const t3 = t2[0];
-        const t4 = t2[1];
+        const t1 = $HC.unwrap(this, $C0, "Counter");
+        const t2 = a[0];
+        const t3 = $lowerUtf8($L, $str(t2), cx);
+        const t4 = t3[0];
+        const t5 = t3[1];
         cx.n = cxm;
-        const r = $E[6](this, $HC.unwrap(this, $C0, "Counter"), t3, t4);
-        const t5 = r[0];
-        const t6 = r[1];
+        const r = $E[6](this, t1, t4, t5);
+        const t6 = r[0];
+        const t7 = r[1];
         try {
-          return $liftUtf8($L, t5, t6);
+          return $liftUtf8($L, t6, t7);
         } finally {
-          if (t6 !== 0) $L.free(t5, t6 * 1, 1);
+          if (t7 !== 0) $L.free(t6, t7 * 1, 1);
         }
       } catch (e) {
         $release(cx, cxm);
@@ -902,9 +906,10 @@ class $C0 {
   same(...a) {
     if (a.length >= 1) {
       try {
-        const t1 = a[0];
-        const t2 = (t1 == null ? 0 : $HC.unwrap(t1, $C0, "Counter?"));
-        const r = $E[7](this, $HC.unwrap(this, $C0, "Counter"), t2);
+        const t1 = $HC.unwrap(this, $C0, "Counter");
+        const t2 = a[0];
+        const t3 = (t2 == null ? 0 : $HC.unwrap(t2, $C0, "Counter?"));
+        const r = $E[7](this, t1, t3);
         return (r !== 0);
       } catch (e) {
         throw $outgoing(e);
@@ -915,15 +920,16 @@ class $C0 {
   pick(...a) {
     if (a.length >= 1 && typeof a[0] === "number") {
       try {
-        const t1 = a[0];
-        const t2 = $int(t1, 0, 4294967295, "u32");
-        const r = $E[8](this, $HC.unwrap(this, $C0, "Counter"), t2);
-        const t3 = r[0];
-        const t4 = r[1];
+        const t1 = $HC.unwrap(this, $C0, "Counter");
+        const t2 = a[0];
+        const t3 = $int(t2, 0, 4294967295, "u32");
+        const r = $E[8](this, t1, t3);
+        const t4 = r[0];
+        const t5 = r[1];
         try {
-          return $liftUtf8($L, t3, t4);
+          return $liftUtf8($L, t4, t5);
         } finally {
-          if (t4 !== 0) $L.free(t3, t4 * 1, 1);
+          if (t5 !== 0) $L.free(t4, t5 * 1, 1);
         }
       } catch (e) {
         throw $outgoing(e);
@@ -933,18 +939,19 @@ class $C0 {
       const cx = $cx;
       const cxm = cx.n;
       try {
-        const t5 = a[0];
-        const t6 = $lowerUtf8($L, $str(t5), cx);
-        const t7 = t6[0];
-        const t8 = t6[1];
+        const t6 = $HC.unwrap(this, $C0, "Counter");
+        const t7 = a[0];
+        const t8 = $lowerUtf8($L, $str(t7), cx);
+        const t9 = t8[0];
+        const t10 = t8[1];
         cx.n = cxm;
-        const r = $E[9](this, $HC.unwrap(this, $C0, "Counter"), t7, t8);
-        const t9 = r[0];
-        const t10 = r[1];
+        const r = $E[9](this, t6, t9, t10);
+        const t11 = r[0];
+        const t12 = r[1];
         try {
-          return $liftUtf8($L, t9, t10);
+          return $liftUtf8($L, t11, t12);
         } finally {
-          if (t10 !== 0) $L.free(t9, t10 * 1, 1);
+          if (t12 !== 0) $L.free(t11, t12 * 1, 1);
         }
       } catch (e) {
         $release(cx, cxm);
@@ -955,7 +962,8 @@ class $C0 {
   }
   fail(...a) {
     try {
-      $E[10](this, $HC.unwrap(this, $C0, "Counter"));
+      const t1 = $HC.unwrap(this, $C0, "Counter");
+      $E[10](this, t1);
     } catch (e) {
       throw $outgoing(e);
     }
@@ -990,7 +998,8 @@ class $C1 extends globalThis.Base {
   }
   twice(...a) {
     try {
-      const r = $E[13](this, $HC.unwrap(this, $C1, "Sub"));
+      const t1 = $HC.unwrap(this, $C1, "Sub");
+      const r = $E[13](this, t1);
       return (r >>> 0);
     } catch (e) {
       throw $outgoing(e);
