@@ -76,6 +76,10 @@ idle();
 const tick = () => new Promise((r) => setTimeout(r, 0));
 p.next = Promise.resolve([3, "three"]);
 let g = call("Probe#later()", p);
+// No value yet: the flag alone, with nothing spilled past it.
+assert.equal(call("future:state", g), 0);
+assert.deepEqual(call("future:get<(u32,str),KvError>", g), [0, 0, null]);
+idle();
 await tick();
 assert.equal(call("future:state", g), 1);
 assert.deepEqual(call("future:get<(u32,str),KvError>", g), [1, 3, "three"]);

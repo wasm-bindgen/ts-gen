@@ -1,7 +1,8 @@
 //! Bridge fixtures: each `tests/fixtures/<name>/` has an `ir.ts`, an
 //! optional `profile`, an optional empty `factory` (generating with
 //! `Options::factory`), optional extra Node flags in `node`, and a
-//! `test.mjs`. The language module is the
+//! `test.mjs`. A variant holds a `base` naming another fixture, and takes
+//! from it each file it doesn't have itself. The language module is the
 //! fixture's `lang.wat` (with `{RUNTIME}` standing for the runtime below), or by default a pass-through module that imports
 //! every IR member (and each `protocol` line) and re-exports it as
 //! `call:<key>` (`call:<group>:<name>` for protocol imports), over the counting runtime in `tests/runtime.wat`.
@@ -607,7 +608,15 @@ fn snapshot(name: &str, ext: &str, got: &str) {
 
 fn fixture(name: &str) {
     let dir = root().join("fixtures").join(name);
-    let read = |f: &str| std::fs::read_to_string(dir.join(f)).ok();
+    // A variant names the fixture it borrows what it lacks from.
+    let base = std::fs::read_to_string(dir.join("base"))
+        .ok()
+        .map(|b| root().join("fixtures").join(b.trim()));
+    let read = |f: &str| {
+        std::fs::read_to_string(dir.join(f))
+            .ok()
+            .or_else(|| std::fs::read_to_string(base.as_ref()?.join(f)).ok())
+    };
     let ir = text::parse(&read("ir.ts").expect("ir.ts")).unwrap_or_else(|e| panic!("ir.ts: {e}"));
     let profile = match read("profile") {
         Some(p) => Profile::parse(&p).unwrap_or_else(|e| panic!("profile: {e}")),
@@ -659,10 +668,12 @@ fn fixture(name: &str) {
         .join(name);
     let _ = std::fs::remove_dir_all(&out);
     std::fs::create_dir_all(&out).unwrap();
-    for e in std::fs::read_dir(&dir).unwrap().flatten() {
-        let p = e.path();
-        if p.extension().is_some_and(|x| x == "mjs") {
-            std::fs::copy(&p, out.join(e.file_name())).unwrap();
+    for d in base.iter().chain([&dir]) {
+        for e in std::fs::read_dir(d).unwrap().flatten() {
+            let p = e.path();
+            if p.extension().is_some_and(|x| x == "mjs") {
+                std::fs::copy(&p, out.join(e.file_name())).unwrap();
+            }
         }
     }
     std::fs::copy(root().join("harness.mjs"), out.join("harness.mjs")).unwrap();
@@ -740,6 +751,7 @@ fixtures! {
     factory => "factory",
     jspi => "jspi",
     jspi_gc => "jspi-gc",
+    jspi_gc_legacy => "jspi-gc-legacy",
     jspi_terminated => "jspi-terminated",
     rest_callbacks => "rest-callbacks",
     never => "never",

@@ -60,7 +60,13 @@ L.balanced(() => L.throwsType(() => app.keep("x", {}), /Target/));
 const picked = [new Target(), new Target()];
 assert.equal(L.balanced(() => app.pick(picked, 1)), picked[1]);
 const tab = L.ex["tw:table"];
-for (let i = L.ex["tw:table/heap_base"].value; i < tab.length; i++) assert.equal(tab.get(i), null);
+const cleared = () => {
+  for (let i = L.ex["tw:table/heap_base"].value; i < tab.length; i++) assert.equal(tab.get(i), null);
+};
+cleared();
+// The bridge clears and frees the range of a call that's never made.
+L.balanced(() => L.throwsType(() => app.pick(picked, "x"), /u32/));
+cleared();
 
 // Termination: entries refuse, and finalizers skip their drops.
 app.listen(t, 1);

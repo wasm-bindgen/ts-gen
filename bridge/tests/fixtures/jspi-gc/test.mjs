@@ -5,6 +5,13 @@ class Api {
     this.resolvers = [];
   }
   later() {
+    // Calls back into a synchronous export from under a promising call.
+    if (this.inner) {
+      const inner = this.inner;
+      this.inner = null;
+      this.before = scratchUse();
+      this.result = app.stuck(inner);
+    }
     return new Promise((r) => this.resolvers.push(r));
   }
   mark() {
@@ -48,6 +55,18 @@ assert.equal(await echoed, 66);
 other.resolvers[0](1);
 other.resolvers[1](1);
 assert.equal(await ran, 2);
+
+// A suspension under a synchronous callback finds a JS frame in its way,
+// and throws the same. The promising call it ran under goes on to park
+// and resume.
+const outer = new Api();
+const inner = new Api();
+outer.inner = inner;
+const nested = app.echo(outer, "A");
+assert.equal(outer.result, 7);
+assert.deepEqual(inner.scratch, outer.before);
+outer.resolvers[0](1);
+assert.equal(await nested, 66);
 
 // A GC list for `suspend_list`.
 const r = new Api();

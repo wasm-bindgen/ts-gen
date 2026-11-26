@@ -48,4 +48,19 @@ assert.equal(caught(), 0);
 // Nor is a parked call's argument freed: it was the language's.
 assert.equal(live(), before);
 
+// Seen first at a settlement, with no entry in between, the calls in
+// flight reject the same way and nothing resumes.
+{
+  const second = await import("./bridge.js?settlement");
+  const inst = second.instantiate(compile("lang.wasm"), compile("bridge.wasm"));
+  const a = new Api();
+  const first = second.app.run(a);
+  const waiting = second.app.run(new Api());
+  new Uint8Array(inst.exports.memory.buffer)[8] = 1;
+  a.resolvers[0](5);
+  await assert.rejects(first, /Module terminated/);
+  await assert.rejects(waiting, /Module terminated/);
+  assert.equal(inst.exports["test:resumed"](), 0);
+}
+
 console.log("ok");
