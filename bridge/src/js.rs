@@ -1138,7 +1138,6 @@ impl<'a, 'b> Glue<'a, 'b> {
                 elem,
                 carrier: Carrier::Host,
                 nullable,
-                writeback,
                 buffer,
                 ..
             } => {
@@ -1150,13 +1149,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 } else {
                     format!("({v} instanceof {ta} ? {v} : new {ta}(0))")
                 };
-                // A fresh copy, except `mut T[]`, whose writes land in the
-                // caller's own array.
-                let e = if *writeback {
-                    check
-                } else {
-                    format!("{ta}.from({check})")
-                };
+                let e = format!("{ta}.from({check})");
                 vec![b.bind(if *nullable {
                     format!("({v} == null ? null : {e})")
                 } else {

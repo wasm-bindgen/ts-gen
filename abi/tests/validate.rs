@@ -174,10 +174,20 @@ fn vec_elements_are_typed_array_types() {
 }
 
 #[test]
-fn mut_vec_is_only_a_parameter() {
-    ok("f(a: mut u8[], b: mut u8[]?);\nexport g(a: mut f32[]);");
-    bad("f(): mut u8[];", "is only a parameter type");
-    bad("f(a: arr<mut u8[]>);", "is only a parameter type");
+fn mut_vec_is_only_an_import_parameter() {
+    ok("f(a: mut u8[], b: mut u8[]?);");
+    bad("f(): mut u8[];", "is only an import parameter type");
+    bad("f(a: arr<mut u8[]>);", "is only an import parameter type");
+    // An export's parameters are all the language's to own (§11).
+    bad(
+        "export g(a: mut f32[]);",
+        "is only an import parameter type",
+    );
+    bad(
+        "export g(a: mut f32[]?);",
+        "is only an import parameter type",
+    );
+    bad("f(cb: fn(mut u8[]));", "is only an import parameter type");
     bad("f(a: mut str[]);", "the element must be a typed-array type");
 }
 

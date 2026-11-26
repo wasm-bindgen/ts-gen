@@ -154,7 +154,7 @@ an opaque value the bridge hasn't converted
 | `future<T>`, `future<T, E>` | — | Promise | [§16](#16-async) |
 | `fn(A, …) -> R throws E`, `fn(A, ...arr<T>)` | — | function | [§18](#18-callbacks) |
 | `*T[]`, `*mut T[]`, `*buffer` | — | typed array over the memory | zero-copy view, import parameters only ([§11](#11-sequences-and-memory)) |
-| `mut T[]` | — | typed array | writeback, parameters only |
+| `mut T[]` | — | typed array | writeback, import parameters only |
 | type parameter `T` | — | per instantiation | [§13](#13-boxes-reference-wire-types-and-generics) |
 | associated type | — | per instantiation | [§13](#13-boxes-reference-wire-types-and-generics) |
 
@@ -1137,8 +1137,9 @@ For `size(): u53`, a JS result of `2 ** 53` is a `TypeError`. For
   itself, as an `externref`.
 * `(A, B, …)` is a fixed-length JS Array, validated with `Array.isArray` and
   `length`.
-* `mut T[]` (parameters only) is **writeback**: the bridge copies in,
-  makes the call, and copies back over the same storage.
+* `mut T[]` (import parameters only) is **writeback**: the bridge copies
+  the language's storage to a typed array, makes the call, and copies back
+  over the same storage.
 * `*T[]` and `*mut T[]` (import parameters only) are zero-copy **views**
   ([below](#views-t-and-mut-t)).
 * `buffer` is a JS `ArrayBuffer` or any view of one (a typed array or a
@@ -1270,7 +1271,7 @@ bridge can share them with another binary. The table's index ranges are in
     and `tw:table/free`.
 * **Import parameters** are borrowed for the call: the language owns them,
   and the bridge never frees them.
-* **Export parameters** transfer ownership to the language, as do the
+* **Export parameters** all transfer ownership to the language, as do the
   arguments of a callback it provides (`tw:call:F`).
   * The bridge allocates them with `tw:realloc` and `tw:table/alloc`, and
     they're the language's from the moment the call is entered. It frees
@@ -1278,9 +1279,9 @@ bridge can share them with another binary. The table's index ranges are in
     returns or unwinds, and may keep them past the call.
   * The bridge frees them itself only when the call is never made, because
     a later argument failed to convert ([§15](#15-exceptions)).
-* `mut T[]` outgoing: the bridge copies the language's storage into a
-  typed array, calls, then copies back into the same storage. The length is
-  fixed.
+* `mut T[]`, an import parameter only: the bridge copies the language's
+  storage into a typed array, calls, then copies back into the same
+  storage. The length is fixed.
 
 ### Views: `*T[]` and `*mut T[]`
 

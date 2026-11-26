@@ -8,8 +8,7 @@
 //!   their scope, module export lists name the block's declarations;
 //! * types: every path resolves, with the right number of type arguments;
 //!   `unit` not in an array; no `T??`; `T[]` element types; `?` never
-//!   on `*T[]`; `*T[]` only in import parameters, and `mut T[]` only in
-//!   parameters;
+//!   on `*T[]`; `*T[]` and `mut T[]` only in import parameters;
 //! * enums: through [`enums::flatten`] (indices, names, `@fallback`,
 //!   aliases, carriers), plus literals on every implicit unit arm, unique
 //!   literals, and `throws` enums that end in a `@fallback` with only
@@ -1483,8 +1482,8 @@ impl<'a> Validator<'a> {
             }
             Type::Vec(e) | Type::VecBox(e) => self.element(t, e, cx, span),
             Type::MutVec(e) => {
-                if !matches!(pos, Pos::ImportParam | Pos::ExportParam) {
-                    p(format!("`{}` is only a parameter type", text()));
+                if pos != Pos::ImportParam {
+                    p(format!("`{}` is only an import parameter type", text()));
                 }
                 self.element(t, e, cx, span);
             }
