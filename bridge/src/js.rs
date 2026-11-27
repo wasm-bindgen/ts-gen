@@ -128,7 +128,7 @@ pub struct Glue<'a, 'b> {
     pub ir: &'a Ir,
     /// The lib IRs `ir` resolves against.
     pub libs: Vec<&'a Ir>,
-    pub validate: bool,
+    pub validation: Validation,
     pub helpers: Vec<String>,
     pub(crate) memo: HashMap<String, String>,
     pub modules: Vec<String>,
@@ -175,12 +175,34 @@ struct Leaf {
     rank: u8,
 }
 
+/// Whose value a lowering reads (§10).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Side {
+    /// The host's, through an import.
+    Host,
+    /// User code's, through an export.
+    User,
+}
+
 #[derive(Clone, Copy)]
 pub struct Mode {
     pub checked: bool,
     /// `tw:unbox` and `tw:arr get`: normalize `undefined` to none even
     /// unchecked, since a box position passes it through (§13).
     pub unbox: bool,
+    pub host: bool,
+}
+
+impl Mode {
+    /// What a helper's body depends on.
+    fn key(self) -> String {
+        format!(
+            "{} {} {}",
+            self.checked,
+            self.unbox,
+            self.host && !self.checked
+        )
+    }
 }
 
 pub(crate) fn lit(l: &Literal) -> String {
@@ -281,7 +303,7 @@ impl<'a, 'b> Glue<'a, 'b> {
             f,
             ir,
             libs,
-            validate: l.profile.validation != Validation::Off,
+            validation: l.profile.validation,
             helpers: Vec::new(),
             memo: HashMap::new(),
             modules: Vec::new(),
@@ -304,10 +326,11 @@ impl<'a, 'b> Glue<'a, 'b> {
         }
     }
 
-    pub(crate) fn mode(&self) -> Mode {
+    pub(crate) fn mode(&self, side: Side) -> Mode {
         Mode {
-            checked: self.validate,
+            checked: self.validation != Validation::Off,
             unbox: false,
+            host: side == Side::Host,
         }
     }
 
@@ -1390,7 +1413,7 @@ impl<'a, 'b> Glue<'a, 'b> {
     /// A JS array as a host `T[]`: a fresh array of its elements, each
     /// tested against `T` when checked.
     fn host_array(&mut self, elem: &Repr, m: Mode) -> Result<String> {
-        let key = format!("ahost {} {} {:?}", m.checked, m.unbox, elem);
+        let key = format!("ahost {} {:?}", m.key(), elem);
         let elem = elem.clone();
         self.helper(key, move |g, name| {
             let mut b = Body::default();
@@ -1474,7 +1497,7 @@ impl<'a, 'b> Glue<'a, 'b> {
     }
 
     fn array_lower(&mut self, elem: &Repr, s: Space, m: Mode) -> Result<String> {
-        let key = format!("alower {} {} {s:?} {:?}", m.checked, m.unbox, elem);
+        let key = format!("alower {} {s:?} {:?}", m.key(), elem);
         let e = self.f.elem(elem, s)?;
         let elem = elem.clone();
         self.helper(key, move |g, name| {
@@ -1870,7 +1893,7 @@ impl<'a, 'b> Glue<'a, 'b> {
     /// helper returns the index, or `[arm, slots...]` for a payload enum.
     /// A nested enum's arms are tested among the containing enum's.
     fn enum_lower(&mut self, e: &Rc<EnumLayout>, m: Mode) -> Result<String> {
-        let key = format!("elower {} {} {}", m.checked, m.unbox, e.path);
+        let key = format!("elower {} {}", m.key(), e.path);
         let e = e.clone();
         self.helper(key, move |g, name| {
             let mut b = Body::default();
@@ -2018,6 +2041,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                         Mode {
                             checked: true,
                             unbox: true,
+                            host: false,
                         },
                     )
                 };
@@ -2040,8 +2064,9 @@ impl<'a, 'b> Glue<'a, 'b> {
             }
             Op::Unbox { repr, checked } => {
                 let m = Mode {
-                    checked: *checked && self.validate,
+                    checked: *checked && self.validation != Validation::Off,
                     unbox: true,
+                    host: false,
                 };
                 let v = match &repr.kind {
                     Kind::Vec {
@@ -2136,12 +2161,14 @@ impl<'a, 'b> Glue<'a, 'b> {
                 let unit = matches!(&r.repr.kind, Kind::Tuple { elems, .. } if elems.is_empty());
                 let call = format!("$option(f, {unit})");
                 let throws = func.sig.throws.clone();
-                self.complete(&mut b, &call, Some(r), throws, false, &[])?;
+                let m = self.mode(Side::User);
+                self.complete(&mut b, &call, Some(r), throws, &[], Some(m))?;
             }
             Op::States => {
                 let fs = self.lift(&func.sig.params[0].repr, &wires[0])?;
                 let call = format!("$states({fs})");
-                self.complete(&mut b, &call, func.sig.results.first(), None, false, &[])?;
+                let m = self.mode(Side::User);
+                self.complete(&mut b, &call, func.sig.results.first(), None, &[], Some(m))?;
             }
             Op::AddListenerList | Op::RemoveListenerList => {
                 let fs = self.lift(&func.sig.params[0].repr, &wires[0])?;
@@ -2192,7 +2219,15 @@ impl<'a, 'b> Glue<'a, 'b> {
                 }
                 let call = format!("{callee}({})", argv.join(", "));
                 let throws = func.sig.throws.clone();
-                self.complete(&mut b, &call, func.sig.results.first(), throws, false, &[])?;
+                let m = self.mode(Side::User);
+                self.complete(
+                    &mut b,
+                    &call,
+                    func.sig.results.first(),
+                    throws,
+                    &[],
+                    Some(m),
+                )?;
             }
         }
         Ok(b.finish(&format!("function {name}({})", params.join(", "))))
@@ -2350,7 +2385,8 @@ impl<'a, 'b> Glue<'a, 'b> {
                 None => line,
             });
         }
-        self.complete(b, &call, result, throws, ctor, &wb)?;
+        let m = (!ctor).then(|| self.mode(Side::Host));
+        self.complete(b, &call, result, throws, &wb, m)?;
         if fold {
             b.close("} catch (e) {");
             b.depth += 1;
@@ -2404,10 +2440,11 @@ impl<'a, 'b> Glue<'a, 'b> {
             argv.join(", ")
         );
         let throws = func.sig.throws.clone();
-        self.complete(b, &call, func.sig.results.first(), throws, true, &[])
+        self.complete(b, &call, func.sig.results.first(), throws, &[], None)
     }
 
-    /// Makes an outgoing call, lowering its result and mapping what it
+    /// Makes an outgoing call, lowering its result under `m` (a
+    /// constructor's is returned as it is, with none) and mapping what it
     /// throws to the `throws` enum's tag.
     fn complete(
         &mut self,
@@ -2415,9 +2452,10 @@ impl<'a, 'b> Glue<'a, 'b> {
         call: &str,
         result: Option<&Position>,
         throws: Option<Rc<EnumLayout>>,
-        ctor: bool,
         wb: &[String],
+        m: Option<Mode>,
     ) -> Result<()> {
+        let ctor = m.is_none();
         let lowering = result.is_some_and(|r| !ctor && lowers_alloc(&r.repr));
         if lowering {
             b.line("const cx = $cx;");
@@ -2453,7 +2491,8 @@ impl<'a, 'b> Glue<'a, 'b> {
                 for l in wb {
                     b.line(l);
                 }
-                let w = self.lower(b, &r.repr, "r", self.mode())?;
+                let m = m.expect("a result's mode");
+                let w = self.lower(b, &r.repr, "r", m)?;
                 self.ret_line(b, &w);
             }
         }

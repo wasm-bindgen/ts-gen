@@ -19,7 +19,7 @@ use ts_gen_abi::protocol;
 use ts_gen_abi::resolve::{Context, Location, Target, TypeDecl};
 
 use crate::form::Space;
-use crate::js::{is_ident, js_str, lit, lowers_alloc, prop, Body, Glue};
+use crate::js::{is_ident, js_str, lit, lowers_alloc, prop, Body, Glue, Mode, Side};
 use crate::plan;
 use crate::{unsupported, Error, Result};
 
@@ -76,6 +76,7 @@ impl<'a, 'b> Glue<'a, 'b> {
         sig: &Signature,
         args: &[Arg],
         on_raw: Option<&str>,
+        m: Mode,
     ) -> Result<bool> {
         let idx = self.entry(key, sig);
         // A raw argument passes through, so only lowered arguments and
@@ -109,7 +110,6 @@ impl<'a, 'b> Glue<'a, 'b> {
                 Arg::Raw(e) => wire.push(e.clone()),
                 Arg::Js(v) => {
                     let v = b.bind(v.clone());
-                    let m = self.mode();
                     wire.extend(self.lower(b, &p.repr, &v, m)?);
                 }
             }
@@ -553,7 +553,8 @@ impl<'a, 'b> Glue<'a, 'b> {
             b.line(format!(
                 "const env = f[$flagged] === undefined ? h : {reg}.call(f);"
             ));
-            g.entry_call(&mut b, &export, &sig, &args, None)?;
+            let m = g.mode(Side::User);
+            g.entry_call(&mut b, &export, &sig, &args, None, m)?;
             if fold {
                 b.close("} catch (e) {");
                 b.depth += 1;
@@ -864,7 +865,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 }
                 let args = entry_args(sig, k.member, binds, None);
                 let on_raw = format!("{reg2}.pair(this, {{r}}, {drop});");
-                g.entry_call(b, &k.key, sig, &args, Some(&on_raw))
+                g.entry_call(b, &k.key, sig, &args, Some(&on_raw), g.mode(Side::User))
             })?;
         }
         let _ = writeln!(s, "{}", class_member(b.finish("  constructor(...a)")));
@@ -916,7 +917,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 let handle = (!k.member.is_static)
                     .then(|| format!("{reg2}.unwrap(this, {var2}, {})", js_str(&cname2)));
                 let args = entry_args(sig, k.member, binds, handle);
-                g.entry_call(b, &k.key, sig, &args, None)
+                g.entry_call(b, &k.key, sig, &args, None, g.mode(Side::User))
             })?;
             let _ = writeln!(s, "{}", class_member(b.finish(&head)));
         }
@@ -948,7 +949,7 @@ impl<'a, 'b> Glue<'a, 'b> {
         };
         self.dispatch(&mut b, js, arms, false, &mut |g, b, k, sig, binds| {
             let args = entry_args(sig, k.member, binds, None);
-            g.entry_call(b, &k.key, sig, &args, None)
+            g.entry_call(b, &k.key, sig, &args, None, g.mode(Side::User))
         })?;
         Ok(b.finish(&head))
     }
