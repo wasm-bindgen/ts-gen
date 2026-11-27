@@ -933,23 +933,24 @@ pub fn repr(l: &Layouts<'_>, r: &Repr) -> Json {
         Kind::Vec {
             elem,
             carrier: c,
+            borrowed,
             writeback,
             nullable: n,
             buffer,
             ..
         } => {
-            let o = o
+            let mut o = o
                 .set("kind", Json::str("vec"))
                 .set("elem", Json::str(elem.name()))
                 .set("carrier", Json::str(carrier(*c)))
                 .set("writeback", Json::Bool(*writeback));
-            nullable(
-                match buffer {
-                    true => o.set("buffer", Json::Bool(true)),
-                    false => o,
-                },
-                *n,
-            )
+            if *borrowed {
+                o = o.set("borrowed", Json::Bool(true));
+            }
+            if *buffer {
+                o = o.set("buffer", Json::Bool(true));
+            }
+            nullable(o, *n)
         }
         Kind::Array {
             elem,
@@ -1082,10 +1083,16 @@ pub fn repr(l: &Layouts<'_>, r: &Repr) -> Json {
                 *n,
             )
         }
-        Kind::View { elem, mutable } => o
-            .set("kind", Json::str("view"))
-            .set("elem", Json::str(elem.name()))
-            .set("mutable", Json::Bool(*mutable)),
+        Kind::View {
+            elem,
+            mutable,
+            nullable: n,
+        } => nullable(
+            o.set("kind", Json::str("view"))
+                .set("elem", Json::str(elem.name()))
+                .set("mutable", Json::Bool(*mutable)),
+            *n,
+        ),
     }
     .done()
 }

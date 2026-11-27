@@ -728,7 +728,7 @@ impl<'a> Parser<'a> {
         at
     }
 
-    /// `*` and `mut` take a whole `T[]`.
+    /// `*` and `*mut` take a whole `T[]`.
     fn whole_vec(&mut self, what: &str) -> Res<Box<Type>> {
         let elem = self.primary()?;
         if !self.eat_brackets() {
@@ -750,8 +750,7 @@ impl<'a> Parser<'a> {
             return Ok(Type::View { mutable, elem });
         }
         if self.is_kw("mut") && (self.is_name_at(1) || is_p(self.peek_at(1), "(")) {
-            self.bump();
-            return Ok(Type::MutVec(self.whole_vec("mut")?));
+            return self.err("`mut T[]` is written `*mut T[]`");
         }
         if self.is_kw("fn") && is_p(self.peek_at(1), "(") {
             self.bump();

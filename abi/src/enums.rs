@@ -269,7 +269,6 @@ impl<'a> Flattener<'_, 'a> {
         match t {
             Type::Vec(_)
             | Type::VecBox(_)
-            | Type::MutVec(_)
             | Type::Array(_)
             | Type::ArrBox(_)
             | Type::Tuple(_)

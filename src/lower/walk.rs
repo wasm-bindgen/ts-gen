@@ -103,7 +103,6 @@ fn ty(t: &mut abi::Type, f: &mut impl FnMut(&mut abi::TypeRef)) {
     match t {
         T::Vec(e)
         | T::VecBox(e)
-        | T::MutVec(e)
         | T::Array(e)
         | T::ArrBox(e)
         | T::Nullable(e, _)

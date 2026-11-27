@@ -193,6 +193,13 @@ external fun hash_buffer(p0: JsAny?)
 /**
  * * `data`
  */
+/** tw:js/global hash(*buffer) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun hash_buffer_2(p0: JsAny?)
+
+/**
+ * * `data`
+ */
 /** tw:js/global hashText(str) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun hashText_str(p0: JsAny?)
@@ -203,6 +210,13 @@ external fun hashText_str(p0: JsAny?)
 /** tw:js/global hashText(buffer) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun hashText_buffer(p0: JsAny?)
+
+/**
+ * * `data`
+ */
+/** tw:js/global hashText(*buffer) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun hashText_buffer_2(p0: JsAny?)
 
 /** tw:js/global Frame.new() */
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")

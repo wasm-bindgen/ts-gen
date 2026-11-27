@@ -10,6 +10,16 @@ class Probe {
   write(xs) {
     xs.fill(9);
   }
+  optWrite(xs) {
+    this.seen = xs;
+    xs?.fill(4);
+  }
+  peek(xs) {
+    this.seen = xs;
+  }
+  peekBuf(xs) {
+    this.seen = xs;
+  }
   list() {
     return this.next;
   }
@@ -90,15 +100,24 @@ assert.deepEqual(call("Probe#rows()", p), [[1], [2, 3]]);
 p.next = [[1, "a"]];
 assert.deepEqual(call("Probe#pairs()", p), [[1, "a"]]);
 
-// Language → JS: `T[]` a fresh copy too, `arr<T>` the value as is; `mut
-// T[]` writes land in the language's.
+// Language → JS: `T[]` a fresh copy too, `arr<T>` the value as is; a view
+// is the language's own array, so `*mut T[]` writes land in it.
 const mine = new Uint8Array(3);
 call("Probe#see(u8[])", p, mine);
 assert.ok(p.seen instanceof Uint8Array && p.seen !== mine);
 p.seen.fill(1);
 assert.deepEqual(mine, new Uint8Array(3));
-call("Probe#write(mut u8[])", p, mine);
+call("Probe#write(*mut u8[])", p, mine);
 assert.deepEqual(mine, new Uint8Array([9, 9, 9]));
+call("Probe#optWrite(*mut u8[]?)", p, mine);
+assert.equal(p.seen, mine);
+assert.deepEqual(mine, new Uint8Array([4, 4, 4]));
+call("Probe#optWrite(*mut u8[]?)", p, null);
+assert.equal(p.seen, undefined);
+for (const peek of ["Probe#peek(*u8[])", "Probe#peekBuf(*buffer)"]) {
+  call(peek, p, mine);
+  assert.equal(p.seen, mine);
+}
 call("Probe#seeList(arr<str>)", p, ["x"]);
 assert.deepEqual(p.seen, ["x"]);
 

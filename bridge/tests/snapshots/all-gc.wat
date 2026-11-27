@@ -63,6 +63,9 @@
   (import "tw:glue" "g50" (func $g50 (param externref) (result i32)))
   (import "tw:glue" "g51" (func $g51 (param externref i32 i32 i32)))
   (import "tw:glue" "g52" (func $g52 (param externref i32 i32)))
+  (import "tw:glue" "g53" (func $g53 (param externref i32 i32)))
+  (import "tw:glue" "g54" (func $g54 (param externref i32 i32)))
+  (import "tw:glue" "g55" (func $g55 (param externref i32 i32)))
   (memory $m (export "memory") 1)
   (table $st (export "table") 0 externref)
   (global (export "hdr") i32 (i32.const 0))
@@ -2586,6 +2589,105 @@
       local.get $l102
       call $g52
       (call $h54 (local.get $p1) (local.get $l101))
+    ) (br $done)))
+    (call $restore (local.get $l1) (local.get $l2))
+    (throw_ref (local.get $l3)))
+    (call $restore (local.get $l1) (local.get $l2))
+  )
+  (func $h55 (param $p0 (ref null $d0)) (result i32 i32)
+    (local $l1 i32)
+    (local $l2 i32)
+    (local $l3 i32)
+    (if (ref.is_null (local.get $p0)) (then (return (i32.const 0) (i32.const -1))))
+    (local.set $l1 (array.len (local.get $p0)))
+    (local.set $l2 (call $salloc (i32.mul (local.get $l1) (i32.const 1)) (i32.const 1)))
+    (block $b (loop $l (br_if $b (i32.ge_u (local.get $l3) (local.get $l1))) (i32.store8 (i32.add (local.get $l2) (i32.mul (local.get $l3) (i32.const 1))) (array.get_u $d0 (local.get $p0) (local.get $l3))) (local.set $l3 (i32.add (local.get $l3) (i32.const 1))) (br $l)))
+    local.get $l2
+    local.get $l1
+  )
+  (func $h56 (param $p0 (ref null $d0)) (param $p1 i32)
+    (local $l1 i32)
+    (local $l2 i32)
+    (if (ref.is_null (local.get $p0)) (then (return)))
+    (local.set $l2 (array.len (local.get $p0)))
+    (block $b (loop $l (br_if $b (i32.ge_u (local.get $l1) (local.get $l2))) (array.set $d0 (local.get $p0) (local.get $l1) (i32.load8_u (i32.add (local.get $p1) (i32.mul (local.get $l1) (i32.const 1))))) (local.set $l1 (i32.add (local.get $l1) (i32.const 1))) (br $l)))
+  )
+  (func $f53 (export "f53") (param $p0 externref) (param $p1 (ref null $d0))
+    (local $l1 i32)
+    (local $l2 i32)
+    (local $l101 i32)
+    (local $l102 i32)
+    (local $l3 exnref)
+    (local.set $l1 (call $sp))
+    (local.set $l2 (call $tsp))
+    (block $done
+    (local.set $l3 (block $catch (result exnref) (try_table (catch_all_ref $catch)
+      local.get $p1
+      call $h55
+      local.set $l102
+      local.set $l101
+      local.get $p0
+      local.get $l101
+      local.get $l102
+      call $g53
+      (call $h56 (local.get $p1) (local.get $l101))
+    ) (br $done)))
+    (call $restore (local.get $l1) (local.get $l2))
+    (throw_ref (local.get $l3)))
+    (call $restore (local.get $l1) (local.get $l2))
+  )
+  (func $h57 (param $p0 (ref null $d0)) (result i32 i32)
+    (local $l1 i32)
+    (local $l2 i32)
+    (local $l3 i32)
+    (if (ref.is_null (local.get $p0)) (then (return (i32.const 0) (i32.const -1))))
+    (local.set $l1 (array.len (local.get $p0)))
+    (local.set $l2 (call $salloc (i32.mul (local.get $l1) (i32.const 1)) (i32.const 1)))
+    (block $b (loop $l (br_if $b (i32.ge_u (local.get $l3) (local.get $l1))) (i32.store8 (i32.add (local.get $l2) (i32.mul (local.get $l3) (i32.const 1))) (array.get_u $d0 (local.get $p0) (local.get $l3))) (local.set $l3 (i32.add (local.get $l3) (i32.const 1))) (br $l)))
+    local.get $l2
+    local.get $l1
+  )
+  (func $f54 (export "f54") (param $p0 externref) (param $p1 (ref $d0))
+    (local $l1 i32)
+    (local $l2 i32)
+    (local $l101 i32)
+    (local $l102 i32)
+    (local $l3 exnref)
+    (local.set $l1 (call $sp))
+    (local.set $l2 (call $tsp))
+    (block $done
+    (local.set $l3 (block $catch (result exnref) (try_table (catch_all_ref $catch)
+      local.get $p1
+      call $h57
+      local.set $l102
+      local.set $l101
+      local.get $p0
+      local.get $l101
+      local.get $l102
+      call $g54
+    ) (br $done)))
+    (call $restore (local.get $l1) (local.get $l2))
+    (throw_ref (local.get $l3)))
+    (call $restore (local.get $l1) (local.get $l2))
+  )
+  (func $f55 (export "f55") (param $p0 externref) (param $p1 (ref $d0))
+    (local $l1 i32)
+    (local $l2 i32)
+    (local $l101 i32)
+    (local $l102 i32)
+    (local $l3 exnref)
+    (local.set $l1 (call $sp))
+    (local.set $l2 (call $tsp))
+    (block $done
+    (local.set $l3 (block $catch (result exnref) (try_table (catch_all_ref $catch)
+      local.get $p1
+      call $h57
+      local.set $l102
+      local.set $l101
+      local.get $p0
+      local.get $l101
+      local.get $l102
+      call $g55
     ) (br $done)))
     (call $restore (local.get $l1) (local.get $l2))
     (throw_ref (local.get $l3)))

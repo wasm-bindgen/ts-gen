@@ -6,6 +6,17 @@ class Probe {
   fill(v) {
     v.fill(8, 1);
   }
+  optFill(v) {
+    this.seen = v;
+    v?.fill(8, 1);
+  }
+  peek(v) {
+    this.peeked = [v instanceof Uint8Array, ...v];
+    v.fill(5);
+  }
+  peekBuf(v) {
+    this.peek(v);
+  }
 }
 const names = [
   "Str", "OptStr", "Bytes", "Floats", "Bigs", "OptBytes", "Nums", "U8s", "I8s", "Bools", "I16s", "U16s", "F16s", "I53s", "Strs", "OptStrs", "Rows", "Nested",
@@ -134,13 +145,37 @@ roundTrip("Bodies", ["t", new Uint8Array([1]), s]);
   assert.deepEqual(scratchUse(), base);
 }
 
-// mut u8[]: the GC array is written back.
+// *mut u8[]: with no memory to view, the GC array's copy is written back.
 {
   p.next = new Uint8Array([1, 2, 3]);
   const g = ex[key("makeBytes")](p);
   ex[key("fill")](p, g);
   ex[key("seeBytes")](p, g);
   assert.deepEqual([...p.seen], [1, 8, 8]);
+  assert.deepEqual(scratchUse(), base);
+}
+
+// A nullable one is absent as `ref.null`, with nothing to write back.
+{
+  p.next = new Uint8Array([1, 2, 3]);
+  const g = ex[key("makeOptBytes")](p);
+  ex[key("optFill")](p, g);
+  ex[key("seeOptBytes")](p, g);
+  assert.deepEqual([...p.seen], [1, 8, 8]);
+  p.next = undefined;
+  ex[key("optFill")](p, ex[key("makeOptBytes")](p));
+  assert.equal(p.seen, undefined);
+  assert.deepEqual(scratchUse(), base);
+}
+
+// *u8[] and *buffer: a copy for the call, so the callee's writes stay in it.
+for (const peek of ["peek", "peekBuf"]) {
+  p.next = new Uint8Array([1, 2, 3]);
+  const g = ex[key("makeBytes")](p);
+  ex[key(peek)](p, g);
+  assert.deepEqual(p.peeked, [true, 1, 2, 3]);
+  ex[key("seeBytes")](p, g);
+  assert.deepEqual([...p.seen], [1, 2, 3]);
   assert.deepEqual(scratchUse(), base);
 }
 

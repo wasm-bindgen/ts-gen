@@ -224,8 +224,8 @@ fn canonical_spelling() {
         ("u8[]?", "u8[]?"),
         ("arr<u8[]>", "arr<u8[]>"),
         ("(u8[])[]", "u8[][]"),
-        ("mut u8[]", "mut u8[]"),
-        ("mut u8[]?", "mut u8[]?"),
+        ("*mut u8[]?", "*mut u8[]?"),
+        ("*buffer?", "*buffer?"),
         (
             "fn(Event) -> unit throws KvError",
             "fn(Event)->unit throws KvError",

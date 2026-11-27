@@ -153,8 +153,7 @@ an opaque value the bridge hasn't converted
 | std `Symbol` | itself | symbol | a class the bridge tests with `typeof === "symbol"`, not `instanceof` |
 | `future<T>`, `future<T, E>` | — | Promise | [§16](#16-async) |
 | `fn(A, …) -> R throws E`, `fn(A, ...arr<T>)` | — | function | [§18](#18-callbacks) |
-| `*T[]`, `*mut T[]`, `*buffer` | — | typed array over the memory | zero-copy view, import parameters only ([§11](#11-sequences-and-memory)) |
-| `mut T[]` | — | typed array | writeback, import parameters only |
+| `*T[]`, `*mut T[]`, `*buffer` | — | typed array | the language's storage lent for the call, to read or to write; import parameters only ([§11](#11-sequences-and-memory)) |
 | type parameter `T` | — | per instantiation | [§13](#13-boxes-reference-wire-types-and-generics) |
 | associated type | — | per instantiation | [§13](#13-boxes-reference-wire-types-and-generics) |
 
@@ -192,13 +191,13 @@ an opaque value the bridge hasn't converted
   whole type after it, postfix included: `arr<@js(null) f64?>`,
   `fn(@js(null) Str?)`, `@js(null) u8[]?` ([§9](#9-nullability)). As the
   operand of a postfix operator it's parenthesized, `(@js(null) T?)[]`.
-* `*`, `*mut` and `mut` are prefixes that apply only to a whole `T[]`, and
-  to nothing else: `*u8[]` is a view, not an array of pointers, and `*u8`
-  is a syntax error. `*buffer` is the one other view.
+* `*` and `*mut` are prefixes that apply only to a whole `T[]`, and to
+  nothing else: `*u8[]` is a view, not an array of pointers, and `*u8` is a
+  syntax error. `*buffer` is the one other view.
 
-* `?` is invalid on `*T[]` and `*mut T[]`. `mut T[]?` is allowed and uses
-  the `T[]?` encoding ([§11](#11-sequences-and-memory)); an absent value
-  has no writeback.
+* A view takes one `?`: `*T[]?`, `*mut T[]?` and `*buffer?` use the `T[]?`
+  encoding ([§11](#11-sequences-and-memory)), and an absent one has nothing
+  to view or write back.
 
 ### Canonical spelling
 
@@ -224,10 +223,10 @@ Keys (§6) and protocol names (§19) print types in canonical form:
   (`fn(Event)`, `fn(Event)->unit throws err`);
 * a function-typed operand of `?` or `[]` whose tail would absorb the
   operator is parenthesized (`(fn(Event)->str)?`), as is the element of
-  `*`, `*mut` or `mut` that isn't a primary type (`*(u8?)[]`).
+  `*` or `*mut` that isn't a primary type (`*(u8?)[]`).
 
 Examples: `Map<Str,f64>`, `arr<(u32,str)>`, `fn(f64,u32)->Str`,
-`*mut u8[]`, `mut u8[]`, `fn(Event)->unit throws KvError`.
+`*mut u8[]`, `fn(Event)->unit throws KvError`.
 
 ### Type aliases
 
@@ -261,8 +260,8 @@ own is `fn(Next<f64>,f64)->f64` again. The bridge and the generators name
 a nested function value by its own spelling that way, so a recursive
 callback has one trampoline.
 
-An alias's type is valid in any position: not `never`, a view or a
-`mut T[]`. Recursion passes through a type constructor, and every
+An alias's type is valid in any position: not `never` or a view.
+Recursion passes through a type constructor, and every
 recursive alias is a function type, since a back-edge lays out only as a
 function value (§10). These are validation errors:
 
@@ -590,8 +589,8 @@ shape** only. Value shapes are types, never attributes.
 The default is the parameters in order. Each parameter appears **at most
 once**, which makes every template invertible. A bare name is a parameter
 or a `let`; `...rest` is the last element and spreads a sequence
-(`arr<T>`, `T[]`). A view parameter (`*T[]`) is the typed array over the
-memory, so `@js(args)` passes it directly.
+(`arr<T>`, `T[]`). A view parameter (`*T[]`) is a typed array, so
+`@js(args)` passes it directly.
 
 **One template serves both directions.** The direction comes from the
 declaration's role:
@@ -1118,7 +1117,7 @@ For `size(): u53`, a JS result of `2 ** 53` is a `TypeError`. For
 
 * `T[]` is the **typed array**, for the typed-array element types only, as
   a fresh copy in both directions, under every carrier (`host` included).
-  The borrowed, no-copy form is `*T[]`:
+  The borrowed form is `*T[]`:
 
   | `T` | `i8` | `u8` | `i16` | `u16` | `i32` | `u32` | `i64` | `u64` | `f16` | `f32` | `f64` |
   |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -1137,10 +1136,8 @@ For `size(): u53`, a JS result of `2 ** 53` is a `TypeError`. For
   itself, as an `externref`.
 * `(A, B, …)` is a fixed-length JS Array, validated with `Array.isArray` and
   `length`.
-* `mut T[]` (import parameters only) is **writeback**: the bridge copies
-  the language's storage to a typed array, makes the call, and copies back
-  over the same storage.
-* `*T[]` and `*mut T[]` (import parameters only) are zero-copy **views**
+* `*T[]` and `*mut T[]` (import parameters only) are **views**: the
+  language's storage lent to the callee for the call, to read or to write
   ([below](#views-t-and-mut-t)).
 * `buffer` is a JS `ArrayBuffer` or any view of one (a typed array or a
   `DataView`), and the language's bytes: it's laid out as `u8[]`, in every
@@ -1157,8 +1154,8 @@ For `size(): u53`, a JS result of `2 ** 53` is a `TypeError`. For
     view gives exactly its window (`byteOffset`, `byteLength`), whatever its
     element type, and anything else is a `TypeError`.
   * Language → JS the bytes are a fresh `Uint8Array`.
-  * `*buffer` (import parameters only) is the bytes as a zero-copy
-    `Uint8Array` over the memory, a view like `*u8[]`.
+  * `*buffer` (import parameters only) is the bytes as a `Uint8Array`, a
+    view laid out as `*u8[]`.
   * It is exactly `ArrayBuffer | ArrayBufferView`, and nothing is lost by
     it: a parameter takes either class as the object itself through its
     derived variants ([§7](#7-overloads-and-the-js-call-dsl)), every one
@@ -1190,7 +1187,7 @@ has the wire parameters `(i32, f64, i32)`.
 | type | wire (memory32) | wire (memory64) |
 |---|---|---|
 | `str` | `(i32 ptr, i32 len)` | `(i64, i64)` |
-| `T[]`, `mut T[]` | `(i32 ptr, i32 len)` | `(i64, i64)` |
+| `T[]` | `(i32 ptr, i32 len)` | `(i64, i64)` |
 | `*T[]`, `*mut T[]` | `(i32 ptr, i32 len)` | `(i64, i64)` |
 | `arr<T>` | see below | |
 
@@ -1280,15 +1277,17 @@ bridge can share them with another binary. The table's index ranges are in
   * The bridge frees them itself only when the call is never made: an
     argument failed to convert, the receiver isn't a live instance, or the
     spill wasn't empty ([§15](#15-exceptions)).
-* `mut T[]`, an import parameter only: the bridge copies the language's
-  storage into a typed array, calls, then copies back into the same
-  storage. The length is fixed.
+* A view (`*T[]`, `*mut T[]`), an import parameter only, lends the
+  language's storage itself rather than a value: what the callee writes
+  through a `*mut T[]` is in that storage when the call returns. The length
+  is fixed.
 
 ### Views: `*T[]` and `*mut T[]`
 
-A view is `(ptr, len)` into linear memory, like Rust's `*const [T]`, which
-JS sees as a **zero-copy** typed array of `T`'s class over the memory. The
-parameter is that typed array, so `@js(args)` passes it like any other:
+A view lends the callee the language's own storage for the call, like
+Rust's `&[T]` and `&mut [T]`: `*T[]` to read, `*mut T[]` to write into.
+`T[]` is the owned copy beside them. JS sees a typed array of `T`'s class,
+so `@js(args)` passes the parameter like any other:
 
 ```ts
 class Crypto {
@@ -1300,24 +1299,46 @@ class GPUQueue {
 }
 ```
 
-* It's always **unsafe**. Generators expose such members as unsafe (Rust
-  `unsafe fn`), and producers usually add a safe `T[]`/`mut T[]` overload
-  alongside.
-* `*T[]` (read) vs `*mut T[]` (write) is generator intent. The bridge treats
-  both the same.
-* Views are created per call and never cached, since `memory.grow` detaches
-  the buffer. A view is used only in `@js(args)`.
-* Views are bounds-checked: `ptr + len × size_of(T) <= memory.byteLength`,
-  or `TypeError`.
-* Aliasing is the language's responsibility.
+**The callee uses the array during the call only.** What it reads then is
+the language's storage as it is, and what it writes through a `*mut T[]`
+is there when the call returns. Past the call the array is nothing it can
+rely on, which is all that lets a profile choose how to lend:
+
+| profile | wire | the callee's typed array | `*T[]` | `*mut T[]` |
+|---|---|---|---|---|
+| a linear memory | `(ptr, len)` | over the memory | no copy | no copy |
+| no memory, `vec = gc` | the GC array, as `T[]` | fresh | a copy | a copy, written back after the call |
+| no memory, `vec = host` | `externref`, as `T[]` | the language's own | no copy | no copy |
+
+* With a linear memory configured a view is `(ptr, len)` into it, whatever
+  the `vec` carrier: a GC language with a memory lends its memory.
+* With no memory a view is the `vec` carrier's `T[]`. A GC array can't be
+  a typed array's storage, so the bridge copies it out, and for `*mut T[]`
+  copies the typed array back over the same array after the call. A `host`
+  typed array is passed as it is.
+* `*T[]` (read) vs `*mut T[]` (write) matters only where there's a copy:
+  a callee that writes through a `*T[]` writes into storage that may or
+  may not be the language's.
+* `*T[]?` and `*mut T[]?` are absent as `T[]?` is (`len = u32::MAX`,
+  `ref.null`, or a null `externref`), and JS sees the absent value of the
+  position.
+* Over a memory it's **unsafe**: the typed array aliases the language's
+  memory with no lifetime, and a callee that keeps it past the call reads
+  whatever is there later. Generators expose such members as unsafe (Rust
+  `unsafe fn`) where the language has the notion. Aliasing is the
+  language's responsibility.
+* Over a memory, views are created per call and never cached, since
+  `memory.grow` detaches the buffer, and are bounds-checked:
+  `ptr + len × size_of(T) <= memory.byteLength`, or `TypeError`.
+* A view is used only in `@js(args)`.
 * `@js(unshared)` says the callee rejects a view of a `SharedArrayBuffer`
   (TS `Uint8Array<ArrayBuffer>`, a WebIDL buffer without `[AllowShared]`).
   If the memory's buffer is a `SharedArrayBuffer` at instantiation, the
   bridge passes a fresh copy instead, and writes it back after the call for
-  `*mut T[]`. It applies only to views: every copy is a fresh `ArrayBuffer`.
-* Views are available whenever a linear memory is configured, whatever the
-  GC settings. They're legal only in import parameters; anywhere else
-  they're a validation error.
+  `*mut T[]`. It applies only over a memory: every copy is a fresh
+  `ArrayBuffer`, and a `host` typed array is the language's to choose.
+* Views are legal only in import parameters; anywhere else they're a
+  validation error.
 
 Multiple memories are out of scope.
 
@@ -1388,9 +1409,9 @@ Kotlin also needs `box-none = null`: it reads `undefined` as null, so it
 can't hold the unit box.
 
 GC doesn't preclude a linear memory: a language may be GC for every category
-and still configure a memory (for `*T[]`), or turn GC off per category.
-Without a memory there are no views, so generators skip `*T[]` members
-(the producer keeps a safe `T[]` overload beside each).
+and still configure a memory, or turn GC off per category. A view is into
+the memory when there is one, and otherwise the `vec` carrier's
+([§11](#views-t-and-mut-t)).
 
 With `host` strings, the language uses JS strings natively through
 `wasm:js-string`. There `str` and `Str` share the wire type `externref`;
@@ -1402,8 +1423,8 @@ externals take only primitives and `externref`):
 
 * `T[]` is a typed array, and the bridge copies it in both directions
   rather than hand over the caller's, so neither side sees the other's
-  later writes. `mut T[]` passes the caller's own typed array, so writes
-  land in it. The no-copy form is `*T[]`, which needs a memory.
+  later writes. A view (`*T[]`, `*mut T[]`) passes the caller's own typed
+  array, so the callee reads it uncopied and its writes land in it.
 * `arr<T>` is a JS array whose elements are the JS values of `T`. Each
   crossing is a fresh value, so the receiver owns it.
 * A handle is the language object externalized (`extern.convert_any`),
@@ -2680,7 +2701,7 @@ tparams     = "<" tparam ("," tparam)* ">"
 tparam      = ident (":" type | "in" "(" type ("," type)* ")" | "in" "keyof" type)? ("=" type)?
 type        = "@js" "(" "null" ")" type | prefix postfix*  // the attribute needs a `T?`
 postfix     = "?" | "[" "]" | "[" type "]"            // `M[K]` (§13)
-prefix      = "*" "mut"? primary "[" "]" | "*" "buffer" | "mut" primary "[" "]" | fntype | primary
+prefix      = "*" "mut"? primary "[" "]" | "*" "buffer" | fntype | primary
 fntype      = "fn" "(" ((type ",")* "..."? type)? ")" ("->" type)? throws?
 primary     = scalar | "bigint" | "str" | "buffer" | "unit" | "never" | "Any" | box
             | "arr" "<" type ">" | "future" "<" type ("," path)? ">"

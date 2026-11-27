@@ -464,7 +464,9 @@ impl Forms {
                 }
             },
             Kind::Unit | Kind::Lit(_) => {}
-            Kind::View { .. } => return unsupported("`*T[]` is legal only in import parameters"),
+            Kind::View { .. } | Kind::Vec { borrowed: true, .. } => {
+                return unsupported("`*T[]` is legal only in import parameters")
+            }
             _ => {
                 for j in self.jsw(r)? {
                     match j {

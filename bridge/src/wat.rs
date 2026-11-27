@@ -1368,7 +1368,7 @@ impl<'a, 'b> Wat<'a, 'b> {
         Ok(())
     }
 
-    /// Copies a `mut T[]`'s scratch bytes back into its GC array (§11).
+    /// Copies a `*mut T[]`'s scratch bytes back into its GC array (§11).
     fn writeback_fn(&mut self, ty: &ValType) -> Result<String> {
         let key = format!("wb {ty}");
         let ty = ty.clone();

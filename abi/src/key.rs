@@ -120,11 +120,7 @@ impl<'a> Keys<'a> {
 
     fn whole_vec(&self, t: &Type, cx: &Context<'_>) -> String {
         match t {
-            Type::Nullable(..)
-            | Type::Vec(_)
-            | Type::Fn(_)
-            | Type::View { .. }
-            | Type::MutVec(_) => {
+            Type::Nullable(..) | Type::Vec(_) | Type::Fn(_) | Type::View { .. } => {
                 format!("({})[]", self.ty(t, cx))
             }
             _ => format!("{}[]", self.ty(t, cx)),
@@ -157,7 +153,6 @@ impl<'a> Keys<'a> {
             Type::UnitBox => "Unit".into(),
             Type::Vec(t) => format!("{}[]", self.operand(t, cx)),
             Type::VecBox(t) => format!("Vec<{}>", self.ty(t, cx)),
-            Type::MutVec(t) => format!("mut {}", self.whole_vec(t, cx)),
             Type::Array(t) => format!("arr<{}>", self.ty(t, cx)),
             Type::ArrBox(t) => format!("Arr<{}>", self.ty(t, cx)),
             Type::Tuple(ts) if ts.len() == 1 => format!("({},)", self.ty(&ts[0], cx)),

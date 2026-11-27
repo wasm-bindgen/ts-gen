@@ -17,7 +17,10 @@ export namespace util {
 class Probe {
   bytes(): u8[];
   see(xs: u8[]);
-  write(xs: mut u8[]);
+  write(xs: *mut u8[]);
+  optWrite(xs: *mut u8[]?);
+  peek(xs: *u8[]);
+  peekBuf(xs: *buffer);
   list(): arr<u32>;
   seeList(xs: arr<str>);
   rows(): arr<arr<u32>>;

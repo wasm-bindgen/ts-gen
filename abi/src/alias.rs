@@ -162,7 +162,6 @@ impl<'a> Expander<'a> {
             },
             Type::Vec(e) => Type::Vec(qb(e)),
             Type::VecBox(e) => Type::VecBox(qb(e)),
-            Type::MutVec(e) => Type::MutVec(qb(e)),
             Type::Array(e) => Type::Array(qb(e)),
             Type::ArrBox(e) => Type::ArrBox(qb(e)),
             Type::Tuple(ts) => Type::Tuple(ts.iter().map(q).collect()),

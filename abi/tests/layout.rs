@@ -432,7 +432,7 @@ class EventTarget {
   addEventListener(type: str, listener: fn(Event));
 }
 class Event {}
-f(bytes: u8[], xs: arr<(u32, str)>, into: mut f64[]): u8[]?;
+f(bytes: u8[], xs: arr<(u32, str)>, into: *mut f64[]): u8[]?;
 "#,
     );
     let host = profile("all-host");
@@ -449,7 +449,7 @@ f(bytes: u8[], xs: arr<(u32, str)>, into: mut f64[]): u8[]?;
         "(externref, externref, externref)"
     );
     assert_eq!(
-        sig(&ir, &host, "f(u8[],arr<(u32,str)>,mut f64[])"),
+        sig(&ir, &host, "f(u8[],arr<(u32,str)>,*mut f64[])"),
         "(externref, externref, externref) -> (externref)"
     );
     // Host sequences inside a linear `arr<T>` are table entries.
@@ -821,7 +821,6 @@ fn protocol_operations() {
 fn invalid_layouts() {
     let ir = parse("enum Rec { A(arr<Rec>); }\nenum Bad { A = 0; }");
     let lin = profile("all-linear");
-    let gc = profile("all-gc");
     let l = Layouts::new(&ir, &lin);
     let cx = Context::default();
     let err = |l: &Layouts, t: &str| l.repr(&ty(t), &cx, Flow::ToJs).unwrap_err().to_string();
@@ -829,11 +828,72 @@ fn invalid_layouts() {
     assert!(err(&l, "Bad").contains("isn't from 1"));
     assert!(err(&l, "bool[]").contains("typed-array"));
     assert!(err(&l, "Missing").contains("names nothing"));
-    let g = Layouts::new(&ir, &gc);
-    assert!(err(&g, "*u8[]").contains("linear memory"));
-    assert!(l
-        .elem(&l.repr(&ty("*u8[]"), &cx, Flow::ToJs).unwrap())
-        .is_err());
+    for p in ["all-linear", "all-gc", "all-host"] {
+        let p = profile(p);
+        let l = Layouts::new(&ir, &p);
+        assert!(l
+            .elem(&l.repr(&ty("*u8[]"), &cx, Flow::ToJs).unwrap())
+            .is_err());
+    }
+}
+
+/// A view is `(ptr, len)` into a memory when there is one, and otherwise
+/// the `vec` carrier's `T[]` (§11).
+#[test]
+fn views_per_profile() {
+    let ir = parse("");
+    let views = ["*u8[]", "*mut u8[]", "*u8[]?", "*mut u8[]?", "*buffer"];
+    let wire = |p: &str, t: &str| wire_of(&ir, &profile(p), t, Flow::ToJs);
+    for t in views {
+        assert_eq!(wire("all-linear", t), "(i32, i32)", "{t}");
+        assert_eq!(wire("all-linear\nmemory = 64", t), "(i64, i64)", "{t}");
+        // A memory beside GC sequences.
+        assert_eq!(wire("all-gc\nmemory = 32", t), "(i32, i32)", "{t}");
+        assert_eq!(wire("all-host", t), "(externref)", "{t}");
+    }
+    for t in ["*u8[]", "*mut u8[]", "*buffer"] {
+        assert_eq!(wire("all-gc", t), "((ref (array (mut i8))))", "{t}");
+    }
+    for t in ["*u8[]?", "*mut u8[]?"] {
+        assert_eq!(wire("all-gc", t), "((ref null (array (mut i8))))", "{t}");
+    }
+    let kind = |p: &str, t: &str| {
+        let p = profile(p);
+        let l = Layouts::new(&ir, &p);
+        l.repr(&ty(t), &Context::default(), Flow::ToJs)
+            .unwrap()
+            .kind
+    };
+    assert!(matches!(
+        kind("all-linear", "*mut u8[]?"),
+        Kind::View {
+            mutable: true,
+            nullable: true,
+            ..
+        }
+    ));
+    // Only `*mut` is written back, and both are the callee's for the call.
+    for (t, w) in [("*u8[]", false), ("*mut u8[]", true), ("*buffer", false)] {
+        for p in ["all-gc", "all-host"] {
+            match kind(p, t) {
+                Kind::Vec {
+                    borrowed,
+                    writeback,
+                    buffer,
+                    ..
+                } => assert_eq!((borrowed, writeback, buffer), (true, w, false), "{p} {t}"),
+                k => panic!("{p} {t}: {k:?}"),
+            }
+        }
+    }
+    assert!(matches!(
+        kind("all-host", "u8[]"),
+        Kind::Vec {
+            borrowed: false,
+            writeback: false,
+            ..
+        }
+    ));
 }
 
 // The golden rendering.
@@ -1121,14 +1181,14 @@ enum Value {
 class Fixture<T> {
   scalars(a: bool, b: i8, c: u16, d: i53, e: u64, f: f16, g: f64): u32;
   nullables(a: bool?, b: u8?, c: i53?, d: u32?, e: f32?, f: Method?, g: Flags?, h: Body?): str?;
-  sequences(a: u8[], b: mut f32[], c: i64[]?, d: arr<u8>, e: arr<str>?, f: arr<Request>): arr<(u32, str)>;
+  sequences(a: u8[], b: *mut f32[], c: i64[]?, d: arr<u8>, e: arr<str>?, f: arr<Request>): arr<(u32, str)>;
   nested(a: arr<arr<(u32, str)>>, b: arr<Body>, c: arr<(Flags?, Method, f64?)>, d: arr<Counter>, e: arr<fn(Event)>, f: arr<Value>);
   boxes(a: Str, b: U32, c: Vec<u8>, d: Arr<str>, e: Tuple<str, u16>, f: Any?): Arr<Request>;
   callbacks(a: fn(Event, u32) -> str, b: fn(str?) -> Body throws err): fn(Request) -> u32;
   handles(a: Counter, b: Counter?): arr<Counter>;
   erased(a: T, b: T?, c: arr<T>): fn(T) -> T;
   undef(a: str??): Request??;
-  view(a: *u8[], b: *mut f64[]);
+  view(a: *u8[], b: *mut f64[], c: *u8[]?, d: *mut f64[]?, e: *buffer);
 }
 export takeCallback(cb: fn(Event)): fn(u32) -> str;
 "#;

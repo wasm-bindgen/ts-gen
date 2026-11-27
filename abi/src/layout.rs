@@ -286,10 +286,14 @@ pub enum Kind {
     NullScalar(Scalar, ScalarNull),
     /// `str`. Nullable as `len = MAX` (linear) or `ref.null`.
     Str { carrier: StrCarrier, nullable: bool },
-    /// `T[]`, or `mut T[]` with `writeback`.
+    /// `T[]`, or a view where there's no linear memory to be over (§11).
     Vec {
         elem: Scalar,
         carrier: Carrier,
+        /// A view, the callee's for the call only: the `host` carrier
+        /// passes the language's own typed array, uncopied.
+        borrowed: bool,
+        /// `*mut T[]` as a view: a copy is written back after the call.
         writeback: bool,
         nullable: bool,
         /// `bigint`, as its `u64` limbs (§10); the host bigint itself under
@@ -333,9 +337,13 @@ pub enum Kind {
     /// An erased type parameter: `anyref` with GC handles, else `externref`
     /// (§13).
     Erased { nullable: bool },
-    /// `*T[]` / `*mut T[]`: `(ptr, len)` in the linear memory, which JS
-    /// sees as a typed array over it.
-    View { elem: Scalar, mutable: bool },
+    /// `*T[]` / `*mut T[]` with a linear memory: `(ptr, len)` in it, which
+    /// JS sees as a typed array over it. Nullable as `len = MAX`.
+    View {
+        elem: Scalar,
+        mutable: bool,
+        nullable: bool,
+    },
     /// A reference back into a function alias whose expansion is being
     /// laid out (§3): a [`Kind::Fn`] whose layout is `ty`'s, absolute,
     /// laid out afresh with [`Layouts::rec`].
@@ -838,7 +846,7 @@ impl<'a> Layouts<'a> {
                 carrier: p.str,
                 nullable,
             },
-            Type::Vec(e) | Type::MutVec(e) => {
+            Type::Vec(e) => {
                 let elem = match **e {
                     Type::Scalar(s) if is_vec_elem(s) => s,
                     _ => {
@@ -851,7 +859,8 @@ impl<'a> Layouts<'a> {
                 Kind::Vec {
                     elem,
                     carrier: p.vec,
-                    writeback: matches!(t, Type::MutVec(_)),
+                    borrowed: false,
+                    writeback: false,
                     nullable,
                     bigint: false,
                     buffer: false,
@@ -860,6 +869,7 @@ impl<'a> Layouts<'a> {
             Type::Buffer => Kind::Vec {
                 elem: Scalar::U8,
                 carrier: p.vec,
+                borrowed: false,
                 writeback: false,
                 nullable,
                 bigint: false,
@@ -868,6 +878,7 @@ impl<'a> Layouts<'a> {
             Type::BigInt => Kind::Vec {
                 elem: Scalar::U64,
                 carrier: p.vec,
+                borrowed: false,
                 writeback: false,
                 nullable,
                 bigint: true,
@@ -905,24 +916,30 @@ impl<'a> Layouts<'a> {
                 provided: (flow == Flow::ToJs).then_some(p.handles),
                 nullable,
             },
-            Type::View { mutable, elem } if !nullable => match **elem {
-                Type::Buffer if !*mutable => {
-                    self.width("`*buffer`")?;
-                    Kind::View {
-                        elem: Scalar::U8,
-                        mutable: false,
-                    }
-                }
-                Type::Scalar(s) if is_vec_elem(s) => {
-                    self.width("`*T[]`")?;
-                    Kind::View {
-                        elem: s,
+            Type::View { mutable, elem } => {
+                let elem = match **elem {
+                    Type::Buffer if !*mutable => Scalar::U8,
+                    Type::Scalar(s) if is_vec_elem(s) => s,
+                    _ => return invalid("`*T[]`: the element must be a typed-array element type"),
+                };
+                match p.memory {
+                    Some(_) => Kind::View {
+                        elem,
                         mutable: *mutable,
-                    }
+                        nullable,
+                    },
+                    // With no memory to view, it's the `vec` carrier's.
+                    None => Kind::Vec {
+                        elem,
+                        carrier: p.vec,
+                        borrowed: true,
+                        writeback: *mutable,
+                        nullable,
+                        bigint: false,
+                        buffer: false,
+                    },
                 }
-                _ => return invalid("`*T[]`: the element must be a typed-array element type"),
-            },
-            Type::View { .. } => return invalid("`?` is invalid on `*T[]`"),
+            }
             // `t` is the `T?` of a `T??`.
             Type::Nullable(inner, _) if nullable => match unboxed(inner) {
                 // Under `box-none = null`, a box's one none is `ref.null`.
@@ -1479,7 +1496,9 @@ impl<'a> Layouts<'a> {
         match &r.kind {
             // A tuple's `unit` element stores nothing.
             Kind::Unit | Kind::Lit(_) => {}
-            Kind::View { .. } => return invalid("`*T[]` is legal only in import parameters"),
+            Kind::View { .. } | Kind::Vec { borrowed: true, .. } => {
+                return invalid("`*T[]` is legal only in import parameters")
+            }
             Kind::Scalar(s) => Self::field(e, native_size(*s), FieldKind::Scalar(*s)),
             Kind::NullScalar(s, _) => {
                 Self::field(e, 1, FieldKind::Present);
@@ -1755,7 +1774,6 @@ impl<'a> Layouts<'a> {
         match t {
             Type::Vec(e) => Type::Vec(qb(e)),
             Type::VecBox(e) => Type::VecBox(qb(e)),
-            Type::MutVec(e) => Type::MutVec(qb(e)),
             Type::Array(e) => Type::Array(qb(e)),
             Type::ArrBox(e) => Type::ArrBox(qb(e)),
             Type::Tuple(ts) => Type::Tuple(qs(ts)),

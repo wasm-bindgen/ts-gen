@@ -72,8 +72,8 @@ import tw:js/global Kv#put(str,buffer): (externref, externref, externref)
 import tw:js/global Kv#get(str): (externref, externref) -> (externref)
 
 ## Views: `*T[]` and `*mut T[]`
-import tw:js/global Crypto#getRandomValues(*mut u8[]): error: `*T[]` needs a linear memory
-import tw:js/global GPUQueue#writeBuffer(GPUBuffer,u53,*u8[]): error: `*T[]` needs a linear memory
+import tw:js/global Crypto#getRandomValues(*mut u8[]): (externref, externref)
+import tw:js/global GPUQueue#writeBuffer(GPUBuffer,u53,*u8[]): (externref, externref, i64, externref)
 
 ## Defaults
 import tw:js/global D1PreparedStatement#all(): (externref) -> (externref)
@@ -148,7 +148,7 @@ import tw:js/global Fixture#nullables(bool?,u8?,i53?,u32?,f32?,Method?,Flags?,Bo
   enum Method: index; Get=1 Post=2
   enum Flags: carrier u8; Read=1 Write=2
   enum Body: slots (externref); Text=1[0] Bytes=2[0] Stream=3[0]
-import tw:js/global Fixture#sequences(u8[],mut f32[],i64[]?,arr<u8>,arr<str>?,arr<Request>): (externref, externref, externref, externref, externref, externref, externref) -> (externref)
+import tw:js/global Fixture#sequences(u8[],*mut f32[],i64[]?,arr<u8>,arr<str>?,arr<Request>): (externref, externref, externref, externref, externref, externref, externref) -> (externref)
   elem arr<u8>: host externref
   elem arr<str>?: host externref
   elem arr<Request>: host externref
@@ -175,7 +175,7 @@ import tw:js/global Fixture#erased(T,T?,arr<T>): (externref, externref, externre
 import tw:js/global Fixture#undef(str??): (externref, i32, externref) -> (i32, externref)
   enum str??: slots (externref); Undefined=1 Value=2[0]
   enum Request??: slots (externref); Undefined=1 Value=2[0]
-import tw:js/global Fixture#view(*u8[],*mut f64[]): error: `*T[]` needs a linear memory
+import tw:js/global Fixture#view(*u8[],*mut f64[],*u8[]?,*mut f64[]?,*buffer): (externref, externref, externref, externref, externref, externref)
 export takeCallback(fn(Event)): (externref) -> (externref)
   call fn(Event): (externref, externref)
   trampoline fn(u32)->str: (externref, i32) -> (externref)

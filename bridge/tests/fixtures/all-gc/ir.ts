@@ -71,5 +71,8 @@ class Probe {
   seeMethod(v: Method);
   makeBodies(): arr<Body>;
   seeBodies(v: arr<Body>);
-  fill(v: mut u8[]);
+  fill(v: *mut u8[]);
+  optFill(v: *mut u8[]?);
+  peek(v: *u8[]);
+  peekBuf(v: *buffer);
 }

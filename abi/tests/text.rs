@@ -108,7 +108,10 @@ fn sample_reads_as_written() {
     assert_eq!(
         s[6].ty,
         Type::Nullable(
-            Box::new(Type::MutVec(Box::new(Type::Scalar(Scalar::U8)))),
+            Box::new(Type::View {
+                mutable: true,
+                elem: Box::new(Type::Scalar(Scalar::U8))
+            }),
             false
         )
     );
@@ -223,7 +226,7 @@ fn equivalent_spellings_read_equal() {
             "f(a: arr<@js(null) u8?>, b: (@js(null) u8?)?, c: str??);",
         ),
         ("f(a: *(u8)[]);", "f(a: *u8[]);"),
-        ("f(a: mut (u8)[]);", "f(a: mut u8[]);"),
+        ("f(a: *mut (u8)[]?);", "f(a: *mut u8[]?);"),
         ("f(a: (u8)[]);", "f(a: u8[]);"),
         (
             "f(a: (buffer), b: *buffer, c: buffer?): arr<buffer>;",
@@ -336,8 +339,12 @@ fn errors_are_positioned() {
         ("ir 1;\nf(a: arr);", "2:6: `arr` needs type arguments"),
         ("ir 1;\nf(a: *u8);", "2:9: `*` applies to a whole `T[]`"),
         (
-            "ir 1;\nf(a: mut u8?);",
-            "2:12: `mut` applies to a whole `T[]`",
+            "ir 1;\nf(a: *mut u8?);",
+            "2:13: `*mut` applies to a whole `T[]`",
+        ),
+        (
+            "ir 1;\nf(a: mut u8[]);",
+            "2:6: `mut T[]` is written `*mut T[]`",
         ),
         ("ir 1;\nf(a: Map<>);", "2:10: an empty type argument list"),
         (

@@ -72,8 +72,8 @@ import tw:js/global Kv#put(str,buffer): (externref, (ref (array (mut i16))), (re
 import tw:js/global Kv#get(str): (externref, (ref (array (mut i16)))) -> ((ref null (array (mut i8))))
 
 ## Views: `*T[]` and `*mut T[]`
-import tw:js/global Crypto#getRandomValues(*mut u8[]): error: `*T[]` needs a linear memory
-import tw:js/global GPUQueue#writeBuffer(GPUBuffer,u53,*u8[]): error: `*T[]` needs a linear memory
+import tw:js/global Crypto#getRandomValues(*mut u8[]): (externref, (ref (array (mut i8))))
+import tw:js/global GPUQueue#writeBuffer(GPUBuffer,u53,*u8[]): (externref, externref, i64, (ref (array (mut i8))))
 
 ## Defaults
 import tw:js/global D1PreparedStatement#all(): (externref) -> (externref)
@@ -148,7 +148,7 @@ import tw:js/global Fixture#nullables(bool?,u8?,i53?,u32?,f32?,Method?,Flags?,Bo
   enum Method: index; Get=1 Post=2
   enum Flags: carrier u8; Read=1 Write=2
   enum Body: slots ((ref null (array (mut i16))), (ref null (array (mut i8))), externref); Text=1[0] Bytes=2[1] Stream=3[2]
-import tw:js/global Fixture#sequences(u8[],mut f32[],i64[]?,arr<u8>,arr<str>?,arr<Request>): (externref, (ref (array (mut i8))), (ref (array (mut f32))), (ref null (array (mut i64))), (ref (array (mut i8))), (ref null (array (mut (ref null (array (mut i16)))))), (ref (array (mut externref)))) -> ((ref (array (mut (ref null (struct (field i32) (field (ref (array (mut i16))))))))))
+import tw:js/global Fixture#sequences(u8[],*mut f32[],i64[]?,arr<u8>,arr<str>?,arr<Request>): (externref, (ref (array (mut i8))), (ref (array (mut f32))), (ref null (array (mut i64))), (ref (array (mut i8))), (ref null (array (mut (ref null (array (mut i16)))))), (ref (array (mut externref)))) -> ((ref (array (mut (ref null (struct (field i32) (field (ref (array (mut i16))))))))))
   elem arr<u8>: gc i8
   elem arr<str>?: gc (ref null (array (mut i16)))
   elem arr<Request>: gc externref
@@ -175,7 +175,7 @@ import tw:js/global Fixture#erased(T,T?,arr<T>): (externref, anyref, anyref, (re
 import tw:js/global Fixture#undef(str??): (externref, i32, (ref null (array (mut i16)))) -> (i32, externref)
   enum str??: slots ((ref null (array (mut i16)))); Undefined=1 Value=2[0]
   enum Request??: slots (externref); Undefined=1 Value=2[0]
-import tw:js/global Fixture#view(*u8[],*mut f64[]): error: `*T[]` needs a linear memory
+import tw:js/global Fixture#view(*u8[],*mut f64[],*u8[]?,*mut f64[]?,*buffer): (externref, (ref (array (mut i8))), (ref (array (mut f64))), (ref null (array (mut i8))), (ref null (array (mut f64))), (ref (array (mut i8))))
 export takeCallback(fn(Event)): (externref) -> (anyref)
   call fn(Event): (externref, externref)
   trampoline fn(u32)->str: (anyref, i32) -> ((ref (array (mut i16))))

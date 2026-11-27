@@ -507,13 +507,13 @@ impl<'a, 'b> Glue<'a, 'b> {
                 );
                 self.nullable_seq(*nullable, s, &w[1], e, absent)
             }
-            // `T[]` is a fresh copy, except `mut T[]`, whose writes land in
-            // the language's own array, and a host bigint, a primitive.
+            // `T[]` is a fresh copy, except a view, which is the language's
+            // own array, and a host bigint, a primitive.
             Kind::Vec {
                 elem,
                 carrier: Carrier::Host,
                 nullable,
-                writeback: false,
+                borrowed: false,
                 bigint: false,
                 ..
             } => {
@@ -666,7 +666,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                     w[0].clone()
                 }
             }
-            Kind::View { elem, .. } => self.view(*elem, w, false),
+            Kind::View { elem, nullable, .. } => self.view(*elem, *nullable, w, false, absent),
             Kind::Handle {
                 class, nullable, ..
             } => {
@@ -693,13 +693,21 @@ impl<'a, 'b> Glue<'a, 'b> {
 
     /// A typed array over the language's memory (§11). An `unshared` one
     /// is a copy when the memory is shared.
-    fn view(&self, elem: Scalar, w: &[String], unshared: bool) -> String {
-        format!(
+    fn view(
+        &self,
+        elem: Scalar,
+        nullable: bool,
+        w: &[String],
+        unshared: bool,
+        absent: &str,
+    ) -> String {
+        let e = format!(
             "$view({}, {}, {}, {unshared})",
             typed_array(elem),
             self.num(Space::Lang, &w[0]),
             self.num(Space::Lang, &w[1])
-        )
+        );
+        self.nullable_seq(nullable, Space::Lang, &w[1], e, absent)
     }
 
     /// A nullable handle is `0` in linear and `null` otherwise (§14).
@@ -2240,7 +2248,10 @@ impl<'a, 'b> Glue<'a, 'b> {
                 Pos::Param(i) => {
                     let param = &m.params[i];
                     let v = match &p.repr.kind {
-                        Kind::View { elem, .. } => self.view(*elem, w, param.unshared),
+                        Kind::View { elem, nullable, .. } => {
+                            let absent = if p.repr.js_null { "null" } else { "undefined" };
+                            self.view(*elem, *nullable, w, param.unshared, absent)
+                        }
                         _ => self.lift(&p.repr, w)?,
                     };
                     let v = b.bind(v);
@@ -2248,26 +2259,35 @@ impl<'a, 'b> Glue<'a, 'b> {
                         let reg = self.fn_handles(&Self::fn_name(&p.repr));
                         b.line(format!("{reg}.once({v});"));
                     }
-                    // A host `mut T[]` is the language's own array already.
+                    let present = format!("{v} !== undefined && {v} !== null");
+                    // A `*mut T[]` with no memory to view (§11): a GC
+                    // array's copy writes back, and a host one is the
+                    // language's own array already.
                     if let Kind::Vec {
                         writeback: true,
-                        carrier: carrier @ (Carrier::Linear | Carrier::Gc),
+                        carrier: Carrier::Gc,
                         nullable,
                         ..
                     } = &p.repr.kind
                     {
-                        let cond = nullable.then(|| format!("{v} !== undefined && {v} !== null"));
-                        writeback.push((Space::of(*carrier), w.clone(), v.clone(), cond));
+                        let cond = nullable.then(|| present.clone());
+                        writeback.push((Space::Scratch, w.clone(), v.clone(), cond));
                     }
                     // An unshared copy of a shared memory writes back.
-                    if let (Kind::View { mutable: true, .. }, true) = (&p.repr.kind, param.unshared)
+                    if let (
+                        Kind::View {
+                            mutable: true,
+                            nullable,
+                            ..
+                        },
+                        true,
+                    ) = (&p.repr.kind, param.unshared)
                     {
-                        writeback.push((
-                            Space::Lang,
-                            w.clone(),
-                            v.clone(),
-                            Some("$L.shared".into()),
-                        ));
+                        let cond = match nullable {
+                            true => format!("$L.shared && {present}"),
+                            false => "$L.shared".into(),
+                        };
+                        writeback.push((Space::Lang, w.clone(), v.clone(), Some(cond)));
                     }
                     args.insert(&param.name, v);
                 }

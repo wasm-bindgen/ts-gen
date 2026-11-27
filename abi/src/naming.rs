@@ -196,7 +196,7 @@ pub fn type_word(t: &Type) -> String {
         Type::BigInt | Type::BigIntBox => "BigInt".into(),
         Type::Buffer => "Buffer".into(),
         Type::Any => "Any".into(),
-        Type::Vec(_) | Type::VecBox(_) | Type::MutVec(_) => "Vec".into(),
+        Type::Vec(_) | Type::VecBox(_) => "Vec".into(),
         Type::Array(_) | Type::ArrBox(_) => "Array".into(),
         Type::Tuple(_) | Type::TupleBox(_) => "Tuple".into(),
         Type::Future(..) => "Future".into(),

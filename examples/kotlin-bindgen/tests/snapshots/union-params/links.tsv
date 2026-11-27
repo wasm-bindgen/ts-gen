@@ -44,8 +44,10 @@ js_code	fixtures.union_params.flat.get_buffer	tw:future	get<buffer>
 js_code	fixtures.union_params.flat.error_err	tw:future	error<err>
 js_code	fixtures.union_params.flat.boxed	tw:js/global	boxed()
 js_code	fixtures.union_params.flat.hash_buffer	tw:js/global	hash(buffer)
+js_code	fixtures.union_params.flat.hash_buffer_2	tw:js/global	hash(*buffer)
 js_code	fixtures.union_params.flat.hashText_str	tw:js/global	hashText(str)
 js_code	fixtures.union_params.flat.hashText_buffer	tw:js/global	hashText(buffer)
+js_code	fixtures.union_params.flat.hashText_buffer_2	tw:js/global	hashText(*buffer)
 js_code	fixtures.union_params.flat.Frame_new	tw:js/global	Frame.new()
 js_code	fixtures.union_params.flat.Frame_get_payload	tw:js/global	Frame#get:payload()
 js_code	fixtures.union_params.flat.Frame_set_payload_buffer	tw:js/global	Frame#set:payload(buffer)

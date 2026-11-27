@@ -50,7 +50,7 @@ js_code	fixtures.sample.flat.get_unit_KvError	tw:future	get<unit,KvError>
 js_code	fixtures.sample.flat.KVNamespace_list_str_u32	tw:js/global	KVNamespace#list(str?,u32?)
 js_code	fixtures.sample.flat.get_arr_Str	tw:future	get<arr<Str>>
 js_code	fixtures.sample.flat.crypto_randomUUID	tw:js/global	crypto.randomUUID()
-js_code	fixtures.sample.flat.crypto_getRandomValues_mut_u8	tw:js/global	crypto.getRandomValues(mut u8[])
+js_code	fixtures.sample.flat.crypto_getRandomValues_mut_u8	tw:js/global	crypto.getRandomValues(*mut u8[])
 js_code	fixtures.sample.flat.Buffer_byteLength_str	node:buffer	Buffer.byteLength(str)
 js_code	fixtures.sample.flat.atob_str	tw:js/global	atob(str)
 js_code	fixtures.sample.flat.setTimeout_fn_f64	tw:js/global	setTimeout(fn(),f64?)

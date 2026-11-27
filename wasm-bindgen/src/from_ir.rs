@@ -945,7 +945,6 @@ fn plain_inner(t: &abi::Type, top: bool) -> abi::Type {
         T::Nullable(v, null) => T::Nullable(b(v), *null),
         T::Vec(e) => T::Vec(b(e)),
         T::VecBox(e) => T::VecBox(b(e)),
-        T::MutVec(e) => T::MutVec(b(e)),
         T::Array(e) => T::Array(b(e)),
         T::ArrBox(e) => T::ArrBox(b(e)),
         T::Tuple(ts) => T::Tuple(ts.iter().map(inner).collect()),

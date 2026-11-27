@@ -11,10 +11,12 @@ class Probe {
   floats(v: f64[]): f64[];
   bigs(v: i64[]): i64[];
   optBytes(v: u8[]?): u8[]?;
-  fill(v: mut u8[]);
+  fill(v: *mut u8[]);
+  optFill(v: *mut u8[]?);
   buf(v: buffer): buffer;
   optBuf(v: buffer?): buffer?;
   peek(v: *buffer);
+  optPeek(v: *u8[]?);
   nums(v: arr<u32>): arr<u32>;
   strs(v: arr<str>): arr<str>;
   optStrs(v: arr<str?>?): arr<str?>?;

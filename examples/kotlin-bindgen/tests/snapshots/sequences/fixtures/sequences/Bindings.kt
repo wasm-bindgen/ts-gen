@@ -88,6 +88,13 @@ fun random(buf: ByteArray) {
 }
 
 /**
+ * * `buf` - filled with random bytes
+ */
+fun randomWithView(buf: ByteArray) {
+    try { fixtures.sequences.flat.random_u8_2(tsgen.runtime.typedArray("Uint8Array", buf)) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+/**
  * * `data` - copied by the callee
  */
 fun write(offset: Double, data: Float32Array) {
@@ -99,6 +106,13 @@ fun write(offset: Double, data: Float32Array) {
  */
 fun write(offset: Double, data: FloatArray) {
     try { fixtures.sequences.flat.write_f64_f32(offset, tsgen.runtime.typedArray("Float32Array", data)) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+/**
+ * * `data` - copied by the callee
+ */
+fun writeWithView(offset: Double, data: FloatArray) {
+    try { fixtures.sequences.flat.write_f64_f32_2(offset, tsgen.runtime.typedArray("Float32Array", data)) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
 sealed interface Err {

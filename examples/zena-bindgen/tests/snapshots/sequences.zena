@@ -103,11 +103,17 @@ declare function __random(p0: Uint8Array): void;
 @external("tw:js/global", "random(u8[])", "tw, throws:err")
 declare function __random2(p0: FixedArray<u8>): void;
 
+@external("tw:js/global", "random(*u8[])", "tw, throws:err")
+declare function __random3(p0: FixedArray<u8>): void;
+
 @external("tw:js/global", "write(f64,Float32Array)", "tw, throws:err")
 declare function __write(p0: f64, p1: Float32Array): void;
 
 @external("tw:js/global", "write(f64,f32[])", "tw, throws:err")
 declare function __write2(p0: f64, p1: FixedArray<f32>): void;
+
+@external("tw:js/global", "write(f64,*f32[])", "tw, throws:err")
+declare function __write3(p0: f64, p1: FixedArray<f32>): void;
 
 export function ___str_f64__array_in(a: array<var (externref | null, f64) | null>): FixedArray<(String, f64)> {
   let out = new FixedArray<(String, f64)>(a.length, ('', 0.0));
@@ -200,7 +206,13 @@ export function randomWithVec(buf: FixedArray<u8>): void {
   __random2(buf);
 }
 
-// skipped random(*u8[]): `*T[]` needs a linear memory
+/**
+ * * `buf` - filled with random bytes
+ */
+export function randomWithView(buf: FixedArray<u8>): void {
+  __random3(buf);
+}
+
 /**
  * * `data` - copied by the callee
  */
@@ -215,4 +227,9 @@ export function writeWithVec(offset: f64, data: FixedArray<f32>): void {
   __write2(offset, data);
 }
 
-// skipped write(f64,*f32[]): `*T[]` needs a linear memory
+/**
+ * * `data` - copied by the callee
+ */
+export function writeWithView(offset: f64, data: FixedArray<f32>): void {
+  __write3(offset, data);
+}

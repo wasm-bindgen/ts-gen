@@ -13,7 +13,7 @@ class Scalars {
 }
 
 class Sequences {
-  bytes(a: u8[], b: f16[]?, c: mut i32[]): f64[];
+  bytes(a: u8[], b: f16[]?, c: *mut i32[], d: *u8[]): f64[];
   numbers(a: arr<f64>, b: arr<u32>?): arr<i53>;
   narrow(a: arr<u8>, b: arr<bool>): arr<u16>;
   strings(a: arr<str>, b: arr<str?>): arr<str>?;

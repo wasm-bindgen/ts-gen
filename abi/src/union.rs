@@ -112,7 +112,7 @@ fn test(symbols: &Symbols<'_>, t: &Type, cx: &Context<'_>) -> Option<String> {
         Type::Array(_) | Type::ArrBox(_) | Type::Tuple(_) | Type::TupleBox(_) => "an array".into(),
         Type::Fn(_) => "a function".into(),
         Type::Future(..) => "a thenable".into(),
-        Type::Vec(e) | Type::VecBox(e) | Type::MutVec(e) => format!("a `{e:?}[]`"),
+        Type::Vec(e) | Type::VecBox(e) => format!("a `{e:?}[]`"),
         Type::Buffer => "a buffer".into(),
         Type::Any | Type::Nullable(..) => "anything".into(),
         Type::Named(r) => match symbols.resolve_decl(&r.path, cx) {

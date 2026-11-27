@@ -306,6 +306,13 @@ fun hash(data: ByteArray) {
 /**
  * * `data`
  */
+fun hashWithView(data: ByteArray) {
+    try { fixtures.union_params.flat.hash_buffer_2(tsgen.runtime.typedArray("Uint8Array", data)) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+/**
+ * * `data`
+ */
 fun hashText(data: String) {
     try { fixtures.union_params.flat.hashText_str(data.toJsString()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
@@ -315,6 +322,13 @@ fun hashText(data: String) {
  */
 fun hashText(data: ByteArray) {
     try { fixtures.union_params.flat.hashText_buffer(tsgen.runtime.typedArray("Uint8Array", data)) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+}
+
+/**
+ * * `data`
+ */
+fun hashTextWithView(data: ByteArray) {
+    try { fixtures.union_params.flat.hashText_buffer_2(tsgen.runtime.typedArray("Uint8Array", data)) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
 }
 
 fun Frame(): Frame {

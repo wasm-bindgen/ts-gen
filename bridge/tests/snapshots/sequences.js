@@ -499,10 +499,6 @@ function $liftVec(s, p, len, C) {
   return new C(s.u8().slice(p, p + n).buffer);
 }
 
-function $writeback(s, p, len, t) {
-  s.u8().set(new Uint8Array(t.buffer, t.byteOffset, len * t.BYTES_PER_ELEMENT), p);
-}
-
 // A zero-copy view over the language's memory for `*T[]` (IR.md §11),
 // created per call and bounds checked. An `unshared` view of a shared
 // memory is a copy instead.
@@ -871,15 +867,20 @@ function $f5(w0_0, w1_0, w1_1) {
   }
 }
 
-// ("tw:js/global", "Probe#fill(mut u8[])")
+// ("tw:js/global", "Probe#fill(*mut u8[])")
 function $f6(w0_0, w1_0, w1_1) {
-  const t1 = $liftVec($L, w1_0, w1_1, Uint8Array);
+  const t1 = $view(Uint8Array, w1_0, w1_1, false);
   w0_0.fill(t1);
-  $writeback($L, w1_0, w1_1, t1);
+}
+
+// ("tw:js/global", "Probe#optFill(*mut u8[]?)")
+function $f7(w0_0, w1_0, w1_1) {
+  const t1 = (w1_1 === -1 ? undefined : $view(Uint8Array, w1_0, w1_1, false));
+  w0_0.optFill(t1);
 }
 
 // ("tw:js/global", "Probe#buf(buffer)")
-function $f7(w0_0, w1_0, w1_1) {
+function $f8(w0_0, w1_0, w1_1) {
   const t1 = $liftVec($L, w1_0, w1_1, Uint8Array);
   const cx = $cx;
   const cxm = cx.n;
@@ -900,26 +901,6 @@ function $f7(w0_0, w1_0, w1_1) {
 }
 
 // ("tw:js/global", "Probe#buf(ArrayBuffer)")
-function $f8(w0_0, w1_0) {
-  const cx = $cx;
-  const cxm = cx.n;
-  try {
-    const r = w0_0.buf(w1_0);
-    const t1 = $lowerVec($L, $bytes(r), Uint8Array, cx);
-    const t2 = t1[0];
-    const t3 = t1[1];
-    const ra = $ret();
-    ra.i32[0] = t3;
-    return t2;
-  } catch (e) {
-    $release(cx, cxm);
-    throw e;
-  } finally {
-    cx.n = cxm;
-  }
-}
-
-// ("tw:js/global", "Probe#buf(ArrayBufferView)")
 function $f9(w0_0, w1_0) {
   const cx = $cx;
   const cxm = cx.n;
@@ -939,8 +920,28 @@ function $f9(w0_0, w1_0) {
   }
 }
 
+// ("tw:js/global", "Probe#buf(ArrayBufferView)")
+function $f10(w0_0, w1_0) {
+  const cx = $cx;
+  const cxm = cx.n;
+  try {
+    const r = w0_0.buf(w1_0);
+    const t1 = $lowerVec($L, $bytes(r), Uint8Array, cx);
+    const t2 = t1[0];
+    const t3 = t1[1];
+    const ra = $ret();
+    ra.i32[0] = t3;
+    return t2;
+  } catch (e) {
+    $release(cx, cxm);
+    throw e;
+  } finally {
+    cx.n = cxm;
+  }
+}
+
 // ("tw:js/global", "Probe#optBuf(buffer?)")
-function $f10(w0_0, w1_0, w1_1) {
+function $f11(w0_0, w1_0, w1_1) {
   const t1 = (w1_1 === -1 ? undefined : $liftVec($L, w1_0, w1_1, Uint8Array));
   const cx = $cx;
   const cxm = cx.n;
@@ -961,27 +962,6 @@ function $f10(w0_0, w1_0, w1_1) {
 }
 
 // ("tw:js/global", "Probe#optBuf(ArrayBuffer?)")
-function $f11(w0_0, w1_0) {
-  const t1 = (w1_0 ?? undefined);
-  const cx = $cx;
-  const cxm = cx.n;
-  try {
-    const r = w0_0.optBuf(t1);
-    const t2 = (r == null ? [0, -1] : $lowerVec($L, $bytes(r), Uint8Array, cx));
-    const t3 = t2[0];
-    const t4 = t2[1];
-    const ra = $ret();
-    ra.i32[0] = t4;
-    return t3;
-  } catch (e) {
-    $release(cx, cxm);
-    throw e;
-  } finally {
-    cx.n = cxm;
-  }
-}
-
-// ("tw:js/global", "Probe#optBuf(ArrayBufferView?)")
 function $f12(w0_0, w1_0) {
   const t1 = (w1_0 ?? undefined);
   const cx = $cx;
@@ -1002,14 +982,41 @@ function $f12(w0_0, w1_0) {
   }
 }
 
+// ("tw:js/global", "Probe#optBuf(ArrayBufferView?)")
+function $f13(w0_0, w1_0) {
+  const t1 = (w1_0 ?? undefined);
+  const cx = $cx;
+  const cxm = cx.n;
+  try {
+    const r = w0_0.optBuf(t1);
+    const t2 = (r == null ? [0, -1] : $lowerVec($L, $bytes(r), Uint8Array, cx));
+    const t3 = t2[0];
+    const t4 = t2[1];
+    const ra = $ret();
+    ra.i32[0] = t4;
+    return t3;
+  } catch (e) {
+    $release(cx, cxm);
+    throw e;
+  } finally {
+    cx.n = cxm;
+  }
+}
+
 // ("tw:js/global", "Probe#peek(*buffer)")
-function $f13(w0_0, w1_0, w1_1) {
+function $f14(w0_0, w1_0, w1_1) {
   const t1 = $view(Uint8Array, w1_0, w1_1, false);
   w0_0.peek(t1);
 }
 
+// ("tw:js/global", "Probe#optPeek(*u8[]?)")
+function $f15(w0_0, w1_0, w1_1) {
+  const t1 = (w1_1 === -1 ? undefined : $view(Uint8Array, w1_0, w1_1, false));
+  w0_0.optPeek(t1);
+}
+
 // ("tw:js/global", "Probe#nums(arr<u32>)")
-function $f14(w0_0, w1_0, w1_1) {
+function $f16(w0_0, w1_0, w1_1) {
   const t1 = $h1(w1_0, w1_1);
   const cx = $cx;
   const cxm = cx.n;
@@ -1030,7 +1037,7 @@ function $f14(w0_0, w1_0, w1_1) {
 }
 
 // ("tw:js/global", "Probe#strs(arr<str>)")
-function $f15(w0_0, w1_0, w1_1) {
+function $f17(w0_0, w1_0, w1_1) {
   const t1 = $h3(w1_0, w1_1);
   const cx = $cx;
   const cxm = cx.n;
@@ -1051,7 +1058,7 @@ function $f15(w0_0, w1_0, w1_1) {
 }
 
 // ("tw:js/global", "Probe#optStrs(arr<str?>?)")
-function $f16(w0_0, w1_0, w1_1) {
+function $f18(w0_0, w1_0, w1_1) {
   const t1 = (w1_1 === -1 ? undefined : $h5(w1_0, w1_1));
   const cx = $cx;
   const cxm = cx.n;
@@ -1072,7 +1079,7 @@ function $f16(w0_0, w1_0, w1_1) {
 }
 
 // ("tw:js/global", "Probe#rows(arr<(u32,str,Request)>)")
-function $f17(w0_0, w1_0, w1_1, w1_2) {
+function $f19(w0_0, w1_0, w1_1, w1_2) {
   const t1 = $h7(w1_0, w1_1, w1_2);
   const cx = $cx;
   const cxm = cx.n;
@@ -1095,7 +1102,7 @@ function $f17(w0_0, w1_0, w1_1, w1_2) {
 }
 
 // ("tw:js/global", "Probe#reqs(arr<Request>)")
-function $f18(w0_0, w1_0, w1_1) {
+function $f20(w0_0, w1_0, w1_1) {
   const t1 = $h9(w1_0, w1_1);
   const cx = $cx;
   const cxm = cx.n;
@@ -1116,7 +1123,7 @@ function $f18(w0_0, w1_0, w1_1) {
 }
 
 // ("tw:js/global", "Probe#nested(arr<arr<str>>)")
-function $f19(w0_0, w1_0, w1_1) {
+function $f21(w0_0, w1_0, w1_1) {
   const t1 = $h11(w1_0, w1_1);
   const cx = $cx;
   const cxm = cx.n;
@@ -1137,7 +1144,7 @@ function $f19(w0_0, w1_0, w1_1) {
 }
 
 // ("tw:js/global", "Probe#mixed(arr<(bool,i53?,f64)>)")
-function $f20(w0_0, w1_0, w1_1) {
+function $f22(w0_0, w1_0, w1_1) {
   const t1 = $h13(w1_0, w1_1);
   const cx = $cx;
   const cxm = cx.n;
@@ -1158,7 +1165,7 @@ function $f20(w0_0, w1_0, w1_1) {
 }
 
 // ("tw:js/global", "Probe#pair((u32,(f64,bool)))")
-function $f21(w0_0, w1_0, w1_1, w1_2) {
+function $f23(w0_0, w1_0, w1_1, w1_2) {
   const t1 = [(w1_0 >>> 0), [w1_1, (w1_2 !== 0)]];
   const r = w0_0.pair(t1);
   $tuple(r, 2, "(u32,(f64,bool))");
@@ -1177,7 +1184,7 @@ function $f21(w0_0, w1_0, w1_1, w1_2) {
 }
 
 // ("tw:js/global", "Probe#optPair((u16,str)?)")
-function $f22(w0_0, w1_0, w1_1, w1_2, w1_3) {
+function $f24(w0_0, w1_0, w1_1, w1_2, w1_3) {
   const t1 = (w1_0 !== 0 ? [(w1_1 & 65535), $liftUtf8($L, w1_2, w1_3)] : undefined);
   const cx = $cx;
   const cxm = cx.n;
@@ -1214,7 +1221,7 @@ export function instantiate(language, bridge, imports = {}) {
   if ($B) throw new Error("this bridge is already instantiated");
   $cls0 = $class(globalThis.Request);
   $B = new WebAssembly.Instance(bridge, {
-    "tw:glue": { r0: $f0, r1: $f1, r2: $f2, r3: $f3, r4: $f4, r5: $f5, r7: $f7, r8: $f8, r9: $f9, r10: $f10, r11: $f11, r12: $f12, r14: $f14, r15: $f15, r16: $f16, r17: $f17, r18: $f18, r19: $f19, r20: $f20, r21: $f21, r22: $f22 },
+    "tw:glue": { r0: $f0, r1: $f1, r2: $f2, r3: $f3, r4: $f4, r5: $f5, r8: $f8, r9: $f9, r10: $f10, r11: $f11, r12: $f12, r13: $f13, r16: $f16, r17: $f17, r18: $f18, r19: $f19, r20: $f20, r21: $f21, r22: $f22, r23: $f23, r24: $f24 },
   }).exports;
   $S = new $Scratch($B);
   const instance = new WebAssembly.Instance(language, {
@@ -1226,23 +1233,25 @@ export function instantiate(language, bridge, imports = {}) {
       "Probe#floats(f64[])": $B.f3,
       "Probe#bigs(i64[])": $B.f4,
       "Probe#optBytes(u8[]?)": $B.f5,
-      "Probe#fill(mut u8[])": $f6,
-      "Probe#buf(buffer)": $B.f7,
-      "Probe#buf(ArrayBuffer)": $B.f8,
-      "Probe#buf(ArrayBufferView)": $B.f9,
-      "Probe#optBuf(buffer?)": $B.f10,
-      "Probe#optBuf(ArrayBuffer?)": $B.f11,
-      "Probe#optBuf(ArrayBufferView?)": $B.f12,
-      "Probe#peek(*buffer)": $f13,
-      "Probe#nums(arr<u32>)": $B.f14,
-      "Probe#strs(arr<str>)": $B.f15,
-      "Probe#optStrs(arr<str?>?)": $B.f16,
-      "Probe#rows(arr<(u32,str,Request)>)": $B.f17,
-      "Probe#reqs(arr<Request>)": $B.f18,
-      "Probe#nested(arr<arr<str>>)": $B.f19,
-      "Probe#mixed(arr<(bool,i53?,f64)>)": $B.f20,
-      "Probe#pair((u32,(f64,bool)))": $B.f21,
-      "Probe#optPair((u16,str)?)": $B.f22,
+      "Probe#fill(*mut u8[])": $f6,
+      "Probe#optFill(*mut u8[]?)": $f7,
+      "Probe#buf(buffer)": $B.f8,
+      "Probe#buf(ArrayBuffer)": $B.f9,
+      "Probe#buf(ArrayBufferView)": $B.f10,
+      "Probe#optBuf(buffer?)": $B.f11,
+      "Probe#optBuf(ArrayBuffer?)": $B.f12,
+      "Probe#optBuf(ArrayBufferView?)": $B.f13,
+      "Probe#peek(*buffer)": $f14,
+      "Probe#optPeek(*u8[]?)": $f15,
+      "Probe#nums(arr<u32>)": $B.f16,
+      "Probe#strs(arr<str>)": $B.f17,
+      "Probe#optStrs(arr<str?>?)": $B.f18,
+      "Probe#rows(arr<(u32,str,Request)>)": $B.f19,
+      "Probe#reqs(arr<Request>)": $B.f20,
+      "Probe#nested(arr<arr<str>>)": $B.f21,
+      "Probe#mixed(arr<(bool,i53?,f64)>)": $B.f22,
+      "Probe#pair((u32,(f64,bool)))": $B.f23,
+      "Probe#optPair((u16,str)?)": $B.f24,
     },
   });
   $X = instance.exports;

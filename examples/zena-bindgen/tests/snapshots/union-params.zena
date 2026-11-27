@@ -611,11 +611,17 @@ declare function __boxed(): Box<BufferSourceBox>;
 @external("tw:js/global", "hash(buffer)", "tw, throws:err")
 declare function __hash(p0: FixedArray<u8>): void;
 
+@external("tw:js/global", "hash(*buffer)", "tw, throws:err")
+declare function __hash2(p0: FixedArray<u8>): void;
+
 @external("tw:js/global", "hashText(str)", "tw, throws:err")
 declare function __hashText(p0: String): void;
 
 @external("tw:js/global", "hashText(buffer)", "tw, throws:err")
 declare function __hashText2(p0: FixedArray<u8>): void;
+
+@external("tw:js/global", "hashText(*buffer)", "tw, throws:err")
+declare function __hashText3(p0: FixedArray<u8>): void;
 
 export function __Body_encode(v: Body | null): inline (i32, externref | null) {
   if (v == null) { return (0, null); }
@@ -801,7 +807,13 @@ export function hash(data: FixedArray<u8>): void {
   __hash(data);
 }
 
-// skipped hash(*buffer): `*buffer` needs a linear memory
+/**
+ * * `data`
+ */
+export function hashWithView(data: FixedArray<u8>): void {
+  __hash2(data);
+}
+
 /**
  * * `data`
  */
@@ -816,7 +828,13 @@ export function hashTextWithBuffer(data: FixedArray<u8>): void {
   __hashText2(data);
 }
 
-// skipped hashText(*buffer): `*buffer` needs a linear memory
+/**
+ * * `data`
+ */
+export function hashTextWithView(data: FixedArray<u8>): void {
+  __hashText3(data);
+}
+
 // export default.receive(Body): the entry module's __export_receive, over the app's receive
 // export default.take(Chunk): the entry module's __export_take, over the app's take
 // export default.take(Part): the entry module's __export_take2, over the app's take
