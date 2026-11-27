@@ -97,6 +97,8 @@ class $Lang extends $Space {
   }
 
   realloc(old, oldSize, align, size) {
+    // A size past the pointer's range would wrap to a small allocation.
+    if (!this.wide && size > 0xffffffff) throw new RangeError("allocation too large");
     const p = this.realloc_(this.p(old), this.p(oldSize), this.p(align), this.p(size));
     return Number(p);
   }

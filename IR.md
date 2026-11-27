@@ -1139,7 +1139,9 @@ is the language's to bear: it may read a wrong value, trap, or see whatever
 the conversion throws (`BigInt(1.5)` is a `RangeError`). Two things hold
 regardless: a carrier is within its wire type, with a narrow one in its
 own range, and the language's memory and the bridge's own state stay sound,
-since no allocation takes its size from an untested value.
+since no allocation takes its size from an untested value: a length is read
+as a `u32`, and one whose bytes don't fit the memory's pointer is a
+`RangeError` before anything is allocated.
 
 What the conversion itself needs runs in every setting:
 

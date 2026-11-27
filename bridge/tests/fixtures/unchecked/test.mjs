@@ -72,6 +72,14 @@ const nums = (v) => {
 L.balanced(() => assert.deepEqual(nums([1, "2", -1]), [1, 2, 4294967295]));
 L.balanced(() => assert.deepEqual(nums({ length: 2, 0: 7, 1: 8 }), [7, 8]));
 L.balanced(() => assert.deepEqual(nums({}), []));
+// A length whose bytes don't fit the memory's pointer allocates nothing
+// and writes nothing.
+L.balanced(() => {
+  const top = L.u8().length - 1;
+  L.u8()[top] = 0xaa;
+  assert.throws(() => call("Probe#nums()", { length: 2 ** 30 }), RangeError);
+  assert.equal(L.u8()[top], 0xaa);
+});
 L.balanced(() => {
   const [ptr, n] = call("Probe#strs()", ["a", 5]);
   const strs = [];
