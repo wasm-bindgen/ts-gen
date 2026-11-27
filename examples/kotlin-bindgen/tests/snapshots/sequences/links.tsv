@@ -15,8 +15,10 @@ js_code	fixtures.sequences.flat.arrays	tw:js/global	arrays()
 js_code	fixtures.sequences.flat.tuples	tw:js/global	tuples()
 js_code	fixtures.sequences.flat.random_Uint8Array	tw:js/global	random(Uint8Array)
 js_code	fixtures.sequences.flat.random_u8	tw:js/global	random(u8[])
+js_code	fixtures.sequences.flat.random_u8_2	tw:js/global	random(*u8[])
 js_code	fixtures.sequences.flat.write_f64_Float32Array	tw:js/global	write(f64,Float32Array)
 js_code	fixtures.sequences.flat.write_f64_f32	tw:js/global	write(f64,f32[])
+js_code	fixtures.sequences.flat.write_f64_f32_2	tw:js/global	write(f64,*f32[])
 js_code	tsgen.runtime.futureState	tw:future	state
 js_code	tsgen.runtime.futureCancel	tw:future	cancel
 js_code	tsgen.runtime.futureAddListener	tw:future	add_listener

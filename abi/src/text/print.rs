@@ -383,11 +383,11 @@ fn list(ts: &[Type]) -> String {
 fn is_primary(t: &Type) -> bool {
     !matches!(
         t,
-        Type::Nullable(..) | Type::Vec(_) | Type::Fn(_) | Type::View { .. } | Type::MutVec(_)
+        Type::Nullable(..) | Type::Vec(_) | Type::Fn(_) | Type::View { .. }
     )
 }
 
-/// The `T[]` that `*` or `mut` applies to.
+/// The `T[]` that `*` or `*mut` applies to.
 fn whole_vec(t: &Type) -> String {
     if is_primary(t) {
         format!("{}[]", ty(t))
@@ -421,7 +421,6 @@ pub(super) fn ty(t: &Type) -> String {
         Type::UnitBox => "Unit".into(),
         Type::Vec(t) => format!("{}[]", operand(t)),
         Type::VecBox(t) => format!("Vec<{}>", ty(t)),
-        Type::MutVec(t) => format!("mut {}", whole_vec(t)),
         Type::Array(t) => format!("arr<{}>", ty(t)),
         Type::ArrBox(t) => format!("Arr<{}>", ty(t)),
         Type::Tuple(ts) if ts.len() == 1 => format!("({},)", ty(&ts[0])),

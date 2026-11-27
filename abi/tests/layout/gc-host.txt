@@ -148,7 +148,7 @@ import tw:js/global Fixture#nullables(bool?,u8?,i53?,u32?,f32?,Method?,Flags?,Bo
   enum Method: index; Get=1 Post=2
   enum Flags: carrier u8; Read=1 Write=2
   enum Body: slots (externref, (ref null (array (mut i8)))); Text=1[0] Bytes=2[1] Stream=3[0]
-import tw:js/global Fixture#sequences(u8[],mut f32[],i64[]?,arr<u8>,arr<str>?,arr<Request>): (externref, (ref (array (mut i8))), (ref (array (mut f32))), (ref null (array (mut i64))), (ref (array (mut i8))), (ref null (array (mut externref))), (ref (array (mut externref)))) -> ((ref (array (mut (ref null (struct (field i32) (field externref)))))))
+import tw:js/global Fixture#sequences(u8[],*mut f32[],i64[]?,arr<u8>,arr<str>?,arr<Request>): (externref, (ref (array (mut i8))), i32, i32, (ref null (array (mut i64))), (ref (array (mut i8))), (ref null (array (mut externref))), (ref (array (mut externref)))) -> ((ref (array (mut (ref null (struct (field i32) (field externref)))))))
   elem arr<u8>: gc i8
   elem arr<str>?: gc externref
   elem arr<Request>: gc externref
@@ -175,7 +175,7 @@ import tw:js/global Fixture#erased(T,T?,arr<T>): (externref, anyref, anyref, (re
 import tw:js/global Fixture#undef(str??): (externref, i32, externref) -> (i32, externref)
   enum str??: slots (externref); Undefined=1 Value=2[0]
   enum Request??: slots (externref); Undefined=1 Value=2[0]
-import tw:js/global Fixture#view(*u8[],*mut f64[]): (externref, i32, i32, i32, i32)
+import tw:js/global Fixture#view(*u8[],*mut f64[],*u8[]?,*mut f64[]?,*buffer): (externref, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32)
 export takeCallback(fn(Event)): (externref) -> (anyref)
   call fn(Event): (externref, externref)
   trampoline fn(u32)->str: (anyref, i32) -> (externref)

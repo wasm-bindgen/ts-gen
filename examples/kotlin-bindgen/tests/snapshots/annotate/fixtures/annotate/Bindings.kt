@@ -129,8 +129,18 @@ fun Bucket.put(key: String, bodyBytes: ByteArray): tsgen.runtime.Future<Unit> {
     return tsgen.runtime.Future<Unit>(r0!!, { f -> val r1 = try { fixtures.annotate.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r1 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
 }
 
+fun Bucket.putWithView(key: String, bodyBytes: ByteArray): tsgen.runtime.Future<Unit> {
+    val r0 = fixtures.annotate.flat.Bucket_put_str_u8_2(this, key.toJsString(), tsgen.runtime.typedArray("Uint8Array", bodyBytes))
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> val r1 = try { fixtures.annotate.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r1 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
+}
+
 fun Bucket.upload(key: String, data: ByteArray): tsgen.runtime.Future<Unit> {
     val r0 = fixtures.annotate.flat.Bucket_upload_str_buffer(this, key.toJsString(), tsgen.runtime.typedArray("Uint8Array", data))
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> val r1 = try { fixtures.annotate.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r1 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
+}
+
+fun Bucket.uploadWithView(key: String, data: ByteArray): tsgen.runtime.Future<Unit> {
+    val r0 = fixtures.annotate.flat.Bucket_upload_str_buffer_2(this, key.toJsString(), tsgen.runtime.typedArray("Uint8Array", data))
     return tsgen.runtime.Future<Unit>(r0!!, { f -> val r1 = try { fixtures.annotate.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r1 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
 }
 

@@ -37,7 +37,7 @@ class Map<K, V> {
 class Types {
   scalars(a: bool, b: i8, c: u8, d: i16, e: u16, f: i32, g: u32, h: i53, i: u53, j: i64, k: u64, l: f16, m: f32, n: f64);
   boxes(a: Bool, b: U32, c: F64, d: Str, e: Vec<u8>, f: Arr<Str>, g: Tuple<str, u16>, h: Tuple<str>): Any?;
-  sequences(a: u8[], b: arr<str?>, c: arr<str>?, d: arr<(u32, str)>, e: (f64,), f: (u32, (f64, bool)), g: mut u8[]?): str??;
+  sequences(a: u8[], b: arr<str?>, c: arr<str>?, d: arr<(u32, str)>, e: (f64,), f: (u32, (f64, bool)), g: *mut u8[]?): str??;
   functions(a: fn(Event), b: fn(Event)?, c: (fn(Event) -> str)?, d: fn(Event) -> str?, e: fn(Event) -> unit throws KvError, f: fn() -> (fn(u8)) throws, g: arr<fn() -> unit throws>): fn(f64, u32) -> Str;
   pointers(a: *u8[], b: *mut f32[], c: arr<*u8[]>, d: *(u8?)[], e: *mut Uint8Array[]);
   futures(): future<unit>;

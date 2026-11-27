@@ -58,8 +58,8 @@ export extension class Scalars on externref {
 }
 
 export extension class Sequences on externref {
-  bytes(a: FixedArray<u8>, b: FixedArray<u16> | null, c: FixedArray<i32>): FixedArray<f64> {
-    return __Sequences_bytes((this as externref), a, b, c);
+  bytes(a: FixedArray<u8>, b: FixedArray<u16> | null, c: FixedArray<i32>, d: FixedArray<u8>): FixedArray<f64> {
+    return __Sequences_bytes((this as externref), a, b, c, d);
   }
   numbers(a: FixedArray<f64>, b: FixedArray<u32> | null): FixedArray<i64> {
     return __Sequences_numbers((this as externref), a, b);
@@ -211,8 +211,8 @@ declare function __Scalars_toI53(p0: externref): i64;
 @external("tw:js/global", "Scalars#toF16()", "tw")
 declare function __Scalars_toF16(p0: externref): f32;
 
-@external("tw:js/global", "Sequences#bytes(u8[],f16[]?,mut i32[])", "tw")
-declare function __Sequences_bytes(p0: externref, p1: FixedArray<u8>, p2: FixedArray<u16> | null, p3: FixedArray<i32>): FixedArray<f64>;
+@external("tw:js/global", "Sequences#bytes(u8[],f16[]?,*mut i32[],*u8[])", "tw")
+declare function __Sequences_bytes(p0: externref, p1: FixedArray<u8>, p2: FixedArray<u16> | null, p3: FixedArray<i32>, p4: FixedArray<u8>): FixedArray<f64>;
 
 @external("tw:js/global", "Sequences#numbers(arr<f64>,arr<u32>?)", "tw")
 declare function __Sequences_numbers(p0: externref, p1: FixedArray<f64>, p2: FixedArray<u32> | null): FixedArray<i64>;

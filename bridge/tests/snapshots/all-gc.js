@@ -1388,11 +1388,30 @@ function $f51(w0_0, w1_0, w1_1, w1_2) {
   w0_0.seeBodies(t1);
 }
 
-// ("tw:js/global", "Probe#fill(mut u8[])")
+// ("tw:js/global", "Probe#fill(*mut u8[])")
 function $f52(w0_0, w1_0, w1_1) {
   const t1 = $liftVec($S, w1_0, w1_1, Uint8Array);
   w0_0.fill(t1);
   $writeback($S, w1_0, w1_1, t1);
+}
+
+// ("tw:js/global", "Probe#optFill(*mut u8[]?)")
+function $f53(w0_0, w1_0, w1_1) {
+  const t1 = (w1_1 === -1 ? undefined : $liftVec($S, w1_0, w1_1, Uint8Array));
+  w0_0.optFill(t1);
+  if (t1 !== undefined && t1 !== null) $writeback($S, w1_0, w1_1, t1);
+}
+
+// ("tw:js/global", "Probe#peek(*u8[])")
+function $f54(w0_0, w1_0, w1_1) {
+  const t1 = $liftVec($S, w1_0, w1_1, Uint8Array);
+  w0_0.peek(t1);
+}
+
+// ("tw:js/global", "Probe#peekBuf(*buffer)")
+function $f55(w0_0, w1_0, w1_1) {
+  const t1 = $liftVec($S, w1_0, w1_1, Uint8Array);
+  w0_0.peekBuf(t1);
 }
 
 export function instantiate(language, bridge, imports = {}) {
@@ -1400,7 +1419,7 @@ export function instantiate(language, bridge, imports = {}) {
   $cls0 = $class(globalThis.Request);
   $cls1 = $class(globalThis.ReadableStream);
   $B = new WebAssembly.Instance(bridge, {
-    "tw:glue": { g0: $f0, g1: $f1, g2: $f2, g3: $f3, g4: $f4, g5: $f5, g6: $f6, g7: $f7, g8: $f8, g9: $f9, g10: $f10, g11: $f11, g12: $f12, g13: $f13, g14: $f14, g15: $f15, g16: $f16, g17: $f17, g18: $f18, g19: $f19, g20: $f20, g21: $f21, g22: $f22, g23: $f23, g24: $f24, g25: $f25, g26: $f26, g27: $f27, g28: $f28, g29: $f29, g30: $f30, g31: $f31, g32: $f32, g33: $f33, g34: $f34, g35: $f35, g36: $f36, g37: $f37, g38: $f38, g39: $f39, g40: $f40, g41: $f41, g42: $f42, g43: $f43, g44: $f44, g45: $f45, g46: $f46, g47: $f47, g50: $f50, g51: $f51, g52: $f52 },
+    "tw:glue": { g0: $f0, g1: $f1, g2: $f2, g3: $f3, g4: $f4, g5: $f5, g6: $f6, g7: $f7, g8: $f8, g9: $f9, g10: $f10, g11: $f11, g12: $f12, g13: $f13, g14: $f14, g15: $f15, g16: $f16, g17: $f17, g18: $f18, g19: $f19, g20: $f20, g21: $f21, g22: $f22, g23: $f23, g24: $f24, g25: $f25, g26: $f26, g27: $f27, g28: $f28, g29: $f29, g30: $f30, g31: $f31, g32: $f32, g33: $f33, g34: $f34, g35: $f35, g36: $f36, g37: $f37, g38: $f38, g39: $f39, g40: $f40, g41: $f41, g42: $f42, g43: $f43, g44: $f44, g45: $f45, g46: $f46, g47: $f47, g50: $f50, g51: $f51, g52: $f52, g53: $f53, g54: $f54, g55: $f55 },
   }).exports;
   $S = new $Scratch($B);
   const instance = new WebAssembly.Instance(language, {
@@ -1458,7 +1477,10 @@ export function instantiate(language, bridge, imports = {}) {
       "Probe#seeMethod(Method)": $f49,
       "Probe#makeBodies()": $B.f50,
       "Probe#seeBodies(arr<Body>)": $B.f51,
-      "Probe#fill(mut u8[])": $B.f52,
+      "Probe#fill(*mut u8[])": $B.f52,
+      "Probe#optFill(*mut u8[]?)": $B.f53,
+      "Probe#peek(*u8[])": $B.f54,
+      "Probe#peekBuf(*buffer)": $B.f55,
     },
   });
   $X = instance.exports;

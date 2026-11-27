@@ -83,7 +83,7 @@ fun floatArray(a: JsAny) = FloatArray(typedArrayLength(a)) { typedArrayDouble(a,
 
 fun doubleArray(a: JsAny) = DoubleArray(typedArrayLength(a)) { typedArrayDouble(a, it) }
 
-/** A `mut T[]`'s writeback: the typed array `a`'s elements, copied over `v`. */
+/** A `*mut T[]`'s writeback: the typed array `a`'s elements, copied over `v`. */
 fun copyInto(a: JsAny, v: ByteArray) = byteArray(a).copyInto(v)
 
 fun copyInto(a: JsAny, v: ShortArray) = shortArray(a).copyInto(v)

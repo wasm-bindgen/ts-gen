@@ -1,2 +1,0 @@
-Bucket#put(str,*u8[]): `*T[]` needs a linear memory
-Bucket#upload(str,*buffer): `*buffer` needs a linear memory

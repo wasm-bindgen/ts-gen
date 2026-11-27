@@ -114,7 +114,7 @@ pub(crate) fn arm_name(t: &abi::Type) -> String {
         T::BigInt | T::BigIntBox => "BigInt".into(),
         T::Any => "Any".into(),
         T::ScalarBox(s) => s.box_name().into(),
-        T::Vec(e) | T::VecBox(e) | T::MutVec(e) => format!("{}Vec", arm_name(e)),
+        T::Vec(e) | T::VecBox(e) => format!("{}Vec", arm_name(e)),
         T::Array(e) | T::ArrBox(e) => format!("{}Array", arm_name(e)),
         T::Tuple(_) | T::TupleBox(_) => "Tuple".into(),
         T::Future(..) => "Future".into(),

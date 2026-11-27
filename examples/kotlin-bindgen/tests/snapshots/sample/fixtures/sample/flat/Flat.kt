@@ -211,7 +211,7 @@ external fun KVNamespace_list_str_u32(p0: JsAny?, p1: JsAny?, p2: Int, p3: Int):
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
 external fun crypto_randomUUID(): JsAny?
 
-/** tw:js/global crypto.getRandomValues(mut u8[]) */
+/** tw:js/global crypto.getRandomValues(*mut u8[]) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun crypto_getRandomValues_mut_u8(p0: JsAny?)
 

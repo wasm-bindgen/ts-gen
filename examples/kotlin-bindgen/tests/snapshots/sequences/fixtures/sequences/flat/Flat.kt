@@ -78,6 +78,13 @@ external fun random_Uint8Array(p0: JsAny?)
 external fun random_u8(p0: JsAny?)
 
 /**
+ * * `buf` - filled with random bytes
+ */
+/** tw:js/global random(*u8[]) */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun random_u8_2(p0: JsAny?)
+
+/**
  * * `data` - copied by the callee
  */
 /** tw:js/global write(f64,Float32Array) */
@@ -90,4 +97,11 @@ external fun write_f64_Float32Array(p0: Double, p1: JsAny?)
 /** tw:js/global write(f64,f32[]) */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun write_f64_f32(p0: Double, p1: JsAny?)
+
+/**
+ * * `data` - copied by the callee
+ */
+/** tw:js/global write(f64,*f32[]) */
+@JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
+external fun write_f64_f32_2(p0: Double, p1: JsAny?)
 

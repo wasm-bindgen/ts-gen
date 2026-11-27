@@ -7,8 +7,8 @@
 //! * declarations: built-in names are escaped, type names are unique in
 //!   their scope, module export lists name the block's declarations;
 //! * types: every path resolves, with the right number of type arguments;
-//!   `unit` not in an array; no `T??`; `T[]` element types; `?` never
-//!   on `*T[]`; `*T[]` and `mut T[]` only in import parameters;
+//!   `unit` not in an array; no `T??`; `T[]` element types; `*T[]` only
+//!   in import parameters;
 //! * enums: through [`enums::flatten`] (indices, names, `@fallback`,
 //!   aliases, carriers), plus literals on every implicit unit arm, unique
 //!   literals, and `throws` enums that end in a `@fallback` with only
@@ -82,7 +82,15 @@ pub fn validate_with(ir: &Ir, opts: Options<'_>) -> Result<(), Vec<Error>> {
     }
 }
 
-/// Element types of `T[]`, `mut T[]` and `*T[]`: the typed arrays.
+/// `*T[]`, `*mut T[]` or `*buffer`, nullable or not.
+fn is_view(t: &Type) -> bool {
+    match t {
+        Type::Nullable(t, _) => matches!(**t, Type::View { .. }),
+        t => matches!(t, Type::View { .. }),
+    }
+}
+
+/// Element types of `T[]` and `*T[]`: the typed arrays.
 pub fn is_vec_element(s: Scalar) -> bool {
     !matches!(s, Scalar::Bool | Scalar::I53 | Scalar::U53)
 }
@@ -911,7 +919,7 @@ impl<'a> Validator<'a> {
                 self.err(p.span, format!("parameter `{}` is declared twice", p.name));
             }
             self.ty(&p.ty, role, &mcx, p.span);
-            if p.unshared && !matches!(p.ty, Type::View { .. }) {
+            if p.unshared && !is_view(&p.ty) {
                 self.err(
                     p.span,
                     format!("`@js(unshared)` applies to a view, not `{}`", p.name),
@@ -1112,7 +1120,7 @@ impl<'a> Validator<'a> {
 
     fn no_pointer_uses(&self, scope: &Scope<'_, 'a>, span: Span) {
         for p in &scope.member.params {
-            if matches!(p.ty, Type::View { .. }) && scope.uses.contains_key(p.name.as_str()) {
+            if is_view(&p.ty) && scope.uses.contains_key(p.name.as_str()) {
                 self.err(
                     span,
                     format!("the view `{}` is used only in `@js(args)`", p.name),
@@ -1481,12 +1489,6 @@ impl<'a> Validator<'a> {
                 }
             }
             Type::Vec(e) | Type::VecBox(e) => self.element(t, e, cx, span),
-            Type::MutVec(e) => {
-                if pos != Pos::ImportParam {
-                    p(format!("`{}` is only an import parameter type", text()));
-                }
-                self.element(t, e, cx, span);
-            }
             Type::View { elem, .. } => {
                 if pos != Pos::ImportParam {
                     p(format!("`{}` is only an import parameter type", text()));
@@ -1503,8 +1505,7 @@ impl<'a> Validator<'a> {
                     "`{}`: `@js(null)` doesn't apply to `T??`, whose inner absence is `null`",
                     text()
                 )),
-                Type::View { .. } => p(format!("`?` is invalid on a view: `{}`", text())),
-                Type::MutVec(_) => self.ty(inner, pos, cx, span),
+                Type::View { .. } => self.ty(inner, pos, cx, span),
                 _ => self.ty(inner, Pos::Inner, cx, span),
             },
             Type::Array(e) | Type::ArrBox(e) if **e == Type::Unit => {

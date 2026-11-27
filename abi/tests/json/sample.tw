@@ -94,7 +94,7 @@ class KVNamespace {
 
 namespace crypto {
   randomUUID(): str;
-  getRandomValues(into: mut u8[]);
+  getRandomValues(into: *mut u8[]);
 }
 
 module "node:buffer" {

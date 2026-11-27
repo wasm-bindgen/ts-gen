@@ -3861,7 +3861,7 @@
       "construct": null
     },
     {
-      "key": "crypto.getRandomValues(mut u8[])",
+      "key": "crypto.getRandomValues(*mut u8[])",
       "role": "import",
       "module": "tw:js/global",
       "owner": null,
@@ -3890,12 +3890,13 @@
             "role": "param",
             "index": 0,
             "repr": {
-              "ty": "mut u8[]",
+              "ty": "*mut u8[]",
               "wire": ["externref"],
               "kind": "vec",
               "elem": "u8",
               "carrier": "host",
               "writeback": true,
+              "borrowed": true,
               "nullable": false
             }
           }

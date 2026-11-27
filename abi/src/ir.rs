@@ -169,7 +169,6 @@ impl Type {
         match self {
             Type::Vec(t)
             | Type::VecBox(t)
-            | Type::MutVec(t)
             | Type::Array(t)
             | Type::ArrBox(t)
             | Type::Future(t, _)
@@ -211,7 +210,6 @@ impl Type {
         match self {
             Type::Vec(t) => Type::Vec(mb(t)),
             Type::VecBox(t) => Type::VecBox(mb(t)),
-            Type::MutVec(t) => Type::MutVec(mb(t)),
             Type::Array(t) => Type::Array(mb(t)),
             Type::ArrBox(t) => Type::ArrBox(mb(t)),
             Type::Tuple(ts) => Type::Tuple(ts.iter().map(m).collect()),
@@ -536,8 +534,6 @@ pub enum Type {
     /// `T[]`, the typed array.
     Vec(Box<Type>),
     VecBox(Box<Type>),
-    /// `mut T[]`: writeback, import parameters only.
-    MutVec(Box<Type>),
     /// `arr<T>`, the JS `Array`.
     Array(Box<Type>),
     ArrBox(Box<Type>),
@@ -547,8 +543,8 @@ pub enum Type {
     /// `future<T, E>`; `E` is [`Path::err`] for `future<T>`.
     Future(Box<Type>, Path),
     Fn(Box<FnType>),
-    /// `*T[]` / `*mut T[]`: a view of the language's memory, import
-    /// parameters only.
+    /// `*T[]` / `*mut T[]`: the language's storage lent to the callee for
+    /// the call, to read or to write; import parameters only (§11).
     View {
         mutable: bool,
         elem: Box<Type>,

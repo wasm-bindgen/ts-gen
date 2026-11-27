@@ -8,8 +8,8 @@ class Probe {
   }
 }
 for (const m of [
-  "str", "optStr", "bytes", "floats", "bigs", "optBytes", "fill", "nums", "strs", "optStrs",
-  "buf", "optBuf", "peek",
+  "str", "optStr", "bytes", "floats", "bigs", "optBytes", "fill", "optFill", "nums", "strs", "optStrs",
+  "buf", "optBuf", "peek", "optPeek",
   "rows", "reqs", "nested", "mixed", "pair", "optPair",
 ]) {
   Probe.prototype[m] = function (v) {
@@ -78,11 +78,27 @@ L.balanced(() => L.throwsType(() => call("Probe#bytes(u8[])", new Int8Array(2), 
 assert.deepEqual(call("Probe#bytes(u8[])", new Uint8Array(0), 1, 0), [1, 0]);
 assert.deepEqual(call("Probe#optBytes(u8[]?)", undefined, 0, -1), [0, -1]);
 
-// mut u8[]: writeback into the same storage, fixed length.
+// *mut u8[]: the callee writes straight into the language's storage.
 {
   const ptr = L.bytes(new Uint8Array([1, 2, 3, 4]));
-  call("Probe#fill(mut u8[])", (v) => v.fill(9, 1, 3), ptr, 4);
+  call("Probe#fill(*mut u8[])", (v) => v.fill(9, 1, 3), ptr, 4);
+  assert.equal(p.seen.pop().buffer, L.ex.memory.buffer);
   assert.deepEqual([...L.u8().slice(ptr, ptr + 4)], [1, 9, 9, 4]);
+}
+
+// A nullable view is absent as `len = MAX`, like `T[]?`.
+{
+  const ptr = L.bytes(new Uint8Array([1, 2, 3, 4]));
+  call("Probe#optFill(*mut u8[]?)", (v) => v.fill(7), ptr, 4);
+  assert.deepEqual([...L.u8().slice(ptr, ptr + 4)], [7, 7, 7, 7]);
+  call("Probe#optFill(*mut u8[]?)", undefined, 0, -1);
+  assert.equal(p.seen.pop(), undefined);
+  call("Probe#optPeek(*u8[]?)", undefined, ptr, 2);
+  const seen = p.seen.pop();
+  assert.equal(seen.buffer, L.ex.memory.buffer);
+  assert.deepEqual([...seen], [7, 7]);
+  call("Probe#optPeek(*u8[]?)", undefined, 0, -1);
+  assert.equal(p.seen.pop(), undefined);
 }
 
 // buffer: bytes to JS as a fresh `Uint8Array`; an `ArrayBuffer` or any view

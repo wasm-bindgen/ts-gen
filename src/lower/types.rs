@@ -1198,7 +1198,6 @@ impl Lowerer<'_> {
             }
             T::Vec(e)
             | T::VecBox(e)
-            | T::MutVec(e)
             | T::Array(e)
             | T::ArrBox(e)
             | T::Nullable(e, _)

@@ -130,9 +130,17 @@ external fun Bucket_put_str_Uint8Array(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAn
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
 external fun Bucket_put_str_u8(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
 
+/** tw:js/global Bucket#put(str,*u8[]) */
+@JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
+external fun Bucket_put_str_u8_2(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
+
 /** tw:js/global Bucket#upload(str,buffer) */
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
 external fun Bucket_upload_str_buffer(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
+
+/** tw:js/global Bucket#upload(str,*buffer) */
+@JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
+external fun Bucket_upload_str_buffer_2(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
 
 /** tw:js/global get:console() */
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")

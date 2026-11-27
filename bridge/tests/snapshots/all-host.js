@@ -403,56 +403,72 @@ function $f1(w0_0, w1_0) {
   w0_0.see(t1);
 }
 
-// ("tw:js/global", "Probe#write(mut u8[])")
+// ("tw:js/global", "Probe#write(*mut u8[])")
 function $f2(w0_0, w1_0) {
   w0_0.write(w1_0);
 }
 
+// ("tw:js/global", "Probe#optWrite(*mut u8[]?)")
+function $f3(w0_0, w1_0) {
+  const t1 = (w1_0 ?? undefined);
+  w0_0.optWrite(t1);
+}
+
+// ("tw:js/global", "Probe#peek(*u8[])")
+function $f4(w0_0, w1_0) {
+  w0_0.peek(w1_0);
+}
+
+// ("tw:js/global", "Probe#peekBuf(*buffer)")
+function $f5(w0_0, w1_0) {
+  w0_0.peekBuf(w1_0);
+}
+
 // ("tw:js/global", "Probe#list()")
-function $f3(w0_0) {
+function $f6(w0_0) {
   const r = w0_0.list();
   const t1 = $h1(r);
   return t1;
 }
 
 // ("tw:js/global", "Probe#seeList(arr<str>)")
-function $f4(w0_0, w1_0) {
+function $f7(w0_0, w1_0) {
   w0_0.seeList(w1_0);
 }
 
 // ("tw:js/global", "Probe#rows()")
-function $f5(w0_0) {
+function $f8(w0_0) {
   const r = w0_0.rows();
   const t1 = $h2(r);
   return t1;
 }
 
 // ("tw:js/global", "Probe#pairs()")
-function $f6(w0_0) {
+function $f9(w0_0) {
   const r = w0_0.pairs();
   const t1 = $h3(r);
   return t1;
 }
 
 // ("tw:js/global", "Probe#on(fn(u32)->str)")
-function $f7(w0_0, w1_0) {
+function $f10(w0_0, w1_0) {
   const t1 = $h4(w1_0);
   w0_0.on(t1);
 }
 
 // ("tw:js/global", "Probe#keep(Counter)")
-function $f8(w0_0, w1_0) {
+function $f11(w0_0, w1_0) {
   const t1 = $HC.wrap(w1_0, () => Object.create($C0.prototype), null);
   w0_0.keep(t1);
 }
 
 // ("tw:arr", "len")
-function $f9(v) {
+function $f12(v) {
   return $array(v, "Arr").length;
 }
 
 // ("tw:arr", "get<u32>")
-function $f10(v, w1_0) {
+function $f13(v, w1_0) {
   $array(v, "Arr");
   const i = w1_0 >>> 0;
   if (i >= v.length) throw new TypeError("an index out of range");
@@ -471,12 +487,12 @@ function $f10(v, w1_0) {
 }
 
 // ("tw:destroy", "fn(u32)->str")
-function $f11(w0_0) {
+function $f14(w0_0) {
   $H0.destroy(w0_0);
 }
 
 // ("tw:call", "fn(u32)->u32")
-function $f12(w0_0, w1_0) {
+function $f15(w0_0, w1_0) {
   const t1 = (w1_0 >>> 0);
   const r = w0_0(t1);
   const t2 = $int(r, 0, 4294967295, "u32");
@@ -484,12 +500,12 @@ function $f12(w0_0, w1_0) {
 }
 
 // ("tw:box", "Counter")
-function $f13(w0_0) {
+function $f16(w0_0) {
   return $HC.wrap(w0_0, () => Object.create($C0.prototype), null);
 }
 
 // ("tw:unbox", "Counter")
-function $f14(v) {
+function $f17(v) {
   const cx = $cx;
   const cxm = cx.n;
   try {
@@ -626,29 +642,32 @@ export function instantiate(language, bridge, imports = {}) {
     "tw:js/global": {
       "Probe#bytes()": $f0,
       "Probe#see(u8[])": $f1,
-      "Probe#write(mut u8[])": $f2,
-      "Probe#list()": $f3,
-      "Probe#seeList(arr<str>)": $f4,
-      "Probe#rows()": $f5,
-      "Probe#pairs()": $f6,
-      "Probe#on(fn(u32)->str)": $f7,
-      "Probe#keep(Counter)": $f8,
+      "Probe#write(*mut u8[])": $f2,
+      "Probe#optWrite(*mut u8[]?)": $f3,
+      "Probe#peek(*u8[])": $f4,
+      "Probe#peekBuf(*buffer)": $f5,
+      "Probe#list()": $f6,
+      "Probe#seeList(arr<str>)": $f7,
+      "Probe#rows()": $f8,
+      "Probe#pairs()": $f9,
+      "Probe#on(fn(u32)->str)": $f10,
+      "Probe#keep(Counter)": $f11,
     },
     "tw:arr": {
-      "len": $f9,
-      "get<u32>": $f10,
+      "len": $f12,
+      "get<u32>": $f13,
     },
     "tw:destroy": {
-      "fn(u32)->str": $f11,
+      "fn(u32)->str": $f14,
     },
     "tw:call": {
-      "fn(u32)->u32": $f12,
+      "fn(u32)->u32": $f15,
     },
     "tw:box": {
-      "Counter": $f13,
+      "Counter": $f16,
     },
     "tw:unbox": {
-      "Counter": $f14,
+      "Counter": $f17,
     },
   });
   $X = instance.exports;

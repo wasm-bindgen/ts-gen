@@ -2553,7 +2553,7 @@ impl<'a> Gen<'a> {
                 }
             }
             Kind::Erased { .. } => return skip("an erased type parameter"),
-            Kind::View { .. } => return skip("`*T[]` needs a linear memory"),
+            Kind::View { .. } => return skip("`*T[]` over a linear memory"),
         })
     }
 
@@ -4565,7 +4565,6 @@ fn mentions_tparam(t: &Type, cx: &Context<'_>) -> bool {
         Type::Named(r) => is_tparam(&r.path, cx) || r.args.iter().any(|a| mentions_tparam(a, cx)),
         Type::Vec(t)
         | Type::VecBox(t)
-        | Type::MutVec(t)
         | Type::Array(t)
         | Type::ArrBox(t)
         | Type::Nullable(t, _)

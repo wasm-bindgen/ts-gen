@@ -7,7 +7,7 @@ private fun unsupported(why: String): Nothing = throw Unsupported(why)
 
 /**
  * Wire values ready to pass: statements to run first, then one expression
- * per value, and statements to run after the call (a `mut T[]`'s writeback).
+ * per value, and statements to run after the call (a `*mut T[]`'s writeback).
  */
 private class Conv(val pre: List<String>, val exprs: List<String>, val post: List<String> = emptyList())
 

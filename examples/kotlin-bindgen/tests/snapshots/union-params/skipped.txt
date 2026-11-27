@@ -1,2 +1,0 @@
-hash(*buffer): `*buffer` needs a linear memory
-hashText(*buffer): `*buffer` needs a linear memory

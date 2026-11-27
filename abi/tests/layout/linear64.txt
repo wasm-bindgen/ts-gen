@@ -148,7 +148,7 @@ import tw:js/global Fixture#nullables(bool?,u8?,i53?,u32?,f32?,Method?,Flags?,Bo
   enum Method: index; Get=1 Post=2
   enum Flags: carrier u8; Read=1 Write=2
   enum Body: slots (i64, i64, externref); Text=1[0,1] Bytes=2[0,1] Stream=3[2]
-import tw:js/global Fixture#sequences(u8[],mut f32[],i64[]?,arr<u8>,arr<str>?,arr<Request>): (externref, i64, i64, i64, i64, i64, i64, i64, i64, i64, i64, i32, i64) -> (i64, i64)
+import tw:js/global Fixture#sequences(u8[],*mut f32[],i64[]?,arr<u8>,arr<str>?,arr<Request>): (externref, i64, i64, i64, i64, i64, i64, i64, i64, i64, i64, i32, i64) -> (i64, i64)
   elem arr<u8>: memory 1 align 1 [u8@0] table []
   elem arr<str>?: memory 16 align 8 [ptr@0 len@8] table []
   elem arr<Request>: memory 0 align 1 [] table [externref]
@@ -175,7 +175,7 @@ import tw:js/global Fixture#erased(T,T?,arr<T>): (externref, externref, externre
 import tw:js/global Fixture#undef(str??): (externref, i32, i64, i64) -> (i32, externref)
   enum str??: slots (i64, i64); Undefined=1 Value=2[0,1]
   enum Request??: slots (externref); Undefined=1 Value=2[0]
-import tw:js/global Fixture#view(*u8[],*mut f64[]): (externref, i64, i64, i64, i64)
+import tw:js/global Fixture#view(*u8[],*mut f64[],*u8[]?,*mut f64[]?,*buffer): (externref, i64, i64, i64, i64, i64, i64, i64, i64, i64, i64)
 export takeCallback(fn(Event)): (externref) -> (i64)
   call fn(Event): (externref, externref)
   trampoline fn(u32)->str: (i64, i32) -> (i64, i64)
