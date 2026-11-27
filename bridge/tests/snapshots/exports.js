@@ -60,6 +60,10 @@ function $instance(v, C, what) {
   return v;
 }
 
+function $isInstance(v, C) {
+  return typeof C === "function" && v instanceof C;
+}
+
 function $isObject(v) {
   return (typeof v === "object" && v !== null) || typeof v === "function";
 }
@@ -77,6 +81,20 @@ function $tuple(v, n, what) {
 function $typed(v, C, what) {
   if (!(v instanceof C)) $fail(what, v);
   return v;
+}
+
+// The error message of a caught value (IR.md §15): `String(err)` runs
+// user code, so it's guarded.
+function $message(e) {
+  try {
+    const m = e !== null && e !== undefined ? e.message : undefined;
+    if (typeof m === "string" && m !== "") return m;
+  } catch {}
+  try {
+    const s = String(e);
+    if (s !== "") return s;
+  } catch {}
+  return "unknown error";
 }
 
 // A memory and its externref table, as the glue reads and writes them.
@@ -226,6 +244,131 @@ function $table(table, stack, constant, heap) {
   table.set(constant + 2, true);
   table.set(constant + 3, false);
   return { table, stack, constant, heap };
+}
+
+// Pairs language handles with their JS wrappers (IR.md §14): one wrapper per
+// live handle. Linear handles are numbers, held weakly through a WeakRef
+// whose finalizer calls the language's drop export; reference handles key a
+// WeakMap, and the shared GC needs no finalizer.
+const $flagged = Symbol("tw.flagged");
+
+class $Handles {
+  constructor(what, linear, drop) {
+    this.what = what;
+    this.linear = linear;
+    this.drop = drop;
+    this.live = linear ? new Map() : new WeakMap();
+    this.of = new WeakMap();
+    this.dead = new WeakSet();
+    this.once_ = new WeakSet();
+    this.reg = linear
+      ? new FinalizationRegistry((rec) => {
+          if (this.live.get(rec.h) === rec) this.live.delete(rec.h);
+          if (rec.drop) $drop(rec.drop, rec.h);
+        })
+      : null;
+  }
+
+  wrap(h, make, drop = this.drop) {
+    const rec = this.live.get(h);
+    if (this.linear) {
+      const w = rec?.ref.deref();
+      if (w !== undefined) return w;
+      // A collected wrapper's drop is still pending: the new wrapper takes
+      // it over, so the handle is dropped once.
+      if (rec) this.reg.unregister(rec);
+    } else if (rec !== undefined) {
+      return rec;
+    }
+    const w = make();
+    this.pair(w, h, drop);
+    return w;
+  }
+
+  // The wrapper `tw:new` made for an instance of a class with an imported
+  // base, which can't be recreated (§17).
+  paired(h, what) {
+    const rec = this.live.get(h);
+    const w = this.linear ? rec?.ref.deref() : rec;
+    if (w === undefined) {
+      throw new TypeError(`a ${what} handle with no live wrapper: construct it with \`tw:new\` and keep the wrapper`);
+    }
+    return w;
+  }
+
+  pair(w, h, drop = this.drop) {
+    this.of.set(w, h);
+    if (this.linear) {
+      const rec = { h, ref: new WeakRef(w), drop };
+      this.live.set(h, rec);
+      this.reg.register(w, rec, rec);
+    } else {
+      this.live.set(h, w);
+    }
+  }
+
+  owns(w, C) {
+    return this.of.has(w) && w instanceof C;
+  }
+
+  unwrap(w, C, what) {
+    if (!this.of.has(w) || !(w instanceof C)) $fail(what ?? this.what, w);
+    if (this.dead.has(w)) throw new TypeError(`a destroyed ${what ?? this.what}`);
+    return this.of.get(w);
+  }
+
+  tryUnwrap(w, C) {
+    return this.of.has(w) && w instanceof C && !this.dead.has(w) ? this.of.get(w) : null;
+  }
+
+  // `@once`: the first call revokes the wrapper (§14).
+  once(w) {
+    this.once_.add(w);
+    this.flag(w);
+  }
+
+  // A function wrapper calls with the handle it closes over until it's
+  // flagged `@once` or destroyed, when it takes the checked `call`.
+  flag(w) {
+    if (typeof w === "function") w[$flagged] = true;
+  }
+
+  call(w) {
+    const h = this.unwrap(w, Function);
+    if (this.once_.has(w)) this.dead.add(w);
+    return h;
+  }
+
+  destroy(h) {
+    const rec = this.live.get(h);
+    if (rec === undefined) return;
+    this.live.delete(h);
+    if (this.linear) {
+      this.reg.unregister(rec);
+      const w = rec.ref.deref();
+      if (w !== undefined) {
+        this.dead.add(w);
+        this.flag(w);
+      }
+    } else {
+      this.dead.add(rec);
+      this.flag(rec);
+    }
+  }
+}
+
+function $fn(v, what) {
+  if (typeof v !== "function") $fail(what, v);
+  return v;
+}
+
+// A language error as its JS error class (§15).
+function $construct(C, msg, props) {
+  const e = C === globalThis.DOMException ? new C(msg, props.name) : new C(msg);
+  for (const k in props) {
+    if (e[k] !== props[k]) Object.defineProperty(e, k, { value: props[k], configurable: true, writable: true });
+  }
+  return e;
 }
 
 // The cleanup stack (IR.md §15): `kind, ptr, size, align` records of the
@@ -395,6 +538,76 @@ function $lowerVec(s, v, C, cx) {
   return [p, n];
 }
 
+// A future the language holds (IR.md §16): a promise, with its state and
+// raw settlement kept for the language's synchronous reads. `check` is a
+// `future<never>`'s rule, which rejects a resolution.
+class $Future {
+  constructor(promise, check, cancel) {
+    this.promise = promise;
+    this.state = 0;
+    this.value = undefined;
+    this.listeners = null;
+    this.cancel = cancel;
+    promise.then(
+      (v) => {
+        if (check) {
+          try {
+            check(v);
+          } catch (e) {
+            return this.settle(2, e);
+          }
+        }
+        this.settle(1, v);
+      },
+      (e) => this.settle(2, e),
+    );
+  }
+
+  settle(state, value) {
+    this.state = state;
+    this.value = value;
+    this.cancel = null;
+    const ls = this.listeners;
+    if (!ls) return;
+    // Each is taken off as it fires, so a wake can still remove one that
+    // hasn't, and one that throws doesn't keep the rest from firing.
+    let failed = false;
+    let error;
+    for (const [w, l] of ls) {
+      ls.delete(w);
+      try {
+        l === true ? $wake(w) : l.fire(this);
+      } catch (e) {
+        if (!failed) error = e;
+        failed = true;
+      }
+    }
+    this.listeners = null;
+    if (failed) throw error;
+  }
+}
+
+function $future(v, check, cancel) {
+  return v instanceof $Future ? v : new $Future(Promise.resolve(v), check ?? null, cancel ?? null);
+}
+
+// A synchronous throw folded into a rejected future (§16).
+function $rejected(e) {
+  return new $Future(Promise.reject(e), null, null);
+}
+
+function $isFuture(f) {
+  if (!(f instanceof $Future)) throw new TypeError(`expected a future, got ${$describe(f)}`);
+  return f;
+}
+
+// A future's value as `get` reads it: a tuple of it once the future is
+// fulfilled (empty for a `unit`), and none until then.
+function $option(f, unit) {
+  if (f.state !== 1) return null;
+  return unit ? [] : [f.value];
+}
+
 
 let $L = null;
 let $S = null;
@@ -402,8 +615,16 @@ let $B = null;
 let $X = null;
 let $T = null;
 const $E = [];
+function $drop(name, h) {
+  $X[name](h);
+}
 
+const $H0 = new $Handles("a `fn(u8)->u8` function", true, "tw:drop:fn(u8)->u8");
+const $H1 = new $Handles("a `fn(u16)->u16` function", true, "tw:drop:fn(u16)->u16");
+const $H2 = new $Handles("a `fn(i8)->i8` function", true, "tw:drop:fn(i8)->i8");
 let $cls0 = null;
+// tag:err
+const $tag0 = new WebAssembly.Tag({ parameters: ["i32", "externref"] });
 
 function $h1(v, cx) {
   const n = v.length >>> 0;
@@ -427,7 +648,48 @@ function $h2(v, cx) {
   $fail("Method", v);
 }
 
-function $h3(v, cx) {
+function $h4(f, h, a0) {
+  const env = f[$flagged] === undefined ? h : $H0.call(f);
+  try {
+    const t1 = (a0 & 255);
+    const r = $E[0](env, t1);
+    return (r & 255);
+  } catch (e) {
+    throw $outgoing(e);
+  }
+}
+
+function $h3(env) {
+  return $H0.wrap(env, () => {
+    const f = function (a0) { return $h4(f, env, a0); };
+    return f;
+  });
+}
+
+function $h6(f, h, a0) {
+  const env = f[$flagged] === undefined ? h : $H1.call(f);
+  try {
+    const t1 = $int(a0, 0, 65535, "u16");
+    const r = $E[1](env, t1);
+    return (r & 65535);
+  } catch (e) {
+    throw $outgoing(e);
+  }
+}
+
+function $h5(env) {
+  return $H1.wrap(env, () => {
+    const f = function (a0) { return $h6(f, env, a0); };
+    return f;
+  });
+}
+
+function $h7(e) {
+  if ((($isInstance(e, globalThis.TypeError)) || ($isInstance(e, globalThis.RangeError)))) return [1, $message(e)];
+  return [-1, $message(e)];
+}
+
+function $h8(v, cx) {
   $array(v, "u32[]");
   const n = v.length;
   const p = n ? $L.alloc(n * 4, 4, cx) : 4;
@@ -441,7 +703,7 @@ function $h3(v, cx) {
   return [p, n];
 }
 
-function $h4(v, cx) {
+function $h9(v, cx) {
   if (v === "GET") {
     return 1;
   }
@@ -449,6 +711,32 @@ function $h4(v, cx) {
     return 2;
   }
   $fail("Method", v);
+}
+
+function $h11(f, h, a0) {
+  const env = f[$flagged] === undefined ? h : $H2.call(f);
+  try {
+    const t1 = $int(a0, -128, 127, "i8");
+    const r = $E[13](env, t1);
+    return (r << 24 >> 24);
+  } catch (e) {
+    throw $outgoing(e);
+  }
+}
+
+function $h10(env) {
+  return $H2.wrap(env, () => {
+    const f = function (a0) { return $h11(f, env, a0); };
+    return f;
+  });
+}
+
+function $h12(arm, m) {
+  const msg = m == null ? "" : String(m);
+  switch (arm) {
+    case 1: return $construct(globalThis.TypeError, msg, {  });
+  }
+  return new Error(msg);
 }
 
 // ("tw:js/global", "Sizes#get:width()")
@@ -594,8 +882,37 @@ function $f10(w0_0) {
   return t1;
 }
 
+// ("tw:js/global", "Probe#on(fn(u8)->u8)")
+function $f11(w0_0, w1_0) {
+  const t1 = $h3(w1_0);
+  w0_0.on(t1);
+}
+
+// ("tw:js/global", "Probe#both(fn(u16)->u16)")
+function $f12(w0_0, w1_0) {
+  const t1 = $h5(w1_0);
+  w0_0.both(t1);
+}
+
+// ("tw:js/global", "Probe#hostFn()")
+function $f13(w0_0) {
+  const r = w0_0.hostFn();
+  return r;
+}
+
+// ("tw:js/global", "Probe#later()")
+function $f14(w0_0) {
+  try {
+    const r = w0_0.later();
+    const t1 = $future(r);
+    return t1;
+  } catch (e) {
+    return $rejected(e);
+  }
+}
+
 // ("tw:unbox", "u8")
-function $f11(v) {
+function $f15(v) {
   const cx = $cx;
   const cxm = cx.n;
   try {
@@ -610,7 +927,7 @@ function $f11(v) {
 }
 
 // ("tw:unboxUnchecked", "u8")
-function $f12(v) {
+function $f16(v) {
   const cx = $cx;
   const cxm = cx.n;
   try {
@@ -625,7 +942,7 @@ function $f12(v) {
 }
 
 // ("tw:arr", "get<u8>")
-function $f13(v, w1_0) {
+function $f17(v, w1_0) {
   $array(v, "Arr");
   const i = w1_0 >>> 0;
   if (i >= v.length) throw new TypeError("an index out of range");
@@ -643,8 +960,77 @@ function $f13(v, w1_0) {
   }
 }
 
+// ("tw:call", "fn()->u8")
+function $f18(w0_0) {
+  const r = w0_0();
+  const t1 = (r & 255);
+  return t1;
+}
+
+// ("tw:call", "fn()->i8")
+function $f19(w0_0) {
+  const r = w0_0();
+  const t1 = $int(r, -128, 127, "i8");
+  return t1;
+}
+
+// ("tw:call", "fn()->u16")
+function $f20(w0_0) {
+  const r = w0_0();
+  const t1 = $int(r, 0, 65535, "u16");
+  return t1;
+}
+
+// ("tw:future", "state")
+function $f21(f) {
+  return $isFuture(f).state;
+}
+
+// ("tw:future", "get<u8>")
+function $f22(w0_0) {
+  const f = $isFuture(w0_0);
+  try {
+    const r = $option(f, false);
+    let t1 = 0, t2 = 0;
+    if (r != null) {
+      const t3 = r[0];
+      const t4 = (t3 & 255);
+      t1 = 1;
+      t2 = t4;
+    }
+    const ra = $ret();
+    ra.i32[0] = t2;
+    return t1;
+  } catch (e) {
+    if (e instanceof WebAssembly.Exception) throw e;
+    throw new WebAssembly.Exception($tag0, $h7(e));
+  }
+}
+
+// ("tw:future", "get<i8>")
+function $f23(w0_0) {
+  const f = $isFuture(w0_0);
+  try {
+    const r = $option(f, false);
+    let t1 = 0, t2 = 0;
+    if (r != null) {
+      $tuple(r, 1, "(i8)?");
+      const t3 = r[0];
+      const t4 = $int(t3, -128, 127, "i8");
+      t1 = 1;
+      t2 = t4;
+    }
+    const ra = $ret();
+    ra.i32[0] = t2;
+    return t1;
+  } catch (e) {
+    if (e instanceof WebAssembly.Exception) throw e;
+    throw new WebAssembly.Exception($tag0, $h7(e));
+  }
+}
+
 // ("tw:js/global", "Keys.echo<"width">(K)")
-function $f14() {
+function $f24() {
   const t1 = "width";
   const r = globalThis.Keys.echo(t1);
   return;
@@ -652,6 +1038,7 @@ function $f14() {
 
 function $outgoing(e) {
   if (e instanceof WebAssembly.Exception) {
+    if (e.is($tag0)) return $h12(e.getArg($tag0, 0), e.getArg($tag0, 1));
   }
   return e;
 }
@@ -661,7 +1048,7 @@ const $N0 = {
       try {
         const t1 = a[0];
         const t2 = $int(t1, 0, 255, "u8");
-        const r = $E[0](t2);
+        const r = $E[2](t2);
         return (r & 255);
       } catch (e) {
         throw $outgoing(e);
@@ -674,7 +1061,7 @@ const $N0 = {
       try {
         const t1 = a[0];
         const t2 = $num(t1, "f64");
-        const r = $E[1](t2);
+        const r = $E[3](t2);
         return r;
       } catch (e) {
         throw $outgoing(e);
@@ -692,7 +1079,7 @@ const $N0 = {
         const t3 = t2[0];
         const t4 = t2[1];
         cx.n = cxm;
-        const r = $E[2](t3, t4);
+        const r = $E[4](t3, t4);
         return (r >>> 0);
       } catch (e) {
         $release(cx, cxm);
@@ -711,7 +1098,7 @@ const $N0 = {
         const t3 = t2[0];
         const t4 = t2[1];
         cx.n = cxm;
-        const r = $E[3](t3, t4);
+        const r = $E[5](t3, t4);
         return (r >>> 0);
       } catch (e) {
         $release(cx, cxm);
@@ -726,9 +1113,9 @@ const $N0 = {
       const cxm = cx.n;
       try {
         const t1 = a[0];
-        const t2 = $h3(t1, cx);
+        const t2 = $h8(t1, cx);
         cx.n = cxm;
-        const r = $E[4](t2[0], t2[1]);
+        const r = $E[6](t2[0], t2[1]);
         return (r >>> 0);
       } catch (e) {
         $release(cx, cxm);
@@ -751,7 +1138,7 @@ const $N0 = {
         const t6 = t5[0];
         const t7 = t5[1];
         cx.n = cxm;
-        const r = $E[5](t3, t6, t7);
+        const r = $E[7](t3, t6, t7);
         return (r >>> 0);
       } catch (e) {
         $release(cx, cxm);
@@ -764,8 +1151,8 @@ const $N0 = {
     if (a.length >= 1) {
       try {
         const t1 = a[0];
-        const t2 = $h4(t1, null);
-        const r = $E[6](t2);
+        const t2 = $h9(t1, null);
+        const r = $E[8](t2);
         return (r >>> 0);
       } catch (e) {
         throw $outgoing(e);
@@ -778,7 +1165,7 @@ const $N0 = {
       try {
         const t1 = a[0];
         const t2 = $instance(t1, $cls0, "Request");
-        const r = $E[7](t2);
+        const r = $E[9](t2);
         return (r !== 0);
       } catch (e) {
         throw $outgoing(e);
@@ -791,7 +1178,7 @@ const $N0 = {
       try {
         const t1 = a[0];
         const t2 = (t1 == null ? null : $instance(t1, $cls0, "Request?"));
-        const r = $E[8](t2);
+        const r = $E[10](t2);
         return (r !== 0);
       } catch (e) {
         throw $outgoing(e);
@@ -804,13 +1191,55 @@ const $N0 = {
       try {
         const t1 = a[0];
         if (t1 !== "width") $fail("\"width\"", t1);
-        const r = $E[9]();
+        const r = $E[11]();
         return (r >>> 0);
       } catch (e) {
         throw $outgoing(e);
       }
     }
     throw new TypeError("`pick` doesn't match its arguments");
+  },
+  handler(...a) {
+    try {
+      const r = $E[12]();
+      return $h10(r);
+    } catch (e) {
+      throw $outgoing(e);
+    }
+  },
+  shared(...a) {
+    try {
+      const r = $E[14]();
+      return $h5(r);
+    } catch (e) {
+      throw $outgoing(e);
+    }
+  },
+  run(...a) {
+    if (a.length >= 1) {
+      try {
+        const t1 = a[0];
+        const t2 = $fn(t1, "fn()->i8");
+        const r = $E[15](t2);
+        return (r << 24 >> 24);
+      } catch (e) {
+        throw $outgoing(e);
+      }
+    }
+    throw new TypeError("`run` doesn't match its arguments");
+  },
+  wait(...a) {
+    if (a.length >= 1) {
+      try {
+        const t1 = a[0];
+        const t2 = $future(t1);
+        const r = $E[16](t2);
+        return (r !== 0);
+      } catch (e) {
+        throw $outgoing(e);
+      }
+    }
+    throw new TypeError("`wait` doesn't match its arguments");
   },
 };
 
@@ -820,7 +1249,7 @@ export function instantiate(language, bridge, imports = {}) {
   if ($B) throw new Error("this bridge is already instantiated");
   $cls0 = $class(globalThis.Request);
   $B = new WebAssembly.Instance(bridge, {
-    "tw:glue": { r1: $f1, r4: $f4, r5: $f5, r6: $f6, r7: $f7 },
+    "tw:glue": { r1: $f1, r4: $f4, r5: $f5, r6: $f6, r7: $f7, r22: $f22, r23: $f23 },
   }).exports;
   $S = new $Scratch($B);
   const instance = new WebAssembly.Instance(language, {
@@ -837,30 +1266,54 @@ export function instantiate(language, bridge, imports = {}) {
       "Probe#method()": $f8,
       "Probe#request()": $f9,
       "Probe#maybe()": $f10,
-      "Keys.echo<\"width\">(K)": $f14,
+      "Probe#on(fn(u8)->u8)": $f11,
+      "Probe#both(fn(u16)->u16)": $f12,
+      "Probe#hostFn()": $f13,
+      "Probe#later()": $f14,
+      "Keys.echo<\"width\">(K)": $f24,
     },
     "tw:unbox": {
-      "u8": $f11,
+      "u8": $f15,
     },
     "tw:unboxUnchecked": {
-      "u8": $f12,
+      "u8": $f16,
     },
     "tw:arr": {
-      "get<u8>": $f13,
+      "get<u8>": $f17,
+    },
+    "tw:call": {
+      "fn()->u8": $f18,
+      "fn()->i8": $f19,
+      "fn()->u16": $f20,
+    },
+    "tw:future": {
+      "state": $f21,
+      "get<u8>": $B.f22,
+      "get<i8>": $B.f23,
+    },
+    "tw:tag": {
+      "err": $tag0,
     },
   });
   $X = instance.exports;
   $T = $table($X["tw:table"], $X["tw:table/stack_base"].value, $X["tw:table/const_base"].value, $X["tw:table/heap_base"].value);
-  $E[0] = $X["app.u8(u8)"];
-  $E[1] = $X["app.f64(f64)"];
-  $E[2] = $X["app.len(str)"];
-  $E[3] = $X["app.bytes(u8[])"];
-  $E[4] = $X["app.nums(arr<u32>)"];
-  $E[5] = $X["app.pair((u32,str))"];
-  $E[6] = $X["app.method(Method)"];
-  $E[7] = $X["app.request(Request)"];
-  $E[8] = $X["app.maybe(Request?)"];
-  $E[9] = $X["app.pick<\"width\">(K)"];
+  $E[0] = $X["tw:call:fn(u8)->u8"];
+  $E[1] = $X["tw:call:fn(u16)->u16"];
+  $E[2] = $X["app.u8(u8)"];
+  $E[3] = $X["app.f64(f64)"];
+  $E[4] = $X["app.len(str)"];
+  $E[5] = $X["app.bytes(u8[])"];
+  $E[6] = $X["app.nums(arr<u32>)"];
+  $E[7] = $X["app.pair((u32,str))"];
+  $E[8] = $X["app.method(Method)"];
+  $E[9] = $X["app.request(Request)"];
+  $E[10] = $X["app.maybe(Request?)"];
+  $E[11] = $X["app.pick<\"width\">(K)"];
+  $E[12] = $X["app.handler()"];
+  $E[13] = $X["tw:call:fn(i8)->i8"];
+  $E[14] = $X["app.shared()"];
+  $E[15] = $X["app.run(fn()->i8)"];
+  $E[16] = $X["app.wait(future<i8>)"];
   $L = new $Lang(instance.exports, { memory: "memory", table: "tw:table", realloc: "tw:realloc", free: "tw:free", talloc: "tw:table/alloc", tfree: "tw:table/free" }, false);
   return instance;
 }

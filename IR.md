@@ -1095,6 +1095,17 @@ makes the call. A value a box operation reads (`tw:unbox`, `tw:arr get`)
 has no side: it's validated unless `validation = off`, and
 `tw:unboxUnchecked` is how a language trusts one (§13).
 
+A function or future type has values of its own to convert: a callback's
+arguments, a JS function's result, the value `get` reads (§16, §18). They
+take the side of the signatures that reach the type, through any depth of
+arrays, tuples, enums, boxes, futures and function types. The type is the
+host's when only imports reach it, and user code's once an export does, or
+a box operation names it (`tw:box`, `tw:unbox`, `tw:tryUnbox`,
+`tw:arr get`). So under `exports` a callback that only imports take has
+its arguments trusted, and one an export returns has them validated. The
+side is the type's, not the value's: a type that goes both ways is
+validated wherever it's used.
+
 Validated:
 
 * **Every validation failure throws `TypeError`**: a wrong `typeof`, a
@@ -2276,7 +2287,8 @@ into the language only where it's read.
   it exactly as an import with `throws E` lowers its result (§15): a value
   that isn't a `T` is a `TypeError`, thrown to `E`'s tag, or left for
   `("tw:err", E)` under `throws = js`. So state 1 says the promise
-  fulfilled, not that its value is a `T`.
+  fulfilled, not that its value is a `T`. Whether it's validated at all is
+  the future type's side (§10).
 * `E` is the future's rejection enum, and `get<T>` is `get<T, err>`, as
   `future<T>` is `future<T, err>`. In a name the two are written with no
   space (`get<Response,FetchError>`).
@@ -2509,6 +2521,8 @@ Function types are first class and structural: `fn(Event)`,
   language → JS; an import result or an export parameter is JS → language.
 * The trampoline converts its arguments outgoing to the language (incoming
   from JS) and its result back to JS. The call import does the reverse.
+  What comes from JS, the trampoline's arguments and the call import's
+  result, is validated by the function type's side (§10).
 * `throws E` on a function type follows the import rules for the call import
   and the entry-point rules for the trampoline: **an error escaping a
   language callback into JS is mapped at the trampoline exactly as at entry

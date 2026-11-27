@@ -2,9 +2,14 @@ import { assert, lang } from "./harness.mjs";
 
 class Request {}
 class Probe {}
-for (const m of ["u8", "f64", "str", "bytes", "nums", "pair", "method", "request", "maybe"]) {
+for (const m of ["u8", "f64", "str", "bytes", "nums", "pair", "method", "request", "maybe", "hostFn", "later"]) {
   Probe.prototype[m] = function () {
     return this.next;
+  };
+}
+for (const m of ["on", "both"]) {
+  Probe.prototype[m] = function (cb) {
+    this.cb = cb;
   };
 }
 const Keys = { echo: () => Keys.next };
@@ -13,7 +18,9 @@ Object.assign(globalThis, { Request, Probe, Keys });
 const { instantiate, app } = await import("./bridge.js");
 const fs = await import("node:fs");
 const compile = (f) => new WebAssembly.Module(fs.readFileSync(f));
+const tick = () => new Promise((r) => setTimeout(r, 0));
 let L;
+let waiting;
 const impl = {
   "app.u8(u8)": (x) => x,
   "app.f64(f64)": (x) => x,
@@ -25,6 +32,17 @@ const impl = {
   "app.request(Request)": () => 1,
   "app.maybe(Request?)": (r) => (r === null ? 0 : 1),
   'app.pick<"width">(K)': () => 7,
+  "app.handler()": () => 8,
+  "app.shared()": () => 16,
+  "app.run(fn()->i8)": (f) => L.call("call:fn()->i8", f),
+  "app.wait(future<i8>)": (f) => ((waiting = f), 1),
+  "tw:future/wake": () => {},
+  "tw:call:fn(u8)->u8": (env, x) => x,
+  "tw:call:fn(u16)->u16": (env, x) => x,
+  "tw:call:fn(i8)->i8": (env, x) => x,
+  "tw:drop:fn(u8)->u8": () => {},
+  "tw:drop:fn(u16)->u16": () => {},
+  "tw:drop:fn(i8)->i8": () => {},
 };
 L = lang(instantiate(compile("lang.wasm"), compile("bridge.wasm"), { "test:impl": impl }));
 // The receiver is user code's own object: its results are still an
@@ -95,5 +113,46 @@ L.throwsType(() => app.method("PUT"), /Method/);
 L.throwsType(() => L.call("unbox:u8", 300), /u8/);
 L.throwsType(() => L.call("arr:get<u8>", [300], 0), /u8/);
 assert.equal(L.call("unboxUnchecked:u8", 300), 44);
+
+// A function or future type takes the side of the signatures that reach
+// it. A callback only imports take is the host's to call, so its
+// arguments are trusted. One an export returns is user code's to call,
+// and so is one that goes both ways.
+L.call("Probe#on(fn(u8)->u8)", p, 8);
+assert.equal(p.cb(300), 44);
+const handler = app.handler();
+assert.equal(handler(7), 7);
+L.throwsType(() => handler(300), /i8/);
+L.call("Probe#both(fn(u16)->u16)", p, 16);
+L.throwsType(() => p.cb(-1), /u16/);
+L.throwsType(() => app.shared()(-1), /u16/);
+
+// So with a JS function's result: one an import returned is the host's,
+// one an export was passed is user code's.
+assert.equal(L.call("call:fn()->u8", call("Probe#hostFn()", () => 300)), 44);
+assert.equal(app.run(() => 7), 7);
+L.throwsType(() => app.run(() => 300), /i8/);
+L.throwsType(() => app.run(300), /fn\(\)->i8/);
+// A type no signature reaches isn't proven the host's.
+L.throwsType(() => L.call("call:fn()->u16", () => -1), /u16/);
+
+// And with a future's value, which a failed read throws to its `E`.
+const err = L.ex["tag:err"];
+{
+  const f = call("Probe#later()", Promise.resolve(300));
+  await tick();
+  assert.deepEqual(L.call("future:get<u8>", f), [1, 44]);
+  app.wait(Promise.resolve(300));
+  await tick();
+  assert.throws(
+    () => L.call("future:get<i8>", waiting),
+    (e) => e instanceof WebAssembly.Exception && e.is(err) && /i8/.test(e.getArg(err, 1)),
+  );
+  app.wait(Promise.resolve(7));
+  await tick();
+  assert.deepEqual(L.call("future:get<i8>", waiting), [1, 7]);
+  // What isn't a future is the language's failure in every setting.
+  L.throwsType(() => L.call("future:get<u8>", {}), /a future/);
+}
 
 console.log("ok");

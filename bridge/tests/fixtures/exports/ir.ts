@@ -23,6 +23,10 @@ class Probe {
   method(): Method;
   request(): Request;
   maybe(): Request?;
+  on(cb: fn(u8) -> u8);
+  both(cb: fn(u16) -> u16);
+  hostFn(): fn() -> u8;
+  later(): future<u8>;
 }
 
 export namespace app {
@@ -36,4 +40,8 @@ export namespace app {
   request(r: Request): bool;
   maybe(r: Request?): bool;
   pick<K in keyof Sizes>(key: K): u32;
+  handler(): fn(i8) -> i8;
+  shared(): fn(u16) -> u16;
+  run(f: fn() -> i8): i8;
+  wait(f: future<i8>): bool;
 }

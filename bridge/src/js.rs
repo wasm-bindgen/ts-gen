@@ -129,6 +129,10 @@ pub struct Glue<'a, 'b> {
     /// The lib IRs `ir` resolves against.
     pub libs: Vec<&'a Ir>,
     pub validation: Validation,
+    /// The function and future types an import's signature reaches, and
+    /// those an export's or a box operation's does (§10).
+    pub(crate) host_types: HashSet<String>,
+    pub(crate) user_types: HashSet<String>,
     pub helpers: Vec<String>,
     pub(crate) memo: HashMap<String, String>,
     pub modules: Vec<String>,
@@ -312,6 +316,8 @@ impl<'a, 'b> Glue<'a, 'b> {
             ir,
             libs,
             validation: l.profile.validation,
+            host_types: HashSet::new(),
+            user_types: HashSet::new(),
             helpers: Vec::new(),
             memo: HashMap::new(),
             modules: Vec::new(),
@@ -345,6 +351,16 @@ impl<'a, 'b> Glue<'a, 'b> {
             },
             unbox: false,
             host,
+        }
+    }
+
+    /// The side of a function or future type's values: the host's only
+    /// when imports alone reach the type (§10).
+    pub(crate) fn type_side(&self, key: &str) -> Side {
+        if self.host_types.contains(key) && !self.user_types.contains(key) {
+            Side::Host
+        } else {
+            Side::User
         }
     }
 
@@ -2179,7 +2195,11 @@ impl<'a, 'b> Glue<'a, 'b> {
                 let unit = matches!(&r.repr.kind, Kind::Tuple { elems, .. } if elems.is_empty());
                 let call = format!("$option(f, {unit})");
                 let throws = func.sig.throws.clone();
-                let m = self.mode(Side::User);
+                let key = throws
+                    .as_ref()
+                    .map(|e| Self::future_key(&r.repr.ty, &e.path))
+                    .unwrap_or_default();
+                let m = self.mode(self.type_side(&key));
                 self.complete(&mut b, &call, Some(r), throws, &[], Some(m))?;
             }
             Op::States => {
@@ -2219,11 +2239,13 @@ impl<'a, 'b> Glue<'a, 'b> {
                 let mut callee = String::new();
                 let mut rest = false;
                 let mut argv = Vec::new();
+                let mut side = Side::User;
                 for (p, w) in func.sig.params.iter().zip(&wires) {
                     match (&p.role, &p.repr.kind) {
                         (Pos::Callee, Kind::Fn { sig, .. }) => {
                             callee = w[0].clone();
                             rest = sig.rest;
+                            side = self.type_side(&Self::fn_name(&p.repr));
                         }
                         (Pos::Callee, _) => callee = w[0].clone(),
                         _ => {
@@ -2237,7 +2259,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 }
                 let call = format!("{callee}({})", argv.join(", "));
                 let throws = func.sig.throws.clone();
-                let m = self.mode(Side::User);
+                let m = self.mode(side);
                 self.complete(
                     &mut b,
                     &call,

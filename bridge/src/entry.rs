@@ -7,7 +7,7 @@
 //! language's, §11), lifts and frees the result, and maps a language tag
 //! escaping into JS (§15).
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt::Write;
 use std::rc::Rc;
 
@@ -479,6 +479,103 @@ impl<'a, 'b> Glue<'a, 'b> {
         }
     }
 
+    /// A future type as its `get` names it: the option of its value, and
+    /// its error.
+    pub(crate) fn future_key(option: &str, error: &str) -> String {
+        format!("{option} {error}")
+    }
+
+    /// Sorts the function and future types by the signatures that reach
+    /// them (§10): an import's, or an export's and a box operation's. A
+    /// box may hold user code's value, and a function the language boxes
+    /// may be called by it.
+    pub(crate) fn sides(&mut self, plan: &plan::Plan<'a>) {
+        let (mut host, mut user) = (HashSet::new(), HashSet::new());
+        let (mut hs, mut us) = (HashSet::new(), HashSet::new());
+        for func in &plan.funcs {
+            match &func.op {
+                plan::Op::Member(_) => self.reach_sig(&func.sig, &mut host, &mut hs),
+                plan::Op::Box(r) | plan::Op::ArrGet(r) | plan::Op::TryUnbox(r) => {
+                    self.reach(r, &mut user, &mut us)
+                }
+                plan::Op::Unbox { repr, .. } => self.reach(repr, &mut user, &mut us),
+                _ => {}
+            }
+        }
+        // A signature that doesn't lay out is reported by its export.
+        for k in self.l.keys.members() {
+            if k.role != Role::Export {
+                continue;
+            }
+            for v in self.mono_variants(&k).unwrap_or_default() {
+                let targs = self.mono_targs.get(&v.key).cloned().unwrap_or_default();
+                if let Ok(sig) = self.l.member(&v, &targs) {
+                    self.reach_sig(&sig, &mut user, &mut us);
+                }
+            }
+        }
+        self.host_types = host;
+        self.user_types = user;
+    }
+
+    fn reach_sig(&self, sig: &Signature, out: &mut HashSet<String>, seen: &mut HashSet<String>) {
+        for p in sig.params.iter().chain(&sig.results) {
+            self.reach(&p.repr, out, seen);
+        }
+        if let Some(e) = &sig.throws {
+            self.reach_enum(e, out, seen);
+        }
+    }
+
+    /// Adds `r`, and the types its values carry in either direction.
+    fn reach(&self, r: &Repr, out: &mut HashSet<String>, seen: &mut HashSet<String>) {
+        let r = &self.l.rec(r).unwrap_or_else(|_| r.clone());
+        if !seen.insert(r.ty.clone()) {
+            return;
+        }
+        match &r.kind {
+            Kind::Fn { sig, .. } => {
+                out.insert(Self::fn_name(r));
+                for p in &sig.params {
+                    self.reach(p, out, seen);
+                }
+                self.reach(&sig.result, out, seen);
+                if let Some(e) = &sig.throws {
+                    self.reach_enum(e, out, seen);
+                }
+            }
+            Kind::Array { elem, .. } => self.reach(elem, out, seen),
+            Kind::Tuple { elems, .. } => {
+                for e in elems {
+                    self.reach(e, out, seen);
+                }
+            }
+            Kind::Enum { layout, .. } => self.reach_enum(layout, out, seen),
+            Kind::Host {
+                of: Host::Box(inner),
+                ..
+            } => self.reach(inner, out, seen),
+            Kind::Host {
+                of: Host::Future { value, error },
+                ..
+            } => {
+                out.insert(Self::future_key(&format!("({})?", value.ty), &error.path));
+                self.reach(value, out, seen);
+                self.reach_enum(error, out, seen);
+            }
+            _ => {}
+        }
+    }
+
+    fn reach_enum(&self, e: &EnumLayout, out: &mut HashSet<String>, seen: &mut HashSet<String>) {
+        if !seen.insert(format!("enum {}", e.path)) {
+            return;
+        }
+        for p in e.arms.iter().flat_map(|a| &a.payload) {
+            self.reach(p, out, seen);
+        }
+    }
+
     /// The helper making (or reusing) the JS function that wraps a handle
     /// of a function type the language provides; calls go through its
     /// trampoline `tw:call:F` (§18).
@@ -553,7 +650,7 @@ impl<'a, 'b> Glue<'a, 'b> {
             b.line(format!(
                 "const env = f[$flagged] === undefined ? h : {reg}.call(f);"
             ));
-            let m = g.mode(Side::User);
+            let m = g.mode(g.type_side(&f));
             g.entry_call(&mut b, &export, &sig, &args, None, m)?;
             if fold {
                 b.close("} catch (e) {");

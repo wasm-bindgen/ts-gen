@@ -4,6 +4,8 @@
   (import "tw:glue" "r5" (func $r5 (param externref) (result i32)))
   (import "tw:glue" "r6" (func $r6 (param externref) (result i32)))
   (import "tw:glue" "r7" (func $r7 (param externref) (result i32)))
+  (import "tw:glue" "r22" (func $r22 (param externref) (result i32)))
+  (import "tw:glue" "r23" (func $r23 (param externref) (result i32)))
   (memory $m (export "memory") 1)
   (table $st (export "table") 0 externref)
   (global (export "hdr") i32 (i32.const 0))
@@ -63,5 +65,17 @@
     local.get $l1
     (i32.load offset=8 (i32.const 0))
     (i32.load offset=16 (i32.const 0))
+  )
+  (func $f22 (export "f22") (param $p0 externref) (result i32 i32)
+    (local $l1 i32)
+    (local.set $l1 (call $r22 (local.get $p0)))
+    local.get $l1
+    (i32.load offset=8 (i32.const 0))
+  )
+  (func $f23 (export "f23") (param $p0 externref) (result i32 i32)
+    (local $l1 i32)
+    (local.set $l1 (call $r23 (local.get $p0)))
+    local.get $l1
+    (i32.load offset=8 (i32.const 0))
   )
 )

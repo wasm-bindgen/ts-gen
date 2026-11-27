@@ -1,5 +1,19 @@
+tw:tag err
 tw:unbox u8
 tw:unboxUnchecked u8
 tw:arr get<u8>
+tw:call fn()->u8
+tw:call fn()->i8
+tw:call fn()->u16
+tw:future state
+tw:future get<u8>
+tw:future get<i8>
 mono tw:js/global Keys.echo<"width">(K)
 export mono app.pick<"width">(K)
+export tw:future/wake
+export tw:call:fn(u8)->u8
+export tw:call:fn(u16)->u16
+export tw:call:fn(i8)->i8
+export tw:drop:fn(u8)->u8
+export tw:drop:fn(u16)->u16
+export tw:drop:fn(i8)->i8
