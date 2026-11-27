@@ -365,6 +365,7 @@ let $B = null;
 let $X = null;
 let $T = null;
 const $E = [];
+let $pending = null;
 
 
 // ("tw:js/global", "P#two()")
@@ -432,6 +433,26 @@ const $N0 = {
     }
     throw new TypeError("`len` doesn't match its arguments");
   },
+  tally(...a) {
+    if (a.length >= 1) {
+      const cx = $cx;
+      const cxm = cx.n;
+      try {
+        const t1 = a[0];
+        const t2 = $lowerUtf8($L, $str(t1), cx);
+        const t3 = t2[0];
+        const t4 = t2[1];
+        $spillCheck();
+        cx.n = cxm;
+        const r = $E[2](t3, t4);
+        return (r >>> 0);
+      } catch (e) {
+        $release(cx, cxm);
+        throw $outgoing(e);
+      }
+    }
+    throw new TypeError("`tally` doesn't match its arguments");
+  },
 };
 
 export { $N0 as app };
@@ -455,6 +476,7 @@ export function instantiate(language, bridge, imports = {}) {
   $T = $table($B["tw:table"], $B["tw:table/stack_base"].value, $B["tw:table/const_base"].value, $B["tw:table/heap_base"].value);
   $E[0] = $spilled($X["app.pair(str)"], [$B.pop_i32], true, false);
   $E[1] = $X["app.len(str)"];
+  $E[2] = $spilled($X["app.tally(str)"], [], true, true);
   $L = new $Lang(instance.exports, { memory: "memory", table: "tw:table", realloc: "tw:realloc", free: "tw:free", talloc: "tw:table/alloc", tfree: "tw:table/free" }, false);
   return instance;
 }

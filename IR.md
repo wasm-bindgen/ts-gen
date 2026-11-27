@@ -1444,8 +1444,9 @@ Order is slot order both ways: from the language's side the spill is first
 in, first out within a crossing. It's empty at every crossing boundary:
 
 * the bridge checks it's empty before each spilled import, and around each
-  export that spills results or that the bridge module calls (one with GC
-  positions, or a promising call, [§16](#16-async));
+  export that spills results, that may leave a `throws = js` error, or
+  that the bridge module calls (one with GC positions, or a promising
+  call, [§16](#16-async));
 * reading a slot that wasn't pushed, overflowing, or leaving slots unread
   throws a `TypeError` and resets it, as does any exception unwinding out of
   an export.

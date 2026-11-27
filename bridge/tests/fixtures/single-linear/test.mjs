@@ -24,4 +24,10 @@ assert.throws(() => app.pair("abc"), (e) => e instanceof TypeError && /left unre
 assert.equal(live(), 0);
 assert.equal(spillEmpty(), true);
 assert.deepEqual(app.pair("abc"), [3, 3]);
+
+// So does a call with `throws` under `throws = js`.
+assert.equal(app.tally("abc"), 3);
+ex.dirty(new P());
+assert.throws(() => app.tally("abc"), (e) => e instanceof TypeError && /left unread/.test(e.message));
+assert.equal(live(), 0);
 console.log("done");

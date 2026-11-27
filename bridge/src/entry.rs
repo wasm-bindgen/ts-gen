@@ -14,7 +14,7 @@ use std::rc::Rc;
 use ts_gen_abi::ir::*;
 use ts_gen_abi::key::{location, Keyed, Role};
 use ts_gen_abi::layout::{native_size, EnumLayout, Host, Kind, Pos, Repr, Signature};
-use ts_gen_abi::profile::{Carrier, Encoding, Results, StrCarrier};
+use ts_gen_abi::profile::{Carrier, Encoding, Results, StrCarrier, Throws};
 use ts_gen_abi::protocol;
 use ts_gen_abi::resolve::{Context, Location, Target, TypeDecl};
 
@@ -118,7 +118,8 @@ impl<'a, 'b> Glue<'a, 'b> {
         // are only those of a call that isn't made, so what can fail before
         // the language runs is checked first.
         if alloc {
-            // Only an entry that checks the spill on its way in (§12).
+            // Only an entry that checks the spill on its way in (§12): a
+            // root, or one `$spilled` wraps.
             let spills = self.l.profile.results == Results::Single
                 && (promising(self.l, sig)
                     || sig
@@ -126,7 +127,8 @@ impl<'a, 'b> Glue<'a, 'b> {
                         .iter()
                         .chain(&sig.results)
                         .any(|p| self.f.has_gc(&p.repr))
-                    || !self.l.lang_core(&sig.core())?.spill.is_empty());
+                    || !self.l.lang_core(&sig.core())?.spill.is_empty()
+                    || (self.l.profile.throws == Throws::Js && sig.throws.is_some()));
             if spills {
                 b.line("$spillCheck();");
             }

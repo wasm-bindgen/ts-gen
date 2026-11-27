@@ -80,4 +80,5 @@
   (func $pop_f32 (export "pop_f32") (result f32) (local $v f32) (local.set $v (f32.load (call $nnext))) (call $settle) (local.get $v))
   (func $push_f64 (export "push_f64") (param $v f64) (f64.store (call $nslot) (local.get $v)))
   (func $pop_f64 (export "pop_f64") (result f64) (local $v f64) (local.set $v (f64.load (call $nnext))) (call $settle) (local.get $v))
+  (global $pending (export "pending") (mut i32) (i32.const 0))
 )
