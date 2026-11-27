@@ -1115,9 +1115,8 @@ Trusted, a value converts as a valid one does, with no test of its type:
 * `i32`, `u32` and the floats cross as they are, and Wasm converts them
   (`ToInt32`, `ToNumber`).
 * `i53`, `u53`, `i64` and `u64` are `BigInt(v)`.
-* A `host` `str` is the value itself, and a `gc` WTF-16 one is
-  `wasm:js-string`'s to encode. Any other `str` is the value if it's a
-  string, else `String(v)`.
+* A `host` `str` is the value itself. Any other `str` is encoded, so it's
+  the value if it's a string, else `String(v)`.
 * `bigint`, a class, an interface, `Any`, a symbol and a JS function are
   the value itself.
 * `T[]` copies `length` elements of the value, `arr<T>` and a tuple read

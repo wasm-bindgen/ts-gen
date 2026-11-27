@@ -1129,13 +1129,12 @@ impl<'a, 'b> Glue<'a, 'b> {
                 ]
             }
             Kind::Str { carrier, nullable } => {
-                let by_ref = matches!(carrier, StrCarrier::Host | StrCarrier::Gc(Encoding::Wtf16));
                 // An encoded string is measured, so even trusted it's
-                // made a string first.
-                let check = match (m.checked, by_ref) {
+                // made a string first. A host one is the value itself.
+                let check = match (m.checked, carrier) {
                     (true, _) => format!("$str({v})"),
-                    (false, true) => v.to_string(),
-                    (false, false) => format!("$ustr({v})"),
+                    (false, StrCarrier::Host) => v.to_string(),
+                    (false, _) => format!("$ustr({v})"),
                 };
                 let (s, enc) = match carrier {
                     StrCarrier::Host | StrCarrier::Gc(Encoding::Wtf16) => {

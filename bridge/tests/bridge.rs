@@ -720,6 +720,8 @@ fixtures! {
     boxes_null => "boxes-null",
     unchecked => "unchecked",
     exports => "exports",
+    exports_gc => "exports-gc",
+    exports_host => "exports-host",
     memory64 => "memory64",
     all_gc => "all-gc",
     gc_wtf16 => "gc-wtf16",
