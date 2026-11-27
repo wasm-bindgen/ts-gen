@@ -3,33 +3,37 @@
 
 package fixtures.overloads.flat
 
-/** tw:future take<str?> */
+/** tw:future get<str?> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_str(p0: JsAny?): JsAny?
+external fun get_str(p0: JsAny?): Int
 
-/** tw:future error<err> */
+/** tw:err err */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun error_err(p0: JsAny?): Int
+external fun err_err(p0: JsAny?): Int
 
 /** tw:ret externref */
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
 external fun ret_externref(): JsAny?
 
+/** tw:future error<err> */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun error_err(p0: JsAny?): Int
+
 /** tw:js/global KV#getText(str) */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun KV_getText_str(p0: JsAny?, p1: JsAny?): JsAny?
 
-/** tw:future take<Any?> */
+/** tw:future get<Any?> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_Any(p0: JsAny?): JsAny?
+external fun get_Any(p0: JsAny?): Int
 
 /** tw:js/global KV#getJson(str) */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun KV_getJson_str(p0: JsAny?, p1: JsAny?): JsAny?
 
-/** tw:future take<unit> */
+/** tw:future get<unit> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_unit(p0: JsAny?)
+external fun get_unit(p0: JsAny?): Int
 
 /** tw:js/global KV#put(str,KVValueKind) */
 @JsFun("(p0, p1, p2, p3) => { throw new Error('ts-gen: unlinked import') }")
@@ -54,10 +58,6 @@ external fun PutOptions_get_ttl(p0: JsAny?): Int
 /** tw:js/global PutOptions#set:ttl(f64) */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun PutOptions_set_ttl_f64(p0: JsAny?, p1: Double)
-
-/** tw:err err */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun err_err(p0: JsAny?): Int
 
 /** tw:js/global Node#append(NodeChildKind) */
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
@@ -171,9 +171,9 @@ external fun Store_readText_str_GetOptions_Any(p0: JsAny?, p1: JsAny?, p2: JsAny
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
 external fun Store_readJson_str_GetOptions_Any(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
 
-/** tw:future take<ArrayBuffer?> */
+/** tw:future get<ArrayBuffer?> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_ArrayBuffer(p0: JsAny?): JsAny?
+external fun get_ArrayBuffer(p0: JsAny?): Int
 
 /** tw:js/global Store#readArrayBuffer(str,GetOptions<Any?>?) */
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
@@ -187,9 +187,13 @@ external fun Store_tail_GetOptions_Any(p0: JsAny?, p1: JsAny?): JsAny?
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun Store_open_StoreReader(p0: JsAny?, p1: JsAny?): JsAny?
 
-/** tw:future take<bool?> */
+/** tw:future get<bool?> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_bool(p0: JsAny?): Int
+external fun get_bool(p0: JsAny?): Int
+
+/** tw:ret i32 */
+@JsFun("() => { throw new Error('ts-gen: unlinked import') }")
+external fun ret_i32(): Int
 
 /** tw:js/global Store#write(str,str) */
 @JsFun("(p0, p1, p2) => { throw new Error('ts-gen: unlinked import') }")
@@ -199,9 +203,9 @@ external fun Store_write_str_str(p0: JsAny?, p1: JsAny?, p2: JsAny?): JsAny?
 @JsFun("(p0, p1, p2, p3) => { throw new Error('ts-gen: unlinked import') }")
 external fun Store_write_str_str_StoreOptions(p0: JsAny?, p1: JsAny?, p2: JsAny?, p3: JsAny?): JsAny?
 
-/** tw:future take<bool> */
+/** tw:future get<bool> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_bool_2(p0: JsAny?): Int
+external fun get_bool_2(p0: JsAny?): Int
 
 /** tw:js/global Store#write(str,str,StoreWriteOptions) */
 @JsFun("(p0, p1, p2, p3) => { throw new Error('ts-gen: unlinked import') }")

@@ -536,7 +536,7 @@ pub enum Type {
     /// `T[]`, the typed array.
     Vec(Box<Type>),
     VecBox(Box<Type>),
-    /// `mut T[]`: writeback, parameters only.
+    /// `mut T[]`: writeback, import parameters only.
     MutVec(Box<Type>),
     /// `arr<T>`, the JS `Array`.
     Array(Box<Type>),

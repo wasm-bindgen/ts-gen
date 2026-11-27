@@ -40,9 +40,13 @@ external fun err_DOMExceptionErr(p0: JsAny?): Int
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun Kv_get_str(p0: JsAny?, p1: JsAny?): JsAny?
 
-/** tw:future take<unit> */
+/** tw:future get<unit,DOMExceptionOrQuotaExceededErr> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_unit(p0: JsAny?)
+external fun get_unit_DOMExceptionOrQuotaExceededErr(p0: JsAny?): Int
+
+/** tw:err DOMExceptionOrQuotaExceededErr */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun err_DOMExceptionOrQuotaExceededErr(p0: JsAny?): Int
 
 /** tw:future error<DOMExceptionOrQuotaExceededErr> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -91,10 +95,6 @@ external fun err_TypeOrRangeErr(p0: JsAny?): Int
 /** tw:js/global Kv#check(str) */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun Kv_check_str(p0: JsAny?, p1: JsAny?)
-
-/** tw:err DOMExceptionOrQuotaExceededErr */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun err_DOMExceptionOrQuotaExceededErr(p0: JsAny?): Int
 
 /**
  * ## Errors
@@ -179,9 +179,9 @@ external fun RequestInit_set_signal_AbortSignal(p0: JsAny?, p1: JsAny?)
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun RequestInit_get_signal(p0: JsAny?): JsAny?
 
-/** tw:future take<str> */
+/** tw:future get<str> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_str(p0: JsAny?): JsAny?
+external fun get_str(p0: JsAny?): Int
 
 /** tw:future error<err> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")

@@ -11,7 +11,7 @@ const fs = await import("node:fs");
 const compile = (f) => new WebAssembly.Module(fs.readFileSync(f));
 const L = lang(
   instantiate(compile("lang.wasm"), compile("bridge.wasm"), {
-    "test:impl": { "take(Absent)": () => 7, "tw:future/wake": () => {} },
+    "test:impl": { "take(Absent)": () => 7 },
   }),
 );
 const call = (key, v) => {
@@ -43,24 +43,23 @@ L.throwsType(() => call("present()", o), /Present/);
 assert.equal(take(o), 7);
 assert.throws(() => take(1), TypeError);
 
-// A future's resolution checks the same way (a host array's elements:
-// absent-classes-host).
+// A future's resolution checks the same way where it's read (a host
+// array's elements: absent-classes-host).
 const tick = () => new Promise((r) => setTimeout(r, 0));
+const err = L.ex["tag:err"];
+const thrown = (re) => (e) => e instanceof WebAssembly.Exception && e.is(err) && re.test(e.getArg(err, 1));
 {
   let f = call("later()", Promise.resolve(o));
   await tick();
-  assert.equal(L.call("future:poll", f, -1), 1);
-  assert.equal(L.call("future:take<Absent>", f), o);
-  L.call("future:drop", f);
+  assert.equal(L.call("future:state", f), 1);
+  assert.deepEqual(L.call("future:get<Absent>", f), [1, o]);
   f = call("later()", Promise.resolve(5));
   await tick();
-  assert.equal(L.call("future:poll", f, -1), 2);
-  assert.match(L.call("future:error<err>", f)[1], /Absent/);
-  L.call("future:drop", f);
+  assert.equal(L.call("future:state", f), 1);
+  assert.throws(() => L.call("future:get<Absent>", f), thrown(/Absent/));
   f = call("laterPresent()", Promise.resolve(o));
   await tick();
-  assert.equal(L.call("future:poll", f, -1), 2, "a present class stays nominal");
-  L.call("future:drop", f);
+  assert.throws(() => L.call("future:get<Present>", f), thrown(/Present/), "a present class stays nominal");
 }
 
 // Its union arm never matches, so discrimination falls through.

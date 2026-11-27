@@ -41,13 +41,17 @@ const tick = () => new Promise((r) => setTimeout(r, 0));
 const later = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const wakes = [];
+let onWake = null;
 const ticks = [];
 let tickResults = [];
 let sleeps = [];
 let runs = [];
 let L;
 const impl = {
-  "tw:future/wake": (w) => wakes.push(w),
+  "tw:future/wake": (w) => {
+    wakes.push(w);
+    onWake?.(w);
+  },
   "tw:loop/tick": (loop, max) => {
     ticks.push([loop, max]);
     return tickResults.shift() ?? 0;
@@ -66,44 +70,76 @@ const impl = {
   },
   "app.wait(future<str>)": (f) => {
     runs.push(f);
-    return L.call("future:poll", f, 3);
+    return L.call("future:state", f);
   },
 };
 L = lang(instantiate(compile("lang.wasm"), compile("bridge.wasm"), { "test:impl": impl }));
 const api = new Api();
-const poll = (f, w = 1) => L.call("future:poll", f, w);
+const state = (f) => L.call("future:state", f);
+// Futures as the language's `arr<Any>`: `[base, len]` in its table.
+const refs = (fs) => {
+  const base = L.ex["tw:table/alloc"](fs.length);
+  fs.forEach((f, i) => L.ex["tw:table"].set(base + i, f));
+  return [base, fs.length];
+};
+const states = (fs) => [...L.take(...L.call("future:states", ...refs(fs)))];
+const listen = (f, w) => L.call("future:add_listener", f, w);
+const listenList = (fs, w) => L.call("future:add_listener_list", ...refs(fs), w);
+const unlistenList = (fs, w) => L.call("future:remove_listener_list", ...refs(fs), w);
 const err = L.ex["tag:err"];
+const fetchError = L.ex["tag:FetchError"];
+// A read's failure, thrown to the future's `E` with its message.
+const thrown = (tag, re) => (e) => e instanceof WebAssembly.Exception && e.is(tag) && re.test(e.getArg(tag, 1));
 
-// A JS promise as a future: poll, wake, take.
+// A JS promise as a future: its state, its wake, and its value.
 let resolve;
 api.next = new Promise((r) => (resolve = r));
 let f = L.call("Api#fetch(str)", api, ...L.str("u"));
-assert.equal(poll(f, 7), 0);
-assert.equal(poll(f, 8), 0, "polling again replaces the waker");
+assert.equal(state(f), 0);
+assert.deepEqual(L.call("future:get<str,FetchError>", f), [0, 0, 0], "no value yet");
+listen(f, 7);
+listen(f, 7);
+listen(f, 8);
+listen(f, 5);
+L.call("future:remove_listener", f, 5);
+// Removing a listener that isn't there does nothing.
+L.call("future:remove_listener", f, 4);
 resolve("body");
 await tick();
-assert.deepEqual(wakes, [8]);
-assert.equal(poll(f), 1);
-assert.equal(L.takeStr(...L.call("future:take<str>", f)), "body");
-L.throwsType(() => L.call("future:take<str>", f), /isn't resolved/);
-L.call("future:drop", f);
+assert.deepEqual(wakes, [7, 8], "a listener is woken once, and a removed one not at all");
+assert.equal(state(f), 1);
+assert.deepEqual(states([f]), [1]);
+// A settled future wakes nothing.
+listen(f, 6);
+// `get` is the value's option, lowered afresh at each read.
+for (let i = 0; i < 2; i++) {
+  const [present, ...s] = L.call("future:get<str,FetchError>", f);
+  assert.equal(present, 1);
+  assert.equal(L.takeStr(...s), "body");
+}
+L.throwsType(() => L.call("future:get<str,FetchError>", {}), /a future/);
+L.throwsType(() => listen({}, 1), /a future/);
+L.throwsType(() => L.call("future:remove_listener", {}, 1), /a future/);
+L.throwsType(() => L.call("future:cancel", {}), /a future/);
+L.throwsType(() => state({}), /a future/);
 
-// Rejections map through `E`.
+// Rejections map through `E`, read as often as asked.
 api.next = Promise.reject(new DOMException("gone", "AbortError"));
 f = L.call("Api#fetch(str)", api, ...L.str("u"));
 await tick();
-assert.equal(poll(f), 2);
+assert.equal(state(f), 2);
 const [arm, msg] = L.call("future:error<FetchError>", f);
 assert.equal(msg, "gone");
 assert.ok(arm > 0, "not the fallback arm");
-L.call("future:drop", f);
+assert.deepEqual(L.call("future:error<FetchError>", f), [arm, msg]);
+assert.deepEqual(L.call("future:get<str,FetchError>", f), [0, 0, 0], "a rejection is no value");
 
 // Without `throws`, a synchronous throw rejects the future.
 api.throwing = new RangeError("sync");
 f = L.call("Api#fetch(str)", api, ...L.str("u"));
 api.throwing = null;
 await tick();
-assert.equal(poll(f), 2);
+assert.equal(state(f), 2);
 assert.equal(L.call("future:error<FetchError>", f)[1], "sync");
 // With `throws`, it goes to the tag.
 assert.throws(
@@ -111,38 +147,175 @@ assert.throws(
   (e) => e instanceof WebAssembly.Exception && e.is(err),
 );
 
-// A resolution that fails validation rejects with its TypeError.
+// A resolution is validated where it's read, as an import's result is:
+// the future fulfils, and reading it throws to its `E`.
 api.next = Promise.resolve("x");
 f = L.call("Api#number()", api);
 await tick();
-assert.equal(poll(f), 2);
-assert.match(L.call("future:error<err>", f)[1], /u32/);
+assert.equal(state(f), 1);
+L.balanced(() => assert.throws(() => L.call("future:get<u32>", f), thrown(err, /u32/)));
+api.next = Promise.resolve(5);
+f = L.call("Api#fetch(str)", api, ...L.str("u"));
+await tick();
+assert.equal(state(f), 1);
+assert.throws(() => L.call("future:get<str,FetchError>", f), thrown(fetchError, /str/));
+// A value that is itself a none is still a value.
+api.next = Promise.resolve(null);
+f = L.call("Api#number()", api);
+await tick();
+assert.throws(() => L.call("future:get<u32>", f), thrown(err, /u32/));
 api.next = Promise.resolve(7);
 f = L.call("Api#number()", api);
 await tick();
-assert.equal(poll(f), 1);
-assert.equal(L.call("future:take<u32>", f), 7);
-api.next = 5;
+assert.deepEqual(L.call("future:get<u32>", f), [1, 7]);
+// A `unit` future's option is its flag alone.
+api.next = new Promise((r) => (resolve = r));
 f = L.call("Api#nothing()", api);
+assert.equal(L.call("future:get<unit>", f), 0);
+resolve(5);
 await tick();
-assert.equal(poll(f), 1);
-L.call("future:take<unit>", f);
+assert.equal(L.call("future:get<unit>", f), 1);
 
 // A `future<never>` that resolves rejects instead.
 api.next = Promise.resolve(1);
 f = L.call("Api#forever()", api);
 await tick();
-assert.equal(poll(f), 2);
+assert.equal(state(f), 2);
 assert.match(L.call("future:error<err>", f)[1], /never/);
 
-// Dropping cancels once and ignores the later settlement.
+// Cancelling is a request: the cancel function runs, and the future
+// settles as its promise does.
 f = L.call("Api#slow(str)", api, ...L.str("u"));
-assert.equal(poll(f, 9), 0);
-L.call("future:drop", f);
+assert.equal(state(f), 0);
+listen(f, 9);
+L.call("future:cancel", f);
 assert.ok(api.signal.aborted);
+assert.equal(state(f), 0);
 await tick();
-assert.ok(!wakes.includes(9));
-L.throwsType(() => poll(f), /dropped/);
+assert.ok(wakes.includes(9));
+assert.equal(state(f), 2);
+assert.match(L.call("future:error<err>", f)[1], /aborted/);
+// Cancelling a settled future does nothing.
+L.call("future:cancel", f);
+assert.equal(state(f), 2);
+
+// A listener on several futures, through the language's own array, is a
+// race: one wake for the first of them to settle, and it's off the rest.
+{
+  const rs = [];
+  const pending = (n) =>
+    Array.from({ length: n }, () => {
+      api.next = new Promise((r) => rs.push(r));
+      return L.call("Api#number()", api);
+    });
+  const fs = pending(3);
+  assert.deepEqual(states(fs), [0, 0, 0]);
+  wakes.length = 0;
+  listenList(fs, 20);
+  // A future holds a waker once: the latest add replaces it.
+  listen(fs[1], 21);
+  listenList([fs[1]], 21);
+  rs[1](1);
+  rs[2]("x");
+  await tick();
+  assert.deepEqual(wakes, [20, 21], "one wake a race");
+  assert.deepEqual(states(fs), [0, 1, 1], "a state says nothing of the value");
+  rs[0](0);
+  await tick();
+  assert.deepEqual(wakes, [20, 21], "a spent race wakes nothing");
+  // Added again and again, it's still one race.
+  const gs = pending(2);
+  for (let i = 0; i < 3; i++) listenList(gs, 30);
+  rs[3](0);
+  await tick();
+  assert.deepEqual(wakes, [20, 21, 30]);
+  rs[4](0);
+  await tick();
+  assert.deepEqual(wakes, [20, 21, 30]);
+  // Removed, it wakes nothing.
+  const hs = pending(2);
+  listenList(hs, 40);
+  unlistenList(hs, 40);
+  rs[5](0);
+  rs[6](0);
+  await tick();
+  assert.deepEqual(wakes, [20, 21, 30]);
+  // Settled futures wake nothing.
+  listenList(fs, 22);
+  await tick();
+  assert.deepEqual(wakes, [20, 21, 30]);
+  L.throwsType(() => states([fs[0], {}]), /a future/);
+  // An element that isn't a future fails the whole call.
+  const [g] = pending(1);
+  L.throwsType(() => listenList([g, {}], 23), /a future/);
+  L.throwsType(() => unlistenList([g, {}], 23), /a future/);
+  rs[7](0);
+  await tick();
+  assert.deepEqual(wakes, [20, 21, 30]);
+
+  // A wake can take off a listener that has yet to fire for the same
+  // settlement, a race included.
+  {
+    const at = rs.length;
+    const [h, k] = pending(2);
+    wakes.length = 0;
+    listen(h, 50);
+    listen(h, 51);
+    listenList([h, k], 52);
+    onWake = (w) => {
+      if (w !== 50) return;
+      L.call("future:remove_listener", h, 51);
+      unlistenList([h, k], 52);
+    };
+    rs[at](0);
+    await tick();
+    onWake = null;
+    assert.deepEqual(wakes, [50], "removed during the settlement, not woken");
+    rs[at + 1](0);
+    await tick();
+    assert.deepEqual(wakes, [50]);
+  }
+
+  // A wake that throws doesn't keep the rest from waking.
+  {
+    const at = rs.length;
+    const [h] = pending(1);
+    wakes.length = 0;
+    listen(h, 60);
+    listen(h, 61);
+    listenList([h], 62);
+    onWake = (w) => {
+      if (w === 60) throw new Error("wake");
+    };
+    let unhandled;
+    process.once("unhandledRejection", (e) => (unhandled = e));
+    rs[at](0);
+    await tick();
+    onWake = null;
+    assert.deepEqual(wakes, [60, 61, 62]);
+    assert.equal(unhandled?.message, "wake", "the first error still surfaces");
+  }
+
+  // A waker added singly to a member of its race, or taken off one, leaves
+  // the race on the others.
+  {
+    const at = rs.length;
+    const hs = pending(3);
+    wakes.length = 0;
+    listenList(hs, 70);
+    listen(hs[0], 70);
+    L.call("future:remove_listener", hs[1], 70);
+    rs[at + 2](0);
+    await tick();
+    assert.deepEqual(wakes, [70], "the race");
+    rs[at + 1](0);
+    await tick();
+    assert.deepEqual(wakes, [70], "taken off this member");
+    rs[at](0);
+    await tick();
+    assert.deepEqual(wakes, [70, 70], "the member's own listener");
+  }
+}
 
 // A cancel signal joins the caller's: the caller's own aborts the call,
 // and its init is passed as a copy.
@@ -150,20 +323,20 @@ L.throwsType(() => poll(f), /dropped/);
   const mine = new AbortController();
   const init = { signal: mine.signal };
   f = L.call("Api#joined(str,Init?)", api, ...L.str("u"), init);
-  assert.equal(poll(f, 10), 0);
+  assert.equal(state(f), 0);
   assert.notEqual(api.init, init);
   assert.equal(init.signal, mine.signal);
   mine.abort();
   await tick();
-  assert.equal(poll(f), 2);
+  assert.equal(state(f), 2);
   assert.match(L.call("future:error<err>", f)[1], /aborted/);
 }
-// Dropping aborts the call, and not the caller's signal.
+// Cancelling aborts the call, and not the caller's signal.
 {
   const mine = new AbortController();
   f = L.call("Api#joined(str,Init?)", api, ...L.str("u"), { signal: mine.signal });
-  assert.equal(poll(f, 11), 0);
-  L.call("future:drop", f);
+  assert.equal(state(f), 0);
+  L.call("future:cancel", f);
   assert.ok(api.init.signal.aborted);
   assert.ok(!mine.signal.aborted);
 }
@@ -172,18 +345,18 @@ L.throwsType(() => poll(f), /dropped/);
 for (const init of [null, {}, { signal: null }, { signal: undefined }]) {
   api.init = undefined;
   f = L.call("Api#joined(str,Init?)", api, ...L.str("u"), init);
-  assert.equal(poll(f, 12), 0);
+  assert.equal(state(f), 0);
   assert.ok(!api.init.signal.aborted);
-  L.call("future:drop", f);
+  L.call("future:cancel", f);
   assert.ok(api.init.signal.aborted);
 }
 // An overload without the init cancels through one the bridge makes.
 api.init = undefined;
 f = L.call("Api#short(str)", api, ...L.str("u"));
-assert.equal(poll(f, 13), 0);
+assert.equal(state(f), 0);
 assert.deepEqual(Object.keys(api.init), ["signal"]);
 assert.ok(!api.init.signal.aborted);
-L.call("future:drop", f);
+L.call("future:cancel", f);
 assert.ok(api.init.signal.aborted);
 
 // A future the language holds reaches JS as its promise.
@@ -210,7 +383,7 @@ let res2;
 assert.equal(app.wait(new Promise((r) => (res2 = r))), 0);
 res2("s");
 await tick();
-assert.equal(poll(runs[runs.length - 1]), 1);
+assert.equal(state(runs[runs.length - 1]), 1);
 
 // A callback returning a future rejects it on a synchronous failure.
 L.call("Api#later(fn(u32)->future<u32>)", api, 100);

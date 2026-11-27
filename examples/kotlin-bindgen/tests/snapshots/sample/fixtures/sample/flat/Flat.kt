@@ -55,9 +55,9 @@ external fun ret_externref(): JsAny?
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun Response_clone(p0: JsAny?): JsAny?
 
-/** tw:future take<str> */
+/** tw:future get<str> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_str(p0: JsAny?): JsAny?
+external fun get_str(p0: JsAny?): Int
 
 /** tw:future error<err> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -67,9 +67,9 @@ external fun error_err(p0: JsAny?): Int
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun Response_text(p0: JsAny?): JsAny?
 
-/** tw:future take<u8[]> */
+/** tw:future get<u8[]> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_u8(p0: JsAny?): JsAny?
+external fun get_u8(p0: JsAny?): Int
 
 /** tw:js/global Response#bytes() */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -175,9 +175,13 @@ external fun SliceOptions_get_start(p0: JsAny?): Int
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun SliceOptions_set_start_u32(p0: JsAny?, p1: Int)
 
-/** tw:future take<str?> */
+/** tw:future get<str?,KvError> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_str_2(p0: JsAny?): JsAny?
+external fun get_str__KvError(p0: JsAny?): Int
+
+/** tw:err KvError */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun err_KvError(p0: JsAny?): Int
 
 /** tw:future error<KvError> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -187,17 +191,17 @@ external fun error_KvError(p0: JsAny?): Int
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun KVNamespace_get_str(p0: JsAny?, p1: JsAny?): JsAny?
 
-/** tw:future take<unit> */
+/** tw:future get<unit,KvError> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_unit(p0: JsAny?)
+external fun get_unit_KvError(p0: JsAny?): Int
 
 /** tw:js/global KVNamespace#put(str,str,u53?) */
 @JsFun("(p0, p1, p2, p3) => { throw new Error('ts-gen: unlinked import') }")
 external fun KVNamespace_put_str_str_u53(p0: JsAny?, p1: JsAny?, p2: JsAny?, p3: Long): JsAny?
 
-/** tw:future take<arr<Str>> */
+/** tw:future get<arr<Str>> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_arr_Str(p0: JsAny?): JsAny?
+external fun get_arr_Str(p0: JsAny?): Int
 
 /** tw:js/global KVNamespace#list(str?,u32?) */
 @JsFun("(p0, p1, p2, p3) => { throw new Error('ts-gen: unlinked import') }")

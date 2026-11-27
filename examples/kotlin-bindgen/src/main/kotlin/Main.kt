@@ -42,8 +42,9 @@ fun checkProfile(p: Map<String, String>): String? {
 
 /** The protocol imports of `tsgen.runtime`. */
 val RUNTIME_LINKS = listOf(
-    "tsgen.runtime.futurePoll" to Import("tw:future", "poll"),
-    "tsgen.runtime.futureDrop" to Import("tw:future", "drop"),
+    "tsgen.runtime.futureState" to Import("tw:future", "state"),
+    "tsgen.runtime.futureCancel" to Import("tw:future", "cancel"),
+    "tsgen.runtime.futureAddListener" to Import("tw:future", "add_listener"),
     "tsgen.runtime.loopWorkAvailable" to Import("tw:loop", "work_available"),
 )
 

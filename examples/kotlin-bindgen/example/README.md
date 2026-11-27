@@ -31,7 +31,7 @@ the router, and `Reply.kt` what the routes share.
 | `/json` | `Http.kt` | `request.json()`, `JSON`, `Response.json` | an erased generic (`json<T>`); an interface of fields, some optional; `Any`; an error enum from `@throws {SyntaxError}`; a static (`ResponseStatic`); a rejected future |
 | `/crypto` | `Crypto.kt` | `crypto.subtle.digest`, `getRandomValues`, `randomUUID`, `TextEncoder`, `btoa`/`atob` | a `union` of buffer types; a generic that returns its argument's type; `@throws {DOMException}` as its own exception |
 | `/stream` | `Streams.kt` | `ReadableStream`, `TransformStream`, `pipeTo`, `tee`, a streamed body | callbacks held in a dictionary, one returning a future (a suspend lambda); a tuple (`tee()`); a host class's type arguments, which are boxes (`ReadableStream<JsString>`, `toJsString()`) |
-| `/fetch` | `Fetch.kt` | a service binding, the global `fetch` with a `RequestInit`, `AbortSignal.timeout` | a literal enum (`cache`); overloads of a `union` parameter; cancellation: `Future.drop()` runs the member's `cancel`, whose signal joins the caller's own |
+| `/fetch` | `Fetch.kt` | a service binding, the global `fetch` with a `RequestInit`, `AbortSignal.timeout` | a literal enum (`cache`); overloads of a `union` parameter; cancellation: `Future.cancel()` runs the member's `cancel`, whose signal joins the caller's own |
 | `/timers` | `Timers.kt` | `scheduler.wait`, `setTimeout`, `queueMicrotask`, `ctx.waitUntil` | `future<unit>`; one-shot callbacks (`awaitCallback`); a future Kotlin provides (`tw:future new`) |
 | `/rewrite` | `Rewrite.kt` | `HTMLRewriter` | callbacks in a dictionary; `str?` (`getAttribute`) |
 | `/counter/*` | `Durable.kt` | a Durable Object: an id from a name, `stub.fetch`, KV `get`/`put`/`delete`/`list`, a transaction, SQL with a cursor, an alarm | an exported class, constructed by JS; an export that ignores an argument it doesn't declare (`alarm()`); a member's own `T`, named at the call (`get<JsNumber>`, `exec<Visit>`) and boxed (`toJsNumber()`); a callback returning `future<T>`; overloads by argument type (`delete`); a variadic (`sql.exec`); an iterator (`cursor.next()`); a std `Map<JsString, T>` |
@@ -95,7 +95,10 @@ the profile:
 Async: an exported `suspend` function makes its future with
 `tw:future new`, runs as a task on `tsgen.runtime.Loop.main`, and settles
 it with `resolve<T>`, or `reject<E>` with the task's exception as `E`.
-`Future.await` polls with a waker and parks the task; `tw:future/wake`
-reposts it, and the bridge ticks the loop through `tw:loop/tick` and
-`next_sleep`. A rejected JS future throws its typed exception, through
-`error<E>`.
+`Future.await` reads the future's value through `get<T>`, an option. With
+none it reads the `state`: while the future is pending the task parks, with
+a waker `add_listener` leaves on the future. `tw:future/wake` reposts the task,
+and the bridge ticks the loop through `tw:loop/tick` and `next_sleep`. A
+rejected JS future throws its typed exception, through `error<E>`, and so
+does a fulfilled one whose value `get<T>` finds is no `T`, through
+`("tw:err", E)`.

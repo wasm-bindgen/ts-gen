@@ -61,10 +61,10 @@ const impl = {
     objs.get(h).n = v;
   },
   "Counter#inc(u32)": (self, h, by) => (objs.get(h).n += by),
-  "Counter#label(str)": (self, h, p, len) => L.own(`${L.readStr(p, len)}${objs.get(h).n}`),
+  "Counter#label(str)": (self, h, p, len) => L.own(`${L.takeStr(p, len)}${objs.get(h).n}`),
   "Counter#same(Counter?)": (self, h, o) => (h === o ? 1 : 0),
   "Counter#pick(u32)": () => L.own("num"),
-  "Counter#pick(str)": () => L.own("str"),
+  "Counter#pick(str)": (self, h, p, len) => (L.take(p, len), L.own("str")),
   "Counter#fail()": () => {
     throw new WebAssembly.Exception(L.ex["tag:KvError"], [2, "missing"]);
   },
@@ -78,7 +78,7 @@ const impl = {
   "Orphan.new(u32)": (self, x) => alloc({ n: x }),
   "Orphan.make()": () => L.call("unbox:Orphan", L.call("new:Orphan.new(u32)", 1)),
   "Dual.new(Any)": (self) => alloc({ kind: "Any" }),
-  "Dual.new(str)": (self) => alloc({ kind: "str" }),
+  "Dual.new(str)": (self, p, len) => (L.take(p, len), alloc({ kind: "str" })),
   "Rest.new()": (self) => alloc({ kind: "none" }),
   "Rest.new(Any?,Any?)": (self) => alloc({ kind: "opts" }),
   "util.twice(u32)": (x) => x * 2,
@@ -247,6 +247,14 @@ L.throwsType(() => L.call("unbox:fn(u32)->str", () => {}), /fn\(u32\)->str/);
 // tw:tryUnbox: the handle, or none (0) when not a live wrapper.
 assert.equal(L.call("tryUnbox:fn(u32)->str", cb), 200);
 assert.equal(L.call("tryUnbox:fn(u32)->str", () => {}), 0);
+// A receiver that isn't a live instance fails before the arguments are the
+// language's, so the bridge frees them.
+L.balanced(() => L.throwsType(() => Counter.prototype.label.call({}, "n="), /Counter/));
+{
+  const gone = new Counter(1);
+  L.call("destroy:Counter", handleOf(gone));
+  L.balanced(() => L.throwsType(() => gone.label("n="), /destroyed/));
+}
 assert.equal(L.call("tryUnbox:Counter", c), handleOf(c));
 assert.equal(L.call("tryUnbox:Counter", {}), 0);
 assert.equal(L.call("tryUnbox:Counter", s), 0, "a wrapper of another class");

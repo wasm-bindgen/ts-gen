@@ -526,7 +526,8 @@ class $C0 {
   get value() {
     const a = [];
     try {
-      const r = $E[2](this, $HC.unwrap(this, $C0, "Counter"));
+      const t1 = $HC.unwrap(this, $C0, "Counter");
+      const r = $E[2](this, t1);
       return (r >>> 0);
     } catch (e) {
       throw $outgoing(e);

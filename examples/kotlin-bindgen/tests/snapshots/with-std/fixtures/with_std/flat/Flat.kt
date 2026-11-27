@@ -83,9 +83,9 @@ external fun display_Intl_NumberFormatOptionsCompactDisplay(p0: Int)
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun Store_env(p0: JsAny?): JsAny?
 
-/** tw:future take<never> */
+/** tw:future get<never> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_never(p0: JsAny?)
+external fun get_never(p0: JsAny?): Int
 
 /** tw:future error<err> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")

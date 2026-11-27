@@ -72,6 +72,16 @@ function $isObject(v) {
   return (typeof v === "object" && v !== null) || typeof v === "function";
 }
 
+function $tuple(v, n, what) {
+  if (!Array.isArray(v) || v.length !== n) $fail(what, v);
+  return v;
+}
+
+function $typed(v, C, what) {
+  if (!(v instanceof C)) $fail(what, v);
+  return v;
+}
+
 // The error message of a caught value (IR.md §15): `String(err)` runs
 // user code, so it's guarded.
 function $message(e) {
@@ -508,33 +518,41 @@ function $liftUtf8(s, p, len) {
   return $td.decode(u8.subarray(p, p + len));
 }
 
-// A future the language holds (IR.md §16): a promise, settled state for
-// synchronous polls, and the waker to call when it settles. `check`
-// validates a resolution, which otherwise rejects with its TypeError.
+// A fresh copy in both directions (IR.md §11).
+// Reading `.buffer` of a small fresh array moves it off-heap, so both
+// directions copy through views of the element type. `set` copies through
+// a clone when its source shares the memory.
+function $lowerVec(s, v, C, cx) {
+  const size = C.BYTES_PER_ELEMENT;
+  const n = v.length;
+  if (n === 0) return [size, 0];
+  const p = s.alloc(n * size, size, cx);
+  new C(s.u8().buffer, p, n).set(v);
+  return [p, n];
+}
+
+// A future the language holds (IR.md §16): a promise, with its state and
+// raw settlement kept for the language's synchronous reads. `check` is a
+// `future<never>`'s rule, which rejects a resolution.
 class $Future {
   constructor(promise, check, cancel) {
     this.promise = promise;
     this.state = 0;
     this.value = undefined;
-    this.waker = -1;
+    this.listeners = null;
     this.cancel = cancel;
-    this.dropped = false;
-    this.taken = false;
-    // The suspensions parked on it (§16).
-    this.parked = null;
     promise.then(
       (v) => {
-        if (this.dropped) return;
-        try {
-          if (check) check(v);
-          this.settle(1, v);
-        } catch (e) {
-          this.settle(2, e);
+        if (check) {
+          try {
+            check(v);
+          } catch (e) {
+            return this.settle(2, e);
+          }
         }
+        this.settle(1, v);
       },
-      (e) => {
-        if (!this.dropped) this.settle(2, e);
-      },
+      (e) => this.settle(2, e),
     );
   }
 
@@ -542,20 +560,47 @@ class $Future {
     this.state = state;
     this.value = value;
     this.cancel = null;
-    const w = this.waker;
-    this.waker = -1;
-    if (w !== -1) $wake(w);
-    $unpark(this, state);
+    const ls = this.listeners;
+    if (!ls) return;
+    // Each is taken off as it fires, so a wake can still remove one that
+    // hasn't, and one that throws doesn't keep the rest from firing.
+    let failed = false;
+    let error;
+    for (const [w, l] of ls) {
+      ls.delete(w);
+      try {
+        l === true ? $wake(w) : l.fire(this);
+      } catch (e) {
+        if (!failed) error = e;
+        failed = true;
+      }
+    }
+    this.listeners = null;
+    if (failed) throw error;
   }
 }
 
 function $future(v, check, cancel) {
-  return v instanceof $Future ? v : new $Future(Promise.resolve(v), check, cancel ?? null);
+  return v instanceof $Future ? v : new $Future(Promise.resolve(v), check ?? null, cancel ?? null);
 }
 
 // A synchronous throw folded into a rejected future (§16).
 function $rejected(e) {
   return new $Future(Promise.reject(e), null, null);
+}
+
+// A suspension parked on futures, among their listeners:
+// `done(i)` runs once, when the first of them, `futures[i]`, settles.
+class $Park {
+  constructor(futures, done) {
+    this.futures = futures;
+    this.done = done;
+  }
+
+  fire(f) {
+    for (const g of this.futures) g.listeners?.delete(this);
+    this.done(this.futures.indexOf(f));
+  }
 }
 
 function $promise(v) {
@@ -564,49 +609,75 @@ function $promise(v) {
 
 function $isFuture(f) {
   if (!(f instanceof $Future)) throw new TypeError(`expected a future, got ${$describe(f)}`);
-  if (f.dropped) throw new TypeError("a dropped future");
   return f;
 }
 
-function $poll(f, waker) {
-  $isFuture(f);
-  if (f.state === 0) f.waker = waker;
-  return f.state;
+// A future's value as `get` reads it: a tuple of it once the future is
+// fulfilled (empty for a `unit`), and none until then.
+function $option(f, unit) {
+  if (f.state !== 1) return null;
+  return unit ? [] : [f.value];
 }
 
-function $settled(f, state) {
-  $isFuture(f);
-  if (f.state !== state || f.taken) {
-    throw new TypeError(state === 1 ? "taking a future that isn't resolved" : "the error of a future that isn't rejected");
-  }
-  f.taken = true;
-  const v = f.value;
-  f.value = undefined;
-  return v;
+function $rejection(f) {
+  if ($isFuture(f).state !== 2) throw new TypeError("the error of a future that isn't rejected");
+  return f.value;
 }
 
-// Dropping cancels: the cancel function runs once, its failure swallowed,
-// and a later settlement is ignored.
-// Resumes the suspensions parked on future `f` with `state`.
-function $unpark(f, state) {
-  const ps = f.parked;
-  f.parked = null;
-  if (ps) for (const w of ps) w(state);
-}
-
-function $dropFuture(f) {
-  if (!(f instanceof $Future) || f.dropped) return;
-  f.dropped = true;
-  f.waker = -1;
-  $unpark(f, 0);
-  f.value = undefined;
-  const c = f.state === 0 ? f.cancel : null;
+// Cancelling is a request: the cancel function runs once, its failure
+// swallowed, and the future settles as its promise does.
+function $cancelFuture(f) {
+  const c = $isFuture(f).cancel;
   f.cancel = null;
   if (c) {
     try {
       c();
     } catch {}
   }
+}
+
+// A pending future's listeners (IR.md §16), by waker: `true` for one
+// the language added to it alone, woken when it settles, or the `$Race`
+// it shares with other futures. The latest add replaces a waker's entry.
+// A parked suspension (`$Park`) is among them under itself.
+function $addListener(f, w) {
+  if ($isFuture(f).state === 0) (f.listeners ??= new Map()).set(w, true);
+}
+
+function $removeListener(f, w) {
+  $isFuture(f).listeners?.delete(w);
+}
+
+// One waker listening to several futures, spent by the first to settle.
+class $Race {
+  constructor(waker, futures) {
+    this.waker = waker;
+    this.futures = futures;
+  }
+
+  fire() {
+    const w = this.waker;
+    for (const f of this.futures) if (f.listeners?.get(w) === this) f.listeners.delete(w);
+    $wake(w);
+  }
+}
+
+function $addListenerList(fs, w) {
+  const pending = [];
+  for (const f of fs) if ($isFuture(f).state === 0) pending.push(f);
+  const race = new $Race(w, pending);
+  for (const f of pending) (f.listeners ??= new Map()).set(w, race);
+}
+
+function $removeListenerList(fs, w) {
+  for (const f of fs) $isFuture(f);
+  for (const f of fs) f.listeners?.delete(w);
+}
+
+function $states(fs) {
+  const out = new Uint8Array(fs.length);
+  for (let i = 0; i < fs.length; i++) out[i] = $isFuture(fs[i]).state;
+  return out;
 }
 
 function $newFuture() {
@@ -715,6 +786,8 @@ const $H0 = new $Handles("a `fn(u32)->future<u32>` function", true, "tw:drop:fn(
 let $cls0 = null;
 // tag:err
 const $tag0 = new WebAssembly.Tag({ parameters: ["i32", "externref"] });
+// tag:FetchError
+const $tag1 = new WebAssembly.Tag({ parameters: ["i32", "externref"] });
 
 function $h1(x0, len) {
   const n = len;
@@ -727,20 +800,12 @@ function $h1(x0, len) {
   return out;
 }
 
-function $h2(v) {
-  if (!(typeof v === "string")) $fail("str", v);
-}
-
-function $h3(v) {
-  if (!(typeof v === "number")) $fail("u32", v);
-}
-
-function $h4(e) {
+function $h2(e) {
   if ((($isInstance(e, globalThis.TypeError)) || ($isInstance(e, globalThis.RangeError)))) return [1, $message(e)];
   return [-1, $message(e)];
 }
 
-function $h6(f, h, a0) {
+function $h4(f, h, a0) {
   try {
     const env = f[$flagged] === undefined ? h : $H0.call(f);
     try {
@@ -755,23 +820,43 @@ function $h6(f, h, a0) {
   }
 }
 
-function $h5(env) {
+function $h3(env) {
   return $H0.wrap(env, () => {
-    const f = function (a0) { return $h6(f, env, a0); };
+    const f = function (a0) { return $h4(f, env, a0); };
     return f;
   });
 }
 
-function $h7(e) {
+function $h5(e) {
   if ((($isInstance(e, globalThis.DOMException) && e.name === "AbortError"))) return [2, $message(e)];
   if ((($isInstance(e, globalThis.TypeError)) || ($isInstance(e, globalThis.RangeError)))) return [1, $message(e)];
   return [-1, $message(e)];
+}
+
+function $h6(x0, len) {
+  const n = len;
+  const out = new Array(n);
+  for (let i = 0; i < n; i++) {
+    const x = x0 + i * 1;
+    const t1 = $L.table.get(x + 0);
+    out[i] = t1;
+  }
+  return out;
+}
+
+function $h7(arm, m) {
+  const msg = m == null ? "" : String(m);
+  switch (arm) {
+    case 1: return $construct(globalThis.TypeError, msg, {  });
+  }
+  return new Error(msg);
 }
 
 function $h8(arm, m) {
   const msg = m == null ? "" : String(m);
   switch (arm) {
     case 1: return $construct(globalThis.TypeError, msg, {  });
+    case 2: return $construct(globalThis.DOMException, msg, { "name": "AbortError" });
   }
   return new Error(msg);
 }
@@ -826,7 +911,7 @@ function $f7(w0_0, w1_0, w1_1) {
   const t1 = $liftUtf8($L, w1_0, w1_1);
   try {
     const r = w0_0.fetch(t1);
-    const t2 = $future(r, $h2);
+    const t2 = $future(r);
     return t2;
   } catch (e) {
     return $rejected(e);
@@ -839,9 +924,9 @@ function $f8(w0_0, w1_0, w1_1) {
   try {
     const t2 = new globalThis.AbortController();
     const t3 = w0_0.slow(t1, t2.signal);
-    const t4 = $future(t3, $h3, () => { t2.abort(); });
+    const t4 = $future(t3, null, () => { t2.abort(); });
     const r = t4;
-    const t5 = $future(r, $h3);
+    const t5 = $future(r);
     return t5;
   } catch (e) {
     return $rejected(e);
@@ -858,9 +943,9 @@ function $f9(w0_0, w1_0, w1_1, w2_0) {
     const t5 = globalThis.AbortSignal.any([t2?.signal, t3.signal].filter((v) => v != null));
     if (t5 !== undefined) t4.signal = t5;
     const t6 = w0_0.joined(t1, t4);
-    const t7 = $future(t6, $h3, () => { t3.abort(); });
+    const t7 = $future(t6, null, () => { t3.abort(); });
     const r = t7;
-    const t8 = $future(r, $h3);
+    const t8 = $future(r);
     return t8;
   } catch (e) {
     return $rejected(e);
@@ -877,9 +962,9 @@ function $f10(w0_0, w1_0, w1_1) {
     const t5 = t3.signal;
     if (t5 !== undefined) t4.signal = t5;
     const t6 = w0_0.joined(t1, t4);
-    const t7 = $future(t6, $h3, () => { t3.abort(); });
+    const t7 = $future(t6, null, () => { t3.abort(); });
     const r = t7;
-    const t8 = $future(r, $h3);
+    const t8 = $future(r);
     return t8;
   } catch (e) {
     return $rejected(e);
@@ -890,7 +975,7 @@ function $f10(w0_0, w1_0, w1_1) {
 function $f11(w0_0) {
   try {
     const r = w0_0.number();
-    const t1 = $future(r, $h3);
+    const t1 = $future(r);
     return t1;
   } catch (e) {
     return $rejected(e);
@@ -901,7 +986,7 @@ function $f11(w0_0) {
 function $f12(w0_0) {
   try {
     const r = w0_0.nothing();
-    const t1 = $future(r, null);
+    const t1 = $future(r);
     return t1;
   } catch (e) {
     return $rejected(e);
@@ -923,11 +1008,11 @@ function $f13(w0_0) {
 function $f14(w0_0) {
   try {
     const r = w0_0.strict();
-    const t1 = $future(r, $h3);
+    const t1 = $future(r);
     return t1;
   } catch (e) {
     if (e instanceof WebAssembly.Exception) throw e;
-    throw new WebAssembly.Exception($tag0, $h4(e));
+    throw new WebAssembly.Exception($tag0, $h2(e));
   }
 }
 
@@ -939,22 +1024,131 @@ function $f15(w0_0, w1_0) {
 
 // ("tw:js/global", "Api#later(fn(u32)->future<u32>)")
 function $f16(w0_0, w1_0) {
-  const t1 = $h5(w1_0);
+  const t1 = $h3(w1_0);
   w0_0.later(t1);
 }
 
-// ("tw:future", "poll")
-function $f17(f, w) {
-  return $poll(f, w);
+// ("tw:future", "state")
+function $f17(f) {
+  return $isFuture(f).state;
 }
 
-// ("tw:future", "take<str>")
+// ("tw:future", "get<str,FetchError>")
 function $f18(w0_0) {
-  const v = $settled(w0_0, 1);
+  const f = $isFuture(w0_0);
   const cx = $cx;
   const cxm = cx.n;
   try {
-    const t1 = $lowerUtf8($L, $str(v), cx);
+    const r = $option(f, false);
+    let t1 = 0, t2 = 0, t3 = 0;
+    if (r != null) {
+      $tuple(r, 1, "(str)?");
+      const t4 = r[0];
+      const t5 = $lowerUtf8($L, $str(t4), cx);
+      const t6 = t5[0];
+      const t7 = t5[1];
+      t1 = 1;
+      t2 = t6;
+      t3 = t7;
+    }
+    const ra = $ret();
+    ra.i32[0] = t2;
+    ra.i32[2] = t3;
+    return t1;
+  } catch (e) {
+    $release(cx, cxm);
+    if (e instanceof WebAssembly.Exception) throw e;
+    throw new WebAssembly.Exception($tag1, $h5(e));
+  } finally {
+    cx.n = cxm;
+  }
+}
+
+// ("tw:future", "get<u32>")
+function $f19(w0_0) {
+  const f = $isFuture(w0_0);
+  try {
+    const r = $option(f, false);
+    let t1 = 0, t2 = 0;
+    if (r != null) {
+      $tuple(r, 1, "(u32)?");
+      const t3 = r[0];
+      const t4 = $int(t3, 0, 4294967295, "u32");
+      t1 = 1;
+      t2 = t4;
+    }
+    const ra = $ret();
+    ra.i32[0] = t2;
+    return t1;
+  } catch (e) {
+    if (e instanceof WebAssembly.Exception) throw e;
+    throw new WebAssembly.Exception($tag0, $h2(e));
+  }
+}
+
+// ("tw:future", "get<unit>")
+function $f20(w0_0) {
+  const f = $isFuture(w0_0);
+  try {
+    const r = $option(f, true);
+    let t1 = 0;
+    if (r != null) {
+      $tuple(r, 0, "(unit)?");
+      t1 = 1;
+    }
+    return t1;
+  } catch (e) {
+    if (e instanceof WebAssembly.Exception) throw e;
+    throw new WebAssembly.Exception($tag0, $h2(e));
+  }
+}
+
+// ("tw:future", "error<FetchError>")
+function $f21(w0_0) {
+  return $h5($rejection(w0_0));
+}
+
+function $f21$r(a0) {
+  const r = $f21(a0);
+  const ra = $ret();
+  ra.i32[0] = r[0];
+  return r[1];
+}
+
+// ("tw:future", "error<err>")
+function $f22(w0_0) {
+  return $h2($rejection(w0_0));
+}
+
+function $f22$r(a0) {
+  const r = $f22(a0);
+  const ra = $ret();
+  ra.i32[0] = r[0];
+  return r[1];
+}
+
+// ("tw:future", "cancel")
+function $f23(f) {
+  $cancelFuture(f);
+}
+
+// ("tw:future", "add_listener")
+function $f24(f, w) {
+  $addListener(f, w);
+}
+
+// ("tw:future", "remove_listener")
+function $f25(f, w) {
+  $removeListener(f, w);
+}
+
+// ("tw:future", "states")
+function $f26(w0_0, w0_1) {
+  const cx = $cx;
+  const cxm = cx.n;
+  try {
+    const r = $states($h6(w0_0, w0_1));
+    const t1 = $lowerVec($L, $typed(r, Uint8Array, "u8[]"), Uint8Array, cx);
     const t2 = t1[0];
     const t3 = t1[1];
     const ra = $ret();
@@ -968,84 +1162,45 @@ function $f18(w0_0) {
   }
 }
 
-// ("tw:future", "take<u32>")
-function $f19(w0_0) {
-  const v = $settled(w0_0, 1);
-  const cx = $cx;
-  const cxm = cx.n;
-  try {
-    const t1 = $int(v, 0, 4294967295, "u32");
-    return t1;
-  } catch (e) {
-    $release(cx, cxm);
-    throw e;
-  } finally {
-    cx.n = cxm;
-  }
+// ("tw:future", "add_listener_list")
+function $f27(w0_0, w0_1, w1_0) {
+  $addListenerList($h6(w0_0, w0_1), w1_0);
 }
 
-// ("tw:future", "take<unit>")
-function $f20(w0_0) {
-  const v = $settled(w0_0, 1);
-}
-
-// ("tw:future", "error<FetchError>")
-function $f21(w0_0) {
-  return $h7($settled(w0_0, 2));
-}
-
-function $f21$r(a0) {
-  const r = $f21(a0);
-  const ra = $ret();
-  ra.i32[0] = r[0];
-  return r[1];
-}
-
-// ("tw:future", "error<err>")
-function $f22(w0_0) {
-  return $h4($settled(w0_0, 2));
-}
-
-function $f22$r(a0) {
-  const r = $f22(a0);
-  const ra = $ret();
-  ra.i32[0] = r[0];
-  return r[1];
-}
-
-// ("tw:future", "drop")
-function $f23(f) {
-  $dropFuture(f);
+// ("tw:future", "remove_listener_list")
+function $f28(w0_0, w0_1, w1_0) {
+  $removeListenerList($h6(w0_0, w0_1), w1_0);
 }
 
 // ("tw:future", "new")
-function $f24() {
+function $f29() {
   return $newFuture();
 }
 
 // ("tw:future", "resolve<u32>")
-function $f25(w0_0, w1_0) {
+function $f30(w0_0, w1_0) {
   $resolver(w0_0).resolve((w1_0 >>> 0));
 }
 
 // ("tw:future", "reject<err>")
-function $f26(w0_0, w1_0, w1_1) {
-  $resolver(w0_0).reject($h8(w1_0, w1_1));
+function $f31(w0_0, w1_0, w1_1) {
+  $resolver(w0_0).reject($h7(w1_0, w1_1));
 }
 
 // ("tw:loop", "work_available")
-function $f27(l) {
+function $f32(l) {
   $loops.available(l);
 }
 
 // ("tw:loop", "drop")
-function $f28(l) {
+function $f33(l) {
   $loops.drop(l);
 }
 
 function $outgoing(e) {
   if (e instanceof WebAssembly.Exception) {
-    if (e.is($tag0)) return $h8(e.getArg($tag0, 0), e.getArg($tag0, 1));
+    if (e.is($tag0)) return $h7(e.getArg($tag0, 0), e.getArg($tag0, 1));
+    if (e.is($tag1)) return $h8(e.getArg($tag1, 0), e.getArg($tag1, 1));
   }
   return e;
 }
@@ -1071,7 +1226,7 @@ const $N0 = {
     if (a.length >= 1) {
       try {
         const t1 = a[0];
-        const t2 = $future(t1, $h2);
+        const t2 = $future(t1);
         const r = $E[2](t2);
         return (r >>> 0);
       } catch (e) {
@@ -1088,7 +1243,7 @@ export function instantiate(language, bridge, imports = {}) {
   if ($B) throw new Error("this bridge is already instantiated");
   $cls0 = $class(globalThis.AbortSignal);
   $B = new WebAssembly.Instance(bridge, {
-    "tw:glue": { r18: $f18, r21: $f21$r, r22: $f22$r },
+    "tw:glue": { r18: $f18, r19: $f19, r21: $f21$r, r22: $f22$r, r26: $f26 },
   }).exports;
   $S = new $Scratch($B);
   const instance = new WebAssembly.Instance(language, {
@@ -1113,23 +1268,29 @@ export function instantiate(language, bridge, imports = {}) {
       "Api#later(fn(u32)->future<u32>)": $f16,
     },
     "tw:future": {
-      "poll": $f17,
-      "take<str>": $B.f18,
-      "take<u32>": $f19,
-      "take<unit>": $f20,
+      "state": $f17,
+      "get<str,FetchError>": $B.f18,
+      "get<u32>": $B.f19,
+      "get<unit>": $f20,
       "error<FetchError>": $B.f21,
       "error<err>": $B.f22,
-      "drop": $f23,
-      "new": $f24,
-      "resolve<u32>": $f25,
-      "reject<err>": $f26,
+      "cancel": $f23,
+      "add_listener": $f24,
+      "remove_listener": $f25,
+      "states": $B.f26,
+      "add_listener_list": $f27,
+      "remove_listener_list": $f28,
+      "new": $f29,
+      "resolve<u32>": $f30,
+      "reject<err>": $f31,
     },
     "tw:loop": {
-      "work_available": $f27,
-      "drop": $f28,
+      "work_available": $f32,
+      "drop": $f33,
     },
     "tw:tag": {
       "err": $tag0,
+      "FetchError": $tag1,
     },
   });
   $X = instance.exports;

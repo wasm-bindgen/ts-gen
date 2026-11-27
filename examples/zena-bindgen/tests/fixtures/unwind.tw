@@ -5,8 +5,25 @@ boom();
 /// Throws a `TypeError`.
 typed() throws;
 later(): future<unit>;
+/// Fulfils with a string, which isn't an `f64`.
+mistyped(): future<f64>;
+mistypedAs(): future<f64, TypeErr>;
+/// Fulfils with nothing for a negative `n`, a string for 0, and else `n`.
+maybe(n: f64): future<f64?>;
+maybeAs(n: f64): future<f64?, TypeErr>;
+maybeOf<T>(n: f64): future<T?>;
+
+enum TypeErr {
+  @js(TypeError) TypeError(Str);
+  @fallback Error(Str);
+}
 
 export sync(): str;
 export before(): future<str>;
 export after(): future<str>;
 export typedAfter(): future<str>;
+export mistypedValue(): future<str>;
+export mistypedValueAs(): future<str>;
+export optionalValue(): future<str>;
+export optionalValueAs(): future<str>;
+export optionalValueOf(): future<str>;

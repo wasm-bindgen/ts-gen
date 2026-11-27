@@ -310,8 +310,10 @@ class Repr(
     val box get() = BoxOp.of(m, "box")
     val unbox get() = BoxOp.of(m, "unbox")
     val call get() = Import.from(m.obj("call"))
-    /** A future's `take<T>` import. */
-    val take get() = valueOp("take")
+    /** A future's `get<T>` import, `get<T,E>` for a rejection enum other than `err`. */
+    val get get() = valueOp("get")
+    /** What `get` throws, as an import that `throws` the rejection enum does. */
+    val getThrows get() = rejection.let { ThrowsL(Import("tw:err", it.path), Import("tw:err", "set:${it.path}"), it) }
     /** A future's `error<E>`, `new`, `resolve<T>` and `reject<E>` imports. */
     val errorOp get() = Import.from(m.obj("errorOp"))
     val futureNew get() = Import.from(m.obj("new"))
@@ -327,7 +329,7 @@ class Repr(
      * the same wire, the value as it is.
      */
     private fun valueOp(op: String) =
-        Import.from(m.obj(op)).let { if (value.kind == "erased") Import(it.module, "$op<Any?>") else it }
+        Import.from(m.obj(op)).let { if (value.kind == "erased") Import(it.module, it.name.replaceFirst(Regex("<Any\\?*"), "<Any?")) else it }
 
     companion object {
         fun from(m: Map<String, Any?>) = Repr(

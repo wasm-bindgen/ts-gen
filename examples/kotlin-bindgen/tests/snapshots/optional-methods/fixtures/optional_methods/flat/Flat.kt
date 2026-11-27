@@ -23,17 +23,21 @@ external fun Handlers_new(): JsAny?
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun call_fn_Element2_future_unit(p0: JsAny?, p1: JsAny?): JsAny?
 
-/** tw:future take<unit> */
+/** tw:future get<unit> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_unit(p0: JsAny?)
+external fun get_unit(p0: JsAny?): Int
 
-/** tw:future error<err> */
+/** tw:err err */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun error_err(p0: JsAny?): Int
+external fun err_err(p0: JsAny?): Int
 
 /** tw:ret externref */
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
 external fun ret_externref(): JsAny?
+
+/** tw:future error<err> */
+@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
+external fun error_err(p0: JsAny?): Int
 
 /**
  * Called per element.
@@ -81,10 +85,6 @@ external fun MoreHandlers_get_end(p0: JsAny?): JsAny?
 /** tw:js/global MoreHandlers#set:end(fn()) */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun MoreHandlers_set_end_fn(p0: JsAny?, p1: JsAny?)
-
-/** tw:err err */
-@JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun err_err(p0: JsAny?): Int
 
 /** tw:js/global rewrite(Handlers,MoreHandlers) */
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")

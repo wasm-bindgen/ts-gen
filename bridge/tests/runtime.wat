@@ -45,7 +45,7 @@
       (then (drop (table.grow $tab (ref.null extern) (i32.sub (global.get $tbump) (table.size $tab))))))
     (global.set $tlive (i32.add (global.get $tlive) (local.get $n)))
     (local.get $b))
-  (func (export "tw:table/free") (param $b i32) (param $n i32)
+  (func $tfree (export "tw:table/free") (param $b i32) (param $n i32)
     (global.set $tlive (i32.sub (global.get $tlive) (local.get $n))))
   (func (export "test:alloc") (param $align {P}) (param $size {P}) (result {P})
     (call $alloc (local.get $align) (local.get $size)))

@@ -15,5 +15,6 @@ class Probe {
   triple(): (u32, str, f64);
   maybe(): f64?;
   get(key: str): (u32, str) throws KvError;
+  later(): future<(u32, str), KvError>;
   on(cb: fn(u32) -> (u32, str));
 }

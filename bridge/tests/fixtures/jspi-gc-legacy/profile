@@ -1,0 +1,5 @@
+all-gc
+results = single
+throws = js
+jspi = on
+eh = legacy

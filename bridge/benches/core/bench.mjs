@@ -179,22 +179,20 @@ case_("export util.len(str 1K)", 2e5, batched((k) => {
   for (let i = 0; i < k; i++) util.len(S1K);
 }, 1024));
 
-// A future round trip: the import makes it, the promise settles it, and the
-// language polls, takes and drops it.
+// A future round trip: the import makes it, the language listens for it, the
+// promise settles it, and the language gets its value.
 {
   const fs = new Array(10000);
-  await caseAsync("future<u32> make, settle, poll, take, drop", 1e5, async (k) => {
+  await caseAsync("future<u32> make, listen, settle, get", 1e5, async (k) => {
     for (let done = 0; done < k; done += fs.length) {
       const n = Math.min(fs.length, k - done);
       for (let i = 0; i < n; i++) {
         fs[i] = call("Probe#later()", p);
-        call("future:poll", fs[i], 1);
+        call("future:add_listener", fs[i], 1);
       }
       await new Promise((r) => setImmediate(r));
       for (let i = 0; i < n; i++) {
-        if (call("future:poll", fs[i], 1) !== 1) throw new Error("unsettled");
-        call("future:take<u32>", fs[i]);
-        call("future:drop", fs[i]);
+        if (call("future:get<u32>", fs[i])[0] !== 1) throw new Error("unsettled");
       }
     }
   });

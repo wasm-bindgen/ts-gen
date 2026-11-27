@@ -4,6 +4,9 @@ class Api {
   fetch() {
     return this.next;
   }
+  futures() {
+    return this.list;
+  }
 }
 globalThis.Api = Api;
 
@@ -30,11 +33,20 @@ const base = scratchUse();
 const api = new Api();
 api.next = Promise.resolve("héllo");
 const f = ex["call:Api#fetch()"](api);
-assert.equal(ex["call:future:poll"](f, 4), 0);
+assert.equal(ex["call:future:state"](f), 0);
+// Futures in the language's own GC array.
+const list = (fs) => {
+  api.list = fs;
+  return ex["call:Api#futures()"](api);
+};
+ex["call:future:add_listener"](f, 4);
 await tick();
 assert.deepEqual(wakes, [4]);
-assert.equal(ex["call:future:poll"](f, 4), 1);
-const s = ex["call:future:take<str>"](f);
+assert.equal(ex["call:future:state"](f), 1);
+// The states are a GC array too.
+assert.equal(typeof ex["call:future:states"](list([f])), "object");
+const [present, s] = ex["call:future:get<str>"](f);
+assert.equal(present, 1);
 const p = app.run();
 ex["call:future:resolve<str>"](resolver, s);
 assert.equal(await p, "héllo");
@@ -44,7 +56,7 @@ assert.deepEqual(scratchUse(), base);
 let res;
 api.next = new Promise((r) => (res = r));
 const g = ex["call:Api#fetch()"](api);
-ex["call:future:poll"](g, 5);
+ex["call:future:add_listener_list"](list([f, g]), 5);
 ex["tw:terminated"].value = 1;
 res("x");
 await tick();

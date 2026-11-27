@@ -1,7 +1,7 @@
 ir 1;
 
 // Futures of type parameters: the language imports their operations on
-// the erasure (`take<Any?>`), as the lowered JSON names them.
+// the erasure (`get<Any?>`), as the lowered JSON names them.
 class Box<T> {}
 
 class Kv {

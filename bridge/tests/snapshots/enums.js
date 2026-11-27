@@ -429,33 +429,28 @@ function $liftVec(s, p, len, C) {
   return new C(s.u8().slice(p, p + n).buffer);
 }
 
-// A future the language holds (IR.md §16): a promise, settled state for
-// synchronous polls, and the waker to call when it settles. `check`
-// validates a resolution, which otherwise rejects with its TypeError.
+// A future the language holds (IR.md §16): a promise, with its state and
+// raw settlement kept for the language's synchronous reads. `check` is a
+// `future<never>`'s rule, which rejects a resolution.
 class $Future {
   constructor(promise, check, cancel) {
     this.promise = promise;
     this.state = 0;
     this.value = undefined;
-    this.waker = -1;
+    this.listeners = null;
     this.cancel = cancel;
-    this.dropped = false;
-    this.taken = false;
-    // The suspensions parked on it (§16).
-    this.parked = null;
     promise.then(
       (v) => {
-        if (this.dropped) return;
-        try {
-          if (check) check(v);
-          this.settle(1, v);
-        } catch (e) {
-          this.settle(2, e);
+        if (check) {
+          try {
+            check(v);
+          } catch (e) {
+            return this.settle(2, e);
+          }
         }
+        this.settle(1, v);
       },
-      (e) => {
-        if (!this.dropped) this.settle(2, e);
-      },
+      (e) => this.settle(2, e),
     );
   }
 
@@ -463,24 +458,28 @@ class $Future {
     this.state = state;
     this.value = value;
     this.cancel = null;
-    const w = this.waker;
-    this.waker = -1;
-    if (w !== -1) $wake(w);
-    $unpark(this, state);
+    const ls = this.listeners;
+    if (!ls) return;
+    // Each is taken off as it fires, so a wake can still remove one that
+    // hasn't, and one that throws doesn't keep the rest from firing.
+    let failed = false;
+    let error;
+    for (const [w, l] of ls) {
+      ls.delete(w);
+      try {
+        l === true ? $wake(w) : l.fire(this);
+      } catch (e) {
+        if (!failed) error = e;
+        failed = true;
+      }
+    }
+    this.listeners = null;
+    if (failed) throw error;
   }
 }
 
 function $future(v, check, cancel) {
-  return v instanceof $Future ? v : new $Future(Promise.resolve(v), check, cancel ?? null);
-}
-
-// Dropping cancels: the cancel function runs once, its failure swallowed,
-// and a later settlement is ignored.
-// Resumes the suspensions parked on future `f` with `state`.
-function $unpark(f, state) {
-  const ps = f.parked;
-  f.parked = null;
-  if (ps) for (const w of ps) w(state);
+  return v instanceof $Future ? v : new $Future(Promise.resolve(v), check ?? null, cancel ?? null);
 }
 
 
@@ -722,13 +721,9 @@ function $h14(v, cx) {
   $fail("Strict", v);
 }
 
-function $h16(v) {
-  if (!(typeof v === "number")) $fail("u32", v);
-}
-
 function $h15(v, cx) {
   if ($isThenable(v)) {
-    const t1 = $future(v, $h16);
+    const t1 = $future(v);
     return [1, t1, 0, 0];
   }
   if ($isObject(v)) {
@@ -744,7 +739,7 @@ function $h15(v, cx) {
   $fail("Arg", v);
 }
 
-function $h17(arm) {
+function $h16(arm) {
   switch (arm) {
     case 1: {
       return "year";
@@ -765,7 +760,7 @@ function $h17(arm) {
   throw new TypeError("an invalid `AnyUnit` arm");
 }
 
-function $h18(v, cx) {
+function $h17(v, cx) {
   if (v === "week") {
     return 5;
   }
@@ -784,7 +779,7 @@ function $h18(v, cx) {
   $fail("AnyUnit", v);
 }
 
-function $h19(arm) {
+function $h18(arm) {
   switch (arm) {
     case 3: {
       return "hour";
@@ -796,7 +791,7 @@ function $h19(arm) {
   throw new TypeError("an invalid `TimeUnit` arm");
 }
 
-function $h20(v, cx) {
+function $h19(v, cx) {
   if (v === "hour") {
     return 3;
   }
@@ -806,7 +801,7 @@ function $h20(v, cx) {
   $fail("TimeUnit", v);
 }
 
-function $h21(arm, s0, s1) {
+function $h20(arm, s0, s1) {
   switch (arm) {
     case 5: {
       return (s0 & 255);
@@ -818,7 +813,7 @@ function $h21(arm, s0, s1) {
   throw new TypeError("an invalid `Gapped` arm");
 }
 
-function $h22(v, cx) {
+function $h21(v, cx) {
   if (typeof v === "number") {
     const t1 = $int(v, 0, 255, "u8");
     return [5, t1, 0];
@@ -832,7 +827,7 @@ function $h22(v, cx) {
   $fail("Gapped", v);
 }
 
-function $h23(arm, s0, s1) {
+function $h22(arm, s0, s1) {
   switch (arm) {
     case 1: {
       return undefined;
@@ -844,7 +839,7 @@ function $h23(arm, s0, s1) {
   throw new TypeError("an invalid `str??` arm");
 }
 
-function $h24(v, cx) {
+function $h23(v, cx) {
   if (v === undefined) {
     return [1, 0, 0];
   }
@@ -1081,28 +1076,28 @@ function $f12(w0_0) {
 
 // ("tw:js/global", "Probe#unit(AnyUnit)")
 function $f13(w0_0, w1_0) {
-  const t1 = $h17(w1_0);
+  const t1 = $h16(w1_0);
   const r = w0_0.unit(t1);
-  const t2 = $h18(r, null);
+  const t2 = $h17(r, null);
   return t2;
 }
 
 // ("tw:js/global", "Probe#time(TimeUnit)")
 function $f14(w0_0, w1_0) {
-  const t1 = $h19(w1_0);
+  const t1 = $h18(w1_0);
   const r = w0_0.time(t1);
-  const t2 = $h20(r, null);
+  const t2 = $h19(r, null);
   return t2;
 }
 
 // ("tw:js/global", "Probe#gapped(Gapped)")
 function $f15(w0_0, w1_0, w1_1, w1_2) {
-  const t1 = $h21(w1_0, w1_1, w1_2);
+  const t1 = $h20(w1_0, w1_1, w1_2);
   const cx = $cx;
   const cxm = cx.n;
   try {
     const r = w0_0.gapped(t1);
-    const t2 = $h22(r, cx);
+    const t2 = $h21(r, cx);
     const t3 = t2[0];
     const t4 = t2[1];
     const t5 = t2[2];
@@ -1120,12 +1115,12 @@ function $f15(w0_0, w1_0, w1_1, w1_2) {
 
 // ("tw:js/global", "Probe#maybe(str??)")
 function $f16(w0_0, w1_0, w1_1, w1_2) {
-  const t1 = $h23(w1_0, w1_1, w1_2);
+  const t1 = $h22(w1_0, w1_1, w1_2);
   const cx = $cx;
   const cxm = cx.n;
   try {
     const r = w0_0.maybe(t1);
-    const t2 = $h24(r, cx);
+    const t2 = $h23(r, cx);
     const t3 = t2[0];
     const t4 = t2[1];
     const t5 = t2[2];

@@ -4,9 +4,10 @@ js_code	fixtures.optional_methods.flat.Element2_set_tag_str	tw:js/global	Element
 js_code	fixtures.optional_methods.flat.Handlers_new	tw:js/global	Handlers.new()
 js_code	fixtures.optional_methods.flat.Handlers_get_element	tw:js/global	Handlers#get:element()
 js_code	fixtures.optional_methods.flat.call_fn_Element2_future_unit	tw:call	(fn(Element2)->future<unit>?)?
-js_code	fixtures.optional_methods.flat.take_unit	tw:future	take<unit>
-js_code	fixtures.optional_methods.flat.error_err	tw:future	error<err>
+js_code	fixtures.optional_methods.flat.get_unit	tw:future	get<unit>
+js_code	fixtures.optional_methods.flat.err_err	tw:err	err
 js_code	fixtures.optional_methods.flat.ret_externref	tw:ret	externref
+js_code	fixtures.optional_methods.flat.error_err	tw:future	error<err>
 js_code	fixtures.optional_methods.flat.Handlers_set_element_fn_Element2_future_unit	tw:js/global	Handlers#set:element(fn(Element2)->future<unit>?)
 js_code	fixtures.optional_methods.flat.Handlers_get_text	tw:js/global	Handlers#get:text()
 js_code	fixtures.optional_methods.flat.call_fn_str_bool	tw:call	fn(str,bool?)?
@@ -18,7 +19,6 @@ js_code	fixtures.optional_methods.flat.MoreHandlers_get_end	tw:js/global	MoreHan
 js_code	fixtures.optional_methods.flat.call_fn	tw:call	fn()?
 js_code	fixtures.optional_methods.flat.MoreHandlers_set_end_fn	tw:js/global	MoreHandlers#set:end(fn())
 js_code	fixtures.optional_methods.flat.rewrite_Handlers_MoreHandlers	tw:js/global	rewrite(Handlers,MoreHandlers)
-js_code	fixtures.optional_methods.flat.err_err	tw:err	err
 js_code	fixtures.optional_methods.flat.inline_InlineHandlers	tw:js/global	inline(InlineHandlers)
 js_code	fixtures.optional_methods.flat.Stream_pipe_StreamSink	tw:js/global	Stream#pipe(StreamSink)
 js_code	fixtures.optional_methods.flat.StreamSink_new	tw:js/global	StreamSink.new()
@@ -50,6 +50,7 @@ js_code	fixtures.optional_methods.flat.box_fn	tw:box	fn()
 js_code	fixtures.optional_methods.flat.unbox_fn	tw:unbox	fn()
 js_code	fixtures.optional_methods.flat.box_fn_str	tw:box	fn(str)
 js_code	fixtures.optional_methods.flat.unbox_fn_str	tw:unbox	fn(str)
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

@@ -3,14 +3,14 @@ js_code	fixtures.export_class_module.flat.DurableObjectState_get_id	tw:js/global
 js_code	fixtures.export_class_module.flat.DurableObject_new	tw:js/global	DurableObject.new()
 js_code	fixtures.export_class_module.flat.DurableObject_get_alarm	tw:js/global	DurableObject#get:alarm()
 js_code	fixtures.export_class_module.flat.call_fn_future_unit	tw:call	(fn()->future<unit>?)?
-js_code	fixtures.export_class_module.flat.take_unit	tw:future	take<unit>
-js_code	fixtures.export_class_module.flat.error_err	tw:future	error<err>
+js_code	fixtures.export_class_module.flat.get_unit	tw:future	get<unit>
+js_code	fixtures.export_class_module.flat.err_err	tw:err	err
 js_code	fixtures.export_class_module.flat.ret_externref	tw:ret	externref
+js_code	fixtures.export_class_module.flat.error_err	tw:future	error<err>
 js_code	fixtures.export_class_module.flat.DurableObject_set_alarm_fn_future_unit	tw:js/global	DurableObject#set:alarm(fn()->future<unit>?)
 js_code	fixtures.export_class_module.flat.err_set_err	tw:err	set:err
 js_code	fixtures.export_class_module.flat.new_Counter_new_DurableObjectState_Env	tw:new	Counter.new(DurableObjectState,Env)
 js_code	fixtures.export_class_module.flat.unbox_Counter	tw:unbox	Counter
-js_code	fixtures.export_class_module.flat.err_err	tw:err	err
 js_code	fixtures.export_class_module.flat.future_new	tw:future	new
 js_code	fixtures.export_class_module.flat.future_resolve_f64	tw:future	resolve<f64>
 js_code	fixtures.export_class_module.flat.reject_err	tw:future	reject<err>
@@ -21,6 +21,7 @@ js_code	fixtures.export_class_module.flat.box_Greeter	tw:box	Greeter
 js_code	fixtures.export_class_module.flat.future_resolve_unit	tw:future	resolve<unit>
 js_code	fixtures.export_class_module.flat.box_fn_future_unit	tw:box	fn()->future<unit>
 js_code	fixtures.export_class_module.flat.unbox_fn_future_unit	tw:unbox	fn()->future<unit>
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

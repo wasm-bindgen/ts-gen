@@ -9,5 +9,8 @@ export namespace app {
   listen(t: Target, base: u32);
   forget();
   guarded(t: Target, s: str): u32;
+  keep(s: str, t: Target);
+  kept(): str;
+  pick(xs: arr<Target>, i: u32): Target;
   terminate();
 }

@@ -50,6 +50,11 @@ function $isObject(v) {
   return (typeof v === "object" && v !== null) || typeof v === "function";
 }
 
+function $tuple(v, n, what) {
+  if (!Array.isArray(v) || v.length !== n) $fail(what, v);
+  return v;
+}
+
 // A memory and its externref table, as the glue reads and writes them.
 // The language's space allocates through its exports and registers each
 // allocation on the call's cleanup list; the scratch space is the
@@ -183,68 +188,28 @@ function $construct(C, msg, props) {
   return e;
 }
 
-// The cleanup stack (IR.md §15): `kind, ptr, size, align` records of the
-// allocations conversions make, memory (0), table slots (1), or the `size`
-// strings of an `arr<str>` at `ptr` (2), below `n`.
-// Each conversion marks `n`, and resets it once the language owns what it
-// pushed. One shared stack saves growing an array per call, and nested
-// conversions only ever touch the records above their own mark. `n` is kept
-// apart because setting an array's `length` is slow.
-const $cx = { a: [], n: 0 };
-
-// Releases a failed conversion's allocations: the records above `m`.
-function $release(cx, m) {
-  const a = cx.a;
-  for (let i = cx.n - 4; i >= m; i -= 4) {
-    try {
-      if (a[i] === 0) $L.free(a[i + 1], a[i + 2], a[i + 3]);
-      else if (a[i] === 1) $L.tfree(a[i + 1], a[i + 2]);
-      else $freeStrs(a[i + 1], a[i + 2]);
-    } catch {}
-  }
-  cx.n = m;
-}
-
-// Frees the first `n` strings of the `(ptr, len)` descriptors at `p`.
-function $freeStrs(p, n) {
-  for (let i = 0; i < n; i++) {
-    const dv = $L.dv();
-    const len = dv.getUint32(p + i * 8 + 4, true);
-    if (len !== 0) {
-      try {
-        $L.free(dv.getUint32(p + i * 8, true), len, 1);
-      } catch {}
-    }
-  }
-}
-
-// A future the language holds (IR.md §16): a promise, settled state for
-// synchronous polls, and the waker to call when it settles. `check`
-// validates a resolution, which otherwise rejects with its TypeError.
+// A future the language holds (IR.md §16): a promise, with its state and
+// raw settlement kept for the language's synchronous reads. `check` is a
+// `future<never>`'s rule, which rejects a resolution.
 class $Future {
   constructor(promise, check, cancel) {
     this.promise = promise;
     this.state = 0;
     this.value = undefined;
-    this.waker = -1;
+    this.listeners = null;
     this.cancel = cancel;
-    this.dropped = false;
-    this.taken = false;
-    // The suspensions parked on it (§16).
-    this.parked = null;
     promise.then(
       (v) => {
-        if (this.dropped) return;
-        try {
-          if (check) check(v);
-          this.settle(1, v);
-        } catch (e) {
-          this.settle(2, e);
+        if (check) {
+          try {
+            check(v);
+          } catch (e) {
+            return this.settle(2, e);
+          }
         }
+        this.settle(1, v);
       },
-      (e) => {
-        if (!this.dropped) this.settle(2, e);
-      },
+      (e) => this.settle(2, e),
     );
   }
 
@@ -252,15 +217,28 @@ class $Future {
     this.state = state;
     this.value = value;
     this.cancel = null;
-    const w = this.waker;
-    this.waker = -1;
-    if (w !== -1) $wake(w);
-    $unpark(this, state);
+    const ls = this.listeners;
+    if (!ls) return;
+    // Each is taken off as it fires, so a wake can still remove one that
+    // hasn't, and one that throws doesn't keep the rest from firing.
+    let failed = false;
+    let error;
+    for (const [w, l] of ls) {
+      ls.delete(w);
+      try {
+        l === true ? $wake(w) : l.fire(this);
+      } catch (e) {
+        if (!failed) error = e;
+        failed = true;
+      }
+    }
+    this.listeners = null;
+    if (failed) throw error;
   }
 }
 
 function $future(v, check, cancel) {
-  return v instanceof $Future ? v : new $Future(Promise.resolve(v), check, cancel ?? null);
+  return v instanceof $Future ? v : new $Future(Promise.resolve(v), check ?? null, cancel ?? null);
 }
 
 // A synchronous throw folded into a rejected future (§16).
@@ -278,38 +256,54 @@ function $wait() {
   return p;
 }
 
-// `tw:future suspend`: 1 resolved, 2 rejected, or once parked, 0 if the
-// future is dropped first.
+// `tw:future suspend`: 1 fulfilled or 2 rejected, once the future has
+// settled.
 function $suspend(f) {
-  $isFuture(f);
-  if (f.state !== 0) return f.state;
-  $parked = new Promise((r) => $parkOn([f], (i, s) => $resume(r, s)));
+  if ($isFuture(f).state !== 0) return f.state;
+  $parked = new Promise((r) => $park([f], () => $resume(r, f.state)));
   return -0x80000000;
 }
 
-// `tw:future suspend_race`: the index of a settled future, the lowest if
-// several are, or once parked the first to settle, or -1 if one is
-// dropped first. The others are left as they are.
-function $suspendRace(fs) {
-  if (fs.length === 0) throw new TypeError("`suspend_race` on an empty list");
+// `tw:future suspend_list`: the index of a settled future, the lowest if
+// several are, or once parked the first to settle. The others are left as
+// they are.
+function $suspendList(fs) {
+  if (fs.length === 0) throw new TypeError("`suspend_list` on an empty list");
   for (const f of fs) $isFuture(f);
   const i = fs.findIndex((f) => f.state !== 0);
   if (i !== -1) return i;
-  $parked = new Promise((r) => $parkOn(fs, (i, s) => $resume(r, s === 0 ? -1 : i)));
+  $parked = new Promise((r) => $park(fs, (i) => $resume(r, i)));
   return -0x80000000;
 }
 
-// Parks a suspension on futures `fs`: `done(i, state)` runs once, when
-// `fs[i]` settles or is dropped first (state 0), and the others forget it.
-function $parkOn(fs, done) {
-  const ws = fs.map((f, i) => {
-    const w = (s) => {
-      fs.forEach((g, j) => g.parked?.delete(ws[j]));
-      done(i, s);
-    };
-    (f.parked ??= new Set()).add(w);
-    return w;
-  });
+// A suspension parked on futures, among their listeners:
+// `done(i)` runs once, when the first of them, `futures[i]`, settles.
+class $Park {
+  constructor(futures, done) {
+    this.futures = futures;
+    this.done = done;
+  }
+
+  fire(f) {
+    for (const g of this.futures) g.listeners?.delete(this);
+    this.done(this.futures.indexOf(f));
+  }
+}
+
+// The suspension that parked last: its wait is the next thing to run.
+let $parking = null;
+
+function $park(fs, done) {
+  const p = new $Park(fs, done);
+  for (const f of fs) (f.listeners ??= new Map()).set(p, p);
+  $parking = p;
+}
+
+// A wait that threw never suspended: its park comes off its futures.
+function $abandon() {
+  const p = $parking;
+  $parking = null;
+  if (p) for (const f of p.futures) f.listeners?.delete(p);
 }
 
 // The scratch above a suspending stack's base, `[b, sp)` and the table's
@@ -369,56 +363,20 @@ function $promising(f) {
   };
 }
 
-// Keeps `vs` reachable until future `f` settles, so their finalizers don't
-// drop the handles a suspended call still uses (§16).
-function $keep(f, vs) {
-  const keep = () => vs;
-  f.promise.then(keep, keep);
-}
-
 function $promise(v) {
   return v instanceof $Future ? v.promise : v;
 }
 
 function $isFuture(f) {
   if (!(f instanceof $Future)) throw new TypeError(`expected a future, got ${$describe(f)}`);
-  if (f.dropped) throw new TypeError("a dropped future");
   return f;
 }
 
-function $settled(f, state) {
-  $isFuture(f);
-  if (f.state !== state || f.taken) {
-    throw new TypeError(state === 1 ? "taking a future that isn't resolved" : "the error of a future that isn't rejected");
-  }
-  f.taken = true;
-  const v = f.value;
-  f.value = undefined;
-  return v;
-}
-
-// Dropping cancels: the cancel function runs once, its failure swallowed,
-// and a later settlement is ignored.
-// Resumes the suspensions parked on future `f` with `state`.
-function $unpark(f, state) {
-  const ps = f.parked;
-  f.parked = null;
-  if (ps) for (const w of ps) w(state);
-}
-
-function $dropFuture(f) {
-  if (!(f instanceof $Future) || f.dropped) return;
-  f.dropped = true;
-  f.waker = -1;
-  $unpark(f, 0);
-  f.value = undefined;
-  const c = f.state === 0 ? f.cancel : null;
-  f.cancel = null;
-  if (c) {
-    try {
-      c();
-    } catch {}
-  }
+// A future's value as `get` reads it: a tuple of it once the future is
+// fulfilled (empty for a `unit`), and none until then.
+function $option(f, unit) {
+  if (f.state !== 1) return null;
+  return unit ? [] : [f.value];
 }
 
 function $newFuture() {
@@ -443,18 +401,17 @@ let $X = null;
 let $T = null;
 const $E = [];
 let $pending = null;
+function $live() {
+  return true;
+}
 // Resumes a parked suspension with `v` (§16).
 function $resume(r, v) {
-  r(v);
+  if ($live()) r(v);
 }
 
 let $cls0 = null;
 
-function $h1(v) {
-  if (!(typeof v === "number")) $fail("u32", v);
-}
-
-function $h2(x0, len) {
+function $h1(x0, len) {
   const n = len;
   const out = new Array(n);
   for (let i = 0; i < n; i++) {
@@ -465,7 +422,7 @@ function $h2(x0, len) {
   return out;
 }
 
-function $h3(arm, m) {
+function $h2(arm, m) {
   const msg = m == null ? "" : String(m);
   switch (arm) {
     case 1: return $construct(globalThis.TypeError, msg, {  });
@@ -477,7 +434,7 @@ function $h3(arm, m) {
 function $f0(w0_0) {
   try {
     const r = w0_0.later();
-    const t1 = $future(r, $h1);
+    const t1 = $future(r);
     return t1;
   } catch (e) {
     return $rejected(e);
@@ -489,52 +446,62 @@ function $f1(f) {
   return $suspend(f);
 }
 
-// ("tw:future", "suspend_race")
+// ("tw:future", "suspend_list")
 function $f2(w0_0, w0_1) {
-  return $suspendRace($h2(w0_0, w0_1));
+  return $suspendList($h1(w0_0, w0_1));
 }
 
-// ("tw:future", "take<u32>")
+// ("tw:future", "get<u32>")
 function $f3(w0_0) {
-  const v = $settled(w0_0, 1);
-  const cx = $cx;
-  const cxm = cx.n;
+  const f = $isFuture(w0_0);
   try {
-    const t1 = $int(v, 0, 4294967295, "u32");
-    return t1;
+    const r = $option(f, false);
+    let t1 = 0, t2 = 0;
+    if (r != null) {
+      $tuple(r, 1, "(u32)?");
+      const t3 = r[0];
+      const t4 = $int(t3, 0, 4294967295, "u32");
+      t1 = 1;
+      t2 = t4;
+    }
+    return [t1, t2];
   } catch (e) {
-    $release(cx, cxm);
     throw e;
-  } finally {
-    cx.n = cxm;
   }
 }
 
-// ("tw:future", "drop")
-function $f4(f) {
-  $dropFuture(f);
+function $f3$s(a0) {
+  $spillCheck();
+  const r = $f3(a0);
+  $B.push_i32(r[1]);
+  return r[0];
+}
+
+// ("tw:js/global", "Api#mark()")
+function $f5(w0_0) {
+  w0_0.mark();
 }
 
 // ("tw:future", "new")
-function $f5() {
+function $f6() {
   return $newFuture();
 }
 
-function $f5$s() {
+function $f6$s() {
   $spillCheck();
-  const r = $f5();
+  const r = $f6();
   $B.push_externref(r[1]);
   return r[0];
 }
 
 // ("tw:future", "resolve<u32>")
-function $f7(w0_0, w1_0) {
+function $f8(w0_0, w1_0) {
   $resolver(w0_0).resolve((w1_0 >>> 0));
 }
 
 // ("tw:err", "set:err")
-function $f8(arm, m) {
-  $pending = $h3(arm, m);
+function $f9(arm, m) {
+  $pending = $h2(arm, m);
   $B.pending.value = 1;
 }
 
@@ -551,7 +518,6 @@ const $N0 = {
           const t1 = a[0];
           const t2 = $instance(t1, $cls0, "Api");
           const r = $E[0](t2);
-          $keep(r, [t1]);
           return $promise(r);
         } catch (e) {
           throw $outgoing(e);
@@ -572,7 +538,6 @@ const $N0 = {
           const t3 = a[1];
           const t4 = $str(t3);
           const r = $E[1](t2, t4);
-          $keep(r, [t1, t3]);
           return $promise(r);
         } catch (e) {
           throw $outgoing(e);
@@ -592,7 +557,6 @@ const $N0 = {
           const t1 = a[0];
           const t2 = $instance(t1, $cls0, "Api");
           const r = $E[2](t2);
-          $keep(r, [t1]);
           return $promise(r);
         } catch (e) {
           throw $outgoing(e);
@@ -603,6 +567,19 @@ const $N0 = {
       return Promise.reject(e);
     }
   },
+  stuck(...a) {
+    if (a.length >= 1) {
+      try {
+        const t1 = a[0];
+        const t2 = $instance(t1, $cls0, "Api");
+        const r = $E[3](t2);
+        return (r >>> 0);
+      } catch (e) {
+        throw $outgoing(e);
+      }
+    }
+    throw new TypeError("`stuck` doesn't match its arguments");
+  },
   fail(...a) {
     try {
       if (a.length >= 2) {
@@ -610,8 +587,7 @@ const $N0 = {
           const t1 = a[0];
           const t2 = $instance(t1, $cls0, "Api");
           const t3 = a[1];
-          const r = $E[3](t2, t3);
-          $keep(r, [t1, t3]);
+          const r = $E[4](t2, t3);
           return $promise(r);
         } catch (e) {
           throw $outgoing(e);
@@ -630,7 +606,7 @@ export function instantiate(language, bridge, imports = {}) {
   if ($B) throw new Error("this bridge is already instantiated");
   $cls0 = $class(globalThis.Api);
   $B = new WebAssembly.Instance(bridge, {
-    "tw:glue": { g1: $f1, g2: $f2, spill_fault: $spillFault, wait: new WebAssembly.Suspending($wait), stash: $stash, unstash: $unstash, throw_pending: $throwPending },
+    "tw:glue": { g1: $f1, g2: $f2, spill_fault: $spillFault, wait: new WebAssembly.Suspending($wait), stash: $stash, unstash: $unstash, abandon: $abandon, throw_pending: $throwPending },
     "wasm:js-string": {
       length: (s) => s.length,
       fromCharCodeArray: (a, start, end) => {
@@ -649,20 +625,21 @@ export function instantiate(language, bridge, imports = {}) {
     ...imports,
     "tw:js/global": {
       "Api#later()": $f0,
+      "Api#mark()": $f5,
     },
     "tw:future": {
       "suspend": $B.s1,
-      "suspend_race": $B.s2,
-      "take<u32>": $f3,
-      "drop": $f4,
-      "new": $f5$s,
-      "resolve<u32>": $f7,
+      "suspend_list": $B.s2,
+      "get<u32>": $f3$s,
+      "new": $f6$s,
+      "resolve<u32>": $f8,
     },
     "tw:ret": {
+      "i32": $B.pop_i32,
       "externref": $B.pop_externref,
     },
     "tw:err": {
-      "set:err": $f8,
+      "set:err": $f9,
     },
   });
   $X = instance.exports;
@@ -673,8 +650,9 @@ export function instantiate(language, bridge, imports = {}) {
   $E[1] = $promising($B.p1);
   $B.entries.set(2, $X["app.race(Api)"]);
   $E[2] = $promising($B.p2);
+  $E[3] = $X["app.stuck(Api)"];
   $B.entries.set(3, $X["app.fail(Api,Str)"]);
-  $E[3] = $promising($B.p3);
+  $E[4] = $promising($B.p3);
   return instance;
 }
 

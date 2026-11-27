@@ -361,7 +361,8 @@ class $C0 {
   get n() {
     const a = [];
     try {
-      const r = $E[1](this, $HC.unwrap(this, $C0, "Arr"));
+      const t1 = $HC.unwrap(this, $C0, "Arr");
+      const r = $E[1](this, t1);
       return (r >>> 0);
     } catch (e) {
       throw $outgoing(e);

@@ -102,17 +102,26 @@ pub struct Output {
 /// futures.
 const ASYNC_RUNTIME: &str = r#"import { Future, Completer, drainMicrotasks } from 'zena:async';
 
-@external("tw:future", "poll", "tw")
-declare function __tw_future_poll(future: externref, waker: i32): i32;
+@external("tw:future", "state", "tw")
+declare function __tw_future_state(future: externref): i32;
 
-@external("tw:future", "take<{T}>", "tw")
-declare function __tw_future_take<T>(future: externref): T;
+@external("tw:future", "get<{T}>", "tw, throws:err")
+declare function __tw_future_get<T>(future: externref): inline (i32, T);
+
+@external("tw:future", "get<Any?>", "tw, throws:err")
+declare function __tw_future_get_any(future: externref): inline (i32, externref | null);
 
 @external("tw:future", "error<err>", "tw")
 declare function __tw_future_error(future: externref): inline (i32, String);
 
-@external("tw:future", "drop", "tw")
-declare function __tw_future_drop(future: externref): void;
+@external("tw:future", "add_listener", "tw")
+declare function __tw_future_add_listener(future: externref, waker: i32): void;
+
+@external("tw:future", "remove_listener", "tw")
+declare function __tw_future_remove_listener(future: externref, waker: i32): void;
+
+@external("tw:future", "cancel", "tw")
+declare function __tw_future_cancel(future: externref): void;
 
 @external("tw:future", "new", "tw")
 declare function __tw_future_new(): inline (externref, externref);
@@ -140,42 +149,87 @@ class __TwAwait<T> implements __TwPoll {
   future: externref;
   waker: i32;
   completer: Completer<T>;
+  get: (future: externref, completer: Completer<T>) => boolean;
   fail: (future: externref) => Error;
 
-  new(future: externref, waker: i32, fail: (future: externref) => Error)
-      : future = future, waker = waker, completer = new Completer<T>(), fail = fail {}
+  new(future: externref, waker: i32,
+      get: (future: externref, completer: Completer<T>) => boolean,
+      fail: (future: externref) => Error)
+      : future = future, waker = waker, completer = new Completer<T>(), get = get,
+        fail = fail {}
 
   poll(): void {
-    let state = __tw_future_poll(this.future, this.waker);
-    if (state == 0) {
-      __tw_polls[this.waker] = this;
-      return;
-    }
-    if (state == 1) {
-      this.completer.complete(__tw_future_take<T>(this.future));
-    } else {
-      let fail = this.fail;
-      this.completer.fail(fail(this.future));
+    while (true) {
+      // The value is validated as it's read: one that isn't a `T` throws
+      // the error a rejection of that kind fails with.
+      try {
+        let get = this.get;
+        if (get(this.future, this.completer)) {
+          break;
+        }
+      } catch (e) {
+        this.completer.fail(e);
+        break;
+      }
+      let state = __tw_future_state(this.future);
+      if (state == 0) {
+        __tw_future_add_listener(this.future, this.waker);
+        __tw_polls[this.waker] = this;
+        return;
+      }
+      if (state == 2) {
+        let fail = this.fail;
+        this.completer.fail(fail(this.future));
+        break;
+      }
     }
     __tw_work_available(1);
   }
 }
 
-/** A JS future as a Zena future, `fail` mapping its rejection to the
- * error it fails with. Cancelling its awaiter drops the JS future, which
- * cancels it. */
+/** A JS future as a Zena future: `get` completes the completer with its
+ * value, if it has one yet, and `fail` maps its rejection to the error it
+ * fails with. Cancelling its awaiter requests the JS future's
+ * cancellation, and stops reading it: it still settles as its promise
+ * does. */
 export async function __tw_await_with<T>(
-    future: externref, fail: (future: externref) => Error): Future<T> {
+    future: externref, get: (future: externref, completer: Completer<T>) => boolean,
+    fail: (future: externref) => Error): Future<T> {
   let waker = __tw_next_waker;
   __tw_next_waker += 1;
-  let a = new __TwAwait<T>(future, waker, fail);
+  let a = new __TwAwait<T>(future, waker, get, fail);
   a.poll();
   try {
     return await a.completer.future;
   } cancel {
     __tw_polls.delete(waker);
-    __tw_future_drop(future);
+    __tw_future_remove_listener(future, waker);
+    __tw_future_cancel(future);
   }
+}
+
+function __tw_err_get<T>(future: externref, completer: Completer<T>): boolean {
+  let (present, value) = __tw_future_get<T>(future);
+  if (present == 0) {
+    return false;
+  }
+  completer.complete(value);
+  return true;
+}
+
+// A `future<T?>`'s none is read as an `Any?`'s, then its value as a `T`.
+function __tw_err_get_option<T>(future: externref, completer: Completer<Option<T>>): boolean {
+  let (present, any) = __tw_future_get_any(future);
+  if (present == 0) {
+    return false;
+  }
+  if (any == null) {
+    completer.complete(none);
+  } else {
+    let (_, value) = __tw_future_get<T>(future);
+    completer.complete(some<T>(value));
+  }
+  return true;
 }
 
 function __tw_err_fail(future: externref): Error {
@@ -184,7 +238,17 @@ function __tw_err_fail(future: externref): Error {
 }
 
 export function __tw_await<T>(future: externref): Future<T> {
-  return __tw_await_with<T>(future, __tw_err_fail);
+  return __tw_await_with<T>(
+      future, (f: externref, c: Completer<T>): boolean => __tw_err_get<T>(f, c), __tw_err_fail);
+}
+
+/** `__tw_await` for a `future<T?>`. Zena lays an `Option<T>` out as the
+ * IR's `T?` only as a whole parameter or result, not inside the
+ * `(i32, T)` of `get<T?>`, so the none is read apart from the value. */
+export function __tw_await_option<T>(future: externref): Future<Option<T>> {
+  return __tw_await_with<Option<T>>(
+      future, (f: externref, c: Completer<Option<T>>): boolean => __tw_err_get_option<T>(f, c),
+      __tw_err_fail);
 }
 
 async function __tw_settle<T>(
@@ -219,6 +283,8 @@ export function __tw_promise<T>(future: Future<T>): externref {
   return __tw_promise_with<T>(future, __tw_err_reject);
 }
 
+// A wake is a hint: its awaiter may be gone, and `poll` reads the future
+// again.
 @export("tw:future/wake")
 export function __tw_wake(waker: i32): void {
   if (let (true, p) = __tw_polls.get(waker)) {
@@ -246,6 +312,7 @@ const RUNTIME: &[&str] = &[
     "ErrException",
     "ErrArm",
     "__tw_await",
+    "__tw_await_option",
     "__tw_await_with",
     "__tw_promise",
     "__tw_promise_with",
@@ -931,7 +998,14 @@ impl<'a> Gen<'a> {
         out.push_str("import { Option, Some, None, none, some } from 'zena:core';\n");
         out.push_str(&self.lib_imports(self.lib_used.borrow().iter()));
         if self.runtime && self.uses_promise {
-            out.push_str("import { Future } from 'zena:async';\n");
+            // A future's own error enum completes it through functions of
+            // these bindings.
+            let names = if self.helpers.contains("Completer<") {
+                "Future, Completer"
+            } else {
+                "Future"
+            };
+            let _ = writeln!(out, "import {{ {names} }} from 'zena:async';");
         }
         out.push('\n');
         if own {
@@ -2319,9 +2393,12 @@ impl<'a> Gen<'a> {
         } else if let (Type::Future(v, e), true) = (&m.result, mentions_tparam(&m.result, &k.cx)) {
             call.result = self.generic_surface(&m.result, &k.cx)?;
             let inner = self.generic_surface(v, &k.cx)?;
-            let (wait, _) = self.future_fns_of(e, &k.cx, Flow::ToLang)?;
+            let error = self
+                .layouts
+                .enum_of(e, &k.cx, Flow::ToLang)
+                .or_else(|e| skip(e.to_string()))?;
             call.raw_results = vec!["externref".into()];
-            call.decode = format!("{wait}<{inner}>(r0)");
+            call.decode = self.awaited(&error, &inner, "r0")?;
         } else if mentions_tparam(&m.result, &k.cx) {
             let t = self.generic_surface(&m.result, &k.cx)?;
             if t.contains("Future<") {
@@ -2533,6 +2610,10 @@ impl<'a> Gen<'a> {
                 if e.is_err() && !matches!(**v, Type::Array(_) | Type::Vec(_) | Type::Tuple(_)) =>
             {
                 let value = self.targ_surface(v, cx)?;
+                // `unbox` awaits at the class's `T`, which reads no none.
+                if option_arg(&value).is_some() {
+                    return skip("a future of an optional as a type argument");
+                }
                 Ok(format!("{}<{value}>", self.future_box()))
             }
             t => self.generic_surface(t, cx),
@@ -3085,16 +3166,16 @@ impl<'a> Gen<'a> {
 
     fn uses_async(&mut self) {
         self.uses_promise = true;
-        for n in ["__tw_await", "__tw_promise"] {
+        for n in ["__tw_await", "__tw_await_option", "__tw_promise"] {
             self.used.insert(n.into());
         }
     }
 
-    /// The Zena type of a future's value, which `take<T>` and
-    /// `resolve<T>` carry as itself.
+    /// The Zena type of a future's value, which `get<T>` and `resolve<T>`
+    /// carry as itself.
     fn future_value(&mut self, value: &Repr) -> R<String> {
         // A `future<never>` never resolves (the bridge rejects it), so it
-        // waits as a `Future<void>`, through `take<unit>`.
+        // waits as a `Future<void>`, through `get<unit>`.
         if value.kind == Kind::Never {
             return Ok("void".into());
         }
@@ -3118,11 +3199,19 @@ impl<'a> Gen<'a> {
         nullable: bool,
     ) -> R<String> {
         let t = self.future_value(value)?;
-        let (wait, _) = self.future_fns(error)?;
+        let future = self.awaited(error, &t, &format!("{x} as externref"))?;
         Ok(if nullable {
-            format!("(if ({x} == null) null else {wait}<{t}>({x} as externref))")
+            format!("(if ({x} == null) null else {future})")
         } else {
-            format!("{wait}<{t}>({x} as externref)")
+            future
+        })
+    }
+
+    /// The Zena future of a `t` over the JS future `x`.
+    fn awaited(&mut self, error: &EnumLayout, t: &str, x: &str) -> R<String> {
+        Ok(match option_arg(t) {
+            Some(inner) => format!("{}<{inner}>({x})", self.future_option_fn(error)?),
+            None => format!("{}<{t}>({x})", self.future_fns(error)?.0),
         })
     }
 
@@ -3149,8 +3238,8 @@ impl<'a> Gen<'a> {
         }
         let key = format!("futurefns {}", error.path);
         if let Some(n) = self.names.get(&key) {
-            let (a, p) = n.split_once(' ').unwrap();
-            return Ok((a.into(), p.into()));
+            let mut n = n.split(' ');
+            return Ok((n.next().unwrap().into(), n.next().unwrap().into()));
         }
         if !error
             .arms
@@ -3166,25 +3255,63 @@ impl<'a> Gen<'a> {
         let fallback = self.tag_fallback(error);
         let arm = self.tags[&error.path].arm.clone();
         let id = type_ident(&error.path);
+        let get_fn = unique(&mut self.used, format!("__tw_future_get_{id}"));
         let error_fn = unique(&mut self.used, format!("__tw_future_error_{id}"));
         let reject_fn = unique(&mut self.used, format!("__tw_future_reject_{id}"));
+        let get = unique(&mut self.used, format!("__tw_{id}_get"));
         let fail = unique(&mut self.used, format!("__tw_{id}_fail"));
         let reject = unique(&mut self.used, format!("__tw_{id}_reject"));
         let wait = unique(&mut self.used, format!("__tw_await_{id}"));
         let promise = unique(&mut self.used, format!("__tw_promise_{id}"));
+        // `get` throws the tag a member that `throws` the enum does.
+        let g = zena_string(&format!("get<{{T}},{}>", error.path));
+        let throws = zena_string(&format!("tw, throws:{}", error.path));
         let e = zena_string(&format!("error<{}>", error.path));
         let r = zena_string(&format!("reject<{}>", error.path));
         let _ = writeln!(
             self.helpers,
-            "@external(\"tw:future\", {e}, \"tw\")\ndeclare function {error_fn}(future: externref): inline (i32, String);\n\n\
+            "@external(\"tw:future\", {g}, {throws})\ndeclare function {get_fn}<T>(future: externref): inline (i32, T);\n\n\
+             @external(\"tw:future\", {e}, \"tw\")\ndeclare function {error_fn}(future: externref): inline (i32, String);\n\n\
              @external(\"tw:future\", {r}, \"tw\")\ndeclare function {reject_fn}(resolver: externref, arm: i32, message: String): void;\n\n\
+             function {get}<T>(future: externref, completer: Completer<T>): boolean {{\n  let (present, value) = {get_fn}<T>(future);\n  if (present == 0) {{\n    return false;\n  }}\n  completer.complete(value);\n  return true;\n}}\n\n\
              function {fail}(future: externref): Error {{\n  let (arm, message) = {error_fn}(future);\n  return new {class}(arm as {arm}, message);\n}}\n\n\
              function {reject}(resolver: externref, e: Error): void {{\n  if (e is {class}) {{\n    {reject_fn}(resolver, e.arm as i32, e.message);\n  }} else {{\n    {reject_fn}(resolver, {fallback} as i32, e.message);\n  }}\n}}\n\n\
-             export function {wait}<T>(future: externref): Future<T> {{\n  return __tw_await_with<T>(future, {fail});\n}}\n\n\
+             export function {wait}<T>(future: externref): Future<T> {{\n  return __tw_await_with<T>(\n      future, (f: externref, c: Completer<T>): boolean => {get}<T>(f, c), {fail});\n}}\n\n\
              export function {promise}<T>(future: Future<T>): externref {{\n  return __tw_promise_with<T>(future, {reject});\n}}\n"
         );
-        self.names.insert(key, format!("{wait} {promise}"));
+        self.names
+            .insert(key, format!("{wait} {promise} {get_fn} {fail}"));
         Ok((wait, promise))
+    }
+
+    /// The Zena future over a JS `future<T?, E>`, which reads its none
+    /// apart from its value (the runtime's `__tw_await_option`).
+    fn future_option_fn(&mut self, error: &EnumLayout) -> R<String> {
+        let (wait, _) = self.future_fns(error)?;
+        if let Origin::Err = error.origin {
+            return Ok("__tw_await_option".into());
+        }
+        let key = format!("futureoption {}", error.path);
+        if let Some(n) = self.names.get(&key) {
+            return Ok(n.clone());
+        }
+        let fns = self.names[&format!("futurefns {}", error.path)].clone();
+        let mut fns = fns.split(' ').skip(2);
+        let (get_fn, fail) = (fns.next().unwrap(), fns.next().unwrap());
+        let id = type_ident(&error.path);
+        let get_any = unique(&mut self.used, format!("__tw_future_get_any_{id}"));
+        let get = unique(&mut self.used, format!("__tw_{id}_get_option"));
+        let wait = unique(&mut self.used, format!("{wait}_option"));
+        let g = zena_string(&format!("get<Any?,{}>", error.path));
+        let throws = zena_string(&format!("tw, throws:{}", error.path));
+        let _ = writeln!(
+            self.helpers,
+            "@external(\"tw:future\", {g}, {throws})\ndeclare function {get_any}(future: externref): inline (i32, externref | null);\n\n\
+             function {get}<T>(future: externref, completer: Completer<Option<T>>): boolean {{\n  let (present, any) = {get_any}(future);\n  if (present == 0) {{\n    return false;\n  }}\n  if (any == null) {{\n    completer.complete(none);\n  }} else {{\n    let (_, value) = {get_fn}<T>(future);\n    completer.complete(some<T>(value));\n  }}\n  return true;\n}}\n\n\
+             export function {wait}<T>(future: externref): Future<Option<T>> {{\n  return __tw_await_with<Option<T>>(\n      future, (f: externref, c: Completer<Option<T>>): boolean => {get}<T>(f, c), {fail});\n}}\n"
+        );
+        self.names.insert(key, wait.clone());
+        Ok(wait)
     }
 
     /// A function type's Zena type.
@@ -4279,6 +4406,11 @@ fn tparam_list(ps: &[TypeParam]) -> String {
     }
     let ps: Vec<String> = ps.iter().map(|p| ident(&p.name)).collect();
     format!("<{}>", ps.join(", "))
+}
+
+/// The `T` of the surface type `Option<T>`.
+fn option_arg(t: &str) -> Option<&str> {
+    t.strip_prefix("Option<")?.strip_suffix('>')
 }
 
 /// A tuple type or value of `parts`. Zena has no 1-tuples, and the IR's

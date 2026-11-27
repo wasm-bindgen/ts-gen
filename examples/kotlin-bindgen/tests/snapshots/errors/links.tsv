@@ -7,7 +7,8 @@ js_code	fixtures.errors.flat.DOMException_get_name	tw:js/global	DOMException#get
 js_code	fixtures.errors.flat.Kv_get_str	tw:js/global	Kv#get(str)
 js_code	fixtures.errors.flat.err_DOMExceptionErr	tw:err	DOMExceptionErr
 js_code	fixtures.errors.flat.Kv_put_str_str	tw:js/global	Kv#put(str,str)
-js_code	fixtures.errors.flat.take_unit	tw:future	take<unit>
+js_code	fixtures.errors.flat.get_unit_DOMExceptionOrQuotaExceededErr	tw:future	get<unit,DOMExceptionOrQuotaExceededErr>
+js_code	fixtures.errors.flat.err_DOMExceptionOrQuotaExceededErr	tw:err	DOMExceptionOrQuotaExceededErr
 js_code	fixtures.errors.flat.error_DOMExceptionOrQuotaExceededErr	tw:future	error<DOMExceptionOrQuotaExceededErr>
 js_code	fixtures.errors.flat.Kv_list	tw:js/global	Kv#list()
 js_code	fixtures.errors.flat.err_TypeErr	tw:err	TypeErr
@@ -15,7 +16,6 @@ js_code	fixtures.errors.flat.Kv_get_size	tw:js/global	Kv#get:size()
 js_code	fixtures.errors.flat.Kv_check_str	tw:js/global	Kv#check(str)
 js_code	fixtures.errors.flat.err_TypeOrRangeErr	tw:err	TypeOrRangeErr
 js_code	fixtures.errors.flat.Kv_grow	tw:js/global	Kv#grow()
-js_code	fixtures.errors.flat.err_DOMExceptionOrQuotaExceededErr	tw:err	DOMExceptionOrQuotaExceededErr
 js_code	fixtures.errors.flat.Kv_close	tw:js/global	Kv#close()
 js_code	fixtures.errors.flat.err_ErrorErr	tw:err	ErrorErr
 js_code	fixtures.errors.flat.Kv_count	tw:js/global	Kv#count()
@@ -33,7 +33,7 @@ js_code	fixtures.errors.flat.RequestInit_set_method_str	tw:js/global	RequestInit
 js_code	fixtures.errors.flat.RequestInit_get_signal	tw:js/global	RequestInit#get:signal()
 js_code	fixtures.errors.flat.RequestInit_set_signal_AbortSignal	tw:js/global	RequestInit#set:signal(AbortSignal?)
 js_code	fixtures.errors.flat.fetch_str	tw:js/global	fetch(str)
-js_code	fixtures.errors.flat.take_str	tw:future	take<str>
+js_code	fixtures.errors.flat.get_str	tw:future	get<str>
 js_code	fixtures.errors.flat.error_err	tw:future	error<err>
 js_code	fixtures.errors.flat.fetch_str_RequestInit	tw:js/global	fetch(str,RequestInit?)
 js_code	fixtures.errors.flat.unbox_DOMExceptionErr	tw:unbox	DOMExceptionErr
@@ -48,6 +48,7 @@ js_code	fixtures.errors.flat.unbox_ErrorErr	tw:unbox	ErrorErr
 js_code	fixtures.errors.flat.box_ErrorErr	tw:box	ErrorErr
 js_code	fixtures.errors.flat.unbox_StorageOrDOMExceptionErr	tw:unbox	StorageOrDOMExceptionErr
 js_code	fixtures.errors.flat.box_StorageOrDOMExceptionErr	tw:box	StorageOrDOMExceptionErr
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

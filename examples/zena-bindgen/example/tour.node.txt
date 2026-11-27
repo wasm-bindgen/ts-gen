@@ -76,7 +76,7 @@ service binding: helper's notes: the waitUntil of /timers ran
 global fetch: helper saw POST /echo "ping"
 a fetch with AbortSignal.timeout(50) rejected with an Error (The operation was aborted due to timeout)
 the helper saw 1 of its requests abort
-a fetch dropped by TaskGroup.race: the helper saw 1 of its requests abort
+a fetch cancelled by TaskGroup.race: the helper saw 1 of its requests abort
 AbortController: the listener heard an "abort" event, signal.aborted is true
 [200]
 

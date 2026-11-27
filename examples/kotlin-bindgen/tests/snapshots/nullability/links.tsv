@@ -11,7 +11,7 @@ js_code	fixtures.nullability.flat.ret_externref	tw:ret	externref
 js_code	fixtures.nullability.flat.Res_find	tw:js/global	Res#find()
 js_code	fixtures.nullability.flat.Res_find_str	tw:js/global	Res#find(str)
 js_code	fixtures.nullability.flat.nested_future_str_arr_str_Record_Str_fn_str_str	tw:js/global	nested(future<str?>,arr<str?>,Record<Str?>,fn(str?)->str?)
-js_code	fixtures.nullability.flat.take_str	tw:future	take<str?>
+js_code	fixtures.nullability.flat.get_str	tw:future	get<str?>
 js_code	fixtures.nullability.flat.error_err	tw:future	error<err>
 js_code	fixtures.nullability.flat.future_new	tw:future	new
 js_code	fixtures.nullability.flat.future_resolve_str	tw:future	resolve<str?>
@@ -30,6 +30,7 @@ js_code	fixtures.nullability.flat.Record_at_str	tw:js/global	Record#at(str)
 js_code	fixtures.nullability.flat.Record_setAt_str_V	tw:js/global	Record#setAt(str,V)
 js_code	fixtures.nullability.flat.box_fn_str_str	tw:box	fn(str?)->str
 js_code	fixtures.nullability.flat.unbox_fn_str_str	tw:unbox	fn(str?)->str
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

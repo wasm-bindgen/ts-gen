@@ -47,9 +47,9 @@ external fun unbox_HandlerFetchKind(p0: JsAny?): Int
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun box_HandlerFetchKind(p0: Int, p1: JsAny?): JsAny?
 
-/** tw:future take<Response> */
+/** tw:future get<Response> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_Response(p0: JsAny?): JsAny?
+external fun get_Response(p0: JsAny?): Int
 
 /** tw:future error<err> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")

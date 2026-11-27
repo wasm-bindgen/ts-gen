@@ -19,7 +19,7 @@ js_code	fixtures.members.flat.Counter_increment	tw:js/global	Counter#increment()
 js_code	fixtures.members.flat.Counter_increment_f64	tw:js/global	Counter#increment(f64)
 js_code	fixtures.members.flat.Counter_reset	tw:js/global	Counter#reset()
 js_code	fixtures.members.flat.Counter_done	tw:js/global	Counter#done()
-js_code	fixtures.members.flat.take_unit	tw:future	take<unit>
+js_code	fixtures.members.flat.get_unit	tw:future	get<unit>
 js_code	fixtures.members.flat.error_err	tw:future	error<err>
 js_code	fixtures.members.flat.Options_new	tw:js/global	Options.new()
 js_code	fixtures.members.flat.Options_get_name	tw:js/global	Options#get:name()
@@ -44,6 +44,7 @@ js_code	fixtures.members.flat.Lock_dispose	tw:js/global	Lock#dispose()
 js_code	fixtures.members.flat.Lock_hasInstance_Any	tw:js/global	Lock.hasInstance(Any?)
 js_code	fixtures.members.flat.Lock_get_species	tw:js/global	Lock#get:species()
 js_code	fixtures.members.flat.Lock_toPrimitive2_str	tw:js/global	Lock#toPrimitive2(str)
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

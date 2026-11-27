@@ -401,12 +401,12 @@ export function createBridge() {
           const t2 = $lowerUtf8($L, $str(t1), cx);
           const t3 = t2[0];
           const t4 = t2[1];
+          cx.n = cxm;
           const r = $E[1](t3, t4);
           return (r >>> 0);
         } catch (e) {
-          throw $outgoing(e);
-        } finally {
           $release(cx, cxm);
+          throw $outgoing(e);
         }
       }
       throw new TypeError("`len` doesn't match its arguments");

@@ -6,9 +6,10 @@
   (type $list (array (mut externref)))
   (import "tw:js/global" "Api#later()" (func $later (param externref) (result externref)))
   (import "tw:future" "suspend" (func $suspend (param externref) (result i32)))
-  (import "tw:future" "suspend_race" (func $race (param (ref $list)) (result i32)))
-  (import "tw:future" "take<u32>" (func $take (param externref) (result i32)))
-  (import "tw:future" "drop" (func $drop (param externref)))
+  (import "tw:future" "suspend_list" (func $race (param (ref $list)) (result i32)))
+  (import "tw:future" "get<u32>" (func $get (param externref) (result i32)))
+  (import "tw:ret" "i32" (func $pop_i32 (result i32)))
+  (import "tw:js/global" "Api#mark()" (func $mark (param externref)))
   (import "tw:future" "new" (func $new (result externref)))
   (import "tw:ret" "externref" (func $pop (result externref)))
   (import "tw:future" "resolve<u32>" (func $resolve (param externref i32)))
@@ -21,12 +22,14 @@
     (call $resolve (local.get $res) (local.get $v))
     (local.get $fut))
 
+  ;; The value of a fulfilled future, its option's value spilled.
+  (func $value (param $f externref) (result i32)
+    (if (i32.eqz (call $get (local.get $f))) (then unreachable))
+    (call $pop_i32))
+
   (func $await (param $f externref) (result i32)
-    (local $v i32)
     (if (i32.ne (call $suspend (local.get $f)) (i32.const 1)) (then unreachable))
-    (local.set $v (call $take (local.get $f)))
-    (call $drop (local.get $f))
-    (local.get $v))
+    (call $value (local.get $f)))
 
   (func (export "app.run(Api)") (param $api externref) (result externref)
     (local $a externref) (local $b externref)
@@ -46,10 +49,7 @@
       (call $later (local.get $api))
       (call $later (local.get $api))))
     (local.set $i (call $race (ref.as_non_null (local.get $l))))
-    (local.set $v (call $take (array.get $list (local.get $l) (local.get $i))))
-    (call $drop (array.get $list (local.get $l) (i32.const 0)))
-    (call $drop (array.get $list (local.get $l) (i32.const 1)))
-    (call $drop (array.get $list (local.get $l) (i32.const 2)))
+    (local.set $v (call $value (array.get $list (local.get $l) (local.get $i))))
     (call $ready (i32.add (i32.mul (local.get $i) (i32.const 100)) (local.get $v))))
 
   ;; Fails with `Error(msg)` once `api.later()` settles.
@@ -57,4 +57,14 @@
     (drop (call $await (call $later (local.get $api))))
     (call $fail (i32.const 0) (local.get $msg))
     (ref.null extern))
+
+  ;; A suspension with no stack to suspend throws, here into a handler,
+  ;; and the language goes on with the bridge's scratch where it was.
+  (func (export "app.stuck(Api)") (param $api externref) (result i32)
+    (block $caught
+      (try_table (catch_all $caught)
+        (drop (call $suspend (call $later (local.get $api))))
+        unreachable))
+    (call $mark (local.get $api))
+    (i32.const 7))
 )

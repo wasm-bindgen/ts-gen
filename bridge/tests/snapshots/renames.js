@@ -450,7 +450,10 @@ export function instantiate(language, bridge, imports = {}) {
   $T = $table($X.__table, $X["tw:table/stack_base"].value, $X.__const_base.value, $X["tw:table/heap_base"].value);
   $L = new $Lang(instance.exports, { memory: "mem", table: "__table", realloc: "__realloc", free: "__free", talloc: "__talloc", tfree: "__tfree" }, false);
   $checkLive = () => {
-    if ($L.u8()[Number(instance.exports.__terminated.value)] !== 0) throw new Error("Module terminated");
+    if ($L.u8()[Number(instance.exports.__terminated.value)] !== 0) {
+      const e = new Error("Module terminated");
+      throw e;
+    }
   };
   return instance;
 }

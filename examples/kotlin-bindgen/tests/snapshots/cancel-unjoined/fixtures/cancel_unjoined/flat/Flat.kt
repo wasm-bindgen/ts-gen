@@ -51,9 +51,9 @@ external fun RequestInit_set_signal_AbortSignal(p0: JsAny?, p1: JsAny?)
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun RequestInit_get_signal(p0: JsAny?): JsAny?
 
-/** tw:future take<str> */
+/** tw:future get<str> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_str(p0: JsAny?): JsAny?
+external fun get_str(p0: JsAny?): Int
 
 /** tw:future error<err> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
@@ -67,9 +67,9 @@ external fun fetch_str(p0: JsAny?): JsAny?
 @JsFun("(p0, p1) => { throw new Error('ts-gen: unlinked import') }")
 external fun fetch_str_RequestInit(p0: JsAny?, p1: JsAny?): JsAny?
 
-/** tw:future take<unit> */
+/** tw:future get<unit> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_unit(p0: JsAny?)
+external fun get_unit(p0: JsAny?): Int
 
 /** tw:js/global send(str) */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")

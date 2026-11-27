@@ -3,8 +3,9 @@
 //! wraps language handles in JS values.
 //!
 //! Every entry checks the termination flag, lowers its arguments on a
-//! cleanup list released after the call (arguments are borrowed), lifts and
-//! frees the result, and maps a language tag escaping into JS (§15).
+//! cleanup list released only if the call isn't made (entered, they're the
+//! language's, §11), lifts and frees the result, and maps a language tag
+//! escaping into JS (§15).
 
 use std::collections::HashMap;
 use std::fmt::Write;
@@ -13,7 +14,7 @@ use std::rc::Rc;
 use ts_gen_abi::ir::*;
 use ts_gen_abi::key::{location, Keyed, Role};
 use ts_gen_abi::layout::{native_size, EnumLayout, Host, Kind, Pos, Repr, Signature};
-use ts_gen_abi::profile::{Carrier, Encoding, StrCarrier};
+use ts_gen_abi::profile::{Carrier, Encoding, Results, StrCarrier, Throws};
 use ts_gen_abi::protocol;
 use ts_gen_abi::resolve::{Context, Location, Target, TypeDecl};
 
@@ -100,42 +101,44 @@ impl<'a, 'b> Glue<'a, 'b> {
         }
         b.open("try {");
         let mut wire = Vec::new();
-        let mut keep = Vec::new();
         for (p, a) in sig.params.iter().zip(args) {
             match a {
-                Arg::Raw(e) => {
-                    if matches!(p.role, Pos::This | Pos::Handle)
-                        && !keep.iter().any(|k| k == "this")
-                    {
-                        keep.push("this".to_string());
-                    }
-                    wire.push(e.clone());
-                }
+                // A receiver check throws, so it runs before the arguments
+                // are handed over.
+                Arg::Raw(e) if e.contains('(') => wire.push(b.bind(e.clone())),
+                Arg::Raw(e) => wire.push(e.clone()),
                 Arg::Js(v) => {
                     let v = b.bind(v.clone());
-                    keep.push(v.clone());
                     let m = self.mode();
                     wire.extend(self.lower(b, &p.repr, &v, m)?);
                 }
             }
+        }
+        // Entered, the language owns its arguments (§11): the records left
+        // are only those of a call that isn't made, so what can fail before
+        // the language runs is checked first.
+        if alloc {
+            // Only an entry that checks the spill on its way in (§12): a
+            // root, or one `$spilled` wraps.
+            let spills = self.l.profile.results == Results::Single
+                && (promising(self.l, sig)
+                    || sig
+                        .params
+                        .iter()
+                        .chain(&sig.results)
+                        .any(|p| self.f.has_gc(&p.repr))
+                    || !self.l.lang_core(&sig.core())?.spill.is_empty()
+                    || (self.l.profile.throws == Throws::Js && sig.throws.is_some()));
+            if spills {
+                b.line("$spillCheck();");
+            }
+            b.line("cx.n = cxm;");
         }
         let call = format!("$E[{idx}]({})", wire.join(", "));
         match sig.results.first() {
             None => b.line(format!("{call};")),
             Some(r) => {
                 b.line(format!("const r = {call};"));
-                // A promising call returns at its first suspension, while
-                // the language may still use its arguments and receiver
-                // (§16): they stay borrowed, and reachable, until its
-                // future settles.
-                if promising(self.l, sig) {
-                    if alloc {
-                        b.line("$hold(cx, cxm, r);");
-                    }
-                    if !keep.is_empty() {
-                        b.line(format!("$keep(r, [{}]);", keep.join(", ")));
-                    }
-                }
                 let n = self.f.jsw(&r.repr)?.len();
                 let ws: Vec<String> = if n == 1 {
                     vec!["r".into()]
@@ -161,16 +164,14 @@ impl<'a, 'b> Glue<'a, 'b> {
         }
         b.close("} catch (e) {");
         b.depth += 1;
+        if alloc {
+            b.line("$release(cx, cxm);");
+        }
         b.line("throw $outgoing(e);");
-        if alloc || gc {
+        if gc {
             b.close("} finally {");
             b.depth += 1;
-            if alloc {
-                b.line("$release(cx, cxm);");
-            }
-            if gc {
-                b.line("$S.reset(m);");
-            }
+            b.line("$S.reset(m);");
         }
         b.close("}");
         Ok(on_raw.is_none() && !sig.results.is_empty())

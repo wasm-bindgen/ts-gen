@@ -499,9 +499,10 @@ class $C0 {
     if (a.length >= 1) {
       $checkLive();
       try {
-        const t1 = a[0];
-        const t2 = $int(t1, 0, 4294967295, "u32");
-        const r = $E[3](this, $HC.unwrap(this, $C0, "Counter"), t2);
+        const t1 = $HC.unwrap(this, $C0, "Counter");
+        const t2 = a[0];
+        const t3 = $int(t2, 0, 4294967295, "u32");
+        const r = $E[3](this, t1, t3);
         return (r >>> 0);
       } catch (e) {
         throw $outgoing(e);
@@ -513,9 +514,10 @@ class $C0 {
     if (a.length >= 1) {
       $checkLive();
       try {
-        const t1 = a[0];
-        const t2 = $str(t1);
-        const r = $E[4](this, $HC.unwrap(this, $C0, "Counter"), t2);
+        const t1 = $HC.unwrap(this, $C0, "Counter");
+        const t2 = a[0];
+        const t3 = $str(t2);
+        const r = $E[4](this, t1, t3);
         return r;
       } catch (e) {
         throw $outgoing(e);
@@ -528,9 +530,10 @@ class $C0 {
       $checkLive();
       const m = $S.mark();
       try {
-        const t1 = a[0];
-        const t2 = (t1 == null ? null : $HC.unwrap(t1, $C0, "Counter?"));
-        const r = $E[5](this, $HC.unwrap(this, $C0, "Counter"), t2);
+        const t1 = $HC.unwrap(this, $C0, "Counter");
+        const t2 = a[0];
+        const t3 = (t2 == null ? null : $HC.unwrap(t2, $C0, "Counter?"));
+        const r = $E[5](this, t1, t3);
         return (r !== 0);
       } catch (e) {
         throw $outgoing(e);
@@ -543,7 +546,8 @@ class $C0 {
   fail(...a) {
     $checkLive();
     try {
-      $E[6](this, $HC.unwrap(this, $C0, "Counter"));
+      const t1 = $HC.unwrap(this, $C0, "Counter");
+      $E[6](this, t1);
     } catch (e) {
       throw $outgoing(e);
     }
@@ -677,7 +681,10 @@ export function instantiate(language, bridge, imports = {}) {
   $B.entries.set(9, $X["util.each(arr<Counter>)"]);
   $E[10] = $B.e9;
   $checkLive = () => {
-    if (instance.exports["tw:terminated"].value !== 0) throw new Error("Module terminated");
+    if (instance.exports["tw:terminated"].value !== 0) {
+      const e = new Error("Module terminated");
+      throw e;
+    }
   };
   return instance;
 }

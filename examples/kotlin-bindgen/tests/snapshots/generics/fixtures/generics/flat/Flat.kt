@@ -399,9 +399,9 @@ external fun Sizes_set_label_str(p0: JsAny?, p1: JsAny?)
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
 external fun Sizes_get_label(p0: JsAny?): JsAny?
 
-/** tw:future take<Any> */
+/** tw:future get<Any> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_Any(p0: JsAny?): JsAny?
+external fun get_Any(p0: JsAny?): Int
 
 /** tw:future error<err> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")

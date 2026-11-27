@@ -354,7 +354,7 @@ external interface Ai : JsAny
 
 fun Ai.run(model: String, inputs: JsAny?): tsgen.runtime.Future<JsAny?> {
     val r0 = fixtures.generics.flat.Ai_run_Name_AiModelList_Name_inputs(this, model.toJsString(), inputs)
-    return tsgen.runtime.Future<JsAny?>(r0!!, { f -> val r1 = fixtures.generics.flat.take_Any(f); r1 }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<JsAny?>(r0!!, { f -> val r1 = try { fixtures.generics.flat.get_Any(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.generics.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2) }, { f -> futureErrorErr(f) })
 }
 
 fun Ai.size(key: String): F64OrStr {
@@ -1740,8 +1740,8 @@ fun raiseErr(e: kotlin.js.JsException): ErrException {
 }
 
 fun futureErrorErr(f: JsAny): ErrException {
-    val r2 = fixtures.generics.flat.error_err(f)
-    val s3 = fixtures.generics.flat.ret_externref()
-    return ErrException(decodeErr(r2, s3)!!)
+    val r3 = fixtures.generics.flat.error_err(f)
+    val s4 = fixtures.generics.flat.ret_externref()
+    return ErrException(decodeErr(r3, s4)!!)
 }
 

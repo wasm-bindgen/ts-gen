@@ -1198,6 +1198,8 @@ impl<'a, 'b> Wat<'a, 'b> {
         self.imports.push(format!(
             "  (import \"{GLUE}\" \"unstash\" (func $unstash (param externref)))"
         ));
+        self.imports
+            .push(format!("  (import \"{GLUE}\" \"abandon\" (func $abandon))"));
     }
 
     /// The suspending `tw:future` import `export` (§16): `prep`, of type
@@ -1516,7 +1518,19 @@ impl<'a, 'b> Wat<'a, 'b> {
             s.push_str(ALLOCN);
         }
         if self.jspi {
-            s.push_str(&JSPI.replace("{SP}", &(hdr + 8 + RET_AREA).to_string()));
+            // A suspension that can't suspend throws (a `SuspendError`
+            // outside a promising call): its park comes off, and scratch
+            // is put back, first.
+            let (locals, wait) = match self.l.profile.eh {
+                Eh::Modern => (" (local $e exnref)", "(block $ok\n      (local.set $e (block $thrown (result exnref)\n        (try_table (catch_all_ref $thrown) (local.set $r (call $wait)))\n        (br $ok)))\n      (call $abandon)\n      (call $unpark (local.get $k) (local.get $sp) (local.get $tsp))\n      (throw_ref (local.get $e)))"),
+                Eh::Legacy => ("", "try\n      (local.set $r (call $wait))\n    catch_all\n      (call $abandon)\n      (call $unpark (local.get $k) (local.get $sp) (local.get $tsp))\n      rethrow 0\n    end"),
+            };
+            s.push_str(
+                &JSPI
+                    .replace("{SP}", &(hdr + 8 + RET_AREA).to_string())
+                    .replace("{LOCALS}", locals)
+                    .replace("{WAIT}", wait),
+            );
         }
         if !self.entries.is_empty() {
             let _ = writeln!(
@@ -1622,8 +1636,12 @@ pub(crate) const PARKED: i32 = i32::MIN;
 const JSPI: &str = r#"  (global $base (export "base") (mut i32) (i32.const 0))
   (global $tbase (export "tbase") (mut i32) (i32.const 0))
   (global $suspended (export "suspended") (mut i32) (i32.const 0))
+  (func $unpark (param $k externref) (param $sp i32) (param $tsp i32)
+    (if (i32.eqz (ref.is_null (local.get $k))) (then (call $unstash (local.get $k))))
+    (call $set_sp (local.get $sp))
+    (call $set_tsp (local.get $tsp)))
   (func $parked (result i32)
-    (local $b i32) (local $tb i32) (local $sp i32) (local $tsp i32) (local $k externref) (local $r i32)
+    (local $b i32) (local $tb i32) (local $sp i32) (local $tsp i32) (local $k externref) (local $r i32){LOCALS}
     (local.set $b (global.get $base))
     (local.set $tb (global.get $tbase))
     (local.set $sp (call $sp))
@@ -1632,10 +1650,8 @@ const JSPI: &str = r#"  (global $base (export "base") (mut i32) (i32.const 0))
       (then
         (local.set $k (call $stash (local.get $b) (local.get $sp) (local.get $tb) (local.get $tsp)))
         (call $restore (local.get $b) (local.get $tb))))
-    (local.set $r (call $wait))
-    (if (i32.eqz (ref.is_null (local.get $k))) (then (call $unstash (local.get $k))))
-    (call $set_sp (local.get $sp))
-    (call $set_tsp (local.get $tsp))
+    {WAIT}
+    (call $unpark (local.get $k) (local.get $sp) (local.get $tsp))
     (global.set $base (local.get $b))
     (global.set $tbase (local.get $tb))
     (global.set $suspended (i32.const 1))

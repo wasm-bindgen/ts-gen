@@ -1432,9 +1432,9 @@
                   }
                 ]
               },
-              "take": {
+              "get": {
                 "module": "tw:future",
-                "name": "take<str>"
+                "name": "get<str>"
               },
               "errorOp": {
                 "module": "tw:future",
@@ -1583,9 +1583,9 @@
                   }
                 ]
               },
-              "take": {
+              "get": {
                 "module": "tw:future",
-                "name": "take<u8[]>"
+                "name": "get<u8[]>"
               },
               "errorOp": {
                 "module": "tw:future",
@@ -3337,9 +3337,9 @@
                   }
                 ]
               },
-              "take": {
+              "get": {
                 "module": "tw:future",
-                "name": "take<str?>"
+                "name": "get<str?,KvError>"
               },
               "errorOp": {
                 "module": "tw:future",
@@ -3574,9 +3574,9 @@
                   }
                 ]
               },
-              "take": {
+              "get": {
                 "module": "tw:future",
-                "name": "take<unit>"
+                "name": "get<unit,KvError>"
               },
               "errorOp": {
                 "module": "tw:future",
@@ -3785,9 +3785,9 @@
                   }
                 ]
               },
-              "take": {
+              "get": {
                 "module": "tw:future",
-                "name": "take<arr<Str>>"
+                "name": "get<arr<Str>>"
               },
               "errorOp": {
                 "module": "tw:future",
@@ -5196,9 +5196,9 @@
                   }
                 ]
               },
-              "take": {
+              "get": {
                 "module": "tw:future",
-                "name": "take<Response>"
+                "name": "get<Response>"
               },
               "errorOp": {
                 "module": "tw:future",
@@ -5332,9 +5332,9 @@
                   }
                 ]
               },
-              "take": {
+              "get": {
                 "module": "tw:future",
-                "name": "take<i64>"
+                "name": "get<i64>"
               },
               "errorOp": {
                 "module": "tw:future",
@@ -5468,9 +5468,9 @@
                   }
                 ]
               },
-              "take": {
+              "get": {
                 "module": "tw:future",
-                "name": "take<u64>"
+                "name": "get<u64>"
               },
               "errorOp": {
                 "module": "tw:future",

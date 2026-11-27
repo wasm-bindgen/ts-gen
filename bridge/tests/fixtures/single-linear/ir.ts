@@ -1,0 +1,11 @@
+ir 1;
+
+class P {
+  two(): (u32, u32);
+}
+
+export namespace app {
+  pair(s: str): (u32, u32);
+  len(s: str): u32;
+  tally(s: str): u32 throws err;
+}

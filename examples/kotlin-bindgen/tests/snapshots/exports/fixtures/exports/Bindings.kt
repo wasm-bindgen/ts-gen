@@ -54,7 +54,7 @@ fun encodeHandlerFetchKind(v: HandlerFetchKind?): HandlerFetchKindWire = when (v
 fun decodeHandlerFetchKind(arm: Int, s0: JsAny?): HandlerFetchKind? = when (arm) {
     0 -> null
     1 -> HandlerFetchKind.Response(s0!!.unsafeCast<Response>())
-    2 -> HandlerFetchKind.Future(tsgen.runtime.Future<Response>(s0!!, { f -> val r3 = fixtures.exports.flat.take_Response(f); r3!!.unsafeCast<Response>() }, { f -> futureErrorErr(f) }))
+    2 -> HandlerFetchKind.Future(tsgen.runtime.Future<Response>(s0!!, { f -> val r3 = try { fixtures.exports.flat.get_Response(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s4 = fixtures.exports.flat.ret_externref(); if (r3 == 0) null else tsgen.runtime.Fulfilled(s4!!.unsafeCast<Response>()) }, { f -> futureErrorErr(f) }))
     else -> throw IllegalStateException("HandlerFetchKind: arm $arm")
 }
 
@@ -106,8 +106,8 @@ fun setErr(e: kotlin.Throwable) {
 }
 
 fun futureErrorErr(f: JsAny): ErrException {
-    val r4 = fixtures.exports.flat.error_err(f)
-    val s5 = fixtures.exports.flat.ret_externref()
-    return ErrException(decodeErr(r4, s5)!!)
+    val r5 = fixtures.exports.flat.error_err(f)
+    val s6 = fixtures.exports.flat.ret_externref()
+    return ErrException(decodeErr(r5, s6)!!)
 }
 

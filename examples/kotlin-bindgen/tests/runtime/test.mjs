@@ -3,7 +3,8 @@
 // through reject<ProbeError>, `undefined` read as none, the box helpers,
 // a box's none, ref.null, written as each node's default, a suspend lambda
 // as a callback's and a parameter's future, arrays copied each way, and a
-// spread parameter as a vararg, and host type arguments kept typed.
+// spread parameter as a vararg, host type arguments kept typed, a future
+// whose value is no `T`, and a cancelled future awaited to its rejection.
 // Prints one line per call.
 import { readFileSync } from 'node:fs';
 const seen = [];
@@ -25,6 +26,9 @@ globalThis.ext = {
   soon: (f) => { setTimeout(f, 1); },
   listen: (l, x) => (typeof l === 'function' ? l(x) : l + x),
   attempt: async (f) => await f(),
+  wrong: async () => 7,
+  wrongBusy: async () => 7,
+  hang: (signal) => new Promise((_, reject) => signal.addEventListener('abort', () => reject(new RangeError('stopped')))),
 };
 import { importObject } from './probe.import-object.mjs';
 import { instantiate, probe, spillEmpty, Counter } from './bridge.js';
@@ -72,5 +76,7 @@ lines.push(`callback: ${await probe.soon()}`);
 lines.push(`listen: ${probe.listen()}`);
 lines.push(`attempt: ${await probe.attempt()}`);
 lines.push(`generic: ${await probe.generic()}`);
+lines.push(`mistaken: ${await probe.mistaken()}`);
+lines.push(`cancelled: ${await probe.cancelled()}`);
 lines.push(`spill empty: ${spillEmpty()}`);
 process.stdout.write(lines.join('\n') + '\n');

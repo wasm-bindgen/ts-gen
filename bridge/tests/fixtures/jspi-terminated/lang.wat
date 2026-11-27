@@ -4,8 +4,7 @@
 (module
   (import "tw:js/global" "Api#later()" (func $later (param externref) (result externref)))
   (import "tw:future" "suspend" (func $suspend (param externref) (result i32)))
-  (import "tw:future" "take<u32>" (func $take (param externref) (result i32)))
-  (import "tw:future" "drop" (func $drop (param externref)))
+  (import "tw:future" "get<u32>" (func $get (param externref) (result i32 i32)))
   (import "tw:future" "new" (func $new (result externref externref)))
   (import "tw:future" "resolve<u32>" (func $resolve (param externref i32)))
 {RUNTIME}
@@ -26,11 +25,18 @@
         (br $done))
       (global.set $caught (i32.add (global.get $caught) (i32.const 1))))
     (global.set $resumed (i32.add (global.get $resumed) (i32.const 1)))
-    (local.set $v (call $take (local.get $f)))
-    (call $drop (local.get $f))
+    (call $get (local.get $f))
+    (local.set $v)
+    drop
     (call $new)
     (local.set $res)
     (local.set $fut)
     (call $resolve (local.get $res) (local.get $v))
     (local.get $fut))
+
+  ;; Suspends holding a string argument, its own to free once resumed.
+  (func (export "app.echo(Api,str)") (param $api externref) (param $p i32) (param $n i32) (result externref)
+    (drop (call $suspend (call $later (local.get $api))))
+    (call $free (local.get $p) (local.get $n) (i32.const 1))
+    (ref.null extern))
 )

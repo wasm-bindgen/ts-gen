@@ -1,7 +1,10 @@
 ir 1;
 
+class Base {}
+
 class Api {
   later(): future<u32>;
+  see(job: Job, me: Any);
 }
 
 export namespace app {
@@ -9,7 +12,8 @@ export namespace app {
   echo(api: Api, s: str): future<u32>;
   share(api: Api): u32;
   peek(): future<u32>;
-  unshare(): u32;
+  listen(w: u32);
+  stuck(): u32;
   race(api: Api): future<u32>;
   lowest(api: Api): future<u32>;
   empty(): future<u32>;
@@ -17,6 +21,11 @@ export namespace app {
 }
 
 export class Task {
+  new(api: Api);
+  run(): future<u32>;
+}
+
+export class Job extends Base {
   new(api: Api);
   run(): future<u32>;
 }

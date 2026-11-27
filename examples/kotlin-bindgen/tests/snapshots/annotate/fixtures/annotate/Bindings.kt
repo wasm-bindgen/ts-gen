@@ -81,34 +81,34 @@ external interface Cache : JsAny
 
 fun Cache.put(url: String): tsgen.runtime.Future<Unit> {
     val r0 = fixtures.annotate.flat.Cache_put_str(this, url.toJsString())
-    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.annotate.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> val r3 = try { fixtures.annotate.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r3 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
 }
 
 fun Cache.put(url: String, ttl: UInt): tsgen.runtime.Future<Unit> {
     val r0 = fixtures.annotate.flat.Cache_put_str_u32(this, url.toJsString(), ttl.toInt())
-    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.annotate.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> val r1 = try { fixtures.annotate.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r1 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
 }
 
 fun Cache.put(request: Response): tsgen.runtime.Future<Unit> {
     val r0 = fixtures.annotate.flat.Cache_put_Response(this, request)
-    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.annotate.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> val r1 = try { fixtures.annotate.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r1 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
 }
 
 fun Cache.put(request: Response, ttl: UInt): tsgen.runtime.Future<Unit> {
     val r0 = fixtures.annotate.flat.Cache_put_Response_u32(this, request, ttl.toInt())
-    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.annotate.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> val r1 = try { fixtures.annotate.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r1 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
 }
 
 external interface Storage : JsAny
 
 fun Storage.delete(key: String): tsgen.runtime.Future<Boolean> {
     val r0 = fixtures.annotate.flat.Storage_delete_str(this, key.toJsString())
-    return tsgen.runtime.Future<Boolean>(r0!!, { f -> val r1 = fixtures.annotate.flat.take_bool(f); (r1 != 0) }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Boolean>(r0!!, { f -> val r1 = try { fixtures.annotate.flat.get_bool(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.annotate.flat.ret_i32(); if (r1 == 0) null else tsgen.runtime.Fulfilled((s2 != 0)) }, { f -> futureErrorErr(f) })
 }
 
 fun Storage.delete(keys: List<String>): tsgen.runtime.Future<UInt> {
     val r0 = fixtures.annotate.flat.Storage_delete_arr_str(this, keys.map { it.toJsString() }.toJsArray())
-    return tsgen.runtime.Future<UInt>(r0!!, { f -> val r1 = fixtures.annotate.flat.take_u32(f); r1.toUInt() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<UInt>(r0!!, { f -> val r1 = try { fixtures.annotate.flat.get_u32(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.annotate.flat.ret_i32(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2.toUInt()) }, { f -> futureErrorErr(f) })
 }
 
 external interface Console : JsAny
@@ -121,17 +121,17 @@ external interface Bucket : JsAny
 
 fun Bucket.put(key: String, bodyBytes: Uint8Array): tsgen.runtime.Future<Unit> {
     val r0 = fixtures.annotate.flat.Bucket_put_str_Uint8Array(this, key.toJsString(), bodyBytes)
-    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.annotate.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> val r1 = try { fixtures.annotate.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r1 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
 }
 
 fun Bucket.put(key: String, bodyBytes: ByteArray): tsgen.runtime.Future<Unit> {
     val r0 = fixtures.annotate.flat.Bucket_put_str_u8(this, key.toJsString(), tsgen.runtime.typedArray("Uint8Array", bodyBytes))
-    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.annotate.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> val r1 = try { fixtures.annotate.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r1 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
 }
 
 fun Bucket.upload(key: String, data: ByteArray): tsgen.runtime.Future<Unit> {
     val r0 = fixtures.annotate.flat.Bucket_upload_str_buffer(this, key.toJsString(), tsgen.runtime.typedArray("Uint8Array", data))
-    return tsgen.runtime.Future<Unit>(r0!!, { f -> fixtures.annotate.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Unit>(r0!!, { f -> val r1 = try { fixtures.annotate.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r1 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) })
 }
 
 external interface Incoming : JsAny
@@ -199,8 +199,8 @@ val console: Console
     }
 
 fun setTimeout(callback: () -> Unit): Int {
-    val r2 = try { fixtures.annotate.flat.setTimeout_fn(callback.toJsReference()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return r2
+    val r0 = try { fixtures.annotate.flat.setTimeout_fn(callback.toJsReference()) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return r0
 }
 
 fun setTimeout(callback: () -> Unit, ms: Double): Int {
@@ -246,7 +246,7 @@ fun <Meta : JsAny?, Cf : JsAny?> Request(): Request<Meta, Cf> {
 fun fetch(input: RequestInfo): tsgen.runtime.Future<Request<JsAny?, Incoming>> {
     val w0 = encodeRequestInfo(input)
     val r1 = fixtures.annotate.flat.fetch_RequestInfo(w0.arm, w0.s0)
-    return tsgen.runtime.Future<Request<JsAny?, Incoming>>(r1!!, { f -> val r2 = fixtures.annotate.flat.take_Request_Any_Incoming(f); r2!!.unsafeCast<Request<JsAny?, Incoming>>() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<Request<JsAny?, Incoming>>(r1!!, { f -> val r2 = try { fixtures.annotate.flat.get_Request_Any_Incoming(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s3 = fixtures.annotate.flat.ret_externref(); if (r2 == 0) null else tsgen.runtime.Fulfilled(s3!!.unsafeCast<Request<JsAny?, Incoming>>()) }, { f -> futureErrorErr(f) })
 }
 
 fun fetch(input: Request<*, out Incoming>): tsgen.runtime.Future<Request<JsAny?, Incoming>> = fetch(RequestInfo.Request(input))
@@ -366,15 +366,15 @@ private fun errMessage(error: Err): String = when (error) {
 /** `e` as `err`: its own error, or the fallback arm with its message. */
 fun toErr(e: kotlin.Throwable): Err = if (e is ErrException) e.error else Err.Error((e.message ?: e.toString()).toJsString())
 
-fun futureErrorErr(f: JsAny): ErrException {
-    val r1 = fixtures.annotate.flat.error_err(f)
+fun raiseErr(e: kotlin.js.JsException): ErrException {
+    val r1 = fixtures.annotate.flat.err_err(e.thrownValue)
     val s2 = fixtures.annotate.flat.ret_externref()
     return ErrException(decodeErr(r1, s2)!!)
 }
 
-fun raiseErr(e: kotlin.js.JsException): ErrException {
-    val r0 = fixtures.annotate.flat.err_err(e.thrownValue)
-    val s1 = fixtures.annotate.flat.ret_externref()
-    return ErrException(decodeErr(r0, s1)!!)
+fun futureErrorErr(f: JsAny): ErrException {
+    val r4 = fixtures.annotate.flat.error_err(f)
+    val s5 = fixtures.annotate.flat.ret_externref()
+    return ErrException(decodeErr(r4, s5)!!)
 }
 

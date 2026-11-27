@@ -19,8 +19,8 @@ fun export_Counter_new_DurableObjectState_Env(p0: JsAny?, p1: JsAny?, p2: JsAny?
 
 /** A new `Counter` constructed through JS. */
 fun newCounter(ctx: DurableObjectState, env: Env): fixtures.export_class_module.app.Counter {
-    val r2 = try { fixtures.export_class_module.flat.new_Counter_new_DurableObjectState_Env(ctx, env) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
-    return fixtures.export_class_module.flat.unbox_Counter(r2!!.unsafeCast<JsAny>())!!.unsafeCast<JsReference<fixtures.export_class_module.app.Counter>>().get()
+    val r0 = try { fixtures.export_class_module.flat.new_Counter_new_DurableObjectState_Env(ctx, env) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }
+    return fixtures.export_class_module.flat.unbox_Counter(r0!!.unsafeCast<JsAny>())!!.unsafeCast<JsReference<fixtures.export_class_module.app.Counter>>().get()
 }
 
 @JsExport

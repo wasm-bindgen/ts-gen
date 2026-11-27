@@ -73,7 +73,7 @@ fun Init(): Init {
 
 fun nested(xs: tsgen.runtime.Future<String?>, ys: List<String?>, r: Record<out JsString?>, cb: (String?) -> String?): tsgen.runtime.Future<String?> {
     val r0 = fixtures.nullability.flat.nested_future_str_arr_str_Record_Str_fn_str_str(xs.raw, ys.map { it?.let { it.toJsString() } }.toJsArray(), r, cb.toJsReference())
-    return tsgen.runtime.Future<String?>(r0!!, { f -> val r1 = fixtures.nullability.flat.take_str(f); r1?.unsafeCast<JsString>()?.toString() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<String?>(r0!!, { f -> val r1 = try { fixtures.nullability.flat.get_str(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s2 = fixtures.nullability.flat.ret_externref(); if (r1 == 0) null else tsgen.runtime.Fulfilled(s2?.unsafeCast<JsString>()?.toString()) }, { f -> futureErrorErr(f) })
 }
 
 fun nested(xs: suspend () -> String?, ys: List<String?>, r: Record<out JsString?>, cb: (String?) -> String?): tsgen.runtime.Future<String?> = nested(futureOfStr(xs), ys, r, cb)
@@ -123,7 +123,7 @@ fun futureOfStr(block: suspend () -> String?): tsgen.runtime.Future<String?> {
     val future = fixtures.nullability.flat.future_new()
     val resolver = fixtures.nullability.flat.ret_externref()
     tsgen.runtime.Loop.main.launch({ block() }) { o -> o.fold({ r -> fixtures.nullability.flat.future_resolve_str(resolver, r?.toJsString()) }, { e -> rejectErr(resolver, e) }) }
-    return tsgen.runtime.Future<String?>(future!!, { f -> val r4 = fixtures.nullability.flat.take_str(f); r4?.unsafeCast<JsString>()?.toString() }, { f -> futureErrorErr(f) })
+    return tsgen.runtime.Future<String?>(future!!, { f -> val r5 = try { fixtures.nullability.flat.get_str(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; val s6 = fixtures.nullability.flat.ret_externref(); if (r5 == 0) null else tsgen.runtime.Fulfilled(s6?.unsafeCast<JsString>()?.toString()) }, { f -> futureErrorErr(f) })
 }
 
 sealed interface Err {
@@ -164,9 +164,9 @@ fun raiseErr(e: kotlin.js.JsException): ErrException {
 }
 
 fun futureErrorErr(f: JsAny): ErrException {
-    val r2 = fixtures.nullability.flat.error_err(f)
-    val s3 = fixtures.nullability.flat.ret_externref()
-    return ErrException(decodeErr(r2, s3)!!)
+    val r3 = fixtures.nullability.flat.error_err(f)
+    val s4 = fixtures.nullability.flat.ret_externref()
+    return ErrException(decodeErr(r3, s4)!!)
 }
 
 fun rejectErr(resolver: JsAny?, e: kotlin.Throwable) {

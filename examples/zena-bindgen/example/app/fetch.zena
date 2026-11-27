@@ -39,7 +39,7 @@ export async function fetchRoute(env: Env): Future<Response> {
   init.setCache(NoStoreOrNoCache.NoStore);
   let global = await (await fetchWithInit(new RequestInfoStr("http://helper/echo"), init)).text();
   // A caller's own signal is kept: the bridge joins it with the one it
-  // aborts on a drop, so the timeout still rejects the future.
+  // aborts on a cancel, so the timeout still rejects the future.
   let timed = new RequestInit<RequestInitCfProperties>();
   timed.signal = AbortSignal.timeout(50.0);
   let timeout = try {
@@ -49,15 +49,15 @@ export async function fetchRoute(env: Env): Future<Response> {
     if (e is ErrException && e.arm == ErrArm.Error) `an Error (${e.message})` else "something else"
   };
   let timedOut = await aborts(env);
-  // Whichever finishes first wins, and the other is dropped. Dropping a
-  // pending future cancels it: the bridge aborts a signal of its own,
-  // which the helper sees as its request aborting. With no init to carry
-  // the signal, the bridge makes one.
+  // Whichever finishes first wins, and the other is cancelled, which
+  // requests its pending JS future's cancellation: the bridge aborts a
+  // signal of its own, which the helper sees as its request aborting.
+  // With no init to carry the signal, the bridge makes one.
   let tasks = new Array<() => Future<String>>();
   tasks.push(() => slow());
   tasks.push(() => giveUp(50.0));
   await TaskGroup.race<String>(tasks);
-  let dropped = await aborts(env);
+  let cancelled = await aborts(env);
   // An AbortController made here: JS calls the listener on `abort()`.
   let controller = new AbortController();
   var heard = "nothing";
@@ -69,6 +69,6 @@ export async function fetchRoute(env: Env): Future<Response> {
   return ok(`service binding: ${bound}global fetch: ${global}` +
     `a fetch with AbortSignal.timeout(50) rejected with ${timeout}\n` +
     `the helper saw ${timedOut} of its requests abort\n` +
-    `a fetch dropped by TaskGroup.race: the helper saw ${dropped} of its requests abort\n` +
+    `a fetch cancelled by TaskGroup.race: the helper saw ${cancelled} of its requests abort\n` +
     `AbortController: the listener heard ${heard}, signal.aborted is ${controller.signal.aborted}\n`);
 }

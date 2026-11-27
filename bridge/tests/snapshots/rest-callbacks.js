@@ -474,11 +474,11 @@ function $h2(f, h, a) {
   try {
     const t1 = a.slice(0);
     const t2 = $h3(t1, cx);
+    cx.n = cxm;
     $E[0](env, t2[0], t2[1]);
   } catch (e) {
-    throw $outgoing(e);
-  } finally {
     $release(cx, cxm);
+    throw $outgoing(e);
   }
 }
 
@@ -500,11 +500,11 @@ function $h5(f, h, a) {
     const t4 = t2[1];
     const t5 = a.slice(1);
     const t6 = $h3(t5, cx);
+    cx.n = cxm;
     $E[1](env, t3, t4, t6[0], t6[1]);
   } catch (e) {
-    throw $outgoing(e);
-  } finally {
     $release(cx, cxm);
+    throw $outgoing(e);
   }
 }
 

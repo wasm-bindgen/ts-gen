@@ -3,7 +3,7 @@
 
 import { Future } from 'zena:async';
 import { __tw_promise } from "./unwind.zena";
-import { after, before, sync, typedAfter } from "./app.zena";
+import { after, before, mistypedValue, mistypedValueAs, optionalValue, optionalValueAs, optionalValueOf, sync, typedAfter } from "./app.zena";
 
 @export("sync()", "tw")
 export function __export_sync(): String {
@@ -26,5 +26,35 @@ export function __export_after(): externref {
 @export("typedAfter()", "tw")
 export function __export_typedAfter(): externref {
   let result: Future<String> = typedAfter();
+  return __tw_promise<String>(result);
+}
+
+@export("mistypedValue()", "tw")
+export function __export_mistypedValue(): externref {
+  let result: Future<String> = mistypedValue();
+  return __tw_promise<String>(result);
+}
+
+@export("mistypedValueAs()", "tw")
+export function __export_mistypedValueAs(): externref {
+  let result: Future<String> = mistypedValueAs();
+  return __tw_promise<String>(result);
+}
+
+@export("optionalValue()", "tw")
+export function __export_optionalValue(): externref {
+  let result: Future<String> = optionalValue();
+  return __tw_promise<String>(result);
+}
+
+@export("optionalValueAs()", "tw")
+export function __export_optionalValueAs(): externref {
+  let result: Future<String> = optionalValueAs();
+  return __tw_promise<String>(result);
+}
+
+@export("optionalValueOf()", "tw")
+export function __export_optionalValueOf(): externref {
+  let result: Future<String> = optionalValueOf();
   return __tw_promise<String>(result);
 }

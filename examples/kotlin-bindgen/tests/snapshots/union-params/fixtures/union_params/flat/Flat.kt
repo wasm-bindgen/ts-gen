@@ -167,9 +167,9 @@ external fun load(): JsAny?
 @JsFun("() => { throw new Error('ts-gen: unlinked import') }")
 external fun loadText(): Int
 
-/** tw:future take<buffer> */
+/** tw:future get<buffer> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")
-external fun take_buffer(p0: JsAny?): JsAny?
+external fun get_buffer(p0: JsAny?): Int
 
 /** tw:future error<err> */
 @JsFun("(p0) => { throw new Error('ts-gen: unlinked import') }")

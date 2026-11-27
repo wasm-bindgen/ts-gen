@@ -30,6 +30,44 @@ function $str(v) {
   return v;
 }
 
+function $some(v, what) {
+  if (v === null || v === undefined) $fail(what, v);
+  return v;
+}
+
+function $isInstance(v, C) {
+  return typeof C === "function" && v instanceof C;
+}
+
+function $array(v, what) {
+  if (!Array.isArray(v)) $fail(what, v);
+  return v;
+}
+
+function $tuple(v, n, what) {
+  if (!Array.isArray(v) || v.length !== n) $fail(what, v);
+  return v;
+}
+
+function $typed(v, C, what) {
+  if (!(v instanceof C)) $fail(what, v);
+  return v;
+}
+
+// The error message of a caught value (IR.md §15): `String(err)` runs
+// user code, so it's guarded.
+function $message(e) {
+  try {
+    const m = e !== null && e !== undefined ? e.message : undefined;
+    if (typeof m === "string" && m !== "") return m;
+  } catch {}
+  try {
+    const s = String(e);
+    if (s !== "") return s;
+  } catch {}
+  return "unknown error";
+}
+
 // A memory and its externref table, as the glue reads and writes them.
 // The language's space allocates through its exports and registers each
 // allocation on the call's cleanup list; the scratch space is the
@@ -142,68 +180,67 @@ function $table(table, stack, constant, heap) {
   return { table, stack, constant, heap };
 }
 
-// The cleanup stack (IR.md §15): `kind, ptr, size, align` records of the
-// allocations conversions make, memory (0), table slots (1), or the `size`
-// strings of an `arr<str>` at `ptr` (2), below `n`.
-// Each conversion marks `n`, and resets it once the language owns what it
-// pushed. One shared stack saves growing an array per call, and nested
-// conversions only ever touch the records above their own mark. `n` is kept
-// apart because setting an array's `length` is slow.
-const $cx = { a: [], n: 0 };
-
-// Releases a failed conversion's allocations: the records above `m`.
-function $release(cx, m) {
-  const a = cx.a;
-  for (let i = cx.n - 4; i >= m; i -= 4) {
-    try {
-      if (a[i] === 0) $L.free(a[i + 1], a[i + 2], a[i + 3]);
-      else if (a[i] === 1) $L.tfree(a[i + 1], a[i + 2]);
-      else $freeStrs(a[i + 1], a[i + 2]);
-    } catch {}
+// A language error as its JS error class (§15).
+function $construct(C, msg, props) {
+  const e = C === globalThis.DOMException ? new C(msg, props.name) : new C(msg);
+  for (const k in props) {
+    if (e[k] !== props[k]) Object.defineProperty(e, k, { value: props[k], configurable: true, writable: true });
   }
-  cx.n = m;
+  return e;
 }
 
-// Frees the first `n` strings of the `(ptr, len)` descriptors at `p`.
-function $freeStrs(p, n) {
-  for (let i = 0; i < n; i++) {
-    const dv = $L.dv();
-    const len = dv.getUint32(p + i * 8 + 4, true);
-    if (len !== 0) {
-      try {
-        $L.free(dv.getUint32(p + i * 8, true), len, 1);
-      } catch {}
-    }
+// The bridge's return area, the first bytes of its scratch memory, where a
+// JS import writes its results past the first.
+let $ra = null;
+function $ret() {
+  if ($ra === null || $ra.i32.length === 0) {
+    const b = $B.memory.buffer;
+    const o = $B.hdr.value + 8;
+    $ra = {
+      i32: new Int32Array(b, o, 16),
+      i64: new BigInt64Array(b, o, 8),
+      f32: new Float32Array(b, o, 16),
+      f64: new Float64Array(b, o, 8),
+    };
   }
+  return $ra;
 }
 
-// A future the language holds (IR.md §16): a promise, settled state for
-// synchronous polls, and the waker to call when it settles. `check`
-// validates a resolution, which otherwise rejects with its TypeError.
+// A fresh copy in both directions (IR.md §11).
+// Reading `.buffer` of a small fresh array moves it off-heap, so both
+// directions copy through views of the element type. `set` copies through
+// a clone when its source shares the memory.
+function $lowerVec(s, v, C, cx) {
+  const size = C.BYTES_PER_ELEMENT;
+  const n = v.length;
+  if (n === 0) return [size, 0];
+  const p = s.alloc(n * size, size, cx);
+  new C(s.u8().buffer, p, n).set(v);
+  return [p, n];
+}
+
+// A future the language holds (IR.md §16): a promise, with its state and
+// raw settlement kept for the language's synchronous reads. `check` is a
+// `future<never>`'s rule, which rejects a resolution.
 class $Future {
   constructor(promise, check, cancel) {
     this.promise = promise;
     this.state = 0;
     this.value = undefined;
-    this.waker = -1;
+    this.listeners = null;
     this.cancel = cancel;
-    this.dropped = false;
-    this.taken = false;
-    // The suspensions parked on it (§16).
-    this.parked = null;
     promise.then(
       (v) => {
-        if (this.dropped) return;
-        try {
-          if (check) check(v);
-          this.settle(1, v);
-        } catch (e) {
-          this.settle(2, e);
+        if (check) {
+          try {
+            check(v);
+          } catch (e) {
+            return this.settle(2, e);
+          }
         }
+        this.settle(1, v);
       },
-      (e) => {
-        if (!this.dropped) this.settle(2, e);
-      },
+      (e) => this.settle(2, e),
     );
   }
 
@@ -211,20 +248,47 @@ class $Future {
     this.state = state;
     this.value = value;
     this.cancel = null;
-    const w = this.waker;
-    this.waker = -1;
-    if (w !== -1) $wake(w);
-    $unpark(this, state);
+    const ls = this.listeners;
+    if (!ls) return;
+    // Each is taken off as it fires, so a wake can still remove one that
+    // hasn't, and one that throws doesn't keep the rest from firing.
+    let failed = false;
+    let error;
+    for (const [w, l] of ls) {
+      ls.delete(w);
+      try {
+        l === true ? $wake(w) : l.fire(this);
+      } catch (e) {
+        if (!failed) error = e;
+        failed = true;
+      }
+    }
+    this.listeners = null;
+    if (failed) throw error;
   }
 }
 
 function $future(v, check, cancel) {
-  return v instanceof $Future ? v : new $Future(Promise.resolve(v), check, cancel ?? null);
+  return v instanceof $Future ? v : new $Future(Promise.resolve(v), check ?? null, cancel ?? null);
 }
 
 // A synchronous throw folded into a rejected future (§16).
 function $rejected(e) {
   return new $Future(Promise.reject(e), null, null);
+}
+
+// A suspension parked on futures, among their listeners:
+// `done(i)` runs once, when the first of them, `futures[i]`, settles.
+class $Park {
+  constructor(futures, done) {
+    this.futures = futures;
+    this.done = done;
+  }
+
+  fire(f) {
+    for (const g of this.futures) g.listeners?.delete(this);
+    this.done(this.futures.indexOf(f));
+  }
 }
 
 function $promise(v) {
@@ -233,49 +297,49 @@ function $promise(v) {
 
 function $isFuture(f) {
   if (!(f instanceof $Future)) throw new TypeError(`expected a future, got ${$describe(f)}`);
-  if (f.dropped) throw new TypeError("a dropped future");
   return f;
 }
 
-function $poll(f, waker) {
-  $isFuture(f);
-  if (f.state === 0) f.waker = waker;
-  return f.state;
+// A future's value as `get` reads it: a tuple of it once the future is
+// fulfilled (empty for a `unit`), and none until then.
+function $option(f, unit) {
+  if (f.state !== 1) return null;
+  return unit ? [] : [f.value];
 }
 
-function $settled(f, state) {
-  $isFuture(f);
-  if (f.state !== state || f.taken) {
-    throw new TypeError(state === 1 ? "taking a future that isn't resolved" : "the error of a future that isn't rejected");
+// A pending future's listeners (IR.md §16), by waker: `true` for one
+// the language added to it alone, woken when it settles, or the `$Race`
+// it shares with other futures. The latest add replaces a waker's entry.
+// A parked suspension (`$Park`) is among them under itself.
+function $addListener(f, w) {
+  if ($isFuture(f).state === 0) (f.listeners ??= new Map()).set(w, true);
+}
+
+// One waker listening to several futures, spent by the first to settle.
+class $Race {
+  constructor(waker, futures) {
+    this.waker = waker;
+    this.futures = futures;
   }
-  f.taken = true;
-  const v = f.value;
-  f.value = undefined;
-  return v;
-}
 
-// Dropping cancels: the cancel function runs once, its failure swallowed,
-// and a later settlement is ignored.
-// Resumes the suspensions parked on future `f` with `state`.
-function $unpark(f, state) {
-  const ps = f.parked;
-  f.parked = null;
-  if (ps) for (const w of ps) w(state);
-}
-
-function $dropFuture(f) {
-  if (!(f instanceof $Future) || f.dropped) return;
-  f.dropped = true;
-  f.waker = -1;
-  $unpark(f, 0);
-  f.value = undefined;
-  const c = f.state === 0 ? f.cancel : null;
-  f.cancel = null;
-  if (c) {
-    try {
-      c();
-    } catch {}
+  fire() {
+    const w = this.waker;
+    for (const f of this.futures) if (f.listeners?.get(w) === this) f.listeners.delete(w);
+    $wake(w);
   }
+}
+
+function $addListenerList(fs, w) {
+  const pending = [];
+  for (const f of fs) if ($isFuture(f).state === 0) pending.push(f);
+  const race = new $Race(w, pending);
+  for (const f of pending) (f.listeners ??= new Map()).set(w, race);
+}
+
+function $states(fs) {
+  const out = new Uint8Array(fs.length);
+  for (let i = 0; i < fs.length; i++) out[i] = $isFuture(fs[i]).state;
+  return out;
 }
 
 function $newFuture() {
@@ -312,60 +376,129 @@ function $wake(w) {
   if ($live()) $X["tw:future/wake"](w);
 }
 
+// tag:err
+const $tag0 = new WebAssembly.Tag({ parameters: ["i32", "externref"] });
 
-function $h1(v) {
-  if (!(typeof v === "string")) $fail("str", v);
+function $h1(v, cx) {
+  $array(v, "Any[]");
+  const n = v.length;
+  const x0 = n ? $S.talloc(n * 1, cx) : 0;
+  for (let i = 0; i < n; i++) {
+    const e = v[i];
+    const t1 = $some(e, "Any");
+    const x = x0 + i * 1;
+    $S.table.set(x + 0, t1);
+  }
+  return [x0, n];
+}
+
+function $h2(e) {
+  if ((($isInstance(e, globalThis.TypeError)) || ($isInstance(e, globalThis.RangeError)))) return [1, $message(e)];
+  return [-1, $message(e)];
+}
+
+function $h3(x0, len) {
+  const n = len;
+  const out = new Array(n);
+  for (let i = 0; i < n; i++) {
+    const x = x0 + i * 1;
+    const t1 = $S.table.get(x + 0);
+    out[i] = t1;
+  }
+  return out;
+}
+
+function $h4(arm, m) {
+  const msg = m == null ? "" : String(m);
+  switch (arm) {
+    case 1: return $construct(globalThis.TypeError, msg, {  });
+  }
+  return new Error(msg);
 }
 
 // ("tw:js/global", "Api#fetch()")
 function $f0(w0_0) {
   try {
     const r = w0_0.fetch();
-    const t1 = $future(r, $h1);
+    const t1 = $future(r);
     return t1;
   } catch (e) {
     return $rejected(e);
   }
 }
 
-// ("tw:future", "poll")
-function $f1(f, w) {
-  return $poll(f, w);
+// ("tw:js/global", "Api#futures()")
+function $f1(w0_0) {
+  const r = w0_0.futures();
+  const t1 = $h1(r, null);
+  const t2 = t1[0];
+  const t3 = t1[1];
+  const ra = $ret();
+  ra.i32[0] = t3;
+  return t2;
 }
 
-// ("tw:future", "take<str>")
-function $f2(w0_0) {
-  const v = $settled(w0_0, 1);
-  const cx = $cx;
-  const cxm = cx.n;
+// ("tw:future", "state")
+function $f2(f) {
+  return $isFuture(f).state;
+}
+
+// ("tw:future", "get<str>")
+function $f3(w0_0) {
+  const f = $isFuture(w0_0);
   try {
-    const t1 = $str(v);
-    return t1;
+    const r = $option(f, false);
+    let t1 = 0, t2 = null;
+    if (r != null) {
+      $tuple(r, 1, "(str)?");
+      const t3 = r[0];
+      const t4 = $str(t3);
+      t1 = 1;
+      t2 = t4;
+    }
+    const ra = $ret();
+    ra.i32[0] = t1;
+    return t2;
   } catch (e) {
-    $release(cx, cxm);
-    throw e;
-  } finally {
-    cx.n = cxm;
+    if (e instanceof WebAssembly.Exception) throw e;
+    throw new WebAssembly.Exception($tag0, $h2(e));
   }
 }
 
-// ("tw:future", "drop")
-function $f3(f) {
-  $dropFuture(f);
+// ("tw:future", "add_listener")
+function $f4(f, w) {
+  $addListener(f, w);
+}
+
+// ("tw:future", "states")
+function $f5(w0_0, w0_1) {
+  const r = $states($h3(w0_0, w0_1));
+  const t1 = $lowerVec($S, $typed(r, Uint8Array, "u8[]"), Uint8Array, null);
+  const t2 = t1[0];
+  const t3 = t1[1];
+  const ra = $ret();
+  ra.i32[0] = t3;
+  return t2;
+}
+
+// ("tw:future", "add_listener_list")
+function $f6(w0_0, w0_1, w1_0) {
+  $addListenerList($h3(w0_0, w0_1), w1_0);
 }
 
 // ("tw:future", "new")
-function $f4() {
+function $f7() {
   return $newFuture();
 }
 
 // ("tw:future", "resolve<str>")
-function $f5(w0_0, w1_0) {
+function $f8(w0_0, w1_0) {
   $resolver(w0_0).resolve(w1_0);
 }
 
 function $outgoing(e) {
   if (e instanceof WebAssembly.Exception) {
+    if (e.is($tag0)) return $h4(e.getArg($tag0, 0), e.getArg($tag0, 1));
   }
   return e;
 }
@@ -390,7 +523,7 @@ export { $N0 as app };
 export function instantiate(language, bridge, imports = {}) {
   if ($B) throw new Error("this bridge is already instantiated");
   $B = new WebAssembly.Instance(bridge, {
-    "tw:glue": { g2: $f2, g5: $f5 },
+    "tw:glue": { g1: $f1, g3: $f3, g5: $f5, g6: $f6, g8: $f8 },
     "wasm:js-string": {
       length: (s) => s.length,
       fromCharCodeArray: (a, start, end) => {
@@ -409,20 +542,26 @@ export function instantiate(language, bridge, imports = {}) {
     ...imports,
     "tw:js/global": {
       "Api#fetch()": $f0,
+      "Api#futures()": $B.f1,
     },
     "tw:future": {
-      "poll": $f1,
-      "take<str>": $B.f2,
-      "drop": $f3,
-      "new": $f4,
-      "resolve<str>": $B.f5,
+      "state": $f2,
+      "get<str>": $B.f3,
+      "add_listener": $f4,
+      "states": $B.f5,
+      "add_listener_list": $B.f6,
+      "new": $f7,
+      "resolve<str>": $B.f8,
     },
   });
   $X = instance.exports;
   $T = $table($X["tw:table"], $X["tw:table/stack_base"].value, $X["tw:table/const_base"].value, $X["tw:table/heap_base"].value);
   $E[0] = $X["app.run()"];
   $checkLive = () => {
-    if (instance.exports["tw:terminated"].value !== 0) throw new Error("Module terminated");
+    if (instance.exports["tw:terminated"].value !== 0) {
+      const e = new Error("Module terminated");
+      throw e;
+    }
   };
   return instance;
 }

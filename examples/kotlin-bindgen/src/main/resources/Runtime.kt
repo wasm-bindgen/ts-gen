@@ -10,13 +10,17 @@ import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.suspendCoroutine
 import kotlin.wasm.WasmExport
 
-/** tw:future poll */
-@JsFun("(f, w) => { throw new Error('ts-gen: unlinked import') }")
-internal external fun futurePoll(f: JsAny?, waker: Int): Int
-
-/** tw:future drop */
+/** tw:future state */
 @JsFun("(f) => { throw new Error('ts-gen: unlinked import') }")
-internal external fun futureDrop(f: JsAny?)
+internal external fun futureState(f: JsAny?): Int
+
+/** tw:future cancel */
+@JsFun("(f) => { throw new Error('ts-gen: unlinked import') }")
+internal external fun futureCancel(f: JsAny?)
+
+/** tw:future add_listener */
+@JsFun("(f, w) => { throw new Error('ts-gen: unlinked import') }")
+internal external fun futureAddListener(f: JsAny?, waker: Int)
 
 /** tw:loop work_available */
 @JsFun("(l) => { throw new Error('ts-gen: unlinked import') }")
@@ -93,27 +97,38 @@ fun copyInto(a: JsAny, v: FloatArray) = floatArray(a).copyInto(v)
 fun copyInto(a: JsAny, v: DoubleArray) = doubleArray(a).copyInto(v)
 
 /**
- * A `future<T, E>` from JS. [await] polls it on the [Loop], parking the
- * task until `tw:future/wake`; [take] reads the resolution through
- * `take<T>`, and [error] the rejection through `error<E>`, as `E`'s
- * typed exception.
+ * A `future<T, E>` from JS. [await] reads its value and, while it is
+ * pending, parks the task on the [Loop] with a waker `add_listener` leaves
+ * on it, until `tw:future/wake`. [get] reads the resolution through
+ * `get<T>`, which checks it as an import that `throws E` checks its
+ * result and gives none until the future is fulfilled, and [error] the
+ * rejection through `error<E>`: both as `E`'s typed exception.
  */
-class Future<T>(val raw: JsAny, private val take: (JsAny) -> T, private val error: (JsAny) -> Throwable) {
+class Future<T>(val raw: JsAny, private val get: (JsAny) -> Fulfilled<T>?, private val error: (JsAny) -> Throwable) {
     suspend fun await(): T {
         val loop = Loop.current ?: error("awaiting a future outside a ts-gen task")
         while (true) {
-            val w = loop.waker()
-            when (futurePoll(raw, w)) {
-                1 -> { loop.forget(w); return take(raw) }
-                2 -> { loop.forget(w); throw error(raw) }
+            get(raw)?.let { return it.value }
+            when (futureState(raw)) {
+                1 -> continue
+                2 -> throw error(raw)
             }
+            val w = loop.waker()
+            futureAddListener(raw, w)
             suspendCoroutine<Unit> { loop.park(w, it) }
         }
     }
 
-    /** Drops the future, which cancels it. */
-    fun drop() = futureDrop(raw)
+    /**
+     * Requests cancellation: a pending future's cancel function runs, once.
+     * The future settles as its promise does, typically rejecting with the
+     * host's abort error.
+     */
+    fun cancel() = futureCancel(raw)
 }
+
+/** A fulfilled future's value: a `T` that is nullable keeps its own null. */
+class Fulfilled<T>(val value: T)
 
 /**
  * The cooperative loop the bridge drives (IR.md §16): ready tasks run in
@@ -138,10 +153,6 @@ class Loop private constructor(val id: Int) {
         val w = nextWaker++
         wakers[w] = this
         return w
-    }
-
-    internal fun forget(w: Int) {
-        wakers.remove(w)
     }
 
     internal fun park(w: Int, c: Continuation<Unit>) {

@@ -19,7 +19,7 @@ suspend fun subrequests(env: Env): Response {
     val posted = fetch("http://backend/post", init).await()
 
     // A caller's own signal is kept: the bridge joins it with the one it
-    // aborts on a drop, so the timeout still rejects the future.
+    // aborts on a cancel, so the timeout still rejects the future.
     val timed = RequestInit<RequestInitCfProperties>().apply { signal = AbortSignalStatic.timeout(50.0) }
     val timeout = try {
         fetch("http://backend/slow", timed).await()
@@ -29,20 +29,21 @@ suspend fun subrequests(env: Env): Response {
     }
     val timedOut = aborts(env)
 
-    // Dropping a pending future cancels it: the bridge aborts a signal of
-    // its own, which the backend sees as its request aborting. With no
-    // init to carry the signal, the bridge makes one.
+    // Cancelling a pending future is a request: the bridge aborts a signal
+    // of its own, which the backend sees as its request aborting, and the
+    // future rejects as the fetch does. With no init to carry the signal,
+    // the bridge makes one.
     val pending = fetch("http://backend/slow")
     delay(50.0)
-    pending.drop()
-    val dropped = aborts(env)
+    pending.cancel()
+    val cancelled = aborts(env)
 
     val reply = """
         BACKEND.fetch: ${hello.status} ${hello.text().await()}
         fetch with an init: ${posted.status} ${posted.text().await()}
         a fetch with AbortSignal.timeout(50) rejected with $timeout
         the backend saw $timedOut of its requests abort
-        a dropped fetch: the backend saw $dropped of its requests abort
+        a cancelled fetch: the backend saw $cancelled of its requests abort
     """.trimIndent() + "\n"
     return text(reply)
 }

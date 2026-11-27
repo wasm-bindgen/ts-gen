@@ -40,7 +40,7 @@ js_code	fixtures.union_params.flat.storeBlob_ValueKind2	tw:js/global	storeBlob(V
 js_code	fixtures.union_params.flat.load	tw:js/global	load()
 js_code	fixtures.union_params.flat.loadText	tw:js/global	loadText()
 js_code	fixtures.union_params.flat.join_arr_buffer	tw:js/global	join(arr<buffer>)
-js_code	fixtures.union_params.flat.take_buffer	tw:future	take<buffer>
+js_code	fixtures.union_params.flat.get_buffer	tw:future	get<buffer>
 js_code	fixtures.union_params.flat.error_err	tw:future	error<err>
 js_code	fixtures.union_params.flat.boxed	tw:js/global	boxed()
 js_code	fixtures.union_params.flat.hash_buffer	tw:js/global	hash(buffer)
@@ -75,6 +75,7 @@ js_code	fixtures.union_params.flat.unbox_BufferOrStr	tw:unbox	BufferOrStr
 js_code	fixtures.union_params.flat.box_BufferOrStr	tw:box	BufferOrStr
 js_code	fixtures.union_params.flat.unbox_BufferSource	tw:unbox	BufferSource
 js_code	fixtures.union_params.flat.box_BufferSource	tw:box	BufferSource
-js_code	tsgen.runtime.futurePoll	tw:future	poll
-js_code	tsgen.runtime.futureDrop	tw:future	drop
+js_code	tsgen.runtime.futureState	tw:future	state
+js_code	tsgen.runtime.futureCancel	tw:future	cancel
+js_code	tsgen.runtime.futureAddListener	tw:future	add_listener
 js_code	tsgen.runtime.loopWorkAvailable	tw:loop	work_available

@@ -22,7 +22,7 @@ external interface Handlers : JsAny
 val Handlers.element: ((Element2) -> tsgen.runtime.Future<Unit>?)?
     get() {
         val r0 = fixtures.optional_methods.flat.Handlers_get_element(this)
-        return r0?.let { f -> { a0: Element2 -> val r1 = fixtures.optional_methods.flat.call_fn_Element2_future_unit(f, a0); r1?.let { tsgen.runtime.Future<Unit>(it, { f -> fixtures.optional_methods.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) }) } } }
+        return r0?.let { f -> { a0: Element2 -> val r1 = fixtures.optional_methods.flat.call_fn_Element2_future_unit(f, a0); r1?.let { tsgen.runtime.Future<Unit>(it, { f -> val r4 = try { fixtures.optional_methods.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r4 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) }) } } }
     }
 
 fun Handlers.setElement(value: suspend (Element2) -> Unit) {
@@ -217,16 +217,16 @@ private fun errMessage(error: Err): String = when (error) {
 /** `e` as `err`: its own error, or the fallback arm with its message. */
 fun toErr(e: kotlin.Throwable): Err = if (e is ErrException) e.error else Err.Error((e.message ?: e.toString()).toJsString())
 
-fun futureErrorErr(f: JsAny): ErrException {
-    val r2 = fixtures.optional_methods.flat.error_err(f)
+fun raiseErr(e: kotlin.js.JsException): ErrException {
+    val r2 = fixtures.optional_methods.flat.err_err(e.thrownValue)
     val s3 = fixtures.optional_methods.flat.ret_externref()
     return ErrException(decodeErr(r2, s3)!!)
 }
 
-fun raiseErr(e: kotlin.js.JsException): ErrException {
-    val r0 = fixtures.optional_methods.flat.err_err(e.thrownValue)
-    val s1 = fixtures.optional_methods.flat.ret_externref()
-    return ErrException(decodeErr(r0, s1)!!)
+fun futureErrorErr(f: JsAny): ErrException {
+    val r5 = fixtures.optional_methods.flat.error_err(f)
+    val s6 = fixtures.optional_methods.flat.ret_externref()
+    return ErrException(decodeErr(r5, s6)!!)
 }
 
 fun rejectErr(resolver: JsAny?, e: kotlin.Throwable) {

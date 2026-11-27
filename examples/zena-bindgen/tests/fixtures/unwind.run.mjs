@@ -12,6 +12,10 @@ globalThis.typed = () => {
   throw new TypeError('typed!');
 };
 globalThis.later = () => new Promise((resolve) => setTimeout(resolve, 1));
+globalThis.mistyped = globalThis.mistypedAs = () =>
+  new Promise((resolve) => setTimeout(resolve, 1, 'text'));
+globalThis.maybe = globalThis.maybeAs = globalThis.maybeOf = (n) =>
+  new Promise((resolve) => setTimeout(resolve, 1, n < 0 ? undefined : n === 0 ? 'text' : n));
 
 // What the loop throws, where no promise carries it.
 process.on('uncaughtException', () => {});

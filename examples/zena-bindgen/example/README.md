@@ -32,7 +32,7 @@ topic is a file in `app/`.
 | `/crypto` | `crypto.zena` | `crypto.subtle.digest`, `getRandomValues`, `TextEncoder`, `btoa` | a `union` parameter's arm overloads, a typed array `u8[]`, `future<ArrayBuffer>`, a generic `T -> T`, a callback per byte |
 | `/stream` | `streams.zena` | `ReadableStream`, `TransformStream`, `pipeTo`, `pipeThrough`, a streamed body | mono generics (`ReadableStream<str>`, imports per instantiation), callbacks returning `future<unit>?`, `T?` in `read()`'s result |
 | `/timers` | `timers.zena` | `setTimeout`, `queueMicrotask`, `scheduler.wait`, `ctx.waitUntil` | one-shot callbacks, a variadic (`setTimeout`'s arguments), a Zena future given to JS |
-| `/fetch` | `fetch.zena` | a service binding, the global `fetch` with `RequestInit`, `AbortSignal.timeout`, `AbortController` | a literal enum (`cache`), `@js(null)` setters (`body`, `signal`), a caller's signal joined with the bridge's, cancellation (`TaskGroup.race` drops the JS future, which had no init to carry a signal), a function in a payload enum (the event listener) |
+| `/fetch` | `fetch.zena` | a service binding, the global `fetch` with `RequestInit`, `AbortSignal.timeout`, `AbortController` | a literal enum (`cache`), `@js(null)` setters (`body`, `signal`), a caller's signal joined with the bridge's, cancellation (`TaskGroup.race` cancels the loser, which requests its JS future's cancellation; it had no init to carry a signal), a function in a payload enum (the event listener) |
 | `/rewrite` | `rewrite.zena` | `HTMLRewriter` | a callback property of an options object, a `union` parameter (`append`) |
 | `/cache` | `cache.zena` | `caches.default`: `put`, `match`, `delete` | `future<Response?>`, `future<bool>` |
 | `/counter/kv` | `durable.zena` | an id from a name, `stub.fetch`; storage `get`, `put`, `list`, `delete` | an exported class with an imported base, generic members at scalars (`get<f64>`: `f64?`), `Map<Str, T>` and its key iterator |
@@ -87,11 +87,16 @@ files as `WebAssembly.Module`s the same way.
 
 Async: a `future<T>` is a Zena `Future<T>`, so a handler is an `async`
 function. The bindings run one tw loop over Zena's microtask queue:
-awaiting a JS future polls it with a waker, `tw:future/wake` polls again,
-and a completion (or a callback's return) asks the bridge for a tick
-(`work_available`), which drains the queue in `tw:loop/tick`. A Zena
-future handed to JS settles a `tw:future` `new` promise through
-`resolve<T>`, or `reject<err>` when it fails.
+awaiting a JS future reads its value with `get<T>`, which has one once the
+future is fulfilled, and validates it: a value that isn't a `T` fails the
+await with the error a rejection would. With no value it reads the
+`state`, and while that's pending leaves a waker on the future (`add_listener`);
+`tw:future/wake` reads it again. A completion (or a callback's return)
+asks the bridge for a tick (`work_available`), which drains the queue in
+`tw:loop/tick`. Cancelling an awaiter requests the JS future's
+cancellation (`cancel`) and stops reading it. A Zena future handed to JS
+settles a `tw:future` `new` promise through `resolve<T>`, or `reject<err>`
+when it fails.
 
 Errors leave Zena the way they come in, as `ErrException`s thrown as the
 `tw:tag` `err`: one with the `TypeError` arm rejects a JS call with a

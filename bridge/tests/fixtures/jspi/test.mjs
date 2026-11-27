@@ -7,10 +7,14 @@ class Api {
   later() {
     return new Promise((r) => this.resolvers.push(r));
   }
+  see(job, me) {
+    this.seen = [job, me];
+  }
 }
-globalThis.Api = Api;
+class Base {}
+Object.assign(globalThis, { Api, Base });
 
-const { instantiate, app, Task, scratchUse } = await import("./bridge.js");
+const { instantiate, app, Task, Job, scratchUse } = await import("./bridge.js");
 const fs = await import("node:fs");
 const compile = (f) => new WebAssembly.Module(fs.readFileSync(f));
 const instance = instantiate(compile("lang.wasm"), compile("bridge.wasm"));
@@ -48,13 +52,8 @@ app.share(s);
 const peeks = [app.peek(), app.peek()];
 s.resolvers[0](7);
 assert.deepEqual(await Promise.all(peeks), [1, 1]);
-// Dropping a future a call is parked on resumes it with 0.
-app.share(new Api());
-const dropped = app.peek();
-app.unshare();
-assert.equal(await dropped, 0);
 
-// `suspend_race` resumes with the first future to settle, leaving the
+// `suspend_list` resumes with the first future to settle, leaving the
 // others to the language, and with the lowest of those already settled.
 const r = new Api();
 const raced = app.race(r);
@@ -73,8 +72,22 @@ const c = new Api();
 const called = cb(c);
 c.resolvers[0](2);
 assert.equal(await called, 42);
+// Its environment is the language's: JS holds one reference, which the
+// collected function's drop releases while the call is parked, and the
+// call holds its own, so the environment is there once it resumes and is
+// freed once.
+const drops = instance.exports["test:drops"];
+const freed = instance.exports["test:freed"];
+const c2 = new Api();
+const parked = app.plus(1)(c2);
+await collect();
+assert.deepEqual([drops(), freed()], [1, 0]);
+c2.resolvers[0](2);
+assert.equal(await parked, 3);
+assert.deepEqual([drops(), freed()], [1, 1]);
 
-// A suspended call keeps its arguments until it settles.
+// A suspended call's arguments are its own: the language reads them once
+// resumed, and frees them.
 const e = new Api();
 const live = instance.exports["test:live"];
 const before = live();
@@ -84,18 +97,62 @@ e.resolvers[0](1);
 assert.equal(await echoed, 66);
 assert.equal(live(), before);
 
-// And its receiver: a collected `Task` would drop the handle `run` still
-// uses. This runs optimized (`node` holds `--no-liftoff`), where a
+// The same for its receiver, whose `Task` JS lets go while `run` is
+// parked. This runs optimized (`node` holds `--no-liftoff`), where a
 // suspended frame doesn't keep the values it no longer reads.
-const drops = instance.exports["test:drops"];
 const t = new Api();
 const ran = new Task(t).run();
 await collect();
-assert.equal(drops(), 0);
+assert.deepEqual([drops(), freed()], [2, 1]);
 t.resolvers[0](5);
 assert.equal(await ran, 5);
+assert.deepEqual([drops(), freed()], [2, 2]);
+
+// A class with an imported base: its wrapper can't be re-made, so a
+// method parked past its caller's reference holds `this`. The wrapper
+// isn't collected, and the handle still crosses to JS as it.
+const j = new Api();
+let job = new Job(j);
+job.tag = 1;
+const held = job.run();
+job = null;
 await collect();
-assert.equal(drops(), 1);
+assert.deepEqual([drops(), freed()], [2, 2]);
+j.resolvers[0](5);
+assert.equal(await held, 5);
+assert.ok(j.seen[0] instanceof Job && j.seen[0] === j.seen[1] && j.seen[0].tag === 1);
+j.seen = null;
+await collect();
+assert.deepEqual([drops(), freed()], [3, 3]);
+
+// A waker and a parked call are both a future's listeners, each run when
+// it settles: a wake that traps doesn't leave the call parked.
+const m = new Api();
+app.share(m);
+app.listen(1);
+app.listen(2);
+const woke = app.peek();
+app.listen(4);
+let trap;
+process.once("unhandledRejection", (e) => (trap = e));
+m.resolvers[0](7);
+assert.equal(await woke, 1);
+await new Promise((r) => setTimeout(r, 0));
+assert.equal(instance.exports["test:woken"](), 7);
+assert.ok(trap instanceof WebAssembly.RuntimeError);
+
+// A suspension that can't suspend leaves nothing behind: scratch is as it
+// was, and its future has no listener of it, however often it's tried.
+const n = new Api();
+app.share(n);
+const shared = instance.exports["test:shared"]();
+const use = scratchUse();
+for (let i = 0; i < 3; i++) assert.equal(app.stuck(), 7);
+assert.equal(shared.listeners?.size ?? 0, 0);
+assert.deepEqual(scratchUse(), use);
+const still = app.peek();
+n.resolvers[0](0);
+assert.equal(await still, 1);
 
 assert.deepEqual(scratchUse(), empty);
 console.log("ok");

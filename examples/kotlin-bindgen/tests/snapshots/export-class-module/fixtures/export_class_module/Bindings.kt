@@ -18,7 +18,7 @@ external interface DurableObject : JsAny
 val DurableObject.alarm: (() -> tsgen.runtime.Future<Unit>?)?
     get() {
         val r0 = fixtures.export_class_module.flat.DurableObject_get_alarm(this)
-        return r0?.let { f -> {  -> val r1 = fixtures.export_class_module.flat.call_fn_future_unit(f); r1?.let { tsgen.runtime.Future<Unit>(it, { f -> fixtures.export_class_module.flat.take_unit(f); Unit }, { f -> futureErrorErr(f) }) } } }
+        return r0?.let { f -> {  -> val r1 = fixtures.export_class_module.flat.call_fn_future_unit(f); r1?.let { tsgen.runtime.Future<Unit>(it, { f -> val r4 = try { fixtures.export_class_module.flat.get_unit(f) } catch (e: kotlin.js.JsException) { throw raiseErr(e) }; if (r4 == 0) null else tsgen.runtime.Fulfilled(Unit) }, { f -> futureErrorErr(f) }) } } }
     }
 
 fun DurableObject.setAlarm(value: suspend () -> Unit) {
@@ -70,21 +70,21 @@ private fun errMessage(error: Err): String = when (error) {
 /** `e` as `err`: its own error, or the fallback arm with its message. */
 fun toErr(e: kotlin.Throwable): Err = if (e is ErrException) e.error else Err.Error((e.message ?: e.toString()).toJsString())
 
-fun futureErrorErr(f: JsAny): ErrException {
-    val r2 = fixtures.export_class_module.flat.error_err(f)
+fun raiseErr(e: kotlin.js.JsException): ErrException {
+    val r2 = fixtures.export_class_module.flat.err_err(e.thrownValue)
     val s3 = fixtures.export_class_module.flat.ret_externref()
     return ErrException(decodeErr(r2, s3)!!)
+}
+
+fun futureErrorErr(f: JsAny): ErrException {
+    val r5 = fixtures.export_class_module.flat.error_err(f)
+    val s6 = fixtures.export_class_module.flat.ret_externref()
+    return ErrException(decodeErr(r5, s6)!!)
 }
 
 fun setErr(e: kotlin.Throwable) {
     val w = encodeErr(toErr(e))
     fixtures.export_class_module.flat.err_set_err(w.arm, w.s0)
-}
-
-fun raiseErr(e: kotlin.js.JsException): ErrException {
-    val r0 = fixtures.export_class_module.flat.err_err(e.thrownValue)
-    val s1 = fixtures.export_class_module.flat.ret_externref()
-    return ErrException(decodeErr(r0, s1)!!)
 }
 
 fun rejectErr(resolver: JsAny?, e: kotlin.Throwable) {
