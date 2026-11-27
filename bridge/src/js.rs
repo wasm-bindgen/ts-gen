@@ -186,14 +186,23 @@ pub enum Side {
 
 #[derive(Clone, Copy)]
 pub struct Mode {
+    /// Tested against its type, else trusted (§10).
     pub checked: bool,
-    /// `tw:unbox` and `tw:arr get`: normalize `undefined` to none even
-    /// unchecked, since a box position passes it through (§13).
+    /// `tw:unbox` and `tw:arr get`: a nullable box reads `undefined` as
+    /// none, where a box position passes it through (§13).
     pub unbox: bool,
+    /// From the host, so a trusted literal isn't compared.
     pub host: bool,
 }
 
 impl Mode {
+    /// A value the bridge built itself.
+    const OWN: Mode = Mode {
+        checked: false,
+        unbox: false,
+        host: true,
+    };
+
     /// What a helper's body depends on.
     fn key(self) -> String {
         format!(
@@ -219,7 +228,7 @@ fn bytes_of(v: &str, checked: bool) -> String {
     match checked {
         true => format!("$bytes({v})"),
         false => format!(
-            "({v} instanceof ArrayBuffer ? new Uint8Array({v}) : ArrayBuffer.isView({v}) ? new Uint8Array({v}.buffer, {v}.byteOffset, {v}.byteLength) : new Uint8Array(0))"
+            "({v} instanceof ArrayBuffer ? new Uint8Array({v}) : new Uint8Array({v}.buffer, {v}.byteOffset, {v}.byteLength))"
         ),
     }
 }
@@ -257,18 +266,17 @@ fn lift_scalar(s: Scalar, w: &str) -> String {
 }
 
 fn lower_scalar(s: Scalar, v: &str, m: Mode) -> String {
-    // Unchecked coercions keep the carrier's range, so the language can
-    // still trust it.
+    // Trusted, a narrow carrier still narrows, so the language reads it in
+    // range whatever the value. The rest is Wasm's own conversion.
     if !m.checked {
         return match s {
             Scalar::Bool => format!("({v} ? 1 : 0)"),
-            Scalar::I8 => format!("($uint({v}) << 24 >> 24)"),
-            Scalar::U8 => format!("($uint({v}) & 255)"),
-            Scalar::I16 => format!("($uint({v}) << 16 >> 16)"),
-            Scalar::U16 => format!("($uint({v}) & 65535)"),
-            Scalar::I32 | Scalar::U32 => format!("$uint({v})"),
-            Scalar::I53 | Scalar::U53 | Scalar::I64 | Scalar::U64 => format!("$ubig({v})"),
-            Scalar::F16 | Scalar::F32 | Scalar::F64 => format!("Number({v})"),
+            Scalar::I8 => format!("({v} << 24 >> 24)"),
+            Scalar::U8 => format!("({v} & 255)"),
+            Scalar::I16 => format!("({v} << 16 >> 16)"),
+            Scalar::U16 => format!("({v} & 65535)"),
+            Scalar::I53 | Scalar::U53 | Scalar::I64 | Scalar::U64 => format!("BigInt({v})"),
+            Scalar::I32 | Scalar::U32 | Scalar::F16 | Scalar::F32 | Scalar::F64 => v.to_string(),
         };
     }
     let int = |lo: i64, hi: i64| format!("$int({v}, {lo}, {hi}, {})", js_str(s.name()));
@@ -1090,8 +1098,12 @@ impl<'a, 'b> Glue<'a, 'b> {
         let cx = if lowers_alloc(r) { "cx" } else { "null" };
         Ok(match &r.kind {
             Kind::Unit | Kind::Never => Vec::new(),
+            // No wire value carries a literal, so user code's is compared
+            // in every setting.
             Kind::Lit(l) => {
-                b.line(format!("if ({v} !== {}) $fail({what}, {v});", literal(l)));
+                if m.checked || !m.host {
+                    b.line(format!("if ({v} !== {}) $fail({what}, {v});", literal(l)));
+                }
                 Vec::new()
             }
             Kind::Scalar(s) => vec![b.bind(lower_scalar(*s, v, m))],
@@ -1111,10 +1123,13 @@ impl<'a, 'b> Glue<'a, 'b> {
                 ]
             }
             Kind::Str { carrier, nullable } => {
-                let check = if m.checked {
-                    format!("$str({v})")
-                } else {
-                    format!("$ustr({v})")
+                let by_ref = matches!(carrier, StrCarrier::Host | StrCarrier::Gc(Encoding::Wtf16));
+                // An encoded string is measured, so even trusted it's
+                // made a string first.
+                let check = match (m.checked, by_ref) {
+                    (true, _) => format!("$str({v})"),
+                    (false, true) => v.to_string(),
+                    (false, false) => format!("$ustr({v})"),
                 };
                 let (s, enc) = match carrier {
                     StrCarrier::Host | StrCarrier::Gc(Encoding::Wtf16) => {
@@ -1143,7 +1158,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 let check = if m.checked {
                     format!("$bigint({v}, {what})")
                 } else {
-                    format!("(typeof {v} === \"bigint\" ? {v} : 0n)")
+                    v.to_string()
                 };
                 if *carrier == Carrier::Host {
                     return Ok(vec![b.bind(if *nullable {
@@ -1172,7 +1187,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 } else if m.checked {
                     format!("$typed({v}, {ta}, {what})")
                 } else {
-                    format!("({v} instanceof {ta} ? {v} : new {ta}(0))")
+                    v.to_string()
                 };
                 let e = format!("{ta}.from({check})");
                 vec![b.bind(if *nullable {
@@ -1207,7 +1222,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 } else if m.checked {
                     format!("$typed({v}, {ta}, {what})")
                 } else {
-                    format!("({v} instanceof {ta} ? {v} : new {ta}(0))")
+                    v.to_string()
                 };
                 let e = format!("$lowerVec({}, {check}, {ta}, {cx})", s.js());
                 self.seq_lower(b, *nullable, s, v, e)
@@ -1340,7 +1355,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                         _ => format!("$some({v}, {what})"),
                     }
                 };
-                vec![b.bind(if *nullable && (m.checked || m.unbox) {
+                vec![b.bind(if *nullable {
                     format!("({v} == null ? null : {check})")
                 } else {
                     check
@@ -1369,7 +1384,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 } else {
                     v.to_string()
                 };
-                vec![b.bind(if *nullable && (m.checked || m.unbox) {
+                vec![b.bind(if *nullable {
                     format!("({v} == null ? null : {check})")
                 } else {
                     check
@@ -1418,7 +1433,7 @@ impl<'a, 'b> Glue<'a, 'b> {
         self.helper(key, move |g, name| {
             let mut b = Body::default();
             if !m.checked {
-                b.line("return Array.isArray(v) ? v.slice() : [];");
+                b.line("return v.slice();");
                 return Ok(b.finish(&format!("function {name}(v)")));
             }
             let what = js_str(&format!("{}[]", elem.ty));
@@ -1502,12 +1517,14 @@ impl<'a, 'b> Glue<'a, 'b> {
         let elem = elem.clone();
         self.helper(key, move |g, name| {
             let mut b = Body::default();
+            // A trusted value with no length is empty: it can't size an
+            // allocation.
             if m.checked {
                 b.line(format!("$array(v, {});", js_str(&format!("{}[]", elem.ty))));
+                b.line("const n = v.length;");
             } else {
-                b.line("if (!Array.isArray(v)) v = [];");
+                b.line("const n = v.length >>> 0;");
             }
-            b.line("const n = v.length;");
             if s == Space::Lang
                 && !g.f.wide
                 && matches!(
@@ -2034,16 +2051,12 @@ impl<'a, 'b> Glue<'a, 'b> {
                 b.line("if (i >= v.length) throw new TypeError(\"an index out of range\");");
                 b.line("const e = v[i];");
                 let body = |g: &mut Self, b: &mut Body| {
-                    g.lower(
-                        b,
-                        r,
-                        "e",
-                        Mode {
-                            checked: true,
-                            unbox: true,
-                            host: false,
-                        },
-                    )
+                    let m = Mode {
+                        checked: g.validation != Validation::Off,
+                        unbox: true,
+                        host: false,
+                    };
+                    g.lower(b, r, "e", m)
                 };
                 self.returning(&mut b, body)?;
                 return Ok(b.finish(&format!("function {name}(v, w1_0)")));
@@ -2167,8 +2180,8 @@ impl<'a, 'b> Glue<'a, 'b> {
             Op::States => {
                 let fs = self.lift(&func.sig.params[0].repr, &wires[0])?;
                 let call = format!("$states({fs})");
-                let m = self.mode(Side::User);
-                self.complete(&mut b, &call, func.sig.results.first(), None, &[], Some(m))?;
+                let m = Some(Mode::OWN);
+                self.complete(&mut b, &call, func.sig.results.first(), None, &[], m)?;
             }
             Op::AddListenerList | Op::RemoveListenerList => {
                 let fs = self.lift(&func.sig.params[0].repr, &wires[0])?;

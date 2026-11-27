@@ -77,11 +77,6 @@ function $tuple(v, n, what) {
   return v;
 }
 
-function $typed(v, C, what) {
-  if (!(v instanceof C)) $fail(what, v);
-  return v;
-}
-
 // The error message of a caught value (IR.md §15): `String(err)` runs
 // user code, so it's guarded.
 function $message(e) {
@@ -524,7 +519,8 @@ function $liftUtf8(s, p, len) {
 // a clone when its source shares the memory.
 function $lowerVec(s, v, C, cx) {
   const size = C.BYTES_PER_ELEMENT;
-  const n = v.length;
+  // A trusted value may have no length (IR.md §10): it copies as empty.
+  const n = v.length >>> 0;
   if (n === 0) return [size, 0];
   const p = s.alloc(n * size, size, cx);
   new C(s.u8().buffer, p, n).set(v);
@@ -1148,7 +1144,7 @@ function $f26(w0_0, w0_1) {
   const cxm = cx.n;
   try {
     const r = $states($h6(w0_0, w0_1));
-    const t1 = $lowerVec($L, $typed(r, Uint8Array, "u8[]"), Uint8Array, cx);
+    const t1 = $lowerVec($L, r, Uint8Array, cx);
     const t2 = t1[0];
     const t3 = t1[1];
     const ra = $ret();

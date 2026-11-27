@@ -485,7 +485,8 @@ function $liftUtf8(s, p, len) {
 // a clone when its source shares the memory.
 function $lowerVec(s, v, C, cx) {
   const size = C.BYTES_PER_ELEMENT;
-  const n = v.length;
+  // A trusted value may have no length (IR.md §10): it copies as empty.
+  const n = v.length >>> 0;
   if (n === 0) return [size, 0];
   const p = s.alloc(n * size, size, cx);
   new C(s.u8().buffer, p, n).set(v);

@@ -48,12 +48,8 @@ function $i53(v) {
   return BigInt(v);
 }
 
-// Unvalidated conversions stay memory safe: they only ever produce a
-// value of the wire type.
-function $uint(v) {
-  return Number(v) || 0;
-}
-
+// A trusted string that's encoded (IR.md §10): its length sizes the
+// allocation, so it's made a string first.
 function $ustr(v) {
   return typeof v === "string" ? v : String(v);
 }
@@ -412,7 +408,8 @@ function $liftUtf8(s, p, len) {
 // a clone when its source shares the memory.
 function $lowerVec(s, v, C, cx) {
   const size = C.BYTES_PER_ELEMENT;
-  const n = v.length;
+  // A trusted value may have no length (IR.md §10): it copies as empty.
+  const n = v.length >>> 0;
   if (n === 0) return [size, 0];
   const p = s.alloc(n * size, size, cx);
   new C(s.u8().buffer, p, n).set(v);
@@ -832,7 +829,7 @@ function $f29(v) {
   const cx = $cx;
   const cxm = cx.n;
   try {
-    const t1 = ($uint(v) & 255);
+    const t1 = (v & 255);
     return t1;
   } catch (e) {
     $release(cx, cxm);
