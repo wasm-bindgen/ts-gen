@@ -74,6 +74,18 @@ pub enum BoxNone {
     Unit,
 }
 
+/// Which values from JS the bridge validates (§10).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Validation {
+    /// Every value.
+    On,
+    /// What user code supplies through an export. What the host supplies
+    /// through an import is trusted.
+    Exports,
+    /// Nothing: every value is trusted.
+    Off,
+}
+
 /// How `throws` errors cross between the language and the bridge (§15).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Throws {
@@ -96,7 +108,7 @@ pub struct Profile {
     /// preclude one (for `*T[]`).
     pub memory: Option<MemoryWidth>,
     pub eh: Eh,
-    pub validation: bool,
+    pub validation: Validation,
     /// A `@js(null) T?` rejects `undefined` from JS (§10).
     pub strict_null: bool,
     pub box_none: BoxNone,
@@ -147,7 +159,7 @@ impl Profile {
             handles: Carrier::Linear,
             memory: Some(MemoryWidth::M32),
             eh: Eh::Modern,
-            validation: true,
+            validation: Validation::On,
             strict_null: false,
             box_none: BoxNone::Null,
             termination_flag: false,
@@ -274,7 +286,14 @@ impl Profile {
                         _ => return Err(bad()),
                     }
                 }
-                "validation" => p.validation = switch(value).ok_or_else(bad)?,
+                "validation" => {
+                    p.validation = match value {
+                        "on" => Validation::On,
+                        "exports" => Validation::Exports,
+                        "off" => Validation::Off,
+                        _ => return Err(bad()),
+                    }
+                }
                 "strict-null" => p.strict_null = switch(value).ok_or_else(bad)?,
                 "box-none" => {
                     p.box_none = match value {
@@ -344,7 +363,12 @@ impl fmt::Display for Profile {
             Eh::Legacy => "legacy",
         };
         writeln!(f, "eh = {eh}")?;
-        writeln!(f, "validation = {}", on(self.validation))?;
+        let validation = match self.validation {
+            Validation::On => "on",
+            Validation::Exports => "exports",
+            Validation::Off => "off",
+        };
+        writeln!(f, "validation = {validation}")?;
         writeln!(f, "strict-null = {}", on(self.strict_null))?;
         let box_none = match self.box_none {
             BoxNone::Null => "null",

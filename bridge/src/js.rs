@@ -18,7 +18,7 @@ use ts_gen_abi::layout::{
     ArmLayout, EnumLayout, Host, Kind, Layouts, Origin, Pos, Position, Repr, ScalarNull, Shape,
     Signature,
 };
-use ts_gen_abi::profile::{BoxNone, Carrier, Encoding, StrCarrier, Throws};
+use ts_gen_abi::profile::{BoxNone, Carrier, Encoding, StrCarrier, Throws, Validation};
 use ts_gen_abi::resolve::{Context, Location, Target, TypeDecl};
 use ts_gen_abi::text;
 
@@ -281,7 +281,7 @@ impl<'a, 'b> Glue<'a, 'b> {
             f,
             ir,
             libs,
-            validate: l.profile.validation,
+            validate: l.profile.validation != Validation::Off,
             helpers: Vec::new(),
             memo: HashMap::new(),
             modules: Vec::new(),
@@ -629,7 +629,9 @@ impl<'a, 'b> Glue<'a, 'b> {
             // `box-none = null`, else as `null` like a box's. Validation
             // catches a raw language object.
             Kind::Erased { .. } => {
-                let v = if self.l.profile.handles != Carrier::Linear && self.l.profile.validation {
+                let v = if self.l.profile.handles != Carrier::Linear
+                    && self.l.profile.validation != Validation::Off
+                {
                     format!("$erased({})", w[0])
                 } else {
                     w[0].clone()
