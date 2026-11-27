@@ -18,7 +18,7 @@ use ts_gen_abi::layout::{
     ArmLayout, EnumLayout, Host, Kind, Layouts, Origin, Pos, Position, Repr, ScalarNull, Shape,
     Signature,
 };
-use ts_gen_abi::profile::{BoxNone, Carrier, Encoding, StrCarrier, Throws};
+use ts_gen_abi::profile::{BoxNone, Carrier, Encoding, StrCarrier, Throws, Validation};
 use ts_gen_abi::resolve::{Context, Location, Target, TypeDecl};
 use ts_gen_abi::text;
 
@@ -128,7 +128,11 @@ pub struct Glue<'a, 'b> {
     pub ir: &'a Ir,
     /// The lib IRs `ir` resolves against.
     pub libs: Vec<&'a Ir>,
-    pub validate: bool,
+    pub validation: Validation,
+    /// The function and future types an import's signature reaches, and
+    /// those an export's or a box operation's does (§10).
+    pub(crate) host_types: HashSet<String>,
+    pub(crate) user_types: HashSet<String>,
     pub helpers: Vec<String>,
     pub(crate) memo: HashMap<String, String>,
     pub modules: Vec<String>,
@@ -175,12 +179,43 @@ struct Leaf {
     rank: u8,
 }
 
+/// Whose value a lowering reads (§10).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Side {
+    /// The host's, through an import.
+    Host,
+    /// User code's, through an export.
+    User,
+}
+
 #[derive(Clone, Copy)]
 pub struct Mode {
+    /// Tested against its type, else trusted (§10).
     pub checked: bool,
-    /// `tw:unbox` and `tw:arr get`: normalize `undefined` to none even
-    /// unchecked, since a box position passes it through (§13).
+    /// `tw:unbox` and `tw:arr get`: a nullable box reads `undefined` as
+    /// none, where a box position passes it through (§13).
     pub unbox: bool,
+    /// From the host, so a trusted literal isn't compared.
+    pub host: bool,
+}
+
+impl Mode {
+    /// A value the bridge built itself.
+    const OWN: Mode = Mode {
+        checked: false,
+        unbox: false,
+        host: true,
+    };
+
+    /// What a helper's body depends on.
+    fn key(self) -> String {
+        format!(
+            "{} {} {}",
+            self.checked,
+            self.unbox,
+            self.host && !self.checked
+        )
+    }
 }
 
 pub(crate) fn lit(l: &Literal) -> String {
@@ -197,7 +232,7 @@ fn bytes_of(v: &str, checked: bool) -> String {
     match checked {
         true => format!("$bytes({v})"),
         false => format!(
-            "({v} instanceof ArrayBuffer ? new Uint8Array({v}) : ArrayBuffer.isView({v}) ? new Uint8Array({v}.buffer, {v}.byteOffset, {v}.byteLength) : new Uint8Array(0))"
+            "({v} instanceof ArrayBuffer ? new Uint8Array({v}) : new Uint8Array({v}.buffer, {v}.byteOffset, {v}.byteLength))"
         ),
     }
 }
@@ -235,18 +270,17 @@ fn lift_scalar(s: Scalar, w: &str) -> String {
 }
 
 fn lower_scalar(s: Scalar, v: &str, m: Mode) -> String {
-    // Unchecked coercions keep the carrier's range, so the language can
-    // still trust it.
+    // Trusted, a narrow carrier still narrows, so the language reads it in
+    // range whatever the value. The rest is Wasm's own conversion.
     if !m.checked {
         return match s {
             Scalar::Bool => format!("({v} ? 1 : 0)"),
-            Scalar::I8 => format!("($uint({v}) << 24 >> 24)"),
-            Scalar::U8 => format!("($uint({v}) & 255)"),
-            Scalar::I16 => format!("($uint({v}) << 16 >> 16)"),
-            Scalar::U16 => format!("($uint({v}) & 65535)"),
-            Scalar::I32 | Scalar::U32 => format!("$uint({v})"),
-            Scalar::I53 | Scalar::U53 | Scalar::I64 | Scalar::U64 => format!("$ubig({v})"),
-            Scalar::F16 | Scalar::F32 | Scalar::F64 => format!("Number({v})"),
+            Scalar::I8 => format!("({v} << 24 >> 24)"),
+            Scalar::U8 => format!("({v} & 255)"),
+            Scalar::I16 => format!("({v} << 16 >> 16)"),
+            Scalar::U16 => format!("({v} & 65535)"),
+            Scalar::I53 | Scalar::U53 | Scalar::I64 | Scalar::U64 => format!("BigInt({v})"),
+            Scalar::I32 | Scalar::U32 | Scalar::F16 | Scalar::F32 | Scalar::F64 => v.to_string(),
         };
     }
     let int = |lo: i64, hi: i64| format!("$int({v}, {lo}, {hi}, {})", js_str(s.name()));
@@ -281,7 +315,9 @@ impl<'a, 'b> Glue<'a, 'b> {
             f,
             ir,
             libs,
-            validate: l.profile.validation,
+            validation: l.profile.validation,
+            host_types: HashSet::new(),
+            user_types: HashSet::new(),
             helpers: Vec::new(),
             memo: HashMap::new(),
             modules: Vec::new(),
@@ -304,10 +340,27 @@ impl<'a, 'b> Glue<'a, 'b> {
         }
     }
 
-    pub(crate) fn mode(&self) -> Mode {
+    /// How a value from `side` lowers: `exports` trusts the host's (§10).
+    pub(crate) fn mode(&self, side: Side) -> Mode {
+        let host = side == Side::Host;
         Mode {
-            checked: self.validate,
+            checked: match self.validation {
+                Validation::On => true,
+                Validation::Exports => !host,
+                Validation::Off => false,
+            },
             unbox: false,
+            host,
+        }
+    }
+
+    /// The side of a function or future type's values: the host's only
+    /// when imports alone reach the type (§10).
+    pub(crate) fn type_side(&self, key: &str) -> Side {
+        if self.host_types.contains(key) && !self.user_types.contains(key) {
+            Side::Host
+        } else {
+            Side::User
         }
     }
 
@@ -629,7 +682,9 @@ impl<'a, 'b> Glue<'a, 'b> {
             // `box-none = null`, else as `null` like a box's. Validation
             // catches a raw language object.
             Kind::Erased { .. } => {
-                let v = if self.l.profile.handles != Carrier::Linear && self.l.profile.validation {
+                let v = if self.l.profile.handles != Carrier::Linear
+                    && self.l.profile.validation != Validation::Off
+                {
                     format!("$erased({})", w[0])
                 } else {
                     w[0].clone()
@@ -1065,8 +1120,12 @@ impl<'a, 'b> Glue<'a, 'b> {
         let cx = if lowers_alloc(r) { "cx" } else { "null" };
         Ok(match &r.kind {
             Kind::Unit | Kind::Never => Vec::new(),
+            // No wire value carries a literal, so user code's is compared
+            // in every setting.
             Kind::Lit(l) => {
-                b.line(format!("if ({v} !== {}) $fail({what}, {v});", literal(l)));
+                if m.checked || !m.host {
+                    b.line(format!("if ({v} !== {}) $fail({what}, {v});", literal(l)));
+                }
                 Vec::new()
             }
             Kind::Scalar(s) => vec![b.bind(lower_scalar(*s, v, m))],
@@ -1086,10 +1145,12 @@ impl<'a, 'b> Glue<'a, 'b> {
                 ]
             }
             Kind::Str { carrier, nullable } => {
-                let check = if m.checked {
-                    format!("$str({v})")
-                } else {
-                    format!("$ustr({v})")
+                // An encoded string is measured, so even trusted it's
+                // made a string first. A host one is the value itself.
+                let check = match (m.checked, carrier) {
+                    (true, _) => format!("$str({v})"),
+                    (false, StrCarrier::Host) => v.to_string(),
+                    (false, _) => format!("$ustr({v})"),
                 };
                 let (s, enc) = match carrier {
                     StrCarrier::Host | StrCarrier::Gc(Encoding::Wtf16) => {
@@ -1118,7 +1179,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 let check = if m.checked {
                     format!("$bigint({v}, {what})")
                 } else {
-                    format!("(typeof {v} === \"bigint\" ? {v} : 0n)")
+                    v.to_string()
                 };
                 if *carrier == Carrier::Host {
                     return Ok(vec![b.bind(if *nullable {
@@ -1147,7 +1208,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 } else if m.checked {
                     format!("$typed({v}, {ta}, {what})")
                 } else {
-                    format!("({v} instanceof {ta} ? {v} : new {ta}(0))")
+                    v.to_string()
                 };
                 let e = format!("{ta}.from({check})");
                 vec![b.bind(if *nullable {
@@ -1182,7 +1243,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 } else if m.checked {
                     format!("$typed({v}, {ta}, {what})")
                 } else {
-                    format!("({v} instanceof {ta} ? {v} : new {ta}(0))")
+                    v.to_string()
                 };
                 let e = format!("$lowerVec({}, {check}, {ta}, {cx})", s.js());
                 self.seq_lower(b, *nullable, s, v, e)
@@ -1315,7 +1376,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                         _ => format!("$some({v}, {what})"),
                     }
                 };
-                vec![b.bind(if *nullable && (m.checked || m.unbox) {
+                vec![b.bind(if *nullable {
                     format!("({v} == null ? null : {check})")
                 } else {
                     check
@@ -1344,7 +1405,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 } else {
                     v.to_string()
                 };
-                vec![b.bind(if *nullable && (m.checked || m.unbox) {
+                vec![b.bind(if *nullable {
                     format!("({v} == null ? null : {check})")
                 } else {
                     check
@@ -1388,12 +1449,12 @@ impl<'a, 'b> Glue<'a, 'b> {
     /// A JS array as a host `T[]`: a fresh array of its elements, each
     /// tested against `T` when checked.
     fn host_array(&mut self, elem: &Repr, m: Mode) -> Result<String> {
-        let key = format!("ahost {} {} {:?}", m.checked, m.unbox, elem);
+        let key = format!("ahost {} {:?}", m.key(), elem);
         let elem = elem.clone();
         self.helper(key, move |g, name| {
             let mut b = Body::default();
             if !m.checked {
-                b.line("return Array.isArray(v) ? v.slice() : [];");
+                b.line("return v.slice();");
                 return Ok(b.finish(&format!("function {name}(v)")));
             }
             let what = js_str(&format!("{}[]", elem.ty));
@@ -1472,17 +1533,19 @@ impl<'a, 'b> Glue<'a, 'b> {
     }
 
     fn array_lower(&mut self, elem: &Repr, s: Space, m: Mode) -> Result<String> {
-        let key = format!("alower {} {} {s:?} {:?}", m.checked, m.unbox, elem);
+        let key = format!("alower {} {s:?} {:?}", m.key(), elem);
         let e = self.f.elem(elem, s)?;
         let elem = elem.clone();
         self.helper(key, move |g, name| {
             let mut b = Body::default();
+            // A trusted value with no length is empty: it can't size an
+            // allocation.
             if m.checked {
                 b.line(format!("$array(v, {});", js_str(&format!("{}[]", elem.ty))));
+                b.line("const n = v.length;");
             } else {
-                b.line("if (!Array.isArray(v)) v = [];");
+                b.line("const n = v.length >>> 0;");
             }
-            b.line("const n = v.length;");
             if s == Space::Lang
                 && !g.f.wide
                 && matches!(
@@ -1868,7 +1931,7 @@ impl<'a, 'b> Glue<'a, 'b> {
     /// helper returns the index, or `[arm, slots...]` for a payload enum.
     /// A nested enum's arms are tested among the containing enum's.
     fn enum_lower(&mut self, e: &Rc<EnumLayout>, m: Mode) -> Result<String> {
-        let key = format!("elower {} {} {}", m.checked, m.unbox, e.path);
+        let key = format!("elower {} {}", m.key(), e.path);
         let e = e.clone();
         self.helper(key, move |g, name| {
             let mut b = Body::default();
@@ -2009,15 +2072,12 @@ impl<'a, 'b> Glue<'a, 'b> {
                 b.line("if (i >= v.length) throw new TypeError(\"an index out of range\");");
                 b.line("const e = v[i];");
                 let body = |g: &mut Self, b: &mut Body| {
-                    g.lower(
-                        b,
-                        r,
-                        "e",
-                        Mode {
-                            checked: true,
-                            unbox: true,
-                        },
-                    )
+                    let m = Mode {
+                        checked: g.validation != Validation::Off,
+                        unbox: true,
+                        host: false,
+                    };
+                    g.lower(b, r, "e", m)
                 };
                 self.returning(&mut b, body)?;
                 return Ok(b.finish(&format!("function {name}(v, w1_0)")));
@@ -2038,8 +2098,9 @@ impl<'a, 'b> Glue<'a, 'b> {
             }
             Op::Unbox { repr, checked } => {
                 let m = Mode {
-                    checked: *checked && self.validate,
+                    checked: *checked && self.validation != Validation::Off,
                     unbox: true,
+                    host: false,
                 };
                 let v = match &repr.kind {
                     Kind::Vec {
@@ -2134,12 +2195,18 @@ impl<'a, 'b> Glue<'a, 'b> {
                 let unit = matches!(&r.repr.kind, Kind::Tuple { elems, .. } if elems.is_empty());
                 let call = format!("$option(f, {unit})");
                 let throws = func.sig.throws.clone();
-                self.complete(&mut b, &call, Some(r), throws, false, &[])?;
+                let key = throws
+                    .as_ref()
+                    .map(|e| Self::future_key(&r.repr.ty, &e.path))
+                    .unwrap_or_default();
+                let m = self.mode(self.type_side(&key));
+                self.complete(&mut b, &call, Some(r), throws, &[], Some(m))?;
             }
             Op::States => {
                 let fs = self.lift(&func.sig.params[0].repr, &wires[0])?;
                 let call = format!("$states({fs})");
-                self.complete(&mut b, &call, func.sig.results.first(), None, false, &[])?;
+                let m = Some(Mode::OWN);
+                self.complete(&mut b, &call, func.sig.results.first(), None, &[], m)?;
             }
             Op::AddListenerList | Op::RemoveListenerList => {
                 let fs = self.lift(&func.sig.params[0].repr, &wires[0])?;
@@ -2172,11 +2239,13 @@ impl<'a, 'b> Glue<'a, 'b> {
                 let mut callee = String::new();
                 let mut rest = false;
                 let mut argv = Vec::new();
+                let mut side = Side::User;
                 for (p, w) in func.sig.params.iter().zip(&wires) {
                     match (&p.role, &p.repr.kind) {
                         (Pos::Callee, Kind::Fn { sig, .. }) => {
                             callee = w[0].clone();
                             rest = sig.rest;
+                            side = self.type_side(&Self::fn_name(&p.repr));
                         }
                         (Pos::Callee, _) => callee = w[0].clone(),
                         _ => {
@@ -2190,7 +2259,15 @@ impl<'a, 'b> Glue<'a, 'b> {
                 }
                 let call = format!("{callee}({})", argv.join(", "));
                 let throws = func.sig.throws.clone();
-                self.complete(&mut b, &call, func.sig.results.first(), throws, false, &[])?;
+                let m = self.mode(side);
+                self.complete(
+                    &mut b,
+                    &call,
+                    func.sig.results.first(),
+                    throws,
+                    &[],
+                    Some(m),
+                )?;
             }
         }
         Ok(b.finish(&format!("function {name}({})", params.join(", "))))
@@ -2348,7 +2425,8 @@ impl<'a, 'b> Glue<'a, 'b> {
                 None => line,
             });
         }
-        self.complete(b, &call, result, throws, ctor, &wb)?;
+        let m = (!ctor).then(|| self.mode(Side::Host));
+        self.complete(b, &call, result, throws, &wb, m)?;
         if fold {
             b.close("} catch (e) {");
             b.depth += 1;
@@ -2402,10 +2480,11 @@ impl<'a, 'b> Glue<'a, 'b> {
             argv.join(", ")
         );
         let throws = func.sig.throws.clone();
-        self.complete(b, &call, func.sig.results.first(), throws, true, &[])
+        self.complete(b, &call, func.sig.results.first(), throws, &[], None)
     }
 
-    /// Makes an outgoing call, lowering its result and mapping what it
+    /// Makes an outgoing call, lowering its result under `m` (a
+    /// constructor's is returned as it is, with none) and mapping what it
     /// throws to the `throws` enum's tag.
     fn complete(
         &mut self,
@@ -2413,9 +2492,10 @@ impl<'a, 'b> Glue<'a, 'b> {
         call: &str,
         result: Option<&Position>,
         throws: Option<Rc<EnumLayout>>,
-        ctor: bool,
         wb: &[String],
+        m: Option<Mode>,
     ) -> Result<()> {
+        let ctor = m.is_none();
         let lowering = result.is_some_and(|r| !ctor && lowers_alloc(&r.repr));
         if lowering {
             b.line("const cx = $cx;");
@@ -2451,7 +2531,8 @@ impl<'a, 'b> Glue<'a, 'b> {
                 for l in wb {
                     b.line(l);
                 }
-                let w = self.lower(b, &r.repr, "r", self.mode())?;
+                let m = m.expect("a result's mode");
+                let w = self.lower(b, &r.repr, "r", m)?;
                 self.ret_line(b, &w);
             }
         }

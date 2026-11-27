@@ -719,6 +719,9 @@ fixtures! {
     boxes => "boxes",
     boxes_null => "boxes-null",
     unchecked => "unchecked",
+    exports => "exports",
+    exports_gc => "exports-gc",
+    exports_host => "exports-host",
     memory64 => "memory64",
     all_gc => "all-gc",
     gc_wtf16 => "gc-wtf16",
@@ -763,6 +766,41 @@ fixtures! {
     symbols => "symbols",
     recursive_callbacks => "recursive-callbacks",
     unions => "unions",
+}
+
+/// An import's glue tests its result against the type only when the
+/// host's side is validated (§10).
+#[test]
+fn trusted_import_results_have_no_type_test() {
+    let dir = root().join("fixtures").join("exports");
+    let read = |f: &str| std::fs::read_to_string(dir.join(f)).unwrap();
+    let ir = text::parse(&read("ir.ts")).unwrap();
+    let protocol = read("protocol");
+    let tests = [
+        "$int(",
+        "$num(",
+        "$str(",
+        "$typed(",
+        "$array(",
+        "$tuple(",
+        "$instance(",
+        "$fn(",
+        "$fail(",
+    ];
+    let tested = |validation: &str| {
+        let profile = Profile::parse(&format!("all-linear\nvalidation = {validation}\n")).unwrap();
+        let lang = wat::parse_str(passthrough(&ir, &[], &profile, &protocol)).unwrap();
+        let js = ts_gen_bridge::generate_opts(&ir, &[], &profile, &lang, Default::default())
+            .unwrap()
+            .js;
+        js.split("\n// (\"")
+            .filter(|f| f.starts_with("tw:js/global\""))
+            .filter_map(|f| f.split("\n}\n").next())
+            .any(|f| tests.iter().any(|t| f.contains(t)))
+    };
+    assert!(tested("on"));
+    assert!(!tested("exports"));
+    assert!(!tested("off"));
 }
 
 #[test]

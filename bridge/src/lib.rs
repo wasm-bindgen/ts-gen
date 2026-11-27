@@ -135,6 +135,7 @@ pub fn generate_opts(
 
     let mut g = Glue::new(&l, &f, ir, libs);
     g.lang_exports = m.export_funcs.iter().map(|(n, _)| n.clone()).collect();
+    g.sides(&plan);
     let mut w = wat::Wat::new(&l, &f);
     let mut funcs = Vec::new();
     let mut imports: Vec<(String, String, String)> = Vec::new();

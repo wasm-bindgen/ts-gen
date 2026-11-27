@@ -46,8 +46,8 @@ questions in [Open items](#open-items).
 * The **JS ABI** sits between the bridge and JS. It's defined by each type's
   JS representation plus `@js(...)` attributes.
 
-The bridge converts between the two, validating everything that comes from
-JS, since that side is untrusted.
+The bridge converts between the two. What comes from JS is validated,
+unless the profile trusts it (§10).
 
 **Invariant:** remove every `@js(...)` and what's left is exactly the bridge
 ABI. `@js` never changes an import name or a wire type. Semantic attributes
@@ -628,8 +628,8 @@ else the longest arm the arguments cover. Trailing `undefined`s don't
 count as arguments here. An arm given fewer arguments than its parameters
 doesn't match.
 
-With a single arm, a pattern mismatch throws `TypeError` **even with
-validation disabled**: running the wrong arm would be incorrect, not merely
+With a single arm, a pattern mismatch throws `TypeError` **in every
+validation setting**: running the wrong arm would be incorrect, not merely
 unvalidated. Outgoing calls never dispatch, since Wasm picks the overload
 statically.
 
@@ -876,8 +876,8 @@ is tested before its `ArrayBufferView` arm (an interface) even when it's
 declared after it. A `buffer` arm is tested after the classes, since it
 takes every view class, and before the interfaces.
 
-Arm tests are dispatch, not validation, so they run even with validation
-disabled. Tagged unions (`@js(when)`) are deferred.
+Arm tests are dispatch, not validation, so they run in every validation
+setting. Tagged unions (`@js(when)`) are deferred.
 
 Example: `Body` in the linear profile.
 
@@ -1077,28 +1077,82 @@ niches are in [§8](#8-enums).
 
 ### Validation
 
-The boundary is untrusted.
+A value from JS is either **validated**, tested against its type, or
+**trusted** to be of it. `validation` (a profile option, §12) says which:
+
+| `validation` | from the host, through an import | from user code, through an export |
+|---|---|---|
+| `on` (the default) | validated | validated |
+| `exports` | trusted | validated |
+| `off` | trusted | trusted |
+
+`exports` is the fast path for a host that keeps its declarations: an
+import's results skip their tests, and what user code passes to an export
+is still held to its type. The side is the binding's, not the caller's.
+An import's result is the host's even when its receiver is an object user
+code supplied, and an export's argument is user code's even when the host
+makes the call. A value a box operation reads (`tw:unbox`, `tw:arr get`)
+has no side: it's validated unless `validation = off`, and
+`tw:unboxUnchecked` is how a language trusts one (§13).
+
+A function or future type has values of its own to convert: a callback's
+arguments, a JS function's result, the value `get` reads (§16, §18). They
+take the side of the signatures that reach the type, through any depth of
+arrays, tuples, enums, boxes, futures and function types. The type is the
+host's when only imports reach it, and user code's once an export does, or
+a box operation names it (`tw:box`, `tw:unbox`, `tw:tryUnbox`,
+`tw:arr get`). So under `exports` a callback that only imports take has
+its arguments trusted, and one an export returns has them validated. The
+side is the type's, not the value's: a type that goes both ways is
+validated wherever it's used.
+
+Validated:
 
 * **Every validation failure throws `TypeError`**: a wrong `typeof`, a
   non-integer, or an out-of-range value alike.
 * There are no implicit Wasm conversions (no wrapping, no `ToInt32`), and no
   `bool` coercion.
-* A bridge option disables validation. Dispatch tests ([§7](#7-overloads-and-the-js-call-dsl),
-  [§8](#8-enums)) still run. Unchecked values are coerced, never trusted,
-  so the language still receives in-range carriers:
-  * `bool` is JS truthiness;
-  * `i8`, `u8`, `i16`, `u16` wrap into their range, and `i32`/`u32`
-    wrap as `i32` (so `u8` 300 is 44);
-  * floats are `Number(v)`, so NaN stays NaN;
-  * `i53`, `u53`, `i64` and `u64` are a bigint as given, or
-    `BigInt(Math.trunc(Number(v)))` (0 when not finite);
-  * `str` is `String(v)`, and a non-typed-array `T[]` is empty.
 * `strict-null = on` (a profile option, off by default) makes a `@js(null)
   T?` take only `null` as absence: JS → Wasm, `undefined` there is a
   `TypeError`, at any depth the bridge validates (a box position
   included). A plain `T?` still takes both, since a default-mode producer
   folds `T | null | undefined` into it (§9). Types, wire and language
   readings are unchanged.
+
+Trusted, a value converts as a valid one does, with no test of its type:
+
+* `bool` is JS truthiness, and `i8`, `u8`, `i16` and `u16` keep the low
+  bits of the value (so `u8` 300 is 44). A carrier enum is its carrier.
+* `i32`, `u32` and the floats cross as they are, and Wasm converts them
+  (`ToInt32`, `ToNumber`).
+* `i53`, `u53`, `i64` and `u64` are `BigInt(v)`.
+* A `host` `str` is the value itself. Any other `str` is encoded, so it's
+  the value if it's a string, else `String(v)`.
+* `bigint`, a class, an interface, `Any`, a symbol and a JS function are
+  the value itself.
+* `T[]` copies `length` elements of the value, `arr<T>` and a tuple read
+  its indices, and a `buffer` takes an `ArrayBuffer`, or a view's window.
+  A value with no `length` is empty.
+
+A trusted value of the wrong type is a broken contract, and what follows
+is the language's to bear: it may read a wrong value, trap, or see whatever
+the conversion throws (`BigInt(1.5)` is a `RangeError`). Two things hold
+regardless: a carrier is within its wire type, with a narrow one in its
+own range, and the language's memory and the bridge's own state stay sound,
+since no allocation takes its size from an untested value: a length is read
+as a `u32`, and one whose bytes don't fit the memory's pointer is a
+`RangeError` before anything is allocated.
+
+What the conversion itself needs runs in every setting:
+
+* Dispatch: arm tests, overload resolution and the discrimination of a
+  `throws` ([§7](#7-overloads-and-the-js-call-dsl), [§8](#8-enums), §15).
+* A handle's lookup: a value that isn't a live wrapper of its class, or of
+  a function the language provided, is a `TypeError` (§14). A `future` is
+  paired the same way (§16).
+* Absence: `T?` reads both `null` and `undefined` as none.
+* A literal type an export takes: no wire value carries it, so the
+  comparison is all there is of it (§13).
 
 Example: `setStatus(code: u16)` exported to JS.
 
@@ -1327,7 +1381,7 @@ Multiple memories are out of scope.
 |---|---|
 | `str` (`gc`, WTF-16, the default) | `(ref $str)`, `$str = (array (mut i16))` |
 | `str` (`gc`, UTF-8) | `(ref $str)`, `$str = (array (mut i8))` |
-| `str` (`host`) | `externref`, holding a validated JS string |
+| `str` (`host`) | `externref`, holding a JS string |
 | `T[]` | `(ref (array (mut T')))`: `T'` is `i8` for `i8`/`u8`, `i16` for `i16`/`u16`/`f16` (holding the `f16` bits), `i32`, `i64`, `f32` or `f64` |
 | `arr<T>` | `(ref (array (mut E)))`. For a scalar `T`, `E` is `T'` as for `T[]`, with `i8` for `bool` and `i64` for `i53`/`u53`, so `arr<u8>` and `u8[]` are both `(array (mut i8))`. Otherwise `E` is the element's wire value when there's one; a struct of the values (fields immutable) when there are several; `externref` for references. A reference `E` is always `ref null` |
 | tuple element | a precise struct: `arr<(u32, str)>` = `(array (mut (ref null (struct (field i32) (field (ref $str))))))` |
@@ -1367,7 +1421,7 @@ generator. The IR is unchanged by it.
 | linear memory | none \| `32` \| `64`; defined and exported by the language (default name `memory`) |
 | externref table | defined and exported by the language (default name `tw:table`); alloc/free hook names |
 | exception handling | `modern` (default) \| `legacy` |
-| validation | on (default) \| off |
+| validation | on (default) \| exports \| off: which values from JS are validated (§10) |
 | strict-null | off (default) \| on: a `@js(null) T?` rejects `undefined` from JS (§10) |
 | `box-none` | `null` (default) \| `unit`: an optional box's none in Wasm (§13) |
 | termination flag | off (default) \| on |
@@ -1394,7 +1448,8 @@ Without a memory there are no views, so generators skip `*T[]` members
 
 With `host` strings, the language uses JS strings natively through
 `wasm:js-string`. There `str` and `Str` share the wire type `externref`;
-`str` only adds the static guarantee that the value has been validated.
+`str` only adds the static guarantee that the value is a string, as far as
+it was validated (§10).
 
 With a `host` carrier, the value crosses as one `externref` holding the JS
 value itself, for languages whose interop can name no GC types (Kotlin/Wasm
@@ -1473,10 +1528,10 @@ profile, it is never converted, and its parameters name unboxed inner types
   * `("tw:unbox", T)`: `(externref) -> T wire`. It runs a type test and
     throws `TypeError` on mismatch, then copies into the language's carrier
     and validates. `tw:unbox T?` reads both `undefined` and `null` as none.
-  * `("tw:unboxUnchecked", T)`: the same, without the type test and
-    validation, for a language that trusts the declared type. It still
-    normalizes none, and stays memory safe, since the bridge's own
-    operations (for example, `wasm:js-string`) trap on wrong types.
+    With `validation = off` it's `tw:unboxUnchecked`.
+  * `("tw:unboxUnchecked", T)`: the same with the value trusted (§10), in
+    every setting, for a language that knows the type already. It still
+    reads both empties as none.
   * `("tw:isNullish")` and `("tw:isUndefined")`, with an empty name:
     `(externref) -> i32`, since Wasm can't compare externrefs. A `T?` box's
     presence test is `tw:isNullish`. A `T??` box's outer none is
@@ -1559,7 +1614,7 @@ profile, it is never converted, and its parameters name unboxed inner types
 | import | signature | meaning |
 |---|---|---|
 | `("tw:arr", "len")` | `(externref) -> i32` | the length, as `u32` |
-| `("tw:arr", "get<T>")` | `(externref, i32 index) -> W(T)` | one element, converted and validated as `("tw:unbox", T)`; an out-of-range index is a `TypeError` |
+| `("tw:arr", "get<T>")` | `(externref, i32 index) -> W(T)` | one element, converted as `("tw:unbox", T)` converts it; a value that isn't an array, or an out-of-range index, is a `TypeError` in every setting |
 | `("tw:arr", "get<B>")` | `(externref, i32 index) -> externref` | for a box element type `B` (`get<Str>`, `get<Arr<u8>>`), the element itself as a box, unconverted; `get<B?>` reads an empty as `ref.null` |
 
 More operations are future work.
@@ -1594,9 +1649,9 @@ In every profile, a language handle enters an erased position only as its
 JS wrapper ([§14](#14-handles)): `("tw:box", C)` makes or reuses the wrapper
 (only reuses it for a class with an imported base, §17), and
 `("tw:unbox", C)` returns the handle (a `TypeError` if the value isn't a
-live wrapper of `C`). This is symmetric with boxes. With validation on
-(§12), the bridge rejects a raw language object reaching JS from an erased
-position with a `TypeError`. The same
+live wrapper of `C`). This is symmetric with boxes. Unless
+`validation = off` (§12), the bridge rejects a raw language object
+reaching JS from an erased position with a `TypeError`. The same
 holds for a callback type `F`. `("tw:tryUnbox", C)` is `(externref) ->
 W(C?)`: the handle, or none when the value isn't a live wrapper of `C`,
 without an exception. It takes only a class with handles or a function
@@ -2234,7 +2289,8 @@ into the language only where it's read.
   it exactly as an import with `throws E` lowers its result (§15): a value
   that isn't a `T` is a `TypeError`, thrown to `E`'s tag, or left for
   `("tw:err", E)` under `throws = js`. So state 1 says the promise
-  fulfilled, not that its value is a `T`.
+  fulfilled, not that its value is a `T`. Whether it's validated at all is
+  the future type's side (§10).
 * `E` is the future's rejection enum, and `get<T>` is `get<T, err>`, as
   `future<T>` is `future<T, err>`. In a name the two are written with no
   space (`get<Response,FetchError>`).
@@ -2467,6 +2523,8 @@ Function types are first class and structural: `fn(Event)`,
   language → JS; an import result or an export parameter is JS → language.
 * The trampoline converts its arguments outgoing to the language (incoming
   from JS) and its result back to JS. The call import does the reverse.
+  What comes from JS, the trampoline's arguments and the call import's
+  result, is validated by the function type's side (§10).
 * `throws E` on a function type follows the import rules for the call import
   and the entry-point rules for the trampoline: **an error escaping a
   language callback into JS is mapped at the trampoline exactly as at entry
@@ -2538,7 +2596,7 @@ Notation in the tables:
 | `tw:call` | `F` | `(externref fn, W(args)…) -> W(R)` | call a JS function |
 | `tw:box` | `T` | `(W(T)) -> externref` | §13 |
 | `tw:unbox` | `T` | `(externref) -> W(T)` | checked |
-| `tw:unboxUnchecked` | `T` | `(externref) -> W(T)` | unchecked |
+| `tw:unboxUnchecked` | `T` | `(externref) -> W(T)` | trusted (§10) |
 | `tw:tryUnbox` | `C` or `F` | `(externref) -> W(C?)` | the handle or none (§13) |
 | `tw:new` | constructor key | `(W(args)) -> externref` | constructs an exported class with an imported base through JS (§17) |
 | `tw:arr` | `len` | `(externref) -> i32` | §13 |

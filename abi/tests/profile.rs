@@ -11,7 +11,7 @@ fn defaults_are_all_linear() {
     assert_eq!(p.handles, Carrier::Linear);
     assert_eq!(p.memory, Some(MemoryWidth::M32));
     assert_eq!(p.eh, Eh::Modern);
-    assert!(p.validation);
+    assert_eq!(p.validation, Validation::On);
     assert!(!p.termination_flag);
     assert!(p.finalizers);
     assert!(p.renames.is_empty());
@@ -57,11 +57,16 @@ fn settings_override_the_preset() {
     assert_eq!(p.handles, Carrier::Linear);
     assert_eq!(p.vec, Carrier::Gc);
     assert_eq!(p.eh, Eh::Legacy);
-    assert!(!p.validation && p.termination_flag && !p.finalizers);
+    assert_eq!(p.validation, Validation::Off);
+    assert!(p.termination_flag && !p.finalizers);
     assert_eq!(p.name("tw:terminated"), "__instance_terminated");
     assert!(!p.jspi);
     let p = Profile::parse("all-linear, jspi = on").unwrap();
     assert!(p.jspi);
+    let p = Profile::parse("all-linear, validation = exports").unwrap();
+    assert_eq!(p.validation, Validation::Exports);
+    assert_eq!(Profile::parse(&p.to_string()).unwrap(), p);
+    assert!(p.to_string().contains("validation = exports\n"));
     assert_eq!(Profile::parse(&p.to_string()).unwrap(), p);
 }
 

@@ -7,7 +7,7 @@
 //! language's, §11), lifts and frees the result, and maps a language tag
 //! escaping into JS (§15).
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt::Write;
 use std::rc::Rc;
 
@@ -19,7 +19,7 @@ use ts_gen_abi::protocol;
 use ts_gen_abi::resolve::{Context, Location, Target, TypeDecl};
 
 use crate::form::Space;
-use crate::js::{is_ident, js_str, lit, lowers_alloc, prop, Body, Glue};
+use crate::js::{is_ident, js_str, lit, lowers_alloc, prop, Body, Glue, Mode, Side};
 use crate::plan;
 use crate::{unsupported, Error, Result};
 
@@ -76,6 +76,7 @@ impl<'a, 'b> Glue<'a, 'b> {
         sig: &Signature,
         args: &[Arg],
         on_raw: Option<&str>,
+        m: Mode,
     ) -> Result<bool> {
         let idx = self.entry(key, sig);
         // A raw argument passes through, so only lowered arguments and
@@ -109,7 +110,6 @@ impl<'a, 'b> Glue<'a, 'b> {
                 Arg::Raw(e) => wire.push(e.clone()),
                 Arg::Js(v) => {
                     let v = b.bind(v.clone());
-                    let m = self.mode();
                     wire.extend(self.lower(b, &p.repr, &v, m)?);
                 }
             }
@@ -479,6 +479,103 @@ impl<'a, 'b> Glue<'a, 'b> {
         }
     }
 
+    /// A future type as its `get` names it: the option of its value, and
+    /// its error.
+    pub(crate) fn future_key(option: &str, error: &str) -> String {
+        format!("{option} {error}")
+    }
+
+    /// Sorts the function and future types by the signatures that reach
+    /// them (§10): an import's, or an export's and a box operation's. A
+    /// box may hold user code's value, and a function the language boxes
+    /// may be called by it.
+    pub(crate) fn sides(&mut self, plan: &plan::Plan<'a>) {
+        let (mut host, mut user) = (HashSet::new(), HashSet::new());
+        let (mut hs, mut us) = (HashSet::new(), HashSet::new());
+        for func in &plan.funcs {
+            match &func.op {
+                plan::Op::Member(_) => self.reach_sig(&func.sig, &mut host, &mut hs),
+                plan::Op::Box(r) | plan::Op::ArrGet(r) | plan::Op::TryUnbox(r) => {
+                    self.reach(r, &mut user, &mut us)
+                }
+                plan::Op::Unbox { repr, .. } => self.reach(repr, &mut user, &mut us),
+                _ => {}
+            }
+        }
+        // A signature that doesn't lay out is reported by its export.
+        for k in self.l.keys.members() {
+            if k.role != Role::Export {
+                continue;
+            }
+            for v in self.mono_variants(&k).unwrap_or_default() {
+                let targs = self.mono_targs.get(&v.key).cloned().unwrap_or_default();
+                if let Ok(sig) = self.l.member(&v, &targs) {
+                    self.reach_sig(&sig, &mut user, &mut us);
+                }
+            }
+        }
+        self.host_types = host;
+        self.user_types = user;
+    }
+
+    fn reach_sig(&self, sig: &Signature, out: &mut HashSet<String>, seen: &mut HashSet<String>) {
+        for p in sig.params.iter().chain(&sig.results) {
+            self.reach(&p.repr, out, seen);
+        }
+        if let Some(e) = &sig.throws {
+            self.reach_enum(e, out, seen);
+        }
+    }
+
+    /// Adds `r`, and the types its values carry in either direction.
+    fn reach(&self, r: &Repr, out: &mut HashSet<String>, seen: &mut HashSet<String>) {
+        let r = &self.l.rec(r).unwrap_or_else(|_| r.clone());
+        if !seen.insert(r.ty.clone()) {
+            return;
+        }
+        match &r.kind {
+            Kind::Fn { sig, .. } => {
+                out.insert(Self::fn_name(r));
+                for p in &sig.params {
+                    self.reach(p, out, seen);
+                }
+                self.reach(&sig.result, out, seen);
+                if let Some(e) = &sig.throws {
+                    self.reach_enum(e, out, seen);
+                }
+            }
+            Kind::Array { elem, .. } => self.reach(elem, out, seen),
+            Kind::Tuple { elems, .. } => {
+                for e in elems {
+                    self.reach(e, out, seen);
+                }
+            }
+            Kind::Enum { layout, .. } => self.reach_enum(layout, out, seen),
+            Kind::Host {
+                of: Host::Box(inner),
+                ..
+            } => self.reach(inner, out, seen),
+            Kind::Host {
+                of: Host::Future { value, error },
+                ..
+            } => {
+                out.insert(Self::future_key(&format!("({})?", value.ty), &error.path));
+                self.reach(value, out, seen);
+                self.reach_enum(error, out, seen);
+            }
+            _ => {}
+        }
+    }
+
+    fn reach_enum(&self, e: &EnumLayout, out: &mut HashSet<String>, seen: &mut HashSet<String>) {
+        if !seen.insert(format!("enum {}", e.path)) {
+            return;
+        }
+        for p in e.arms.iter().flat_map(|a| &a.payload) {
+            self.reach(p, out, seen);
+        }
+    }
+
     /// The helper making (or reusing) the JS function that wraps a handle
     /// of a function type the language provides; calls go through its
     /// trampoline `tw:call:F` (§18).
@@ -553,7 +650,8 @@ impl<'a, 'b> Glue<'a, 'b> {
             b.line(format!(
                 "const env = f[$flagged] === undefined ? h : {reg}.call(f);"
             ));
-            g.entry_call(&mut b, &export, &sig, &args, None)?;
+            let m = g.mode(g.type_side(&f));
+            g.entry_call(&mut b, &export, &sig, &args, None, m)?;
             if fold {
                 b.close("} catch (e) {");
                 b.depth += 1;
@@ -864,7 +962,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 }
                 let args = entry_args(sig, k.member, binds, None);
                 let on_raw = format!("{reg2}.pair(this, {{r}}, {drop});");
-                g.entry_call(b, &k.key, sig, &args, Some(&on_raw))
+                g.entry_call(b, &k.key, sig, &args, Some(&on_raw), g.mode(Side::User))
             })?;
         }
         let _ = writeln!(s, "{}", class_member(b.finish("  constructor(...a)")));
@@ -916,7 +1014,7 @@ impl<'a, 'b> Glue<'a, 'b> {
                 let handle = (!k.member.is_static)
                     .then(|| format!("{reg2}.unwrap(this, {var2}, {})", js_str(&cname2)));
                 let args = entry_args(sig, k.member, binds, handle);
-                g.entry_call(b, &k.key, sig, &args, None)
+                g.entry_call(b, &k.key, sig, &args, None, g.mode(Side::User))
             })?;
             let _ = writeln!(s, "{}", class_member(b.finish(&head)));
         }
@@ -948,7 +1046,7 @@ impl<'a, 'b> Glue<'a, 'b> {
         };
         self.dispatch(&mut b, js, arms, false, &mut |g, b, k, sig, binds| {
             let args = entry_args(sig, k.member, binds, None);
-            g.entry_call(b, &k.key, sig, &args, None)
+            g.entry_call(b, &k.key, sig, &args, None, g.mode(Side::User))
         })?;
         Ok(b.finish(&head))
     }

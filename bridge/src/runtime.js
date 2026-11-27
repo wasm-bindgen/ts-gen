@@ -94,18 +94,8 @@ function $u64(v) {
   $fail("u64", v);
 }
 
-// Unvalidated conversions stay memory safe: they only ever produce a
-// value of the wire type.
-function $uint(v) {
-  return Number(v) || 0;
-}
-
-function $ubig(v) {
-  if (typeof v === "bigint") return v;
-  const n = Math.trunc(Number(v));
-  return Number.isFinite(n) ? BigInt(n) : 0n;
-}
-
+// A trusted string that's encoded (IR.md §10): its length sizes the
+// allocation, so it's made a string first.
 function $ustr(v) {
   return typeof v === "string" ? v : String(v);
 }
@@ -249,6 +239,8 @@ class $Lang extends $Space {
   }
 
   realloc(old, oldSize, align, size) {
+    // A size past the pointer's range would wrap to a small allocation.
+    if (!this.wide && size > 0xffffffff) throw new RangeError("allocation too large");
     const p = this.realloc_(this.p(old), this.p(oldSize), this.p(align), this.p(size));
     return Number(p);
   }
@@ -790,7 +782,8 @@ function $liftWtf16(s, p, len) {
 // a clone when its source shares the memory.
 function $lowerVec(s, v, C, cx) {
   const size = C.BYTES_PER_ELEMENT;
-  const n = v.length;
+  // A trusted value may have no length (IR.md §10): it copies as empty.
+  const n = v.length >>> 0;
   if (n === 0) return [size, 0];
   const p = s.alloc(n * size, size, cx);
   new C(s.u8().buffer, p, n).set(v);
