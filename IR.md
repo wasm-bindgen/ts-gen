@@ -1080,10 +1080,20 @@ niches are in [§8](#8-enums).
 A value from JS is either **validated**, tested against its type, or
 **trusted** to be of it. `validation` (a profile option, §12) says which:
 
-| `validation` | a value from JS |
-|---|---|
-| `on` (the default) | validated |
-| `off` | trusted |
+| `validation` | from the host, through an import | from user code, through an export |
+|---|---|---|
+| `on` (the default) | validated | validated |
+| `exports` | trusted | validated |
+| `off` | trusted | trusted |
+
+`exports` is the fast path for a host that keeps its declarations: an
+import's results skip their tests, and what user code passes to an export
+is still held to its type. The side is the binding's, not the caller's.
+An import's result is the host's even when its receiver is an object user
+code supplied, and an export's argument is user code's even when the host
+makes the call. A value a box operation reads (`tw:unbox`, `tw:arr get`)
+has no side: it's validated unless `validation = off`, and
+`tw:unboxUnchecked` is how a language trusts one (§13).
 
 Validated:
 
@@ -1399,7 +1409,7 @@ generator. The IR is unchanged by it.
 | linear memory | none \| `32` \| `64`; defined and exported by the language (default name `memory`) |
 | externref table | defined and exported by the language (default name `tw:table`); alloc/free hook names |
 | exception handling | `modern` (default) \| `legacy` |
-| validation | on (default) \| off |
+| validation | on (default) \| exports \| off: which values from JS are validated (§10) |
 | strict-null | off (default) \| on: a `@js(null) T?` rejects `undefined` from JS (§10) |
 | `box-none` | `null` (default) \| `unit`: an optional box's none in Wasm (§13) |
 | termination flag | off (default) \| on |
@@ -1627,9 +1637,9 @@ In every profile, a language handle enters an erased position only as its
 JS wrapper ([§14](#14-handles)): `("tw:box", C)` makes or reuses the wrapper
 (only reuses it for a class with an imported base, §17), and
 `("tw:unbox", C)` returns the handle (a `TypeError` if the value isn't a
-live wrapper of `C`). This is symmetric with boxes. With validation on
-(§12), the bridge rejects a raw language object reaching JS from an erased
-position with a `TypeError`. The same
+live wrapper of `C`). This is symmetric with boxes. Unless
+`validation = off` (§12), the bridge rejects a raw language object
+reaching JS from an erased position with a `TypeError`. The same
 holds for a callback type `F`. `("tw:tryUnbox", C)` is `(externref) ->
 W(C?)`: the handle, or none when the value isn't a live wrapper of `C`,
 without an exception. It takes only a class with handles or a function

@@ -334,11 +334,17 @@ impl<'a, 'b> Glue<'a, 'b> {
         }
     }
 
+    /// How a value from `side` lowers: `exports` trusts the host's (§10).
     pub(crate) fn mode(&self, side: Side) -> Mode {
+        let host = side == Side::Host;
         Mode {
-            checked: self.validation != Validation::Off,
+            checked: match self.validation {
+                Validation::On => true,
+                Validation::Exports => !host,
+                Validation::Off => false,
+            },
             unbox: false,
-            host: side == Side::Host,
+            host,
         }
     }
 
